@@ -1,155 +1,47 @@
-// import React, { useState, useEffect } from 'react';
-// import HomePage from './components/HomePage';
-// import Login from './components/Login';
-// import Signup from './components/Signup';
-// import UserDashboard from './components/UserDashboard';
-// import VendorDashboard from './components/VendorDashboard';
-// import DoctorDashboard from './components/DoctorDashboard';
-// import DeliveryDashboard from './components/DeliveryDashboard';
-
-// function App() {
-//   const [currentPage, setCurrentPage] = useState('home');
-//   const [authMode, setAuthMode] = useState('login');
-//   const [currentUser, setCurrentUser] = useState(null);
-
-//   useEffect(() => {
-//     // Check if user is already logged in
-//     const user = localStorage.getItem('currentUser');
-//     if (user) {
-//       const userData = JSON.parse(user);
-//       setCurrentUser(userData);
-//       setCurrentPage(
-//         userData.userType === 'vendor' ? 'vendorDashboard' : 
-//         userData.userType === 'doctor' ? 'doctorDashboard' :
-//         userData.userType === 'delivery' ? 'deliveryDashboard' : 'dashboard'
-//       );
-//     }
-//   }, []);
-
-//   const handleLoginSuccess = (user) => {
-//     setCurrentUser(user);
-//     setCurrentPage(
-//       user.userType === 'vendor' ? 'vendorDashboard' : 
-//       user.userType === 'doctor' ? 'doctorDashboard' :
-//       user.userType === 'delivery' ? 'deliveryDashboard' : 'dashboard'
-//     );
-//   };
-
-//   const handleLogout = () => {
-//     localStorage.removeItem('currentUser');
-//     setCurrentUser(null);
-//     setCurrentPage('home');
-//   };
-
-//   const renderPage = () => {
-//     switch (currentPage) {
-//       case 'home':
-//         return (
-//           <HomePage 
-//             onNavigateToAuth={() => {
-//               setCurrentPage('auth');
-//               setAuthMode('login');
-//             }}
-//           />
-//         );
-//       case 'auth':
-//         if (authMode === 'login') {
-//           return (
-//             <Login 
-//               onSwitchToSignup={() => setAuthMode('signup')}
-//               onLoginSuccess={handleLoginSuccess}
-//             />
-//           );
-//         } else {
-//           return (
-//             <Signup 
-//               onSwitchToLogin={() => setAuthMode('login')}
-//               onSignupSuccess={() => setAuthMode('login')}
-//             />
-//           );
-//         }
-//       case 'dashboard':
-//         return (
-//           <UserDashboard 
-//             user={currentUser}
-//             onLogout={handleLogout}
-//           />
-//         );
-//       case 'vendorDashboard':
-//         return (
-//           <VendorDashboard 
-//             user={currentUser}
-//             onLogout={handleLogout}
-//           />
-//         );
-//       case 'doctorDashboard':
-//         return (
-//           <DoctorDashboard 
-//             user={currentUser}
-//             onLogout={handleLogout}
-//           />
-//         );
-//       case 'deliveryDashboard':
-//         return (
-//           <DeliveryDashboard 
-//             user={currentUser}
-//             onLogout={handleLogout}
-//           />
-//         );
-//       default:
-//         return <HomePage onNavigateToAuth={() => setCurrentPage('auth')} />;
-//     }
-//   };
-
-//   return (
-//     <div className="App">
-//       {renderPage()}
-//     </div>
-//   );
-// }
-
-// export default App;
-
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import HomePage from './components/HomePage';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import UserDashboard from './components/UserDashboard';
-import VendorDashboard from './components/VendorDashboard';
-import DoctorDashboard from './components/DoctorDashboard';
-import DeliveryDashboard from './components/DeliveryDashboard';
+import UserDashboard from './components/user/UserDashboard';
+import VendorDashboard from './components/vendor/VendorDashboard';
+import DoctorDashboard from './components/doctor/DoctorDashboard';
+import DeliveryDashboard from './components/delivery/DeliveryDashboard';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
+import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [authMode, setAuthMode] = useState('login');
   const [currentUser, setCurrentUser] = useState(null);
 
+  // User type to dashboard mapping
+  const userTypeToPageMap = {
+    vendor: 'vendorDashboard',
+    doctor: 'doctorDashboard',
+    delivery: 'deliveryDashboard',
+    admin: 'adminDashboard'
+  };
+
   useEffect(() => {
     // Check if user is already logged in
     const user = localStorage.getItem('currentUser');
     if (user) {
-      const userData = JSON.parse(user);
-      setCurrentUser(userData);
-      setCurrentPage(
-        userData.userType === 'vendor' ? 'vendorDashboard' : 
-        userData.userType === 'doctor' ? 'doctorDashboard' :
-        userData.userType === 'delivery' ? 'deliveryDashboard' :
-        userData.userType === 'admin' ? 'adminDashboard' : 'dashboard'
-      );
+      try {
+        const userData = JSON.parse(user);
+        setCurrentUser(userData);
+        setCurrentPage(userTypeToPageMap[userData.userType] || 'dashboard');
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+        localStorage.removeItem('currentUser');
+      }
     }
   }, []);
 
   const handleLoginSuccess = (user) => {
     setCurrentUser(user);
-    setCurrentPage(
-      user.userType === 'vendor' ? 'vendorDashboard' : 
-      user.userType === 'doctor' ? 'doctorDashboard' :
-      user.userType === 'delivery' ? 'deliveryDashboard' :
-      user.userType === 'admin' ? 'adminDashboard' : 'dashboard'
-    );
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    setCurrentPage(userTypeToPageMap[user.userType] || 'dashboard');
   };
 
   const handleLogout = () => {
@@ -158,42 +50,63 @@ function App() {
     setCurrentPage('home');
   };
 
+  const navigateToAuth = () => {
+    setCurrentPage('auth');
+    setAuthMode('login');
+  };
+
+  const navigateToAdmin = () => {
+    setCurrentPage('adminAuth');
+    setAuthMode('login');
+  };
+
+  const switchToSignup = () => setAuthMode('signup');
+  const switchToLogin = () => setAuthMode('login');
+  
+  const handleSignupSuccess = () => {
+    setAuthMode('login');
+    setCurrentPage('auth');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+  };
+
+  const renderAuthPage = () => {
+    if (authMode === 'login') {
+      return (
+        <Login 
+          onSwitchToSignup={switchToSignup}
+          onLoginSuccess={handleLoginSuccess}
+          onBack={handleBackToHome}
+        />
+      );
+    }
+    return (
+      <Signup 
+        onSwitchToLogin={switchToLogin}
+        onSignupSuccess={handleSignupSuccess}
+        onBack={handleBackToHome}
+      />
+    );
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
         return (
           <HomePage 
-            onNavigateToAuth={() => {
-              setCurrentPage('auth');
-              setAuthMode('login');
-            }}
-            onNavigateToAdmin={() => {
-              setCurrentPage('adminAuth');
-              setAuthMode('login');
-            }}
+            onNavigateToAuth={navigateToAuth}
+            onNavigateToAdmin={navigateToAdmin}
           />
         );
       case 'auth':
-        if (authMode === 'login') {
-          return (
-            <Login 
-              onSwitchToSignup={() => setAuthMode('signup')}
-              onLoginSuccess={handleLoginSuccess}
-            />
-          );
-        } else {
-          return (
-            <Signup 
-              onSwitchToLogin={() => setAuthMode('login')}
-              onSignupSuccess={() => setAuthMode('login')}
-            />
-          );
-        }
+        return renderAuthPage();
       case 'adminAuth':
         return (
           <AdminLogin 
             onLoginSuccess={handleLoginSuccess}
-            onSwitchToSignup={() => setAuthMode('signup')}
+            onBack={handleBackToHome}
           />
         );
       case 'dashboard':
@@ -232,7 +145,12 @@ function App() {
           />
         );
       default:
-        return <HomePage onNavigateToAuth={() => setCurrentPage('auth')} />;
+        return (
+          <HomePage 
+            onNavigateToAuth={navigateToAuth}
+            onNavigateToAdmin={navigateToAdmin}
+          />
+        );
     }
   };
 

@@ -5,31 +5,41 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
   const [reviewForm, setReviewForm] = useState({
     name: '',
     email: '',
-    rating: 5,
+    rating: 0, // Changed from 5 to 0 - no stars selected initially
     comment: ''
   });
   const [reviewErrors, setReviewErrors] = useState({});
+  const [touchedFields, setTouchedFields] = useState({});
 
   // Review form validation
   const validateReviewForm = () => {
     const errors = {};
     const nameRegex = /^[A-Za-z\s]+$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Improved email regex - more strict validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!reviewForm.name.trim()) {
       errors.name = 'Name is required';
     } else if (!nameRegex.test(reviewForm.name)) {
       errors.name = 'Name should contain only letters and spaces';
+    } else if (reviewForm.name.trim().length < 2) {
+      errors.name = 'Name should be at least 2 characters long';
     }
 
     if (!reviewForm.email.trim()) {
       errors.email = 'Email is required';
     } else if (!emailRegex.test(reviewForm.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = 'Please enter a valid email address (e.g., example@domain.com)';
+    }
+
+    if (reviewForm.rating === 0) {
+      errors.rating = 'Please select a rating';
     }
 
     if (!reviewForm.comment.trim()) {
       errors.comment = 'Review comment is required';
+    } else if (reviewForm.comment.length < 10) {
+      errors.comment = 'Review should be at least 10 characters long';
     } else if (reviewForm.comment.length > 500) {
       errors.comment = 'Review should not exceed 500 characters';
     }
@@ -37,20 +47,76 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
     return errors;
   };
 
+  // Validate individual field
+  const validateField = (field, value) => {
+    const nameRegex = /^[A-Za-z\s]*$/; // Allow empty during typing
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    switch (field) {
+      case 'name':
+        if (!value.trim()) {
+          return 'Name is required';
+        } else if (!nameRegex.test(value)) {
+          return 'Name should contain only letters and spaces';
+        } else if (value.trim().length < 2) {
+          return 'Name should be at least 2 characters long';
+        }
+        return '';
+      
+      case 'email':
+        if (!value.trim()) {
+          return 'Email is required';
+        } else if (!emailRegex.test(value)) {
+          return 'Please enter a valid email address (e.g., example@domain.com)';
+        }
+        return '';
+      
+      case 'rating':
+        if (value === 0) {
+          return 'Please select a rating';
+        }
+        return '';
+      
+      case 'comment':
+        if (!value.trim()) {
+          return 'Review comment is required';
+        } else if (value.length < 10) {
+          return 'Review should be at least 10 characters long';
+        } else if (value.length > 500) {
+          return 'Review should not exceed 500 characters';
+        }
+        return '';
+      
+      default:
+        return '';
+    }
+  };
+
   const handleReviewSubmit = (e) => {
     e.preventDefault();
+    
+    // Mark all fields as touched
+    setTouchedFields({
+      name: true,
+      email: true,
+      rating: true,
+      comment: true
+    });
+    
     const errors = validateReviewForm();
     
     if (Object.keys(errors).length === 0) {
       // Create new review with pending status
       const newReview = {
         id: Date.now(),
-        name: reviewForm.name,
-        email: reviewForm.email,
+        name: reviewForm.name.trim(),
+        email: reviewForm.email.trim(),
         rating: reviewForm.rating,
-        comment: reviewForm.comment,
+        comment: reviewForm.comment.trim(),
         date: new Date().toISOString().split('T')[0],
-        avatar: reviewForm.name.includes(' ') ? reviewForm.name.split(' ')[0][0] + reviewForm.name.split(' ')[1][0] : reviewForm.name[0],
+        avatar: reviewForm.name.includes(' ') ? 
+          reviewForm.name.split(' ')[0][0] + reviewForm.name.split(' ')[1][0] : 
+          reviewForm.name[0],
         status: 'pending'
       };
 
@@ -72,10 +138,11 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
       setReviewForm({
         name: '',
         email: '',
-        rating: 5,
+        rating: 0, // Reset to 0 stars
         comment: ''
       });
       setReviewErrors({});
+      setTouchedFields({});
       setShowReviewModal(false);
     } else {
       setReviewErrors(errors);
@@ -83,18 +150,76 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
   };
 
   const handleInputChange = (field, value) => {
-    setReviewForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (reviewErrors[field]) {
-      setReviewErrors(prev => ({
+    // For name field, only allow letters and spaces
+    if (field === 'name') {
+      const lettersOnly = value.replace(/[^A-Za-z\s]/g, '');
+      setReviewForm(prev => ({
         ...prev,
-        [field]: ''
+        [field]: lettersOnly
+      }));
+    } else {
+      setReviewForm(prev => ({
+        ...prev,
+        [field]: value
       }));
     }
+    
+    // Mark field as touched
+    setTouchedFields(prev => ({
+      ...prev,
+      [field]: true
+    }));
+    
+    // Validate field in real-time if it's been touched before
+    if (touchedFields[field]) {
+      const error = validateField(field, field === 'name' ? value.replace(/[^A-Za-z\s]/g, '') : value);
+      setReviewErrors(prev => ({
+        ...prev,
+        [field]: error
+      }));
+    }
+  };
+
+  const handleFieldBlur = (field, value) => {
+    setTouchedFields(prev => ({
+      ...prev,
+      [field]: true
+    }));
+    
+    const error = validateField(field, value);
+    setReviewErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
+  // Handle star rating selection
+  const handleStarClick = (star) => {
+    setReviewForm(prev => ({
+      ...prev,
+      rating: star
+    }));
+    
+    // Mark rating as touched and validate
+    setTouchedFields(prev => ({
+      ...prev,
+      rating: true
+    }));
+    
+    const error = validateField('rating', star);
+    setReviewErrors(prev => ({
+      ...prev,
+      rating: error
+    }));
+  };
+
+  // Function to render star display
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <span key={index}>
+        {index < rating ? '⭐' : '☆'}
+      </span>
+    ));
   };
 
   if (!showReviewModal) return null;
@@ -109,6 +234,7 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
             onClick={() => {
               setShowReviewModal(false);
               setReviewErrors({});
+              setTouchedFields({});
             }}
           >
             ×
@@ -117,28 +243,31 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
         
         <form onSubmit={handleReviewSubmit} style={styles.reviewForm}>
           <div style={styles.formGroup}>
-            <label style={styles.formLabel}>Your Name</label>
+            <label style={styles.formLabel}>Your Name *</label>
             <input
               type="text"
               value={reviewForm.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              placeholder="Enter your full name"
+              onBlur={(e) => handleFieldBlur('name', e.target.value)}
+              placeholder="Enter your full name (letters only)"
               style={{
                 ...styles.formInput,
                 ...(reviewErrors.name && styles.formInputError)
               }}
               required
+              maxLength={50}
             />
             {reviewErrors.name && <span style={styles.errorText}>{reviewErrors.name}</span>}
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.formLabel}>Your Email</label>
+            <label style={styles.formLabel}>Your Email *</label>
             <input
               type="email"
               value={reviewForm.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              placeholder="Enter your email"
+              onBlur={(e) => handleFieldBlur('email', e.target.value)}
+              placeholder="Enter your email (e.g., name@example.com)"
               style={{
                 ...styles.formInput,
                 ...(reviewErrors.email && styles.formInputError)
@@ -149,7 +278,7 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.formLabel}>Rating</label>
+            <label style={styles.formLabel}>Rating *</label>
             <div style={styles.ratingSelection}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -159,23 +288,29 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
                     ...styles.starButton,
                     ...(reviewForm.rating >= star ? styles.starButtonActive : {})
                   }}
-                  onClick={() => handleInputChange('rating', star)}
+                  onClick={() => handleStarClick(star)}
                 >
                   {star <= reviewForm.rating ? '⭐' : '☆'}
                 </button>
               ))}
             </div>
             <div style={styles.ratingText}>
-              {reviewForm.rating} {reviewForm.rating === 1 ? 'star' : 'stars'} selected
+              {reviewForm.rating > 0 ? (
+                <span>{reviewForm.rating} {reviewForm.rating === 1 ? 'star' : 'stars'} selected</span>
+              ) : (
+                <span style={styles.noRatingText}>No rating selected</span>
+              )}
             </div>
+            {reviewErrors.rating && <span style={styles.errorText}>{reviewErrors.rating}</span>}
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.formLabel}>Your Review</label>
+            <label style={styles.formLabel}>Your Review *</label>
             <textarea
               value={reviewForm.comment}
               onChange={(e) => handleInputChange('comment', e.target.value)}
-              placeholder="Share your experience with QuickMed..."
+              onBlur={(e) => handleFieldBlur('comment', e.target.value)}
+              placeholder="Share your experience with QuickMed (minimum 10 characters)..."
               rows="5"
               style={{
                 ...styles.formTextarea,
@@ -187,19 +322,26 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
             {reviewErrors.comment && <span style={styles.errorText}>{reviewErrors.comment}</span>}
             <div style={styles.charCount}>
               {reviewForm.comment.length}/500 characters
+              {reviewForm.comment.length < 10 && reviewForm.comment.length > 0 && (
+                <span style={styles.warningText}> - Minimum 10 characters required</span>
+              )}
             </div>
           </div>
 
           <div style={styles.reviewNote}>
             <p style={styles.noteText}>
-              <strong>Note:</strong> Your review will be submitted for approval and will be visible to our admin team. 
+              <strong>Note:</strong> Fields marked with * are required. Your review will be submitted for approval and will be visible to our admin team. 
               Once approved, it will appear on our website.
             </p>
           </div>
 
           <button 
             type="submit" 
-            style={styles.submitReviewButton}
+            style={{
+              ...styles.submitReviewButton,
+              ...(Object.keys(validateReviewForm()).length > 0 && styles.submitButtonDisabled)
+            }}
+            disabled={Object.keys(validateReviewForm()).length > 0}
           >
             Submit Review
           </button>
@@ -285,8 +427,8 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin }) => {
 
   // Predefined admin credentials
   const ADMIN_CREDENTIALS = {
-    email: 'yerrajagan29@gmail.com',
-    password: 'Jagan@123'
+    email: 'poornima@gmail.com',
+    password: 'Poori@123'
   };
 
   // Updated services data
@@ -404,7 +546,7 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin }) => {
   const validateContactForm = () => {
     const errors = {};
     const nameRegex = /^[A-Za-z\s]+$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!contactForm.name.trim()) {
       errors.name = 'Name is required';
@@ -1199,12 +1341,6 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin }) => {
           <div style={styles.footerSection}>
             <h3 style={styles.footerTitle}>QUICKMED</h3>
             <p style={styles.footerText}>Delivering healthcare to your doorstep with speed and care.</p>
-            <div style={styles.socialLinks}>
-              <span style={styles.socialIcon}>📘</span>
-              <span style={styles.socialIcon}>📷</span>
-              <span style={styles.socialIcon}>🐦</span>
-              <span style={styles.socialIcon}>💼</span>
-            </div>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerSubtitle}>Quick Links</h4>
@@ -1248,9 +1384,8 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin }) => {
   );
 };
 
-// ... (Keep all the same styles object from previous code)
+// Styles object (same as before with minor additions)
 const styles = {
-  // ... (All the same styles as in the previous code)
   homepage: {
     minHeight: '100vh',
     display: 'flex',
@@ -1268,9 +1403,6 @@ const styles = {
     top: 0,
     zIndex: 1000,
   },
-  // ... (Include all other styles exactly as they were in the previous code)
-  // Make sure to include all the styles for modalOverlay, reviewModalContent, formInput, formTextarea, etc.
-
   logo: {
     flex: 1,
   },
@@ -1445,6 +1577,11 @@ const styles = {
     color: '#7C2A62',
     fontWeight: 'bold',
     fontSize: '1rem',
+    marginBottom: '0.5rem',
+  },
+  noRatingText: {
+    color: '#666',
+    fontStyle: 'italic',
   },
   reviewNote: {
     backgroundColor: '#F7D9EB',
@@ -1470,6 +1607,11 @@ const styles = {
     fontWeight: 'bold',
     transition: 'all 0.3s ease',
     marginTop: '1rem',
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#cccccc',
+    cursor: 'not-allowed',
+    opacity: 0.6,
   },
   adminForm: {
     display: 'flex',
@@ -1518,6 +1660,10 @@ const styles = {
     color: '#666',
     textAlign: 'right',
     marginTop: '0.3rem',
+  },
+  warningText: {
+    color: '#ff9800',
+    fontSize: '0.7rem',
   },
   adminLoginButton: {
     padding: '12px 2rem',
