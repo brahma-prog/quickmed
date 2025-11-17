@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useEffect } from 'react';
 
 // Separate ReviewModal component to prevent re-renders
@@ -7,7 +5,7 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
   const [reviewForm, setReviewForm] = useState({
     name: '',
     email: '',
-    rating: 0, // Changed from 5 to 0 - no stars selected initially
+    rating: 0,
     comment: ''
   });
   const [reviewErrors, setReviewErrors] = useState({});
@@ -17,7 +15,6 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
   const validateReviewForm = () => {
     const errors = {};
     const nameRegex = /^[A-Za-z\s]+$/;
-    // Improved email regex - more strict validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!reviewForm.name.trim()) {
@@ -51,7 +48,7 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
 
   // Validate individual field
   const validateField = (field, value) => {
-    const nameRegex = /^[A-Za-z\s]*$/; // Allow empty during typing
+    const nameRegex = /^[A-Za-z\s]*$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     switch (field) {
@@ -140,7 +137,7 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
       setReviewForm({
         name: '',
         email: '',
-        rating: 0, // Reset to 0 stars
+        rating: 0,
         comment: ''
       });
       setReviewErrors({});
@@ -152,7 +149,6 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
   };
 
   const handleInputChange = (field, value) => {
-    // For name field, only allow letters and spaces
     if (field === 'name') {
       const lettersOnly = value.replace(/[^A-Za-z\s]/g, '');
       setReviewForm(prev => ({
@@ -166,13 +162,11 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
       }));
     }
     
-    // Mark field as touched
     setTouchedFields(prev => ({
       ...prev,
       [field]: true
     }));
     
-    // Validate field in real-time if it's been touched before
     if (touchedFields[field]) {
       const error = validateField(field, field === 'name' ? value.replace(/[^A-Za-z\s]/g, '') : value);
       setReviewErrors(prev => ({
@@ -202,7 +196,6 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
       rating: star
     }));
     
-    // Mark rating as touched and validate
     setTouchedFields(prev => ({
       ...prev,
       rating: true
@@ -213,15 +206,6 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
       ...prev,
       rating: error
     }));
-  };
-
-  // Function to render star display
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <span key={index}>
-        {index < rating ? '⭐' : '☆'}
-      </span>
-    ));
   };
 
   if (!showReviewModal) return null;
@@ -353,6 +337,143 @@ const ReviewModal = ({ showReviewModal, setShowReviewModal, setPendingReviews })
   );
 };
 
+// Service Details Modal Component
+const ServiceDetailsModal = ({ showServiceModal, setShowServiceModal, selectedService, onNavigateToAuth }) => {
+  const handleBookService = () => {
+    alert('Please login first to book this service.');
+    setShowServiceModal(false);
+    onNavigateToAuth();
+  };
+
+  if (!showServiceModal || !selectedService) return null;
+
+  const serviceDetails = {
+    'Medicine Delivery': {
+      description: 'Get your prescribed medicines delivered to your doorstep within hours with real-time tracking.',
+      features: [
+        'Same-day delivery available',
+        'Real-time order tracking',
+        'Prescription verification',
+        'Temperature-sensitive packaging',
+        'Emergency delivery options'
+      ],
+      process: [
+        'Upload your prescription',
+        'Select medicines from verified pharmacies',
+        'Track delivery in real-time',
+        'Receive at your doorstep'
+      ]
+    },
+    'Doctor Consultation': {
+      description: 'Connect with certified doctors online for quick consultations and prescriptions.',
+      features: [
+        '24/7 doctor availability',
+        'Video and audio consultations',
+        'Digital prescriptions',
+        'Follow-up consultations',
+        'Specialist doctor access'
+      ],
+      process: [
+        'Choose your preferred doctor',
+        'Schedule appointment',
+        'Connect via secure video call',
+        'Receive digital prescription'
+      ]
+    },
+    'Live Order Tracking': {
+      description: 'Track your medical orders in real-time from dispatch to delivery at your doorstep.',
+      features: [
+        'Real-time GPS tracking',
+        'Delivery time estimates',
+        'Delivery partner details',
+        'Live order status updates',
+        'Route optimization'
+      ],
+      process: [
+        'Order confirmation',
+        'Package pickup tracking',
+        'Live delivery tracking',
+        'Delivery confirmation'
+      ]
+    },
+    'Health Checkups': {
+      description: 'Schedule at-home health checkups with certified professionals and digital reports.',
+      features: [
+        'At-home sample collection',
+        'Certified phlebotomists',
+        'Digital reports within 24 hours',
+        'Doctor consultation for reports',
+        'Comprehensive health packages'
+      ],
+      process: [
+        'Book your health package',
+        'Sample collection at home',
+        'Lab processing',
+        'Digital report delivery'
+      ]
+    }
+  };
+
+  const details = serviceDetails[selectedService.name] || {};
+
+  return (
+    <div style={styles.modalOverlay}>
+      <div style={styles.serviceModalContent}>
+        <div style={styles.modalHeader}>
+          <h2 style={styles.modalTitle}>{selectedService.name}</h2>
+          <button 
+            style={styles.closeButton}
+            onClick={() => setShowServiceModal(false)}
+          >
+            ×
+          </button>
+        </div>
+        
+        <div style={styles.serviceModalBody}>
+          <div style={styles.serviceIconLarge}>
+            <span style={styles.serviceIconText}>{selectedService.icon}</span>
+          </div>
+          
+          <p style={styles.serviceDescription}>{details.description}</p>
+          
+          <div style={styles.serviceDetailsSection}>
+            <h3 style={styles.serviceDetailsTitle}>Key Features</h3>
+            <ul style={styles.featuresList}>
+              {details.features?.map((feature, index) => (
+                <li key={index} style={styles.featureItem}>
+                  <span style={styles.checkIcon}>✓</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          <div style={styles.serviceDetailsSection}>
+            <h3 style={styles.serviceDetailsTitle}>How It Works</h3>
+            <div style={styles.processSteps}>
+              {details.process?.map((step, index) => (
+                <div key={index} style={styles.processStep}>
+                  <div style={styles.stepNumber}>{index + 1}</div>
+                  <p style={styles.stepText}>{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div style={styles.serviceCTA}>
+            <button 
+              style={styles.bookServiceButton}
+              onClick={handleBookService}
+            >
+              Book This Service
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => {
   const [activeSection, setActiveSection] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
@@ -371,6 +492,9 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
   const [pendingReviews, setPendingReviews] = useState([]);
   const [showBackToHome, setShowBackToHome] = useState(false);
   const [activeFooterLink, setActiveFooterLink] = useState('');
+  const [showServiceModal, setShowServiceModal] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [reviews] = useState([
     {
@@ -521,7 +645,7 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
   // Medical background image URL
   const medicalBackground = 'https://images.unsplash.com/photo-1551076805-e1869033e561?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
-  // Function to render star ratings - REMOVED DUPLICATE
+  // Function to render star ratings
   const renderStars = (rating) => {
     return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
   };
@@ -539,6 +663,7 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
     setActiveSection(section);
     scrollToTop();
     setShowBackToHome(false);
+    setIsMobileMenuOpen(false);
   };
 
   // Function to handle footer link click
@@ -667,6 +792,43 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
       handleSectionChange('home');
     }
   };
+
+  // Handle emergency call
+  const handleEmergencyCall = () => {
+    // Show calling interface
+    alert('Connecting to QuickMed Emergency Services...\n\nOur emergency team will assist you immediately.');
+    
+    // In a real application, this would initiate a phone call
+    // For demo purposes, we'll just show a success message
+    setTimeout(() => {
+      alert('Connected to QuickMed Emergency Services. Help is on the way!');
+    }, 2000);
+  };
+
+  // Handle service learn more click
+  const handleServiceLearnMore = (service) => {
+    setSelectedService(service);
+    setShowServiceModal(true);
+  };
+
+  // Mobile menu toggle
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.nav') && !event.target.closest('.mobile-menu-button')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   // Admin Modal Component
   const AdminLoginModal = () => {
@@ -882,11 +1044,29 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
           <div style={styles.footerContact}>
             <div style={styles.footerContactItem}>
               <span style={styles.footerContactIcon}>📧</span>
-              <span style={styles.footerContactText}>support@quickmed.com</span>
+              <a 
+                href="mailto:support@quickmed.com" 
+                style={styles.footerContactLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = 'mailto:support@quickmed.com?subject=QuickMed Inquiry&body=Hello QuickMed Team,';
+                }}
+              >
+                support@quickmed.com
+              </a>
             </div>
             <div style={styles.footerContactItem}>
               <span style={styles.footerContactIcon}>📞</span>
-              <span style={styles.footerContactText}>9392416962</span>
+              <a 
+                href="tel:9392416962" 
+                style={styles.footerContactLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = 'tel:9392416962';
+                }}
+              >
+                9392416962
+              </a>
             </div>
             <div style={styles.footerContactItem}>
               <span style={styles.footerContactIcon}>🏥</span>
@@ -917,11 +1097,19 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
       {/* Admin Login Modal */}
       {showAdminModal && <AdminLoginModal />}
 
-      {/* Review Modal - Now as separate component */}
+      {/* Review Modal */}
       <ReviewModal 
         showReviewModal={showReviewModal}
         setShowReviewModal={setShowReviewModal}
         setPendingReviews={setPendingReviews}
+      />
+
+      {/* Service Details Modal */}
+      <ServiceDetailsModal 
+        showServiceModal={showServiceModal}
+        setShowServiceModal={setShowServiceModal}
+        selectedService={selectedService}
+        onNavigateToAuth={onNavigateToAuth}
       />
 
       {/* Success Message Modal */}
@@ -947,7 +1135,20 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
           <h1 style={styles.logoText}>QUICKMED</h1>
           <p style={styles.tagline}>Quick Care Smarter Health</p>
         </div>
-        <nav style={styles.nav}>
+        
+        {/* Mobile Menu Button */}
+        <button 
+          style={styles.mobileMenuButton}
+          onClick={toggleMobileMenu}
+          className="mobile-menu-button"
+        >
+          {isMobileMenuOpen ? '✕' : '☰'}
+        </button>
+        
+        <nav style={{
+          ...styles.nav,
+          ...(isMobileMenuOpen && styles.navMobileOpen)
+        }} className="nav">
           <button 
             style={activeSection === 'home' ? {...styles.navButton, ...styles.activeNavButton} : styles.navButton}
             onClick={() => handleSectionChange('home')}
@@ -1037,7 +1238,10 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
                     <h3 style={styles.emergencyTitle}>Emergency Services</h3>
                     <p style={styles.emergencyText}>24/7 emergency consultation available</p>
                   </div>
-                  <button style={styles.emergencyButton}>
+                  <button 
+                    style={styles.emergencyButton}
+                    onClick={handleEmergencyCall}
+                  >
                     Call Now
                   </button>
                 </div>
@@ -1065,7 +1269,7 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
 
               {/* Medical Categories */}
               <div style={styles.categoriesSection}>
-                <h3 style={styles.categoriesTitle}>Quick Access Categories</h3>
+                <h3 style={styles.categoriesTitle}>Medical Categories</h3>
                 <div style={styles.categoriesGrid}>
                   {medicalCategories.map((category, index) => (
                     <div 
@@ -1244,7 +1448,10 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
                   </div>
                   <h3 style={styles.serviceName}>{service.name}</h3>
                   <p style={styles.serviceDescription}>{service.description}</p>
-                  <button style={styles.learnMoreButton}>
+                  <button 
+                    style={styles.learnMoreButton}
+                    onClick={() => handleServiceLearnMore(service)}
+                  >
                     Learn More →
                   </button>
                 </div>
@@ -1382,14 +1589,32 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
                     <span style={styles.contactIcon}>📧</span>
                     <div style={styles.contactText}>
                       <strong>Email:</strong>
-                      <p>support@quickmed.com</p>
+                      <a 
+                        href="mailto:support@quickmed.com" 
+                        style={styles.contactLink}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = 'mailto:support@quickmed.com?subject=QuickMed Inquiry&body=Hello QuickMed Team,';
+                        }}
+                      >
+                        support@quickmed.com
+                      </a>
                     </div>
                   </div>
                   <div style={styles.contactItem}>
                     <span style={styles.contactIcon}>📞</span>
                     <div style={styles.contactText}>
                       <strong>Phone:</strong>
-                      <p>9392416962</p>
+                      <a 
+                        href="tel:9392416962" 
+                        style={styles.contactLink}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = 'tel:9392416962';
+                        }}
+                      >
+                        9392416962
+                      </a>
                     </div>
                   </div>
                   <div style={styles.contactItem}>
@@ -1487,13 +1712,13 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
         )}
       </main>
 
-      {/* Updated Footer */}
+      {/* Footer */}
       <Footer />
     </div>
   );
 };
 
-// Updated Styles object with fixed duplicate keys
+// Styles object with proper responsive design
 const styles = {
   homepage: {
     minHeight: '100vh',
@@ -1501,6 +1726,7 @@ const styles = {
     flexDirection: 'column',
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
+  // Header Styles with Responsive Design
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -1511,9 +1737,18 @@ const styles = {
     position: 'sticky',
     top: 0,
     zIndex: 1000,
+    '@media (max-width: 768px)': {
+      padding: '1rem',
+      flexWrap: 'wrap',
+    },
   },
   logo: {
-    flex: 1,
+    textAlign: 'left',
+    minWidth: '200px',
+    '@media (max-width: 768px)': {
+      minWidth: 'auto',
+      flex: 1,
+    },
   },
   logoText: {
     margin: 0,
@@ -1523,65 +1758,132 @@ const styles = {
     background: 'linear-gradient(45deg, #7C2A62, #5a1a4a)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
+    '@media (max-width: 768px)': {
+      fontSize: '1.8rem',
+    },
+    '@media (max-width: 480px)': {
+      fontSize: '1.5rem',
+    },
   },
   tagline: {
     margin: 0,
     color: '#000000',
     fontSize: '0.9rem',
     fontWeight: '500',
+    '@media (max-width: 768px)': {
+      fontSize: '0.8rem',
+    },
+  },
+  mobileMenuButton: {
+    display: 'none',
+    backgroundColor: 'transparent',
+    border: 'none',
+    fontSize: '1.5rem',
+    cursor: 'pointer',
+    padding: '0.5rem',
+    color: '#7C2A62',
+    '@media (max-width: 768px)': {
+      display: 'block',
+    },
   },
   nav: {
     display: 'flex',
     alignItems: 'center',
-    gap: '1.5rem',
+    gap: '1rem',
+    '@media (max-width: 768px)': {
+      display: 'none',
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
+      backgroundColor: '#F7D9EB',
+      flexDirection: 'column',
+      padding: '1rem',
+      boxShadow: '0 4px 20px rgba(124, 42, 98, 0.3)',
+      zIndex: 1000,
+    },
+  },
+  navMobileOpen: {
+    '@media (max-width: 768px)': {
+      display: 'flex !important',
+    },
   },
   navButton: {
-    padding: '0.75rem 1.5rem',
+    padding: '0.5rem 1rem',
     border: 'none',
     backgroundColor: 'transparent',
     cursor: 'pointer',
-    fontSize: '1rem',
-    borderRadius: '25px',
+    fontSize: '0.9rem',
+    borderRadius: '20px',
     transition: 'all 0.3s ease',
     fontWeight: '600',
     color: '#000000',
+    whiteSpace: 'nowrap',
+    '@media (max-width: 768px)': {
+      width: '100%',
+      textAlign: 'center',
+      padding: '0.75rem 1rem',
+      fontSize: '1rem',
+    },
   },
   activeNavButton: {
     backgroundColor: '#7C2A62',
     color: '#ffffff',
-    boxShadow: '0 4px 15px rgba(124, 42, 98, 0.5)',
+    boxShadow: '0 2px 10px rgba(124, 42, 98, 0.3)',
   },
   authButtons: {
     display: 'flex',
-    gap: '1rem',
+    gap: '0.5rem',
     marginLeft: '1rem',
+    '@media (max-width: 768px)': {
+      marginLeft: 0,
+      flexDirection: 'column',
+      width: '100%',
+      gap: '0.5rem',
+      marginTop: '0.5rem',
+    },
   },
   loginButton: {
-    padding: '0.75rem 1.5rem',
+    padding: '0.5rem 1rem',
     border: '2px solid #7C2A62',
     backgroundColor: 'transparent',
     cursor: 'pointer',
-    borderRadius: '25px',
+    borderRadius: '20px',
     fontWeight: '600',
     transition: 'all 0.3s ease',
     color: '#7C2A62',
+    fontSize: '0.9rem',
+    whiteSpace: 'nowrap',
+    '@media (max-width: 768px)': {
+      width: '100%',
+      padding: '0.75rem 1rem',
+    },
   },
   adminAccessButton: {
-    padding: '0.75rem 1.5rem',
+    padding: '0.5rem 1rem',
     border: 'none',
     backgroundColor: '#7C2A62',
     color: 'white',
     cursor: 'pointer',
-    borderRadius: '25px',
+    borderRadius: '20px',
     fontWeight: '600',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(124, 42, 98, 0.3)',
+    boxShadow: '0 2px 10px rgba(124, 42, 98, 0.3)',
+    fontSize: '0.9rem',
+    whiteSpace: 'nowrap',
+    '@media (max-width: 768px)': {
+      width: '100%',
+      padding: '0.75rem 1rem',
+    },
   },
   // Back to Home Styles
   backToHomeBanner: {
     backgroundColor: '#7C2A62',
     padding: '0.5rem 2rem',
     textAlign: 'center',
+    '@media (max-width: 768px)': {
+      padding: '0.5rem 1rem',
+    },
   },
   backToHomeBannerButton: {
     backgroundColor: 'white',
@@ -1630,6 +1932,10 @@ const styles = {
     maxWidth: '400px',
     width: '100%',
     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+    '@media (max-width: 480px)': {
+      padding: '1.5rem',
+      margin: '1rem',
+    },
   },
   reviewModalContent: {
     background: 'white',
@@ -1640,6 +1946,24 @@ const styles = {
     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
     maxHeight: '90vh',
     overflowY: 'auto',
+    '@media (max-width: 480px)': {
+      padding: '1.5rem',
+      margin: '1rem',
+    },
+  },
+  serviceModalContent: {
+    background: 'white',
+    borderRadius: '20px',
+    padding: '2rem',
+    maxWidth: '600px',
+    width: '100%',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    '@media (max-width: 480px)': {
+      padding: '1.5rem',
+      margin: '1rem',
+    },
   },
   modalHeader: {
     display: 'flex',
@@ -1688,6 +2012,95 @@ const styles = {
   },
   notificationIcon: {
     fontSize: '1.5rem',
+  },
+  // Service Modal Styles
+  serviceModalBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2rem',
+  },
+  serviceIconLarge: {
+    textAlign: 'center',
+    fontSize: '4rem',
+    marginBottom: '1rem',
+  },
+  serviceIconText: {
+    fontSize: '4rem',
+  },
+  serviceDescription: {
+    fontSize: '1.1rem',
+    lineHeight: '1.6',
+    color: '#333',
+    textAlign: 'center',
+  },
+  serviceDetailsSection: {
+    marginTop: '1rem',
+  },
+  serviceDetailsTitle: {
+    fontSize: '1.3rem',
+    color: '#7C2A62',
+    marginBottom: '1rem',
+    fontWeight: '600',
+  },
+  featuresList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+  },
+  featureItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.8rem',
+    fontSize: '1rem',
+  },
+  checkIcon: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+  },
+  processSteps: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+  },
+  processStep: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    padding: '1rem',
+    backgroundColor: '#F7D9EB',
+    borderRadius: '10px',
+  },
+  stepNumber: {
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    width: '30px',
+    height: '30px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    flexShrink: 0,
+  },
+  stepText: {
+    margin: 0,
+    fontSize: '1rem',
+  },
+  serviceCTA: {
+    textAlign: 'center',
+    marginTop: '2rem',
+  },
+  bookServiceButton: {
+    padding: '1rem 2rem',
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    border: 'none',
+    borderRadius: '25px',
+    cursor: 'pointer',
+    fontSize: '1.1rem',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
   },
   // Review Form Styles
   reviewForm: {
@@ -1895,6 +2308,10 @@ const styles = {
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     position: 'relative',
+    '@media (max-width: 768px)': {
+      padding: '2rem 1rem',
+      minHeight: 'auto',
+    },
   },
   heroContent: {
     maxWidth: '1200px',
@@ -1908,6 +2325,12 @@ const styles = {
     color: '#000000',
     fontWeight: '700',
     textShadow: '2px 2px 4px rgba(255,255,255,0.8)',
+    '@media (max-width: 768px)': {
+      fontSize: '2.5rem',
+    },
+    '@media (max-width: 480px)': {
+      fontSize: '2rem',
+    },
   },
   heroText: {
     fontSize: '1.3rem',
@@ -1919,6 +2342,10 @@ const styles = {
     maxWidth: '800px',
     marginLeft: 'auto',
     marginRight: 'auto',
+    '@media (max-width: 768px)': {
+      fontSize: '1.1rem',
+      marginBottom: '2rem',
+    },
   },
   emergencySection: {
     marginBottom: '3rem',
@@ -1934,6 +2361,12 @@ const styles = {
     maxWidth: '500px',
     margin: '0 auto',
     backdropFilter: 'blur(10px)',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      gap: '1rem',
+      textAlign: 'center',
+      padding: '1rem',
+    },
   },
   emergencyIcon: {
     fontSize: '2.5rem',
@@ -1967,6 +2400,9 @@ const styles = {
     color: '#000000',
     fontWeight: '600',
     textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem',
+    },
   },
   searchForm: {
     display: 'flex',
@@ -1976,6 +2412,10 @@ const styles = {
     borderRadius: '50px',
     overflow: 'hidden',
     background: 'white',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      borderRadius: '25px',
+    },
   },
   searchInput: {
     flex: 1,
@@ -1985,6 +2425,9 @@ const styles = {
     outline: 'none',
     background: 'transparent',
     color: '#000000',
+    '@media (max-width: 768px)': {
+      padding: '1rem',
+    },
   },
   searchButton: {
     padding: '1.2rem 2.5rem',
@@ -1995,6 +2438,10 @@ const styles = {
     fontWeight: 'bold',
     color: 'white',
     transition: 'all 0.3s ease',
+    '@media (max-width: 768px)': {
+      padding: '1rem',
+      borderRadius: '0 0 25px 25px',
+    },
   },
   searchResults: {
     display: 'grid',
@@ -2008,6 +2455,9 @@ const styles = {
     boxShadow: '0 4px 15px rgba(124, 42, 98, 0.1)',
     borderLeft: '4px solid #7C2A62',
     transition: 'all 0.3s ease',
+    '@media (max-width: 768px)': {
+      padding: '1.5rem',
+    },
   },
   searchResultTitle: {
     margin: '0 0 1rem 0',
@@ -2042,6 +2492,9 @@ const styles = {
     color: '#000000',
     fontWeight: '600',
     textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem',
+    },
   },
   categoriesGrid: {
     display: 'grid',
@@ -2049,6 +2502,13 @@ const styles = {
     gap: '2rem',
     maxWidth: '900px',
     margin: '0 auto',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: '1rem',
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   categoryCard: {
     display: 'flex',
@@ -2088,6 +2548,9 @@ const styles = {
     color: '#000000',
     fontWeight: '600',
     textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem',
+    },
   },
   featuredGrid: {
     display: 'grid',
@@ -2095,6 +2558,13 @@ const styles = {
     gap: '2rem',
     maxWidth: '1000px',
     margin: '0 auto',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: '1rem',
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   featureItem: {
     textAlign: 'center',
@@ -2116,6 +2586,9 @@ const styles = {
     gap: '3rem',
     marginTop: '4rem',
     flexWrap: 'wrap',
+    '@media (max-width: 768px)': {
+      gap: '1.5rem',
+    },
   },
   statItem: {
     textAlign: 'center',
@@ -2145,6 +2618,9 @@ const styles = {
     color: '#000000',
     fontWeight: '600',
     textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem',
+    },
   },
   testimonialsGrid: {
     display: 'grid',
@@ -2152,6 +2628,9 @@ const styles = {
     gap: '2rem',
     maxWidth: '800px',
     margin: '0 auto',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   testimonialCard: {
     padding: '2rem',
@@ -2176,12 +2655,18 @@ const styles = {
     padding: '5rem 2rem',
     maxWidth: '1200px',
     margin: '0 auto',
+    '@media (max-width: 768px)': {
+      padding: '3rem 1rem',
+    },
   },
   // Contact Section with proper spacing
   contactSection: {
     padding: '6rem 2rem 5rem 2rem',
     maxWidth: '1200px',
     margin: '0 auto',
+    '@media (max-width: 768px)': {
+      padding: '3rem 1rem',
+    },
   },
   contactSubtitle: {
     fontSize: '1.2rem',
@@ -2189,7 +2674,6 @@ const styles = {
     color: '#000000',
     marginBottom: '3rem',
     fontWeight: '400',
-    paddingTop: '50px',
   },
   sectionTitle: {
     fontSize: '3rem',
@@ -2197,6 +2681,9 @@ const styles = {
     textAlign: 'center',
     color: '#000000',
     fontWeight: '700',
+    '@media (max-width: 768px)': {
+      fontSize: '2rem',
+    },
   },
   aboutContent: {
     lineHeight: '1.8',
@@ -2206,17 +2693,31 @@ const styles = {
     fontSize: '1.2rem',
     color: '#000000',
     textAlign: 'center',
+    '@media (max-width: 768px)': {
+      fontSize: '1rem',
+    },
   },
   featureGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
     gap: '2rem',
     marginTop: '3rem',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: '1rem',
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   servicesGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '2.5rem',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+      gap: '2rem',
+    },
   },
   serviceCard: {
     padding: '3rem 2rem',
@@ -2226,6 +2727,9 @@ const styles = {
     textAlign: 'center',
     transition: 'all 0.3s ease',
     border: '2px solid #f8f9fa',
+    '@media (max-width: 768px)': {
+      padding: '2rem 1.5rem',
+    },
   },
   serviceIconContainer: {
     width: '80px',
@@ -2243,6 +2747,9 @@ const styles = {
     marginBottom: '1.5rem',
     color: '#000000',
     fontWeight: '600',
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem',
+    },
   },
   serviceDescription: {
     marginBottom: '2rem',
@@ -2265,6 +2772,9 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
     gap: '2.5rem',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   doctorCard: {
     padding: '2.5rem',
@@ -2275,6 +2785,9 @@ const styles = {
     transition: 'all 0.3s ease',
     position: 'relative',
     border: '2px solid #f8f9fa',
+    '@media (max-width: 768px)': {
+      padding: '2rem 1.5rem',
+    },
   },
   doctorImage: {
     width: '100px',
@@ -2302,6 +2815,11 @@ const styles = {
     borderRadius: '15px',
     fontSize: '0.9rem',
     fontWeight: 'bold',
+    '@media (max-width: 768px)': {
+      position: 'static',
+      display: 'inline-block',
+      marginBottom: '1rem',
+    },
   },
   doctorName: {
     fontSize: '1.5rem',
@@ -2329,6 +2847,11 @@ const styles = {
     backgroundColor: 'white',
     borderRadius: '20px',
     boxShadow: '0 8px 25px rgba(124, 42, 98, 0.1)',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+      gap: '2rem',
+      padding: '2rem',
+    },
   },
   overallRating: {
     textAlign: 'center',
@@ -2395,6 +2918,9 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
     gap: '2rem',
     marginBottom: '4rem',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+    },
   },
   reviewCard: {
     padding: '2rem',
@@ -2408,6 +2934,10 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: '1.5rem',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      gap: '1rem',
+    },
   },
   reviewerInfo: {
     display: 'flex',
@@ -2446,6 +2976,9 @@ const styles = {
     fontSize: '2rem',
     marginBottom: '1rem',
     color: '#000000',
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem',
+    },
   },
   addReviewText: {
     color: '#000000',
@@ -2469,6 +3002,10 @@ const styles = {
     gridTemplateColumns: '1fr 1fr',
     gap: '4rem',
     alignItems: 'start',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+      gap: '3rem',
+    },
   },
   contactInfo: {
     padding: '3rem',
@@ -2476,6 +3013,9 @@ const styles = {
     borderRadius: '20px',
     boxShadow: '0 8px 25px rgba(124, 42, 98, 0.1)',
     height: 'fit-content',
+    '@media (max-width: 768px)': {
+      padding: '2rem',
+    },
   },
   contactInfoTitle: {
     fontSize: '1.8rem',
@@ -2507,6 +3047,12 @@ const styles = {
     gap: '0.2rem',
     flex: 1,
   },
+  contactLink: {
+    color: '#7C2A62',
+    textDecoration: 'none',
+    fontWeight: '500',
+    transition: 'color 0.3s ease',
+  },
   contactForm: {
     display: 'flex',
     flexDirection: 'column',
@@ -2523,7 +3069,7 @@ const styles = {
     color: 'white',
     transition: 'all 0.3s ease',
   },
-  // Updated Footer Styles - Fixed duplicate keys
+  // Footer Styles
   footer: {
     backgroundColor: '#7A1B5B',
     color: 'white',
@@ -2536,6 +3082,11 @@ const styles = {
     padding: '0 2rem',
     maxWidth: '1200px',
     margin: '0 auto',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+      gap: '2rem',
+      padding: '0 1rem',
+    },
   },
   footerSection: {
     display: 'flex',
@@ -2587,7 +3138,6 @@ const styles = {
     flexDirection: 'column',
     gap: '1rem',
   },
-  // Fixed duplicate keys by renaming footer contact styles
   footerContactItem: {
     display: 'flex',
     alignItems: 'center',
@@ -2602,6 +3152,11 @@ const styles = {
   footerContactText: {
     color: '#F7D9EB',
     fontSize: '1rem',
+  },
+  footerContactLink: {
+    color: '#F7D9EB',
+    textDecoration: 'none',
+    transition: 'color 0.3s ease',
   },
   footerBottom: {
     borderTop: '1px solid #F7D9EB',

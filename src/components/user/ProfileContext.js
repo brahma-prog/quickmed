@@ -1,7 +1,9 @@
-import React, { useState, useContext, createContext } from 'react';
+import React, { useState, useContext } from 'react';
 
-const ProfileContext = createContext();
+// Create a context for global profile state
+const ProfileContext = React.createContext();
 
+// Profile Provider Component (should be at app root level)
 export const ProfileProvider = ({ children, user }) => {
   const [profile, setProfile] = useState({
     fullName: user?.fullName || 'Jagan',
@@ -27,6 +29,7 @@ export const ProfileProvider = ({ children, user }) => {
   );
 };
 
+// Hook to use profile context
 export const useProfile = () => {
   const context = useContext(ProfileContext);
   if (!context) {
@@ -34,5 +37,3 @@ export const useProfile = () => {
   }
   return context;
 };
-
-export default useProfile;

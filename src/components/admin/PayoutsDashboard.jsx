@@ -554,6 +554,75 @@ const PayoutsDashboard = () => {
     return '#dc3545';
   };
 
+  // Button hover styles
+  const buttonStyle = {
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    transition: 'all 0.3s ease',
+    ':hover': {
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+    }
+  };
+
+  const primaryButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: primaryColor,
+    color: 'white',
+  };
+
+  const secondaryButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#6c757d',
+    color: 'white',
+  };
+
+  const successButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#28a745',
+    color: 'white',
+  };
+
+  const dangerButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#dc3545',
+    color: 'white',
+  };
+
+  const infoButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#17a2b8',
+    color: 'white',
+  };
+
+  const warningButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: '#ffc107',
+    color: '#212529',
+  };
+
+  // Table row hover style
+  const tableRowStyle = {
+    transition: 'all 0.3s ease',
+    ':hover': {
+      backgroundColor: '#f8f9fa',
+      transform: 'translateY(-1px)',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }
+  };
+
+  // Card hover style
+  const cardHoverStyle = {
+    transition: 'all 0.3s ease',
+    ':hover': {
+      transform: 'translateY(-3px)',
+      boxShadow: '0 6px 12px rgba(0,0,0,0.15)'
+    }
+  };
+
   // Refund Details Component
   const RefundDetails = ({ refund, onClose, onApprove, onReject }) => {
     return (
@@ -591,7 +660,9 @@ const PayoutsDashboard = () => {
                 border: 'none',
                 fontSize: '24px',
                 cursor: 'pointer',
-                color: '#666'
+                color: '#666',
+                transition: 'color 0.3s ease',
+                ':hover': { color: primaryColor }
               }}
             >
               ×
@@ -662,7 +733,14 @@ const PayoutsDashboard = () => {
                         padding: '8px 12px',
                         backgroundColor: accentColor,
                         borderRadius: '5px',
-                        fontSize: '12px'
+                        fontSize: '12px',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        ':hover': {
+                          backgroundColor: primaryColor,
+                          color: 'white',
+                          transform: 'translateY(-2px)'
+                        }
                       }}>
                         📎 {file}
                       </div>
@@ -679,13 +757,8 @@ const PayoutsDashboard = () => {
                     <button
                       onClick={() => onApprove(refund.refundId)}
                       style={{
-                        padding: '10px 20px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
+                        ...successButtonStyle,
+                        padding: '10px 20px'
                       }}
                     >
                       Approve Refund
@@ -693,13 +766,8 @@ const PayoutsDashboard = () => {
                     <button
                       onClick={() => onReject(refund.refundId)}
                       style={{
-                        padding: '10px 20px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
+                        ...dangerButtonStyle,
+                        padding: '10px 20px'
                       }}
                     >
                       Reject Refund
@@ -714,7 +782,11 @@ const PayoutsDashboard = () => {
                 {refund.auditLogs.map((log, index) => (
                   <div key={index} style={{ 
                     padding: '8px 0',
-                    borderBottom: index < refund.auditLogs.length - 1 ? '1px solid #ddd' : 'none'
+                    borderBottom: index < refund.auditLogs.length - 1 ? '1px solid #ddd' : 'none',
+                    transition: 'background-color 0.3s ease',
+                    ':hover': {
+                      backgroundColor: '#e9ecef'
+                    }
                   }}>
                     <div style={{ fontSize: '12px', fontWeight: 'bold' }}>{log.action}</div>
                     <div style={{ fontSize: '11px', color: '#666' }}>
@@ -771,7 +843,9 @@ const PayoutsDashboard = () => {
                 border: 'none',
                 fontSize: '24px',
                 cursor: 'pointer',
-                color: '#666'
+                color: '#666',
+                transition: 'color 0.3s ease',
+                ':hover': { color: primaryColor }
               }}
             >
               ×
@@ -810,7 +884,8 @@ const PayoutsDashboard = () => {
                   borderRadius: '50%',
                   backgroundColor: 
                     step.status === 'completed' ? '#28a745' :
-                    step.status === 'current' ? '#17a2b8' : '#6c757d'
+                    step.status === 'current' ? '#17a2b8' : '#6c757d',
+                  transition: 'all 0.3s ease'
                 }} />
                 <div style={{ fontWeight: 'bold', color: step.status === 'pending' ? '#6c757d' : '#212529' }}>
                   {step.step}
@@ -830,7 +905,11 @@ const PayoutsDashboard = () => {
               padding: '15px',
               borderRadius: '5px',
               marginTop: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                backgroundColor: '#d1e7ff'
+              }
             }}>
               <div style={{ fontWeight: 'bold', color: primaryColor }}>Refund is being processed</div>
               <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
@@ -843,7 +922,7 @@ const PayoutsDashboard = () => {
     );
   };
 
-  // Delivery Agent Profile Component (unchanged)
+  // Delivery Agent Profile Component
   const DeliveryAgentProfile = ({ agent, onClose }) => {
     return (
       <div style={{
@@ -877,7 +956,9 @@ const PayoutsDashboard = () => {
                 border: 'none',
                 fontSize: '24px',
                 cursor: 'pointer',
-                color: '#666'
+                color: '#666',
+                transition: 'color 0.3s ease',
+                ':hover': { color: primaryColor }
               }}
             >
               ×
@@ -938,7 +1019,12 @@ const PayoutsDashboard = () => {
                   padding: '15px',
                   backgroundColor: '#f8f9fa',
                   borderRadius: '8px',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  transition: 'all 0.3s ease',
+                  ':hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                  }
                 }}>
                   <div style={{ fontSize: '12px', color: '#666' }}>On-Time Delivery Rate</div>
                   <div style={{ fontSize: '24px', fontWeight: 'bold', color: getPerformanceColor(agent.onTimeRate) }}>
@@ -949,7 +1035,12 @@ const PayoutsDashboard = () => {
                 <div style={{
                   padding: '15px',
                   backgroundColor: '#f8f9fa',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  ':hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                  }
                 }}>
                   <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>Performance Trend</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
@@ -962,7 +1053,12 @@ const PayoutsDashboard = () => {
                 <div style={{
                   padding: '15px',
                   backgroundColor: '#f8f9fa',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  ':hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                  }
                 }}>
                   <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>Financial Summary</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '12px' }}>
@@ -980,12 +1076,8 @@ const PayoutsDashboard = () => {
                   <button
                     onClick={() => handleSuspendAgent(agent.agentId)}
                     style={{
+                      ...dangerButtonStyle,
                       padding: '8px 16px',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
                       fontSize: '12px'
                     }}
                   >
@@ -996,12 +1088,8 @@ const PayoutsDashboard = () => {
                   <button
                     onClick={() => handleReinstateAgent(agent.agentId)}
                     style={{
+                      ...successButtonStyle,
                       padding: '8px 16px',
-                      backgroundColor: '#28a745',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
                       fontSize: '12px'
                     }}
                   >
@@ -1011,12 +1099,8 @@ const PayoutsDashboard = () => {
                 <button
                   onClick={() => handleAdjustIncentives(agent.agentId)}
                   style={{
+                    ...primaryButtonStyle,
                     padding: '8px 16px',
-                    backgroundColor: primaryColor,
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
                     fontSize: '12px'
                   }}
                 >
@@ -1024,12 +1108,8 @@ const PayoutsDashboard = () => {
                 </button>
                 <button
                   style={{
+                    ...infoButtonStyle,
                     padding: '8px 16px',
-                    backgroundColor: '#17a2b8',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
                     fontSize: '12px'
                   }}
                 >
@@ -1043,19 +1123,55 @@ const PayoutsDashboard = () => {
           <div style={{ marginTop: '30px' }}>
             <h3 style={{ color: primaryColor, marginBottom: '15px' }}>Delivery Statistics</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', textAlign: 'center' }}>
-              <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px' }}>
+              <div style={{ 
+                padding: '15px', 
+                backgroundColor: '#e7f3ff', 
+                borderRadius: '8px',
+                transition: 'all 0.3s ease',
+                ':hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                }
+              }}>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{agent.deliveriesCompleted}</div>
                 <div style={{ fontSize: '12px', color: '#666' }}>Total Deliveries</div>
               </div>
-              <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px' }}>
+              <div style={{ 
+                padding: '15px', 
+                backgroundColor: '#e7f3ff', 
+                borderRadius: '8px',
+                transition: 'all 0.3s ease',
+                ':hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                }
+              }}>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{agent.onTimeRate}%</div>
                 <div style={{ fontSize: '12px', color: '#666' }}>On-Time Rate</div>
               </div>
-              <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px' }}>
+              <div style={{ 
+                padding: '15px', 
+                backgroundColor: '#e7f3ff', 
+                borderRadius: '8px',
+                transition: 'all 0.3s ease',
+                ':hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                }
+              }}>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{agent.averageDuration}</div>
                 <div style={{ fontSize: '12px', color: '#666' }}>Avg. Duration</div>
               </div>
-              <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px' }}>
+              <div style={{ 
+                padding: '15px', 
+                backgroundColor: '#e7f3ff', 
+                borderRadius: '8px',
+                transition: 'all 0.3s ease',
+                ':hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                }
+              }}>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{agent.complaints}</div>
                 <div style={{ fontSize: '12px', color: '#666' }}>Complaints</div>
               </div>
@@ -1066,7 +1182,7 @@ const PayoutsDashboard = () => {
     );
   };
 
-  // Vendor Ledger Component (unchanged)
+  // Vendor Ledger Component
   const VendorLedger = ({ vendor, onClose }) => {
     const totalEarnings = vendor.ledger.reduce((sum, item) => sum + parseFloat(item.vendorEarning.replace('₹', '').replace('-', '')), 0);
     
@@ -1105,7 +1221,9 @@ const PayoutsDashboard = () => {
                 border: 'none',
                 fontSize: '24px',
                 cursor: 'pointer',
-                color: '#666'
+                color: '#666',
+                transition: 'color 0.3s ease',
+                ':hover': { color: primaryColor }
               }}
             >
               ×
@@ -1114,15 +1232,45 @@ const PayoutsDashboard = () => {
 
           {/* Summary Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
-            <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ 
+              padding: '15px', 
+              backgroundColor: '#e7f3ff', 
+              borderRadius: '8px', 
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-3px)',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }
+            }}>
               <div style={{ fontSize: '12px', color: '#666' }}>Total Earnings</div>
               <div style={{ fontSize: '20px', fontWeight: 'bold', color: primaryColor }}>{vendor.earnings}</div>
             </div>
-            <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ 
+              padding: '15px', 
+              backgroundColor: '#e7f3ff', 
+              borderRadius: '8px', 
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-3px)',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }
+            }}>
               <div style={{ fontSize: '12px', color: '#666' }}>Pending Amount</div>
               <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ffc107' }}>{vendor.pendingAmount}</div>
             </div>
-            <div style={{ padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ 
+              padding: '15px', 
+              backgroundColor: '#e7f3ff', 
+              borderRadius: '8px', 
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-3px)',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }
+            }}>
               <div style={{ fontSize: '12px', color: '#666' }}>Last Settlement</div>
               <div style={{ fontSize: '20px', fontWeight: 'bold', color: primaryColor }}>{vendor.lastSettlement}</div>
             </div>
@@ -1149,7 +1297,15 @@ const PayoutsDashboard = () => {
               </thead>
               <tbody>
                 {vendor.ledger.map((item, index) => (
-                  <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                  <tr key={index} style={{ 
+                    borderBottom: '1px solid #ddd',
+                    transition: 'all 0.3s ease',
+                    ':hover': {
+                      backgroundColor: '#f8f9fa',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }
+                  }}>
                     <td style={{ padding: '12px' }}>{item.orderId}</td>
                     <td style={{ padding: '12px' }}>{item.date}</td>
                     <td style={{ padding: '12px' }}>{item.product}</td>
@@ -1194,7 +1350,11 @@ const PayoutsDashboard = () => {
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr 1fr',
                 gap: '10px',
-                fontSize: '14px'
+                fontSize: '14px',
+                transition: 'background-color 0.3s ease',
+                ':hover': {
+                  backgroundColor: '#e9ecef'
+                }
               }}>
                 <div><strong>Action:</strong> {log.action}</div>
                 <div><strong>By:</strong> {log.user}</div>
@@ -1211,7 +1371,7 @@ const PayoutsDashboard = () => {
     );
   };
 
-  // Payment Release Confirmation Component (unchanged)
+  // Payment Release Confirmation Component
   const PaymentReleaseConfirmation = ({ vendor, onClose, onConfirm }) => {
     return (
       <div style={{
@@ -1252,12 +1412,8 @@ const PayoutsDashboard = () => {
             <button
               onClick={onClose}
               style={{
-                padding: '10px 20px',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
+                ...secondaryButtonStyle,
+                padding: '10px 20px'
               }}
             >
               Cancel
@@ -1265,12 +1421,8 @@ const PayoutsDashboard = () => {
             <button
               onClick={onConfirm}
               style={{
-                padding: '10px 20px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
+                ...successButtonStyle,
+                padding: '10px 20px'
               }}
             >
               Confirm Release
@@ -1302,7 +1454,7 @@ const PayoutsDashboard = () => {
   };
 
   return (
-    <div>
+    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <h2 style={{ color: primaryColor, marginBottom: '20px' }}>Payouts Dashboard</h2>
       
       {/* Tabs */}
@@ -1315,7 +1467,12 @@ const PayoutsDashboard = () => {
             color: activeTab === 'summary' ? 'white' : primaryColor,
             border: 'none',
             borderBottom: activeTab === 'summary' ? `3px solid ${primaryColor}` : 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            ':hover': {
+              backgroundColor: activeTab === 'summary' ? primaryColor : accentColor,
+              color: activeTab === 'summary' ? 'white' : primaryColor
+            }
           }}
         >
           Payout Summary
@@ -1328,7 +1485,12 @@ const PayoutsDashboard = () => {
             color: activeTab === 'vendors' ? 'white' : primaryColor,
             border: 'none',
             borderBottom: activeTab === 'vendors' ? `3px solid ${primaryColor}` : 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            ':hover': {
+              backgroundColor: activeTab === 'vendors' ? primaryColor : accentColor,
+              color: activeTab === 'vendors' ? 'white' : primaryColor
+            }
           }}
         >
           Vendor Earnings
@@ -1341,7 +1503,12 @@ const PayoutsDashboard = () => {
             color: activeTab === 'delivery' ? 'white' : primaryColor,
             border: 'none',
             borderBottom: activeTab === 'delivery' ? `3px solid ${primaryColor}` : 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            ':hover': {
+              backgroundColor: activeTab === 'delivery' ? primaryColor : accentColor,
+              color: activeTab === 'delivery' ? 'white' : primaryColor
+            }
           }}
         >
           Delivery Agents
@@ -1354,7 +1521,12 @@ const PayoutsDashboard = () => {
             color: activeTab === 'refunds' ? 'white' : primaryColor,
             border: 'none',
             borderBottom: activeTab === 'refunds' ? `3px solid ${primaryColor}` : 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            ':hover': {
+              backgroundColor: activeTab === 'refunds' ? primaryColor : accentColor,
+              color: activeTab === 'refunds' ? 'white' : primaryColor
+            }
           }}
         >
           Refunds & Chargebacks
@@ -1370,7 +1542,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px' }}>Pending Payouts</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{payoutSummary.pendingPayouts}</div>
@@ -1382,7 +1559,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px' }}>Processed This Week</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{payoutSummary.processedThisWeek}</div>
@@ -1394,7 +1576,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px' }}>Next Settlement</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{payoutSummary.nextSettlement}</div>
@@ -1407,7 +1594,12 @@ const PayoutsDashboard = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            transition: 'all 0.3s ease',
+            ':hover': {
+              transform: 'translateY(-3px)',
+              boxShadow: '0 6px 12px rgba(0,0,0,0.1)'
+            }
           }}>
             <h3 style={{ color: primaryColor, marginBottom: '15px' }}>Payment Method Status</h3>
             <div style={{ display: 'grid', gap: '10px' }}>
@@ -1418,7 +1610,13 @@ const PayoutsDashboard = () => {
                   alignItems: 'center',
                   padding: '10px',
                   backgroundColor: accentColor,
-                  borderRadius: '5px'
+                  borderRadius: '5px',
+                  transition: 'all 0.3s ease',
+                  ':hover': {
+                    backgroundColor: primaryColor,
+                    color: 'white',
+                    transform: 'translateY(-2px)'
+                  }
                 }}>
                   <span>{method.name}</span>
                   <span style={{
@@ -1451,7 +1649,13 @@ const PayoutsDashboard = () => {
                 padding: '12px',
                 border: `1px solid ${accentColor}`,
                 borderRadius: '5px',
-                fontSize: '14px'
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                ':focus': {
+                  outline: 'none',
+                  borderColor: primaryColor,
+                  boxShadow: `0 0 0 2px ${accentColor}`
+                }
               }}
             />
           </div>
@@ -1461,7 +1665,11 @@ const PayoutsDashboard = () => {
             backgroundColor: 'white',
             borderRadius: '8px',
             overflow: 'hidden',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            transition: 'all 0.3s ease',
+            ':hover': {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }
           }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -1476,7 +1684,15 @@ const PayoutsDashboard = () => {
               </thead>
               <tbody>
                 {filteredVendors.map(vendor => (
-                  <tr key={vendor.id} style={{ borderBottom: `1px solid ${accentColor}` }}>
+                  <tr key={vendor.id} style={{ 
+                    borderBottom: `1px solid ${accentColor}`,
+                    transition: 'all 0.3s ease',
+                    ':hover': {
+                      backgroundColor: '#f8f9fa',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }
+                  }}>
                     <td style={{ padding: '12px' }}>
                       <div><strong>{vendor.name}</strong></div>
                       <div style={{ fontSize: '12px', color: '#666' }}>ID: {vendor.vendorId}</div>
@@ -1508,12 +1724,8 @@ const PayoutsDashboard = () => {
                           <button
                             onClick={() => handleReleasePayment(vendor)}
                             style={{
+                              ...successButtonStyle,
                               padding: '6px 12px',
-                              backgroundColor: '#28a745',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
                               fontSize: '12px'
                             }}
                           >
@@ -1523,12 +1735,8 @@ const PayoutsDashboard = () => {
                         <button
                           onClick={() => handleViewLedger(vendor)}
                           style={{
+                            ...primaryButtonStyle,
                             padding: '6px 12px',
-                            backgroundColor: primaryColor,
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
                             fontSize: '12px'
                           }}
                         >
@@ -1537,12 +1745,8 @@ const PayoutsDashboard = () => {
                         <button
                           onClick={() => handleDownloadReceipt(vendor)}
                           style={{
+                            ...infoButtonStyle,
                             padding: '6px 12px',
-                            backgroundColor: '#17a2b8',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
                             fontSize: '12px'
                           }}
                         >
@@ -1573,7 +1777,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Active Agents</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{deliveryKPIs.activeAgents}</div>
@@ -1585,7 +1794,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>On-Time Delivery</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{deliveryKPIs.onTimeDeliveryRate}%</div>
@@ -1597,7 +1811,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Avg. Duration</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{deliveryKPIs.averageDeliveryDuration}</div>
@@ -1609,7 +1828,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Complaints (7 Days)</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{deliveryKPIs.complaintsLast7Days}</div>
@@ -1629,7 +1853,13 @@ const PayoutsDashboard = () => {
                 padding: '12px',
                 border: `1px solid ${accentColor}`,
                 borderRadius: '5px',
-                fontSize: '14px'
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                ':focus': {
+                  outline: 'none',
+                  borderColor: primaryColor,
+                  boxShadow: `0 0 0 2px ${accentColor}`
+                }
               }}
             />
           </div>
@@ -1639,7 +1869,11 @@ const PayoutsDashboard = () => {
             backgroundColor: 'white',
             borderRadius: '8px',
             overflow: 'hidden',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            transition: 'all 0.3s ease',
+            ':hover': {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }
           }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -1655,7 +1889,15 @@ const PayoutsDashboard = () => {
               </thead>
               <tbody>
                 {filteredAgents.map(agent => (
-                  <tr key={agent.id} style={{ borderBottom: `1px solid ${accentColor}` }}>
+                  <tr key={agent.id} style={{ 
+                    borderBottom: `1px solid ${accentColor}`,
+                    transition: 'all 0.3s ease',
+                    ':hover': {
+                      backgroundColor: '#f8f9fa',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }
+                  }}>
                     <td style={{ padding: '12px', fontWeight: 'bold' }}>{agent.agentId}</td>
                     <td style={{ padding: '12px' }}>{agent.name}</td>
                     <td style={{ padding: '12px' }}>{agent.phone}</td>
@@ -1694,12 +1936,8 @@ const PayoutsDashboard = () => {
                       <button
                         onClick={() => handleViewProfile(agent)}
                         style={{
+                          ...primaryButtonStyle,
                           padding: '6px 12px',
-                          backgroundColor: primaryColor,
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
                           fontSize: '12px'
                         }}
                       >
@@ -1729,7 +1967,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Total Refunds</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{refundKPIs.totalRefunds}</div>
@@ -1741,7 +1984,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Pending Refunds</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107' }}>{refundKPIs.pendingRefunds}</div>
@@ -1753,7 +2001,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Total Amount</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#dc3545' }}>{refundKPIs.totalRefundAmount}</div>
@@ -1765,7 +2018,12 @@ const PayoutsDashboard = () => {
               padding: '20px',
               borderRadius: '8px',
               border: `1px solid ${accentColor}`,
-              textAlign: 'center'
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              ':hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              }
             }}>
               <h3 style={{ color: primaryColor, margin: '0 0 10px', fontSize: '14px' }}>Avg. Processing</h3>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{refundKPIs.avgProcessingTime}</div>
@@ -1785,18 +2043,20 @@ const PayoutsDashboard = () => {
                 padding: '12px',
                 border: `1px solid ${accentColor}`,
                 borderRadius: '5px',
-                fontSize: '14px'
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                ':focus': {
+                  outline: 'none',
+                  borderColor: primaryColor,
+                  boxShadow: `0 0 0 2px ${accentColor}`
+                }
               }}
             />
             <button
               onClick={exportRefundData}
               style={{
+                ...primaryButtonStyle,
                 padding: '12px 20px',
-                backgroundColor: primaryColor,
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
                 fontSize: '14px',
                 whiteSpace: 'nowrap'
               }}
@@ -1810,7 +2070,11 @@ const PayoutsDashboard = () => {
             backgroundColor: 'white',
             borderRadius: '8px',
             overflow: 'hidden',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            transition: 'all 0.3s ease',
+            ':hover': {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }
           }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -1826,7 +2090,15 @@ const PayoutsDashboard = () => {
               </thead>
               <tbody>
                 {filteredRefunds.map(refund => (
-                  <tr key={refund.id} style={{ borderBottom: `1px solid ${accentColor}` }}>
+                  <tr key={refund.id} style={{ 
+                    borderBottom: `1px solid ${accentColor}`,
+                    transition: 'all 0.3s ease',
+                    ':hover': {
+                      backgroundColor: '#f8f9fa',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }
+                  }}>
                     <td style={{ padding: '12px', fontWeight: 'bold' }}>{refund.refundId}</td>
                     <td style={{ padding: '12px' }}>{refund.orderId}</td>
                     <td style={{ padding: '12px' }}>
@@ -1864,12 +2136,8 @@ const PayoutsDashboard = () => {
                         <button
                           onClick={() => handleReviewRefund(refund)}
                           style={{
+                            ...primaryButtonStyle,
                             padding: '6px 12px',
-                            backgroundColor: primaryColor,
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
                             fontSize: '12px'
                           }}
                         >
@@ -1879,12 +2147,8 @@ const PayoutsDashboard = () => {
                           <button
                             onClick={() => handleTrackRefund(refund)}
                             style={{
+                              ...infoButtonStyle,
                               padding: '6px 12px',
-                              backgroundColor: '#17a2b8',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
                               fontSize: '12px'
                             }}
                           >
@@ -1895,12 +2159,8 @@ const PayoutsDashboard = () => {
                           <button
                             onClick={() => handleDownloadRefundReceipt(refund)}
                             style={{
+                              ...successButtonStyle,
                               padding: '6px 12px',
-                              backgroundColor: '#28a745',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
                               fontSize: '12px'
                             }}
                           >

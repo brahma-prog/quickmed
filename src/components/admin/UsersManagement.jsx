@@ -10,7 +10,7 @@ const UsersManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserHistory, setShowUserHistory] = useState(false);
-  const [actionLoading, setActionLoading] = useState(null); // Track loading state for specific actions
+  const [actionLoading, setActionLoading] = useState(null);
 
   // Simulate API call to fetch users
   useEffect(() => {
@@ -181,24 +181,25 @@ const UsersManagement = () => {
     return counts;
   };
 
-  // Enhanced action buttons with real-time loading states and better styling
+  // Enhanced action buttons with proper alignment
   const getActionButtons = (user) => {
     const isActionLoading = actionLoading === user.id;
 
     const baseButtonStyle = {
-      padding: '6px 12px',
+      padding: '8px 16px',
       border: 'none',
-      borderRadius: '4px',
+      borderRadius: '6px',
       cursor: isActionLoading ? 'not-allowed' : 'pointer',
-      fontSize: '12px',
+      fontSize: '13px',
       fontWeight: '500',
       transition: 'all 0.3s ease',
-      width: '100px',
+      minWidth: '120px',
       opacity: isActionLoading ? 0.7 : 1,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '5px'
+      gap: '6px',
+      height: '36px'
     };
 
     const inactivateButton = (
@@ -255,8 +256,10 @@ const UsersManagement = () => {
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: '8px',
-            alignItems: 'flex-start'
+            gap: '10px',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            width: '100%'
           }}>
             {inactivateButton}
             {viewHistoryButton}
@@ -267,8 +270,10 @@ const UsersManagement = () => {
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: '8px',
-            alignItems: 'flex-start'
+            gap: '10px',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            width: '100%'
           }}>
             {activateButton}
             {viewHistoryButton}
@@ -279,8 +284,10 @@ const UsersManagement = () => {
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: '8px',
-            alignItems: 'flex-start'
+            gap: '10px',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            width: '100%'
           }}>
             {inactivateButton}
             {viewHistoryButton}
@@ -291,8 +298,10 @@ const UsersManagement = () => {
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: '8px',
-            alignItems: 'flex-start'
+            gap: '10px',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            width: '100%'
           }}>
             {viewHistoryButton}
           </div>
@@ -304,63 +313,95 @@ const UsersManagement = () => {
 
   return (
     <div style={{ 
-      padding: '20px', 
+      padding: '24px', 
       fontFamily: 'Arial, sans-serif',
-      height: '100vh',
-      overflow: 'auto',
+      minHeight: '100vh',
+      backgroundColor: '#f8f9fa',
       boxSizing: 'border-box'
     }}>
-      <h2 style={{ color: primaryColor, marginBottom: '20px', borderBottom: `2px solid ${accentColor}`, paddingBottom: '10px' }}>Users Management</h2>
+      <h2 style={{ 
+        color: primaryColor, 
+        marginBottom: '24px', 
+        borderBottom: `2px solid ${accentColor}`, 
+        paddingBottom: '12px',
+        fontSize: '28px',
+        fontWeight: '600'
+      }}>
+        Users Management
+      </h2>
       
       {/* Search and Filter */}
       <div style={{ 
         display: 'flex', 
-        gap: '15px', 
-        marginBottom: '20px', 
+        gap: '16px', 
+        marginBottom: '24px', 
         flexWrap: 'wrap',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}>
-        <input
-          type="text"
-          placeholder="Search users by name or email..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: '10px',
-            border: `1px solid ${accentColor}`,
-            borderRadius: '5px',
-            flex: '1',
-            minWidth: '250px',
-            fontSize: '14px'
-          }}
-        />
-        <select
-          value={userType}
-          onChange={(e) => setUserType(e.target.value)}
-          style={{
-            padding: '10px',
-            border: `1px solid ${accentColor}`,
-            borderRadius: '5px',
-            backgroundColor: 'white',
-            minWidth: '150px',
-            fontSize: '14px'
-          }}
-        >
-          <option value="all">All Users ({typeCounts.all})</option>
-          <option value="customer">Customers ({typeCounts.customer})</option>
-          <option value="vendor">Vendors ({typeCounts.vendor})</option>
-          <option value="doctor">Doctors ({typeCounts.doctor})</option>
-          <option value="delivery">Delivery Agents ({typeCounts.delivery})</option>
-        </select>
+        <div style={{ 
+          display: 'flex', 
+          gap: '16px', 
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          flex: 1
+        }}>
+          <input
+            type="text"
+            placeholder="Search users by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              padding: '12px 16px',
+              border: `1px solid ${accentColor}`,
+              borderRadius: '8px',
+              flex: '1',
+              minWidth: '280px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.3s ease',
+              boxSizing: 'border-box'
+            }}
+            onFocus={(e) => e.target.style.borderColor = primaryColor}
+            onBlur={(e) => e.target.style.borderColor = accentColor}
+          />
+          <select
+            value={userType}
+            onChange={(e) => setUserType(e.target.value)}
+            style={{
+              padding: '12px 16px',
+              border: `1px solid ${accentColor}`,
+              borderRadius: '8px',
+              backgroundColor: 'white',
+              minWidth: '180px',
+              fontSize: '14px',
+              outline: 'none',
+              cursor: 'pointer',
+              transition: 'border-color 0.3s ease',
+              boxSizing: 'border-box'
+            }}
+            onFocus={(e) => e.target.style.borderColor = primaryColor}
+            onBlur={(e) => e.target.style.borderColor = accentColor}
+          >
+            <option value="all">All Users ({typeCounts.all})</option>
+            <option value="customer">Customers ({typeCounts.customer})</option>
+            <option value="vendor">Vendors ({typeCounts.vendor})</option>
+            <option value="doctor">Doctors ({typeCounts.doctor})</option>
+            <option value="delivery">Delivery Agents ({typeCounts.delivery})</option>
+          </select>
+        </div>
         
         {/* Results counter */}
         <div style={{ 
           color: '#666', 
           fontSize: '14px',
-          backgroundColor: '#f8f9fa',
-          padding: '8px 12px',
-          borderRadius: '5px',
-          border: `1px solid ${accentColor}`
+          backgroundColor: '#ffffff',
+          padding: '10px 16px',
+          borderRadius: '8px',
+          border: `1px solid ${accentColor}`,
+          whiteSpace: 'nowrap',
+          fontWeight: '500',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
           {filteredUsers.length} user(s) found
         </div>
@@ -370,15 +411,16 @@ const UsersManagement = () => {
       {loading && (
         <div style={{ 
           textAlign: 'center', 
-          padding: '40px', 
+          padding: '48px', 
           color: primaryColor,
-          backgroundColor: '#f9f9f9',
-          borderRadius: '8px',
-          marginBottom: '20px',
-          border: `1px solid ${accentColor}`
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          marginBottom: '24px',
+          border: `1px solid ${accentColor}`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '16px', marginBottom: '10px' }}>Loading users...</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>Please wait while we fetch user data</div>
+          <div style={{ fontSize: '18px', marginBottom: '12px', fontWeight: '500' }}>Loading users...</div>
+          <div style={{ fontSize: '14px', color: '#666' }}>Please wait while we fetch user data</div>
         </div>
       )}
 
@@ -386,41 +428,93 @@ const UsersManagement = () => {
       {!loading && (
         <div style={{
           backgroundColor: 'white',
-          borderRadius: '8px',
+          borderRadius: '12px',
           overflow: 'hidden',
           border: `1px solid ${accentColor}`,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ 
               width: '100%', 
               borderCollapse: 'collapse', 
-              minWidth: '800px',
-              fontSize: '14px'
+              minWidth: '900px',
+              fontSize: '14px',
+              tableLayout: 'fixed'
             }}>
               <thead>
                 <tr style={{ 
                   backgroundColor: primaryColor, 
                   color: 'white',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  height: '56px'
                 }}>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>User ID</th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Name</th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Type</th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Email</th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Status</th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Last Login</th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Actions</th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '100px'
+                  }}>
+                    User ID
+                  </th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '180px'
+                  }}>
+                    Name
+                  </th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '120px'
+                  }}>
+                    Type
+                  </th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '220px'
+                  }}>
+                    Email
+                  </th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '120px'
+                  }}>
+                    Status
+                  </th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '130px'
+                  }}>
+                    Last Login
+                  </th>
+                  <th style={{ 
+                    padding: '16px', 
+                    textAlign: 'left', 
+                    fontWeight: '600', 
+                    width: '150px'
+                  }}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map(user => {
+                {filteredUsers.map((user, index) => {
                   const statusColors = getStatusColor(user.status);
                   return (
                     <tr key={user.id} style={{ 
                       borderBottom: `1px solid ${accentColor}`,
                       transition: 'background-color 0.2s',
-                      backgroundColor: actionLoading === user.id ? '#f8f9fa' : 'white'
+                      backgroundColor: actionLoading === user.id ? '#f8f9fa' : 'white',
+                      height: '72px'
                     }}
                     onMouseEnter={(e) => {
                       if (actionLoading !== user.id) {
@@ -432,56 +526,139 @@ const UsersManagement = () => {
                         e.currentTarget.style.backgroundColor = 'white';
                       }
                     }}>
-                      <td style={{ padding: '12px', fontWeight: '500' }}>#{user.id}</td>
-                      <td style={{ padding: '12px', fontWeight: '500' }}>{user.name}</td>
+                      {/* User ID */}
                       <td style={{ 
-                        padding: '12px', 
+                        padding: '16px', 
+                        fontWeight: '600', 
+                        color: primaryColor,
+                        verticalAlign: 'middle'
+                      }}>
+                        #{user.id}
+                      </td>
+                      
+                      {/* Name */}
+                      <td style={{ 
+                        padding: '16px', 
+                        fontWeight: '500',
+                        verticalAlign: 'middle',
+                        lineHeight: '1.4'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          height: '100%',
+                          minHeight: '40px'
+                        }}>
+                          {user.name}
+                        </div>
+                      </td>
+                      
+                      {/* Type */}
+                      <td style={{ 
+                        padding: '16px', 
                         textTransform: 'capitalize',
                         color: primaryColor,
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        verticalAlign: 'middle'
                       }}>
-                        {user.type}
-                      </td>
-                      <td style={{ padding: '12px' }}>{user.email}</td>
-                      <td style={{ padding: '12px' }}>
-                        <span style={{
-                          padding: '6px 12px',
-                          borderRadius: '15px',
-                          fontSize: '12px',
-                          backgroundColor: statusColors.bg,
-                          color: statusColors.text,
-                          fontWeight: '600',
-                          border: `1px solid ${statusColors.text}20`
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          height: '100%',
+                          minHeight: '40px'
                         }}>
-                          {user.status.toUpperCase()}
-                        </span>
+                          {user.type}
+                        </div>
                       </td>
+                      
+                      {/* Email */}
                       <td style={{ 
-                        padding: '12px', 
-                        fontSize: '12px',
-                        color: user.lastLogin ? '#333' : '#999',
-                        fontStyle: user.lastLogin ? 'normal' : 'italic'
+                        padding: '16px', 
+                        color: '#555',
+                        verticalAlign: 'middle'
                       }}>
-                        {user.lastLogin || 'Never logged in'}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          height: '100%',
+                          minHeight: '40px'
+                        }}>
+                          {user.email}
+                        </div>
                       </td>
-                      <td style={{ padding: '12px' }}>
+                      
+                      {/* Status */}
+                      <td style={{ 
+                        padding: '16px',
+                        verticalAlign: 'middle'
+                      }}>
                         <div style={{ 
                           display: 'flex', 
-                          flexDirection: 'column', 
-                          gap: '8px', 
-                          alignItems: 'flex-start'
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          height: '100%'
+                        }}>
+                          <span style={{
+                            padding: '8px 16px',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            backgroundColor: statusColors.bg,
+                            color: statusColors.text,
+                            fontWeight: '600',
+                            border: `1px solid ${statusColors.text}20`,
+                            textAlign: 'center',
+                            minWidth: '80px',
+                            display: 'inline-block'
+                          }}>
+                            {user.status.toUpperCase()}
+                          </span>
+                        </div>
+                      </td>
+                      
+                      {/* Last Login */}
+                      <td style={{ 
+                        padding: '16px', 
+                        fontSize: '13px',
+                        color: user.lastLogin ? '#333' : '#999',
+                        fontStyle: user.lastLogin ? 'normal' : 'italic',
+                        textAlign: 'left',
+                        verticalAlign: 'middle'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          height: '100%',
+                          minHeight: '40px'
+                        }}>
+                          {user.lastLogin || 'Never logged in'}
+                        </div>
+                      </td>
+                      
+                      {/* Actions */}
+                      <td style={{ 
+                        padding: '16px',
+                        verticalAlign: 'middle'
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'flex-start',
+                          alignItems: 'flex-start',
+                          height: '100%'
                         }}>
                           {getActionButtons(user)}
-                          {actionLoading === user.id && (
-                            <div style={{
-                              fontSize: '11px',
-                              color: primaryColor,
-                              fontStyle: 'italic'
-                            }}>
-                              Processing...
-                            </div>
-                          )}
                         </div>
+                        {actionLoading === user.id && (
+                          <div style={{
+                            fontSize: '11px',
+                            color: primaryColor,
+                            fontStyle: 'italic',
+                            textAlign: 'left',
+                            marginTop: '8px',
+                            marginLeft: '4px'
+                          }}>
+                            Processing...
+                          </div>
+                        )}
                       </td>
                     </tr>
                   );
@@ -495,14 +672,15 @@ const UsersManagement = () => {
       {!loading && filteredUsers.length === 0 && (
         <div style={{ 
           textAlign: 'center', 
-          padding: '40px', 
+          padding: '48px', 
           color: '#666',
-          backgroundColor: '#f9f9f9',
-          borderRadius: '8px',
-          marginTop: '20px',
-          border: `1px solid ${accentColor}`
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          marginTop: '24px',
+          border: `1px solid ${accentColor}`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '16px', marginBottom: '10px' }}>No users found</div>
+          <div style={{ fontSize: '18px', marginBottom: '12px', fontWeight: '500' }}>No users found</div>
           <div style={{ fontSize: '14px' }}>Try adjusting your search criteria or filters</div>
         </div>
       )}
@@ -519,31 +697,34 @@ const UsersManagement = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          padding: '20px',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             backgroundColor: 'white',
-            padding: '30px',
+            padding: '32px',
             borderRadius: '12px',
-            width: '90%',
-            maxWidth: '700px',
-            maxHeight: '85vh',
+            width: '100%',
+            maxWidth: '800px',
+            maxHeight: '90vh',
             overflowY: 'auto',
             boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-            border: `3px solid ${primaryColor}`
+            border: `3px solid ${primaryColor}`,
+            boxSizing: 'border-box'
           }}>
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '25px',
+              marginBottom: '24px',
               borderBottom: `2px solid ${accentColor}`,
-              paddingBottom: '15px'
+              paddingBottom: '16px'
             }}>
               <h3 style={{ 
                 color: primaryColor, 
                 margin: 0,
-                fontSize: '20px',
+                fontSize: '22px',
                 fontWeight: '600'
               }}>
                 📊 User History - {selectedUser.name}
@@ -556,14 +737,15 @@ const UsersManagement = () => {
                   fontSize: '24px',
                   cursor: 'pointer',
                   color: primaryColor,
-                  padding: '5px',
+                  padding: '8px',
                   borderRadius: '50%',
                   width: '40px',
                   height: '40px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transition: 'background-color 0.2s'
+                  transition: 'background-color 0.2s',
+                  flexShrink: 0
                 }}
                 onMouseOver={(e) => e.target.style.backgroundColor = accentColor}
                 onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
@@ -572,9 +754,9 @@ const UsersManagement = () => {
               </button>
             </div>
             
-            {/* User Details Section */}
+            {/* User Details Section - Compact side-by-side alignment */}
             <div style={{ 
-              marginBottom: '25px',
+              marginBottom: '24px',
               backgroundColor: '#f8f9fa',
               padding: '20px',
               borderRadius: '8px',
@@ -582,53 +764,94 @@ const UsersManagement = () => {
             }}>
               <h4 style={{ 
                 color: primaryColor, 
-                marginBottom: '15px',
-                fontSize: '16px',
+                marginBottom: '16px',
+                fontSize: '18px',
                 fontWeight: '600'
               }}>
                 👤 User Details
               </h4>
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                gap: '15px',
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '12px',
                 fontSize: '14px'
               }}>
-                <div><strong>Name:</strong> {selectedUser.name}</div>
-                <div><strong>Email:</strong> {selectedUser.email}</div>
-                <div><strong>Type:</strong> 
-                  <span style={{
-                    textTransform: 'capitalize',
-                    color: primaryColor,
-                    fontWeight: '600',
-                    marginLeft: '5px'
-                  }}>
-                    {selectedUser.type}
-                  </span>
+                {/* Left Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '80px' }}>Name:</strong>
+                    <span style={{ marginLeft: '8px' }}>{selectedUser.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '80px' }}>Email:</strong>
+                    <span style={{ marginLeft: '8px' }}>{selectedUser.email}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '80px' }}>Type:</strong>
+                    <span style={{ 
+                      marginLeft: '8px',
+                      textTransform: 'capitalize',
+                      color: primaryColor,
+                      fontWeight: '600'
+                    }}>
+                      {selectedUser.type}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '80px' }}>Status:</strong>
+                    <span style={{ marginLeft: '8px' }}>
+                      <span style={{
+                        padding: '4px 8px',
+                        borderRadius: '8px',
+                        fontSize: '11px',
+                        backgroundColor: getStatusColor(selectedUser.status).bg,
+                        color: getStatusColor(selectedUser.status).text,
+                        fontWeight: '600'
+                      }}>
+                        {selectedUser.status.toUpperCase()}
+                      </span>
+                    </span>
+                  </div>
                 </div>
-                <div><strong>Status:</strong> 
-                  <span style={{
-                    padding: '4px 8px',
-                    borderRadius: '10px',
-                    fontSize: '11px',
-                    backgroundColor: getStatusColor(selectedUser.status).bg,
-                    color: getStatusColor(selectedUser.status).text,
-                    fontWeight: '600',
-                    marginLeft: '5px'
-                  }}>
-                    {selectedUser.status.toUpperCase()}
-                  </span>
+                
+                {/* Right Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '100px' }}>Phone:</strong>
+                    <span style={{ marginLeft: '8px' }}>{selectedUser.phone}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '100px' }}>Registration:</strong>
+                    <span style={{ marginLeft: '8px' }}>{selectedUser.registrationDate}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '100px' }}>Last Login:</strong>
+                    <span style={{ marginLeft: '8px' }}>{selectedUser.lastLogin || 'Never'}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <strong style={{ minWidth: '100px' }}>User ID:</strong>
+                    <span style={{ marginLeft: '8px', color: primaryColor, fontWeight: '600' }}>#{selectedUser.id}</span>
+                  </div>
                 </div>
-                <div><strong>Phone:</strong> {selectedUser.phone}</div>
-                <div><strong>Registration:</strong> {selectedUser.registrationDate}</div>
-                <div><strong>Last Login:</strong> {selectedUser.lastLogin || 'Never'}</div>
-                <div><strong>Address:</strong> {selectedUser.address}</div>
+                
+                {/* Full width row for address */}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start',
+                  gridColumn: '1 / -1',
+                  marginTop: '8px',
+                  paddingTop: '12px',
+                  borderTop: `1px solid ${accentColor}`
+                }}>
+                  <strong style={{ minWidth: '80px' }}>Address:</strong>
+                  <span style={{ marginLeft: '8px' }}>{selectedUser.address}</span>
+                </div>
               </div>
             </div>
 
-            {/* Activity History Section */}
+            {/* Activity History Section - Compact side-by-side alignment */}
             <div style={{ 
-              marginBottom: '25px',
+              marginBottom: '24px',
               backgroundColor: '#f8f9fa',
               padding: '20px',
               borderRadius: '8px',
@@ -636,8 +859,8 @@ const UsersManagement = () => {
             }}>
               <h4 style={{ 
                 color: primaryColor, 
-                marginBottom: '15px',
-                fontSize: '16px',
+                marginBottom: '16px',
+                fontSize: '18px',
                 fontWeight: '600'
               }}>
                 📈 Activity History
@@ -649,128 +872,150 @@ const UsersManagement = () => {
                 fontSize: '14px',
                 border: `1px solid ${accentColor}`
               }}>
-                {/* Enhanced activity data with better formatting */}
+                {/* Customer Activity */}
                 {selectedUser.type === 'customer' && (
-                  <div style={{ display: 'grid', gap: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Total Orders:</strong></span>
-                      <span style={{ color: primaryColor, fontWeight: '600' }}>{selectedUser.orders}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Total Orders:</strong>
+                        <span style={{ marginLeft: '8px', color: primaryColor, fontWeight: '600', fontSize: '15px' }}>{selectedUser.orders}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Total Spent:</strong>
+                        <span style={{ marginLeft: '8px', color: '#28a745', fontWeight: '600', fontSize: '15px' }}>${selectedUser.totalSpent}</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Total Spent:</strong></span>
-                      <span style={{ color: '#28a745', fontWeight: '600' }}>${selectedUser.totalSpent}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Recent Activity:</strong></span>
-                      <span>Last purchase on 2023-10-15</span>
-                    </div>
-                    <div style={{ 
-                      padding: '10px', 
-                      backgroundColor: getStatusColor(selectedUser.status).bg,
-                      color: getStatusColor(selectedUser.status).text,
-                      borderRadius: '5px',
-                      marginTop: '10px',
-                      fontSize: '13px',
-                      fontWeight: '500'
-                    }}>
-                      {selectedUser.status === 'active' 
-                        ? '✅ Active - Can place orders' 
-                        : selectedUser.status === 'pending' 
-                        ? '⏳ Pending - Awaiting approval' 
-                        : '❌ Inactive - Cannot place orders'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Recent Activity:</strong>
+                        <span style={{ marginLeft: '8px' }}>Last purchase on 2023-10-15</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Account Status:</strong>
+                        <span style={{ marginLeft: '8px' }}>
+                          <span style={{ 
+                            padding: '4px 8px',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            backgroundColor: getStatusColor(selectedUser.status).bg,
+                            color: getStatusColor(selectedUser.status).text,
+                            fontWeight: '600'
+                          }}>
+                            {selectedUser.status.toUpperCase()}
+                          </span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
+                
+                {/* Vendor Activity */}
                 {selectedUser.type === 'vendor' && (
-                  <div style={{ display: 'grid', gap: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Products Listed:</strong></span>
-                      <span style={{ color: primaryColor, fontWeight: '600' }}>{selectedUser.products}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Products Listed:</strong>
+                        <span style={{ marginLeft: '8px', color: primaryColor, fontWeight: '600', fontSize: '15px' }}>{selectedUser.products}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Rating:</strong>
+                        <span style={{ marginLeft: '8px', color: '#FFA500', fontWeight: '600', fontSize: '15px' }}>{selectedUser.rating}/5 ⭐</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Rating:</strong></span>
-                      <span style={{ color: '#FFA500', fontWeight: '600' }}>{selectedUser.rating}/5 ⭐</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Recent Activity:</strong></span>
-                      <span>Added 5 new products</span>
-                    </div>
-                    <div style={{ 
-                      padding: '10px', 
-                      backgroundColor: getStatusColor(selectedUser.status).bg,
-                      color: getStatusColor(selectedUser.status).text,
-                      borderRadius: '5px',
-                      marginTop: '10px',
-                      fontSize: '13px',
-                      fontWeight: '500'
-                    }}>
-                      {selectedUser.status === 'active' 
-                        ? '✅ Active - Can sell products' 
-                        : selectedUser.status === 'pending' 
-                        ? '⏳ Pending - Awaiting approval' 
-                        : '❌ Inactive - Cannot sell products'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Recent Activity:</strong>
+                        <span style={{ marginLeft: '8px' }}>Added 5 new products</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Account Status:</strong>
+                        <span style={{ marginLeft: '8px' }}>
+                          <span style={{ 
+                            padding: '4px 8px',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            backgroundColor: getStatusColor(selectedUser.status).bg,
+                            color: getStatusColor(selectedUser.status).text,
+                            fontWeight: '600'
+                          }}>
+                            {selectedUser.status.toUpperCase()}
+                          </span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
+                
+                {/* Doctor Activity */}
                 {selectedUser.type === 'doctor' && (
-                  <div style={{ display: 'grid', gap: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Specialization:</strong></span>
-                      <span style={{ color: primaryColor, fontWeight: '600' }}>{selectedUser.specialization}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Specialization:</strong>
+                        <span style={{ marginLeft: '8px', color: primaryColor, fontWeight: '600', fontSize: '15px' }}>{selectedUser.specialization}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Experience:</strong>
+                        <span style={{ marginLeft: '8px', color: primaryColor, fontWeight: '600', fontSize: '15px' }}>{selectedUser.experience}</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Experience:</strong></span>
-                      <span style={{ color: primaryColor, fontWeight: '600' }}>{selectedUser.experience}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Recent Activity:</strong></span>
-                      <span>Completed 3 consultations</span>
-                    </div>
-                    <div style={{ 
-                      padding: '10px', 
-                      backgroundColor: getStatusColor(selectedUser.status).bg,
-                      color: getStatusColor(selectedUser.status).text,
-                      borderRadius: '5px',
-                      marginTop: '10px',
-                      fontSize: '13px',
-                      fontWeight: '500'
-                    }}>
-                      {selectedUser.status === 'active' 
-                        ? '✅ Active - Can provide consultations' 
-                        : selectedUser.status === 'pending' 
-                        ? '⏳ Pending - Awaiting approval' 
-                        : '❌ Inactive - Cannot provide consultations'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Recent Activity:</strong>
+                        <span style={{ marginLeft: '8px' }}>Completed 3 consultations</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Account Status:</strong>
+                        <span style={{ marginLeft: '8px' }}>
+                          <span style={{ 
+                            padding: '4px 8px',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            backgroundColor: getStatusColor(selectedUser.status).bg,
+                            color: getStatusColor(selectedUser.status).text,
+                            fontWeight: '600'
+                          }}>
+                            {selectedUser.status.toUpperCase()}
+                          </span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
+                
+                {/* Delivery Activity */}
                 {selectedUser.type === 'delivery' && (
-                  <div style={{ display: 'grid', gap: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Total Deliveries:</strong></span>
-                      <span style={{ color: primaryColor, fontWeight: '600' }}>{selectedUser.deliveries}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Total Deliveries:</strong>
+                        <span style={{ marginLeft: '8px', color: primaryColor, fontWeight: '600', fontSize: '15px' }}>{selectedUser.deliveries}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Rating:</strong>
+                        <span style={{ marginLeft: '8px', color: '#FFA500', fontWeight: '600', fontSize: '15px' }}>{selectedUser.rating}/5 ⭐</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Rating:</strong></span>
-                      <span style={{ color: '#FFA500', fontWeight: '600' }}>{selectedUser.rating}/5 ⭐</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span><strong>Recent Activity:</strong></span>
-                      <span>2 deliveries today</span>
-                    </div>
-                    <div style={{ 
-                      padding: '10px', 
-                      backgroundColor: getStatusColor(selectedUser.status).bg,
-                      color: getStatusColor(selectedUser.status).text,
-                      borderRadius: '5px',
-                      marginTop: '10px',
-                      fontSize: '13px',
-                      fontWeight: '500'
-                    }}>
-                      {selectedUser.status === 'active' 
-                        ? '✅ Active - Can accept deliveries' 
-                        : selectedUser.status === 'pending' 
-                        ? '⏳ Pending - Awaiting approval' 
-                        : '❌ Inactive - Cannot accept deliveries'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Recent Activity:</strong>
+                        <span style={{ marginLeft: '8px' }}>2 deliveries today</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <strong style={{ minWidth: '120px' }}>Account Status:</strong>
+                        <span style={{ marginLeft: '8px' }}>
+                          <span style={{ 
+                            padding: '4px 8px',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            backgroundColor: getStatusColor(selectedUser.status).bg,
+                            color: getStatusColor(selectedUser.status).text,
+                            fontWeight: '600'
+                          }}>
+                            {selectedUser.status.toUpperCase()}
+                          </span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -783,7 +1028,9 @@ const UsersManagement = () => {
               justifyContent: 'space-between', 
               alignItems: 'center',
               paddingTop: '20px',
-              borderTop: `1px solid ${accentColor}`
+              borderTop: `1px solid ${accentColor}`,
+              gap: '12px',
+              flexWrap: 'wrap'
             }}>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {selectedUser.status === 'active' ? (
@@ -801,7 +1048,8 @@ const UsersManagement = () => {
                       cursor: 'pointer',
                       fontSize: '14px',
                       fontWeight: '600',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      minWidth: '130px'
                     }}
                     onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
                     onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
@@ -823,7 +1071,8 @@ const UsersManagement = () => {
                       cursor: 'pointer',
                       fontSize: '14px',
                       fontWeight: '600',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      minWidth: '130px'
                     }}
                     onMouseOver={(e) => e.target.style.backgroundColor = '#218838'}
                     onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
@@ -831,7 +1080,7 @@ const UsersManagement = () => {
                     Activate User
                   </button>
                 ) : (
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     <button 
                       onClick={() => {
                         handleActivateUser(selectedUser.id);
@@ -846,12 +1095,13 @@ const UsersManagement = () => {
                         cursor: 'pointer',
                         fontSize: '14px',
                         fontWeight: '600',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        minWidth: '110px'
                       }}
                       onMouseOver={(e) => e.target.style.backgroundColor = '#218838'}
                       onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
                     >
-                      Active User
+                      Activate User
                     </button>
                     <button 
                       onClick={() => {
@@ -867,12 +1117,13 @@ const UsersManagement = () => {
                         cursor: 'pointer',
                         fontSize: '14px',
                         fontWeight: '600',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        minWidth: '110px'
                       }}
                       onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
                       onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
                     >
-                      Inactive User
+                      Inactivate User
                     </button>
                   </div>
                 )}
@@ -880,7 +1131,7 @@ const UsersManagement = () => {
               <button 
                 onClick={handleCloseHistory}
                 style={{
-                  padding: '10px 25px',
+                  padding: '10px 24px',
                   backgroundColor: primaryColor,
                   color: 'white',
                   border: 'none',
@@ -888,7 +1139,8 @@ const UsersManagement = () => {
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '600',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  minWidth: '100px'
                 }}
                 onMouseOver={(e) => e.target.style.backgroundColor = '#6a2452'}
                 onMouseOut={(e) => e.target.style.backgroundColor = primaryColor}

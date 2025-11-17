@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 
 const DeliveryAgentLookup = () => {
   const primaryColor = '#7C2A62';
   const accentColor = '#F7D9EB';
+  const hoverColor = '#8C3A72';
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAgent, setSelectedAgent] = useState(null);
@@ -21,13 +21,13 @@ const DeliveryAgentLookup = () => {
   // Create ref for earnings section
   const earningsRef = useRef(null);
 
-  // Mock data with enhanced information
+  // Mock data with Indian phone numbers only
   const mockAgents = [
     {
       id: 'DA001',
       name: 'Raj Kumar',
       region: 'Central Bangalore',
-      phone: '+91 9876543210',
+      phone: '+91 98765 43210',
       email: 'raj.kumar@quickmed.com',
       vehicleType: 'Bike',
       vehicleNumber: 'KA01AB1234',
@@ -128,7 +128,7 @@ const DeliveryAgentLookup = () => {
       id: 'DA002',
       name: 'Priya Singh',
       region: 'South Bangalore',
-      phone: '+91 9876543211',
+      phone: '+91 87654 32109',
       email: 'priya.singh@quickmed.com',
       vehicleType: 'Scooter',
       vehicleNumber: 'KA01CD5678',
@@ -155,6 +155,14 @@ const DeliveryAgentLookup = () => {
           comment: 'Fastest delivery ever! Very satisfied with the service.',
           date: '2024-01-14',
           orderId: 'ORD1004'
+        },
+        {
+          id: 2,
+          customer: 'Anjali Rao',
+          rating: 5,
+          comment: 'Courteous and efficient service. Highly recommended!',
+          date: '2024-01-13',
+          orderId: 'ORD1005'
         }
       ],
       
@@ -167,6 +175,15 @@ const DeliveryAgentLookup = () => {
           status: 'Delivered',
           deliveryTime: '21 mins',
           rating: 5
+        },
+        {
+          date: '2024-01-14',
+          orderId: 'ORD1017',
+          customer: 'Lakshmi Nair',
+          address: '789 JP Nagar, Bangalore',
+          status: 'Delivered',
+          deliveryTime: '19 mins',
+          rating: 5
         }
       ]
     },
@@ -174,7 +191,7 @@ const DeliveryAgentLookup = () => {
       id: 'DA003',
       name: 'Amit Sharma',
       region: 'North Bangalore',
-      phone: '+91 9876543212',
+      phone: '+91 76543 21098',
       email: 'amit.sharma@quickmed.com',
       vehicleType: 'Bike',
       vehicleNumber: 'KA01EF9012',
@@ -200,7 +217,15 @@ const DeliveryAgentLookup = () => {
           rating: 4,
           comment: 'Good service but could improve communication.',
           date: '2024-01-10',
-          orderId: 'ORD1005'
+          orderId: 'ORD1006'
+        },
+        {
+          id: 2,
+          customer: 'Vikram Joshi',
+          rating: 3,
+          comment: 'Delivery was late but agent was apologetic.',
+          date: '2024-01-09',
+          orderId: 'ORD1007'
         }
       ],
       
@@ -213,6 +238,107 @@ const DeliveryAgentLookup = () => {
           status: 'Delivered',
           deliveryTime: '30 mins',
           rating: 4
+        },
+        {
+          date: '2024-01-09',
+          orderId: 'ORD1009',
+          customer: 'Priya Menon',
+          address: '321 Malleshwaram, Bangalore',
+          status: 'Delivered',
+          deliveryTime: '35 mins',
+          rating: 3
+        }
+      ]
+    },
+    {
+      id: 'DA004',
+      name: 'Suresh Reddy',
+      region: 'East Bangalore',
+      phone: '+91 65432 10987',
+      email: 'suresh.reddy@quickmed.com',
+      vehicleType: 'Bike',
+      vehicleNumber: 'KA01GH3456',
+      status: 'Active',
+      licenseNumber: 'DL12345678901237',
+      verificationStatus: 'Verified',
+      totalDeliveries: 412,
+      onTimePercentage: 94,
+      averageDeliveryTime: '26 mins',
+      averageRating: 4.6,
+      joinDate: '2023-04-18',
+      address: '234 KR Puram, Bangalore',
+      
+      performanceTrend: {
+        weekly: [91, 93, 92, 94, 93, 95, 94],
+        monthly: [90, 92, 93, 94, 93, 94, 95, 94, 93, 94, 95, 94]
+      },
+      
+      recentReviews: [
+        {
+          id: 1,
+          customer: 'Ramesh Kumar',
+          rating: 5,
+          comment: 'Excellent service! Always on time.',
+          date: '2024-01-15',
+          orderId: 'ORD1008'
+        }
+      ],
+      
+      deliveryHistory: [
+        {
+          date: '2024-01-15',
+          orderId: 'ORD1018',
+          customer: 'Geeta Sharma',
+          address: '567 Marathahalli, Bangalore',
+          status: 'Delivered',
+          deliveryTime: '27 mins',
+          rating: 5
+        }
+      ]
+    },
+    {
+      id: 'DA005',
+      name: 'Anjali Patel',
+      region: 'West Bangalore',
+      phone: '+91 94321 09876',
+      email: 'anjali.patel@quickmed.com',
+      vehicleType: 'Scooter',
+      vehicleNumber: 'KA01IJ7890',
+      status: 'Active',
+      licenseNumber: 'DL12345678901238',
+      verificationStatus: 'Verified',
+      totalDeliveries: 278,
+      onTimePercentage: 96,
+      averageDeliveryTime: '22 mins',
+      averageRating: 4.9,
+      joinDate: '2023-09-12',
+      address: '876 Vijayanagar, Bangalore',
+      
+      performanceTrend: {
+        weekly: [94, 95, 95, 96, 95, 97, 96],
+        monthly: [93, 94, 95, 96, 95, 96, 97, 96, 95, 96, 97, 96]
+      },
+      
+      recentReviews: [
+        {
+          id: 1,
+          customer: 'Deepak Verma',
+          rating: 5,
+          comment: 'Best delivery agent! Very professional.',
+          date: '2024-01-14',
+          orderId: 'ORD1009'
+        }
+      ],
+      
+      deliveryHistory: [
+        {
+          date: '2024-01-14',
+          orderId: 'ORD1019',
+          customer: 'Mohan Das',
+          address: '654 Rajajinagar, Bangalore',
+          status: 'Delivered',
+          deliveryTime: '20 mins',
+          rating: 5
         }
       ]
     }
@@ -349,7 +475,7 @@ const DeliveryAgentLookup = () => {
 
     return (
       <div style={{ marginBottom: '20px' }}>
-        <h4 style={{ color: primaryColor, marginBottom: '15px' }}>{title}</h4>
+        <h4 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>{title}</h4>
         <div style={{ 
           display: 'flex', 
           alignItems: 'end', 
@@ -358,7 +484,8 @@ const DeliveryAgentLookup = () => {
           padding: '15px',
           backgroundColor: '#f8f9fa',
           borderRadius: '5px',
-          border: `1px solid ${accentColor}`
+          border: `1px solid ${accentColor}`,
+          transition: 'all 0.3s ease'
         }}>
           {data.map((value, index) => {
             const height = ((value - minValue) / (maxValue - minValue)) * 80 + 20;
@@ -370,13 +497,23 @@ const DeliveryAgentLookup = () => {
                     width: '20px',
                     backgroundColor: primaryColor,
                     borderRadius: '3px 3px 0 0',
-                    marginBottom: '5px'
+                    marginBottom: '5px',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = hoverColor;
+                    e.target.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = primaryColor;
+                    e.target.style.transform = 'scale(1)';
                   }}
                 />
                 <div style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>
                   {labels[index]}
                 </div>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', color: primaryColor }}>
+                <div style={{ fontSize: '10px', fontWeight: 'bold', color: primaryColor, textAlign: 'center' }}>
                   {value}%
                 </div>
               </div>
@@ -411,7 +548,9 @@ const DeliveryAgentLookup = () => {
           width: '90%',
           maxWidth: '500px',
           maxHeight: '90vh',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+          transition: 'all 0.3s ease'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ color: primaryColor, margin: 0 }}>{title}</h3>
@@ -422,7 +561,23 @@ const DeliveryAgentLookup = () => {
                 border: 'none',
                 fontSize: '24px',
                 cursor: 'pointer',
-                color: '#666'
+                color: '#666',
+                padding: '5px',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#f0f0f0';
+                e.target.style.color = primaryColor;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.color = '#666';
               }}
             >
               ×
@@ -454,9 +609,9 @@ const DeliveryAgentLookup = () => {
         title="Suspend Delivery Agent"
       >
         <div>
-          <p>Are you sure you want to suspend agent <strong>{selectedAgent?.name}</strong> (ID: {selectedAgent?.id})?</p>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <p style={{ textAlign: 'center', marginBottom: '20px' }}>Are you sure you want to suspend agent <strong>{selectedAgent?.name}</strong> (ID: {selectedAgent?.id})?</p>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
               Reason for Suspension:
             </label>
             <textarea
@@ -465,24 +620,46 @@ const DeliveryAgentLookup = () => {
               placeholder="Enter reason for suspension..."
               style={{
                 width: '100%',
-                padding: '10px',
+                padding: '12px',
                 border: `1px solid ${accentColor}`,
                 borderRadius: '5px',
                 minHeight: '80px',
-                resize: 'vertical'
+                resize: 'vertical',
+                transition: 'all 0.3s ease',
+                fontFamily: 'inherit'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = primaryColor;
+                e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = accentColor;
+                e.target.style.boxShadow = 'none';
               }}
             />
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <button
               onClick={() => setShowSuspendModal(false)}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#6c757d',
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#5a6268';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#6c757d';
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Cancel
@@ -490,12 +667,24 @@ const DeliveryAgentLookup = () => {
             <button
               onClick={handleLocalSuspend}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#dc3545',
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#c82333';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#dc3545';
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Confirm Suspend
@@ -531,62 +720,37 @@ const DeliveryAgentLookup = () => {
       >
         <div>
           <div style={{ display: 'grid', gap: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Name:</label>
-              <input
-                type="text"
-                value={localAgent.name}
-                onChange={(e) => handleFieldChange('name', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: `1px solid ${accentColor}`,
-                  borderRadius: '5px'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Phone:</label>
-              <input
-                type="text"
-                value={localAgent.phone}
-                onChange={(e) => handleFieldChange('phone', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: `1px solid ${accentColor}`,
-                  borderRadius: '5px'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Email:</label>
-              <input
-                type="email"
-                value={localAgent.email}
-                onChange={(e) => handleFieldChange('email', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: `1px solid ${accentColor}`,
-                  borderRadius: '5px'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Region:</label>
-              <input
-                type="text"
-                value={localAgent.region}
-                onChange={(e) => handleFieldChange('region', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: `1px solid ${accentColor}`,
-                  borderRadius: '5px'
-                }}
-              />
-            </div>
+            {[
+              { label: 'Name:', field: 'name', type: 'text' },
+              { label: 'Phone:', field: 'phone', type: 'text' },
+              { label: 'Email:', field: 'email', type: 'email' },
+              { label: 'Region:', field: 'region', type: 'text' },
+            ].map(({ label, field, type }) => (
+              <div key={field}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>{label}</label>
+                <input
+                  type={type}
+                  value={localAgent[field]}
+                  onChange={(e) => handleFieldChange(field, e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease',
+                    fontSize: '14px'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = primaryColor;
+                    e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = accentColor;
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+            ))}
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Address:</label>
               <textarea
@@ -594,25 +758,48 @@ const DeliveryAgentLookup = () => {
                 onChange={(e) => handleFieldChange('address', e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '8px',
+                  padding: '10px',
                   border: `1px solid ${accentColor}`,
                   borderRadius: '5px',
                   minHeight: '60px',
-                  resize: 'vertical'
+                  resize: 'vertical',
+                  transition: 'all 0.3s ease',
+                  fontSize: '14px',
+                  fontFamily: 'inherit'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = primaryColor;
+                  e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = accentColor;
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
             <button
               onClick={() => setShowEditModal(false)}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#6c757d',
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#5a6268';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#6c757d';
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Cancel
@@ -620,12 +807,24 @@ const DeliveryAgentLookup = () => {
             <button
               onClick={handleLocalSave}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: primaryColor,
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = hoverColor;
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = primaryColor;
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Save Changes
@@ -662,7 +861,7 @@ const DeliveryAgentLookup = () => {
         title="Add Incentive"
       >
         <div>
-          <p>Add incentive for agent <strong>{selectedAgent?.name}</strong> (ID: {selectedAgent?.id})</p>
+          <p style={{ textAlign: 'center', marginBottom: '20px' }}>Add incentive for agent <strong>{selectedAgent?.name}</strong> (ID: {selectedAgent?.id})</p>
           <div style={{ display: 'grid', gap: '15px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Amount (₹):</label>
@@ -673,9 +872,19 @@ const DeliveryAgentLookup = () => {
                 placeholder="Enter amount"
                 style={{
                   width: '100%',
-                  padding: '8px',
+                  padding: '10px',
                   border: `1px solid ${accentColor}`,
-                  borderRadius: '5px'
+                  borderRadius: '5px',
+                  transition: 'all 0.3s ease',
+                  fontSize: '14px'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = primaryColor;
+                  e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = accentColor;
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
@@ -687,25 +896,48 @@ const DeliveryAgentLookup = () => {
                 placeholder="Enter reason for incentive..."
                 style={{
                   width: '100%',
-                  padding: '8px',
+                  padding: '10px',
                   border: `1px solid ${accentColor}`,
                   borderRadius: '5px',
                   minHeight: '80px',
-                  resize: 'vertical'
+                  resize: 'vertical',
+                  transition: 'all 0.3s ease',
+                  fontSize: '14px',
+                  fontFamily: 'inherit'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = primaryColor;
+                  e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = accentColor;
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
             <button
               onClick={() => setShowIncentiveModal(false)}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#6c757d',
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#5a6268';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#6c757d';
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Cancel
@@ -713,12 +945,24 @@ const DeliveryAgentLookup = () => {
             <button
               onClick={handleLocalAdd}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#ffc107',
                 color: 'black',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#e0a800';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#ffc107';
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Add Incentive
@@ -730,12 +974,20 @@ const DeliveryAgentLookup = () => {
   };
 
   return (
-    <div>
-      <h2 style={{ color: primaryColor, marginBottom: '20px' }}>Delivery Agent Lookup & Profile</h2>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <h2 style={{ 
+        color: primaryColor, 
+        marginBottom: '20px',
+        paddingBottom: '10px',
+        borderBottom: `2px solid ${accentColor}`,
+        textAlign: 'center'
+      }}>
+        Delivery Agent Lookup & Profile
+      </h2>
       
       {/* Search Section */}
       <div style={{ marginBottom: '30px' }}>
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', justifyContent: 'center' }}>
           <input
             type="text"
             placeholder="Enter Agent ID, Name, Phone, or Email"
@@ -744,10 +996,20 @@ const DeliveryAgentLookup = () => {
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             style={{
               flex: 1,
-              padding: '12px',
+              maxWidth: '400px',
+              padding: '12px 15px',
               border: `1px solid ${accentColor}`,
-              borderRadius: '5px',
-              fontSize: '14px'
+              borderRadius: '8px',
+              fontSize: '14px',
+              transition: 'all 0.3s ease'
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = primaryColor;
+              e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = accentColor;
+              e.target.style.boxShadow = 'none';
             }}
           />
           <button
@@ -757,9 +1019,19 @@ const DeliveryAgentLookup = () => {
               backgroundColor: primaryColor,
               color: 'white',
               border: 'none',
-              borderRadius: '5px',
+              borderRadius: '8px',
               cursor: 'pointer',
-              fontSize: '14px'
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = hoverColor;
+              e.target.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = primaryColor;
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             Search
@@ -774,9 +1046,10 @@ const DeliveryAgentLookup = () => {
           padding: '20px',
           borderRadius: '8px',
           border: `1px solid ${accentColor}`,
-          marginBottom: '20px'
+          marginBottom: '20px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
         }}>
-          <h3 style={{ color: primaryColor, marginBottom: '15px' }}>Available Delivery Agents</h3>
+          <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>Available Delivery Agents</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '15px' }}>
             {agents.map(agent => (
               <div 
@@ -787,9 +1060,24 @@ const DeliveryAgentLookup = () => {
                   borderRadius: '8px',
                   cursor: 'pointer',
                   backgroundColor: selectedAgent?.id === agent.id ? `${accentColor}40` : 'white',
-                  transition: 'all 0.3s'
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                 }}
                 onClick={() => setSelectedAgent(agent)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
+                  if (selectedAgent?.id !== agent.id) {
+                    e.currentTarget.style.borderColor = hoverColor;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+                  if (selectedAgent?.id !== agent.id) {
+                    e.currentTarget.style.borderColor = accentColor;
+                  }
+                }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{agent.name}</div>
@@ -798,13 +1086,14 @@ const DeliveryAgentLookup = () => {
                     borderRadius: '12px',
                     fontSize: '12px',
                     backgroundColor: agent.status === 'Active' ? '#d4edda' : '#f8d7da',
-                    color: agent.status === 'Active' ? '#155724' : '#721c24'
+                    color: agent.status === 'Active' ? '#155724' : '#721c24',
+                    transition: 'all 0.3s ease'
                   }}>
                     {agent.status}
                   </span>
                 </div>
-                <div style={{ fontSize: '14px', color: '#666' }}>ID: {agent.id}</div>
-                <div style={{ fontSize: '14px', color: '#666' }}>Region: {agent.region}</div>
+                <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>ID: {agent.id}</div>
+                <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>Region: {agent.region}</div>
                 <div style={{ fontSize: '14px', color: '#666' }}>Phone: {agent.phone}</div>
               </div>
             ))}
@@ -819,20 +1108,56 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>A. Agent Information</h3>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>A. Agent Information</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
-              <div><strong>Agent ID:</strong> {selectedAgent.id}</div>
-              <div><strong>Name:</strong> {selectedAgent.name}</div>
-              <div><strong>Assigned Region:</strong> {selectedAgent.region}</div>
-              <div><strong>Phone:</strong> {selectedAgent.phone}</div>
-              <div><strong>Email:</strong> {selectedAgent.email}</div>
-              <div><strong>Vehicle Type:</strong> {selectedAgent.vehicleType}</div>
-              <div><strong>Vehicle Number:</strong> {selectedAgent.vehicleNumber}</div>
-              <div><strong>Join Date:</strong> {selectedAgent.joinDate}</div>
-              <div><strong>Address:</strong> {selectedAgent.address}</div>
-              <div>
+              {[
+                { label: 'Agent ID:', value: selectedAgent.id },
+                { label: 'Name:', value: selectedAgent.name },
+                { label: 'Assigned Region:', value: selectedAgent.region },
+                { label: 'Phone:', value: selectedAgent.phone },
+                { label: 'Email:', value: selectedAgent.email },
+                { label: 'Vehicle Type:', value: selectedAgent.vehicleType },
+                { label: 'Vehicle Number:', value: selectedAgent.vehicleNumber },
+                { label: 'Join Date:', value: selectedAgent.joinDate },
+                { label: 'Address:', value: selectedAgent.address },
+              ].map((item, index) => (
+                <div key={index} style={{ 
+                  padding: '10px',
+                  borderRadius: '5px',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = `${accentColor}20`;
+                  e.currentTarget.style.borderColor = accentColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }}
+                >
+                  <strong>{item.label}</strong> {item.value}
+                </div>
+              ))}
+              <div style={{ 
+                padding: '10px',
+                borderRadius: '5px',
+                transition: 'all 0.3s ease',
+                border: '1px solid transparent'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = `${accentColor}20`;
+                e.currentTarget.style.borderColor = accentColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = 'transparent';
+              }}
+              >
                 <strong>Status:</strong> 
                 <span style={{
                   padding: '4px 8px',
@@ -840,7 +1165,8 @@ const DeliveryAgentLookup = () => {
                   fontSize: '12px',
                   marginLeft: '8px',
                   backgroundColor: selectedAgent.status === 'Active' ? '#d4edda' : '#f8d7da',
-                  color: selectedAgent.status === 'Active' ? '#155724' : '#721c24'
+                  color: selectedAgent.status === 'Active' ? '#155724' : '#721c24',
+                  transition: 'all 0.3s ease'
                 }}>
                   {selectedAgent.status}
                 </span>
@@ -853,23 +1179,53 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>B. Verification & Documents</h3>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>B. Verification & Documents</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
-              <div><strong>Driver License:</strong> {selectedAgent.licenseNumber}</div>
-              <div><strong>Background Check:</strong> 
-                <span style={{
-                  padding: '4px 8px',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  marginLeft: '8px',
-                  backgroundColor: selectedAgent.verificationStatus === 'Verified' ? '#d4edda' : '#fff3cd',
-                  color: selectedAgent.verificationStatus === 'Verified' ? '#155724' : '#856404'
-                }}>
-                  {selectedAgent.verificationStatus}
-                </span>
-              </div>
+              {[
+                { label: 'Driver License:', value: selectedAgent.licenseNumber },
+                { 
+                  label: 'Background Check:', 
+                  value: selectedAgent.verificationStatus,
+                  isStatus: true
+                }
+              ].map((item, index) => (
+                <div key={index} style={{ 
+                  padding: '10px',
+                  borderRadius: '5px',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = `${accentColor}20`;
+                  e.currentTarget.style.borderColor = accentColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }}
+                >
+                  <strong>{item.label}</strong> 
+                  {item.isStatus ? (
+                    <span style={{
+                      padding: '4px 8px',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      marginLeft: '8px',
+                      backgroundColor: selectedAgent.verificationStatus === 'Verified' ? '#d4edda' : '#fff3cd',
+                      color: selectedAgent.verificationStatus === 'Verified' ? '#155724' : '#856404',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      {item.value}
+                    </span>
+                  ) : (
+                    item.value
+                  )}
+                </div>
+              ))}
             </div>
           </section>
 
@@ -878,26 +1234,46 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>C. Delivery Performance Metrics</h3>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>C. Delivery Performance Metrics</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-              <div style={{ textAlign: 'center', padding: '15px', backgroundColor: accentColor, borderRadius: '5px' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>{selectedAgent.totalDeliveries}</div>
-                <div>Total Deliveries</div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#d4edda', borderRadius: '5px' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#155724' }}>{selectedAgent.onTimePercentage}%</div>
-                <div>On-Time Delivery</div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#cce7ff', borderRadius: '5px' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#004085' }}>{selectedAgent.averageDeliveryTime}</div>
-                <div>Avg. Delivery Time</div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '5px' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#856404' }}>{selectedAgent.averageRating}/5</div>
-                <div>Customer Rating</div>
-              </div>
+              {[
+                { value: selectedAgent.totalDeliveries, label: 'Total Deliveries', bgColor: accentColor, color: primaryColor },
+                { value: `${selectedAgent.onTimePercentage}%`, label: 'On-Time Delivery', bgColor: '#d4edda', color: '#155724' },
+                { value: selectedAgent.averageDeliveryTime, label: 'Avg. Delivery Time', bgColor: '#cce7ff', color: '#004085' },
+                { value: `${selectedAgent.averageRating}/5`, label: 'Customer Rating', bgColor: '#fff3cd', color: '#856404' },
+              ].map((metric, index) => (
+                <div 
+                  key={index}
+                  style={{ 
+                    textAlign: 'center', 
+                    padding: '20px', 
+                    backgroundColor: metric.bgColor, 
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    border: '2px solid transparent'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.15)';
+                    e.currentTarget.style.borderColor = primaryColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = 'transparent';
+                  }}
+                >
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: metric.color, marginBottom: '8px' }}>
+                    {metric.value}
+                  </div>
+                  <div style={{ color: metric.color, opacity: 0.9, fontSize: '14px' }}>{metric.label}</div>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -906,9 +1282,11 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>D. Performance Summary</h3>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>D. Performance Summary</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <PerformanceChart trend={selectedAgent.performanceTrend} title="Weekly Performance Trend" timeFrame="weekly" />
               <PerformanceChart trend={selectedAgent.performanceTrend} title="Monthly Performance Trend" timeFrame="monthly" />
@@ -920,9 +1298,11 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>E. Customer Feedback & Ratings</h3>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>E. Customer Feedback & Ratings</h3>
             <div style={{ marginBottom: '20px', textAlign: 'center' }}>
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: primaryColor }}>
                 {selectedAgent.averageRating}/5
@@ -930,15 +1310,27 @@ const DeliveryAgentLookup = () => {
               <div style={{ fontSize: '14px', color: '#666' }}>Average Rating from {selectedAgent.totalDeliveries} deliveries</div>
             </div>
             
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <div style={{ maxHeight: '300px', overflowY: 'auto', padding: '10px' }}>
               {selectedAgent.recentReviews.map(review => (
                 <div key={review.id} style={{
                   padding: '15px',
                   border: `1px solid ${accentColor}`,
-                  borderRadius: '5px',
+                  borderRadius: '8px',
                   marginBottom: '10px',
-                  backgroundColor: '#f8f9fa'
-                }}>
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateX(5px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.borderColor = primaryColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateX(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = accentColor;
+                }}
+                >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ fontWeight: 'bold' }}>{review.customer}</div>
                     <div style={{ 
@@ -947,7 +1339,8 @@ const DeliveryAgentLookup = () => {
                       color: review.rating >= 4 ? '#155724' : review.rating >= 3 ? '#856404' : '#721c24',
                       borderRadius: '12px',
                       fontSize: '12px',
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      transition: 'all 0.3s ease'
                     }}>
                       {review.rating} ★
                     </div>
@@ -966,29 +1359,56 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>F. Recent Delivery History</h3>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>F. Recent Delivery History</h3>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Date</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Order ID</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Customer</th>
-                    <th style={{ padding: '12px', textAlign: 'left' }}>Address</th>
-                    <th style={{ padding: '12px', textAlign: 'center' }}>Status</th>
-                    <th style={{ padding: '12px', textAlign: 'center' }}>Delivery Time</th>
-                    <th style={{ padding: '12px', textAlign: 'center' }}>Rating</th>
+                    {['Date', 'Order ID', 'Customer', 'Address', 'Status', 'Delivery Time', 'Rating'].map((header, index) => (
+                      <th 
+                        key={index}
+                        style={{ 
+                          padding: '12px', 
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          borderRight: index < 6 ? '1px solid rgba(255,255,255,0.2)' : 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = hoverColor;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = primaryColor;
+                        }}
+                      >
+                        {header}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {selectedAgent.deliveryHistory.map((delivery, index) => (
-                    <tr key={index} style={{ borderBottom: `1px solid ${accentColor}` }}>
-                      <td style={{ padding: '12px' }}>{delivery.date}</td>
-                      <td style={{ padding: '12px', fontWeight: 'bold' }}>{delivery.orderId}</td>
-                      <td style={{ padding: '12px' }}>{delivery.customer}</td>
-                      <td style={{ padding: '12px', maxWidth: '200px' }}>
+                    <tr 
+                      key={index} 
+                      style={{ 
+                        borderBottom: `1px solid ${accentColor}`,
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = `${accentColor}15`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <td style={{ padding: '12px', textAlign: 'center' }}>{delivery.date}</td>
+                      <td style={{ padding: '12px', fontWeight: 'bold', textAlign: 'center' }}>{delivery.orderId}</td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>{delivery.customer}</td>
+                      <td style={{ padding: '12px', maxWidth: '200px', textAlign: 'center' }}>
                         <div style={{ 
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -999,11 +1419,12 @@ const DeliveryAgentLookup = () => {
                       </td>
                       <td style={{ padding: '12px', textAlign: 'center' }}>
                         <span style={{
-                          padding: '4px 8px',
+                          padding: '6px 12px',
                           borderRadius: '12px',
                           fontSize: '12px',
                           backgroundColor: delivery.status === 'Delivered' ? '#d4edda' : '#fff3cd',
-                          color: delivery.status === 'Delivered' ? '#155724' : '#856404'
+                          color: delivery.status === 'Delivered' ? '#155724' : '#856404',
+                          transition: 'all 0.3s ease'
                         }}>
                           {delivery.status}
                         </span>
@@ -1011,12 +1432,13 @@ const DeliveryAgentLookup = () => {
                       <td style={{ padding: '12px', textAlign: 'center' }}>{delivery.deliveryTime}</td>
                       <td style={{ padding: '12px', textAlign: 'center' }}>
                         <span style={{
-                          padding: '4px 8px',
+                          padding: '6px 12px',
                           borderRadius: '12px',
                           fontSize: '12px',
                           backgroundColor: delivery.rating >= 4 ? '#d4edda' : delivery.rating >= 3 ? '#fff3cd' : '#f8d7da',
                           color: delivery.rating >= 4 ? '#155724' : delivery.rating >= 3 ? '#856404' : '#721c24',
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          transition: 'all 0.3s ease'
                         }}>
                           {delivery.rating} ★
                         </span>
@@ -1033,87 +1455,63 @@ const DeliveryAgentLookup = () => {
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
-            border: `1px solid ${accentColor}`
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
           }}>
-            <h3 style={{ color: primaryColor, marginBottom: '15px' }}>Admin Actions</h3>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <button 
-                onClick={() => handleAdminAction('activate', selectedAgent.id)}
-                style={{ 
-                  padding: '10px 15px', 
-                  backgroundColor: '#28a745', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '5px', 
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Activate
-              </button>
-              <button 
-                onClick={() => handleAdminAction('suspend', selectedAgent.id)}
-                style={{ 
-                  padding: '10px 15px', 
-                  backgroundColor: '#dc3545', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '5px', 
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Suspend
-              </button>
-              <button 
-                onClick={() => handleAdminAction('edit', selectedAgent.id)}
-                style={{ 
-                  padding: '10px 15px', 
-                  backgroundColor: primaryColor, 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '5px', 
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Edit Profile
-              </button>
-              <button 
-                onClick={() => handleAdminAction('incentive', selectedAgent.id)}
-                style={{ 
-                  padding: '10px 15px', 
-                  backgroundColor: '#ffc107', 
-                  color: 'black', 
-                  border: 'none', 
-                  borderRadius: '5px', 
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Add Incentive
-              </button>
-              <button 
-                onClick={() => handleAdminAction('earnings', selectedAgent.id)}
-                style={{ 
-                  padding: '10px 15px', 
-                  backgroundColor: '#17a2b8', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '5px', 
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                View Earnings
-              </button>
+            <h3 style={{ color: primaryColor, marginBottom: '15px', textAlign: 'center' }}>Admin Actions</h3>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {[
+                { label: 'Activate', action: 'activate', bgColor: '#28a745', hoverColor: '#218838' },
+                { label: 'Suspend', action: 'suspend', bgColor: '#dc3545', hoverColor: '#c82333' },
+                { label: 'Edit Profile', action: 'edit', bgColor: primaryColor, hoverColor: hoverColor },
+                { label: 'Add Incentive', action: 'incentive', bgColor: '#ffc107', hoverColor: '#e0a800', textColor: 'black' },
+                { label: 'View Earnings', action: 'earnings', bgColor: '#17a2b8', hoverColor: '#138496' },
+              ].map((button, index) => (
+                <button 
+                  key={index}
+                  onClick={() => handleAdminAction(button.action, selectedAgent.id)}
+                  style={{ 
+                    padding: '12px 20px', 
+                    backgroundColor: button.bgColor, 
+                    color: button.textColor || 'white', 
+                    border: 'none', 
+                    borderRadius: '5px', 
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                    minWidth: '140px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = button.hoverColor;
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = button.bgColor;
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  {button.label}
+                </button>
+              ))}
             </div>
           </section>
         </div>
       )}
 
       {!selectedAgent && searchQuery && (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '40px', 
+          color: '#666',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          border: `1px solid ${accentColor}`,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+        }}>
           No delivery agent found with the search criteria
         </div>
       )}
@@ -1128,7 +1526,8 @@ const DeliveryAgentLookup = () => {
             borderRadius: '8px',
             border: `2px solid ${primaryColor}`,
             marginTop: '20px',
-            boxShadow: '0 4px 12px rgba(124, 42, 98, 0.2)'
+            boxShadow: '0 4px 12px rgba(124, 42, 98, 0.2)',
+            transition: 'all 0.3s ease'
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -1142,7 +1541,17 @@ const DeliveryAgentLookup = () => {
                 border: 'none',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                fontSize: '14px'
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#5a6268';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#6c757d';
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Close Earnings
@@ -1151,47 +1560,84 @@ const DeliveryAgentLookup = () => {
           
           {/* Summary Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: accentColor, borderRadius: '5px' }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: primaryColor }}>
-                {earningsData.reduce((sum, earning) => sum + earning.deliveries, 0)}
+            {[
+              { value: earningsData.reduce((sum, earning) => sum + earning.deliveries, 0), label: 'Total Deliveries', bgColor: accentColor, color: primaryColor },
+              { value: `₹${earningsData.reduce((sum, earning) => sum + earning.earnings, 0)}`, label: 'Base Earnings', bgColor: '#d4edda', color: '#155724' },
+              { value: `₹${earningsData.reduce((sum, earning) => sum + earning.incentives, 0)}`, label: 'Total Incentives', bgColor: '#fff3cd', color: '#856404' },
+              { value: `₹${earningsData.reduce((sum, earning) => sum + earning.total, 0)}`, label: 'Total Earnings', bgColor: '#cce7ff', color: '#004085' },
+            ].map((metric, index) => (
+              <div 
+                key={index}
+                style={{ 
+                  textAlign: 'center', 
+                  padding: '20px', 
+                  backgroundColor: metric.bgColor, 
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  border: '2px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.borderColor = primaryColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }}
+              >
+                <div style={{ fontSize: '20px', fontWeight: 'bold', color: metric.color, marginBottom: '8px' }}>
+                  {metric.value}
+                </div>
+                <div style={{ color: metric.color, opacity: 0.9, fontSize: '14px' }}>{metric.label}</div>
               </div>
-              <div>Total Deliveries</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#d4edda', borderRadius: '5px' }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#155724' }}>
-                ₹{earningsData.reduce((sum, earning) => sum + earning.earnings, 0)}
-              </div>
-              <div>Base Earnings</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '5px' }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#856404' }}>
-                ₹{earningsData.reduce((sum, earning) => sum + earning.incentives, 0)}
-              </div>
-              <div>Total Incentives</div>
-            </div>
-            <div style={{ textAlign: 'center', padding: '15px', backgroundColor: '#cce7ff', borderRadius: '5px' }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#004085' }}>
-                ₹{earningsData.reduce((sum, earning) => sum + earning.total, 0)}
-              </div>
-              <div>Total Earnings</div>
-            </div>
+            ))}
           </div>
           
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
-                  <th style={{ padding: '12px', textAlign: 'left' }}>Date</th>
-                  <th style={{ padding: '12px', textAlign: 'center' }}>Deliveries</th>
-                  <th style={{ padding: '12px', textAlign: 'center' }}>Base Earnings (₹)</th>
-                  <th style={{ padding: '12px', textAlign: 'center' }}>Incentives (₹)</th>
-                  <th style={{ padding: '12px', textAlign: 'center' }}>Total (₹)</th>
+                  {['Date', 'Deliveries', 'Base Earnings (₹)', 'Incentives (₹)', 'Total (₹)'].map((header, index) => (
+                    <th 
+                      key={index}
+                      style={{ 
+                        padding: '12px', 
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        borderRight: index < 4 ? '1px solid rgba(255,255,255,0.2)' : 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = hoverColor;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = primaryColor;
+                      }}
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {earningsData.map((earning, index) => (
-                  <tr key={index} style={{ borderBottom: `1px solid ${accentColor}` }}>
-                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{earning.date}</td>
+                  <tr 
+                    key={index} 
+                    style={{ 
+                      borderBottom: `1px solid ${accentColor}`,
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = `${accentColor}10`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <td style={{ padding: '12px', fontWeight: 'bold', textAlign: 'center' }}>{earning.date}</td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>{earning.deliveries}</td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>₹{earning.earnings}</td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>₹{earning.incentives}</td>
@@ -1201,7 +1647,7 @@ const DeliveryAgentLookup = () => {
               </tbody>
               <tfoot>
                 <tr style={{ backgroundColor: accentColor, fontWeight: 'bold' }}>
-                  <td style={{ padding: '12px' }}>Total</td>
+                  <td style={{ padding: '12px', textAlign: 'center' }}>Total</td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>
                     {earningsData.reduce((sum, earning) => sum + earning.deliveries, 0)}
                   </td>
@@ -1220,13 +1666,28 @@ const DeliveryAgentLookup = () => {
           </div>
 
           {/* Additional Earnings Information */}
-          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '5px' }}>
-            <h4 style={{ color: primaryColor, marginBottom: '10px' }}>Earnings Summary</h4>
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '15px', 
+            backgroundColor: '#f8f9fa', 
+            borderRadius: '5px',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = `${accentColor}10`;
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#f8f9fa';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+          >
+            <h4 style={{ color: primaryColor, marginBottom: '10px', textAlign: 'center' }}>Earnings Summary</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '10px' }}>
-              <div><strong>Average Daily Earnings:</strong> ₹{(earningsData.reduce((sum, earning) => sum + earning.total, 0) / earningsData.length).toFixed(2)}</div>
-              <div><strong>Average Deliveries per Day:</strong> {(earningsData.reduce((sum, earning) => sum + earning.deliveries, 0) / earningsData.length).toFixed(1)}</div>
-              <div><strong>Incentive Percentage:</strong> {((earningsData.reduce((sum, earning) => sum + earning.incentives, 0) / earningsData.reduce((sum, earning) => sum + earning.total, 0)) * 100).toFixed(1)}%</div>
-              <div><strong>Period Covered:</strong> {earningsData.length} days</div>
+              <div style={{ textAlign: 'center' }}><strong>Average Daily Earnings:</strong> ₹{(earningsData.reduce((sum, earning) => sum + earning.total, 0) / earningsData.length).toFixed(2)}</div>
+              <div style={{ textAlign: 'center' }}><strong>Average Deliveries per Day:</strong> {(earningsData.reduce((sum, earning) => sum + earning.deliveries, 0) / earningsData.length).toFixed(1)}</div>
+              <div style={{ textAlign: 'center' }}><strong>Incentive Percentage:</strong> {((earningsData.reduce((sum, earning) => sum + earning.incentives, 0) / earningsData.reduce((sum, earning) => sum + earning.total, 0)) * 100).toFixed(1)}%</div>
+              <div style={{ textAlign: 'center' }}><strong>Period Covered:</strong> {earningsData.length} days</div>
             </div>
           </div>
         </section>

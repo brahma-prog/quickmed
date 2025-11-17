@@ -465,7 +465,7 @@ const AnalyticsDashboard = () => {
       if (revenueFilter === 'low' && value <= 15000) return value;
       if (revenueFilter === 'medium' && value > 15000 && value <= 20000) return value;
       if (revenueFilter === 'high' && value > 20000) return value;
-      return 0; // Hide values that don't match the filter
+      return 0; // Show 0 instead of hiding to maintain chart structure
     });
   };
 
@@ -476,20 +476,22 @@ const AnalyticsDashboard = () => {
       if (refundFilter === 'low' && value <= 800) return value;
       if (refundFilter === 'medium' && value > 800 && value <= 1200) return value;
       if (refundFilter === 'high' && value > 1200) return value;
-      return 0; // Hide values that don't match the filter
+      return 0; // Show 0 instead of hiding to maintain chart structure
     });
   };
 
-  // NEW: Filter function for daily orders
+  // FIXED: Filter function for daily orders - now properly shows low values
   const getFilteredDailyOrdersData = () => {
     if (dailyOrdersFilter === 'all') return dailyOrders;
     
-    return dailyOrders.map(value => {
+    const filteredData = dailyOrders.map(value => {
       if (dailyOrdersFilter === 'low' && value <= 8) return value;
       if (dailyOrdersFilter === 'medium' && value > 8 && value <= 15) return value;
       if (dailyOrdersFilter === 'high' && value > 15) return value;
-      return 0; // Hide values that don't match the filter
+      return 0; // Show 0 instead of hiding to maintain chart structure
     });
+    
+    return filteredData;
   };
 
   const getFilteredHeatmapData = () => {
@@ -515,7 +517,7 @@ const AnalyticsDashboard = () => {
     console.log(`Chart focus changed to: ${focus}`);
   };
 
-  // Chart rendering functions - FIXED with null safety
+  // Chart rendering functions - FIXED with proper alignment and high value display
   const renderLineChart = () => {
     if (!dailyOrders || dailyOrders.length === 0) {
       return <div>Loading chart data...</div>;
@@ -545,7 +547,8 @@ const AnalyticsDashboard = () => {
                 alignItems: 'flex-end',
                 justifyContent: 'center',
                 opacity: (activeKPI === 'all' || activeKPI === 'FR-1') && value > 0 ? 1 : 0.3,
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                minHeight: value > 0 ? '2px' : '0px' // Ensure even low values are visible
               }}
             >
               <span style={{ 
@@ -597,7 +600,11 @@ const AnalyticsDashboard = () => {
     
     const filteredRevenueData = getFilteredRevenueData();
     const filteredRefundData = getFilteredRefundData();
-    const maxValue = Math.max(...revenueData, ...refundData);
+    
+    // Calculate max value based on filtered data to ensure proper scaling
+    const allFilteredValues = [...filteredRevenueData, ...filteredRefundData].filter(val => val > 0);
+    const maxValue = allFilteredValues.length > 0 ? Math.max(...allFilteredValues) : Math.max(...revenueData, ...refundData);
+    
     const chartHeight = 200;
     
     return (
@@ -607,66 +614,112 @@ const AnalyticsDashboard = () => {
         padding: '10px 0', 
         display: 'flex', 
         alignItems: 'flex-end', 
-        gap: '8%', 
         justifyContent: 'center',
+        gap: '2%', // Further reduced gap for perfect alignment
         marginTop: '20px'
       }}>
-        {revenueData.map((value, index) => (
-          <div key={`revenue-${index}`} style={{ 
+        {revenueData.map((_, index) => (
+          <div key={`day-${index}`} style={{ 
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center', 
             width: '12%',
             height: '100%',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
+            position: 'relative'
           }}>
-            {/* Revenue Bar */}
+            {/* Revenue Bar - Positioned on the left side */}
             <div
               style={{
-                width: '80%',
+                width: '40%', // Slightly wider for better visibility
                 height: `${((filteredRevenueData[index] || 0) / maxValue) * (chartHeight - 60)}px`,
                 backgroundColor: revenueColor,
                 borderRadius: '4px 4px 0 0',
-                marginBottom: '5px',
-                opacity: (revenueFilter !== 'all' || refundFilter === 'all') ? 
-                         (chartFocus === 'all' || chartFocus === 'revenue' ? 1 : 0.3) : 0,
+                opacity: (chartFocus === 'all' || chartFocus === 'revenue') && filteredRevenueData[index] > 0 ? 1 : 0.3,
                 transition: 'all 0.3s ease',
-                minHeight: filteredRevenueData[index] > 0 ? '2px' : '0px'
+                minHeight: filteredRevenueData[index] > 0 ? '3px' : '0px',
+                position: 'absolute',
+                left: '5%', // Moved left for better alignment
+                border: filteredRevenueData[index] > 0 ? '1px solid rgba(0,0,0,0.1)' : 'none'
               }}
+              title={`Day ${index + 1} Revenue: $${filteredRevenueData[index]?.toLocaleString() || 0}`}
             />
-            {/* Refund Bar */}
+            {/* Refund Bar - Positioned on the right side */}
             <div
               style={{
-                width: '80%',
+                width: '40%', // Slightly wider for better visibility
                 height: `${((filteredRefundData[index] || 0) / maxValue) * (chartHeight - 60)}px`,
                 backgroundColor: refundColor,
                 borderRadius: '4px 4px 0 0',
-                opacity: (refundFilter !== 'all' || revenueFilter === 'all') ? 
-                        (chartFocus === 'all' || chartFocus === 'refunds' ? 1 : 0.3) : 0,
+                opacity: (chartFocus === 'all' || chartFocus === 'refunds') && filteredRefundData[index] > 0 ? 1 : 0.3,
                 transition: 'all 0.3s ease',
-                minHeight: filteredRefundData[index] > 0 ? '2px' : '0px'
+                minHeight: filteredRefundData[index] > 0 ? '3px' : '0px',
+                position: 'absolute',
+                right: '5%', // Moved right for better alignment
+                border: filteredRefundData[index] > 0 ? '1px solid rgba(0,0,0,0.1)' : 'none'
               }}
+              title={`Day ${index + 1} Refunds: $${filteredRefundData[index]?.toLocaleString() || 0}`}
             />
+            
+            {/* Day Label */}
             <span style={{ 
               fontSize: '10px', 
               marginTop: '5px', 
               color: '#666',
               position: 'absolute',
-              bottom: '-20px'
+              bottom: '-20px',
+              fontWeight: 'bold'
             }}>
               Day {index + 1}
             </span>
+            
+            {/* Value Labels */}
+            {filteredRevenueData[index] > 0 && (chartFocus === 'all' || chartFocus === 'revenue') && (
+              <div style={{
+                position: 'absolute',
+                top: `${chartHeight - 70 - ((filteredRevenueData[index] / maxValue) * (chartHeight - 60))}px`,
+                left: '5%',
+                fontSize: '9px',
+                fontWeight: 'bold',
+                color: revenueColor,
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                padding: '1px 3px',
+                borderRadius: '2px',
+                transform: 'translateX(-50%)',
+                whiteSpace: 'nowrap'
+              }}>
+                ${(filteredRevenueData[index] / 1000).toFixed(0)}k
+              </div>
+            )}
+            
+            {filteredRefundData[index] > 0 && (chartFocus === 'all' || chartFocus === 'refunds') && (
+              <div style={{
+                position: 'absolute',
+                top: `${chartHeight - 70 - ((filteredRefundData[index] / maxValue) * (chartHeight - 60))}px`,
+                right: '5%',
+                fontSize: '9px',
+                fontWeight: 'bold',
+                color: refundColor,
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                padding: '1px 3px',
+                borderRadius: '2px',
+                transform: 'translateX(50%)',
+                whiteSpace: 'nowrap'
+              }}>
+                ${filteredRefundData[index]}
+              </div>
+            )}
           </div>
         ))}
         
-        {/* Legend - MOVED TO TOP RIGHT */}
+        {/* Legend - TOP RIGHT */}
         <div style={{ 
           position: 'absolute', 
           top: '-30px',
           right: '10px', 
           display: 'flex', 
           gap: '15px',
-          backgroundColor: 'rgba(255,255,255,0.9)',
+          backgroundColor: 'rgba(255,255,255,0.95)',
           padding: '8px 12px',
           borderRadius: '6px',
           border: `1px solid ${accentColor}`,
@@ -679,7 +732,10 @@ const AnalyticsDashboard = () => {
               gap: '5px',
               cursor: 'pointer',
               opacity: chartFocus === 'all' || chartFocus === 'revenue' ? 1 : 0.5,
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              backgroundColor: chartFocus === 'revenue' ? `${revenueColor}20` : 'transparent'
             }}
             onClick={() => handleChartFocusChange(chartFocus === 'revenue' ? 'all' : 'revenue')}
             title="Click to focus on revenue"
@@ -699,7 +755,10 @@ const AnalyticsDashboard = () => {
               gap: '5px',
               cursor: 'pointer',
               opacity: chartFocus === 'all' || chartFocus === 'refunds' ? 1 : 0.5,
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              backgroundColor: chartFocus === 'refunds' ? `${refundColor}20` : 'transparent'
             }}
             onClick={() => handleChartFocusChange(chartFocus === 'refunds' ? 'all' : 'refunds')}
             title="Click to focus on refunds"
@@ -714,42 +773,43 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
 
-        {/* Filter Buttons - MOVED TO TOP LEFT */}
+        {/* Filter Buttons - TOP LEFT */}
         <div style={{ 
           position: 'absolute', 
-          top: '-40px',
+          top: '-50px',
           left: '10px', 
           display: 'flex', 
-          gap: '20px',
-          alignItems: 'flex-start'
+          gap: '15px',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap'
         }}>
           {/* Revenue Filter */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
             <div style={{ 
               fontSize: '11px', 
               fontWeight: 'bold', 
-              color: primaryColor, 
-              marginBottom: '5px',
+              color: revenueColor, 
+              marginBottom: '2px',
               textAlign: 'center'
             }}>
               Revenue Filter:
             </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
               {['all', 'low', 'medium', 'high'].map(filter => (
                 <button
                   key={`revenue-${filter}`}
                   onClick={() => setRevenueFilter(filter)}
                   style={{
-                    padding: '4px 8px',
-                    fontSize: '9px',
-                    backgroundColor: revenueFilter === filter ? primaryColor : '#F0F0F0',
+                    padding: '3px 6px',
+                    fontSize: '8px',
+                    backgroundColor: revenueFilter === filter ? revenueColor : '#F0F0F0',
                     color: revenueFilter === filter ? 'white' : '#666',
                     border: 'none',
-                    borderRadius: '4px',
+                    borderRadius: '3px',
                     cursor: 'pointer',
                     fontWeight: 'bold',
                     transition: 'all 0.2s ease',
-                    minWidth: '45px'
+                    minWidth: '40px'
                   }}
                 >
                   {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -764,27 +824,27 @@ const AnalyticsDashboard = () => {
               fontSize: '11px', 
               fontWeight: 'bold', 
               color: refundColor, 
-              marginBottom: '5px',
+              marginBottom: '2px',
               textAlign: 'center'
             }}>
               Refund Filter:
             </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
               {['all', 'low', 'medium', 'high'].map(filter => (
                 <button
                   key={`refund-${filter}`}
                   onClick={() => setRefundFilter(filter)}
                   style={{
-                    padding: '4px 8px',
-                    fontSize: '9px',
+                    padding: '3px 6px',
+                    fontSize: '8px',
                     backgroundColor: refundFilter === filter ? refundColor : '#F0F0F0',
                     color: refundFilter === filter ? 'white' : '#666',
                     border: 'none',
-                    borderRadius: '4px',
+                    borderRadius: '3px',
                     cursor: 'pointer',
                     fontWeight: 'bold',
                     transition: 'all 0.2s ease',
-                    minWidth: '45px'
+                    minWidth: '40px'
                   }}
                 >
                   {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -1227,7 +1287,7 @@ const AnalyticsDashboard = () => {
         }}>
           <h4 style={{ 
             color: primaryColor, 
-            marginBottom: '40px',
+            marginBottom: '60px', // Increased margin to accommodate filters
             textAlign: 'center'
           }}>
             Revenue vs Refunds

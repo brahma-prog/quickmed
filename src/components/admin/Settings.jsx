@@ -607,7 +607,16 @@ const Settings = () => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#6a2352';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = primaryColor;
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 Save Changes
@@ -630,7 +639,16 @@ const Settings = () => {
                   border: 'none',
                   borderRadius: '5px',
                   cursor: 'pointer',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#6a2352';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = primaryColor;
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 + New Role
@@ -649,7 +667,16 @@ const Settings = () => {
                   border: `1px solid ${accentColor}`,
                   borderRadius: '5px',
                   width: '100%',
-                  maxWidth: '400px'
+                  maxWidth: '400px',
+                  transition: 'all 0.3s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = primaryColor;
+                  e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = accentColor;
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
@@ -669,7 +696,15 @@ const Settings = () => {
                     borderBottom: `1px solid ${accentColor}`,
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f9f9f9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
                   }}
                 >
                   <div>
@@ -705,7 +740,16 @@ const Settings = () => {
                         border: `1px solid ${primaryColor}`,
                         borderRadius: '5px',
                         cursor: 'pointer',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = primaryColor;
+                        e.target.style.color = 'white';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.color = primaryColor;
                       }}
                     >
                       View Permissions
@@ -721,7 +765,16 @@ const Settings = () => {
                           border: 'none',
                           borderRadius: '5px',
                           cursor: 'pointer',
-                          fontSize: '14px'
+                          fontSize: '14px',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#cc0000';
+                          e.target.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = '#ff4444';
+                          e.target.style.transform = 'translateY(0)';
                         }}
                       >
                         Delete
@@ -769,9 +822,18 @@ const Settings = () => {
                         padding: '8px',
                         border: `1px solid ${accentColor}`,
                         borderRadius: '5px',
-                        width: '100%'
+                        width: '100%',
+                        transition: 'all 0.3s ease'
                       }}
                       placeholder="Enter role name"
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
 
@@ -787,9 +849,18 @@ const Settings = () => {
                         border: `1px solid ${accentColor}`,
                         borderRadius: '5px',
                         width: '100%',
-                        minHeight: '80px'
+                        minHeight: '80px',
+                        transition: 'all 0.3s ease'
                       }}
                       placeholder="Enter role description"
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
 
@@ -802,7 +873,16 @@ const Settings = () => {
                         color: '#666',
                         border: `1px solid #ccc`,
                         borderRadius: '5px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#f5f5f5';
+                        e.target.style.color = '#333';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.color = '#666';
                       }}
                     >
                       Cancel
@@ -815,7 +895,16 @@ const Settings = () => {
                         color: 'white',
                         border: 'none',
                         borderRadius: '5px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#6a2352';
+                        e.target.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = primaryColor;
+                        e.target.style.transform = 'translateY(0)';
                       }}
                     >
                       Create Role
@@ -859,8 +948,18 @@ const Settings = () => {
                         <div key={module.id} style={{
                           border: `1px solid ${accentColor}`,
                           borderRadius: '5px',
-                          padding: '15px'
-                        }}>
+                          padding: '15px',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = primaryColor;
+                          e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = accentColor;
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                        >
                           <h5 style={{ margin: '0 0 10px 0', color: primaryColor }}>
                             {module.name}
                           </h5>
@@ -873,7 +972,20 @@ const Settings = () => {
                                   alignItems: 'center',
                                   gap: '5px',
                                   cursor: selectedRole.isDefault ? 'not-allowed' : 'pointer',
-                                  opacity: selectedRole.isDefault ? 0.6 : 1
+                                  opacity: selectedRole.isDefault ? 0.6 : 1,
+                                  padding: '5px 10px',
+                                  borderRadius: '3px',
+                                  transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!selectedRole.isDefault) {
+                                    e.currentTarget.style.backgroundColor = accentColor;
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!selectedRole.isDefault) {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }
                                 }}
                               >
                                 <input
@@ -914,7 +1026,16 @@ const Settings = () => {
                         color: '#666',
                         border: `1px solid #ccc`,
                         borderRadius: '5px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#f5f5f5';
+                        e.target.style.color = '#333';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.color = '#666';
                       }}
                     >
                       Close
@@ -928,7 +1049,16 @@ const Settings = () => {
                           color: 'white',
                           border: 'none',
                           borderRadius: '5px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#6a2352';
+                          e.target.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = primaryColor;
+                          e.target.style.transform = 'translateY(0)';
                         }}
                       >
                         Update Permissions
@@ -956,7 +1086,24 @@ const Settings = () => {
                 <h4 style={{ color: primaryColor, marginBottom: '15px' }}>Notification Channels</h4>
                 <div style={{ display: 'grid', gap: '15px' }}>
                   {['sms', 'email', 'push'].map(channel => (
-                    <div key={channel} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div key={channel} style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      padding: '15px',
+                      border: `1px solid ${accentColor}`,
+                      borderRadius: '5px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = primaryColor;
+                      e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = accentColor;
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                    >
                       <div>
                         <div style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
                           {channel} Notifications
@@ -994,8 +1141,18 @@ const Settings = () => {
                     <div key={template.id} style={{
                       border: `1px solid ${accentColor}`,
                       borderRadius: '5px',
-                      padding: '15px'
-                    }}>
+                      padding: '15px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = primaryColor;
+                      e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = accentColor;
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                    >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
                         <div>
                           <div style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
@@ -1015,7 +1172,16 @@ const Settings = () => {
                               border: `1px solid ${primaryColor}`,
                               borderRadius: '3px',
                               cursor: 'pointer',
-                              fontSize: '12px'
+                              fontSize: '12px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = primaryColor;
+                              e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'transparent';
+                              e.target.style.color = primaryColor;
                             }}
                           >
                             Preview
@@ -1029,7 +1195,16 @@ const Settings = () => {
                               border: 'none',
                               borderRadius: '3px',
                               cursor: 'pointer',
-                              fontSize: '12px'
+                              fontSize: '12px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#6a2352';
+                              e.target.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = primaryColor;
+                              e.target.style.transform = 'translateY(0)';
                             }}
                           >
                             Edit
@@ -1051,7 +1226,16 @@ const Settings = () => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#6a2352';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = primaryColor;
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 Save Changes
@@ -1085,7 +1269,22 @@ const Settings = () => {
                       min="0"
                       max="100"
                       step="0.1"
-                      style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', maxWidth: '200px' }}
+                      style={{ 
+                        padding: '8px', 
+                        border: `1px solid ${accentColor}`, 
+                        borderRadius: '5px', 
+                        width: '100%', 
+                        maxWidth: '200px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                     <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
                       Percentage of order amount taken by platform
@@ -1110,7 +1309,22 @@ const Settings = () => {
                     <select
                       value={payoutSettings.calculationMethod}
                       onChange={(e) => handlePayoutUpdate('calculationMethod', e.target.value)}
-                      style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', maxWidth: '200px' }}
+                      style={{ 
+                        padding: '8px', 
+                        border: `1px solid ${accentColor}`, 
+                        borderRadius: '5px', 
+                        width: '100%', 
+                        maxWidth: '200px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     >
                       <option value="flat">Flat Fee</option>
                       <option value="distance">Distance Based</option>
@@ -1125,7 +1339,21 @@ const Settings = () => {
                         value={payoutSettings.daytimeFee}
                         onChange={(e) => handlePayoutUpdate('daytimeFee', parseInt(e.target.value))}
                         min="0"
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                     <div>
@@ -1135,7 +1363,21 @@ const Settings = () => {
                         value={payoutSettings.nighttimeFee}
                         onChange={(e) => handlePayoutUpdate('nighttimeFee', parseInt(e.target.value))}
                         min="0"
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                   </div>
@@ -1158,7 +1400,22 @@ const Settings = () => {
                     type="date"
                     value={payoutSettings.startDate}
                     onChange={(e) => handlePayoutUpdate('startDate', e.target.value)}
-                    style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', maxWidth: '200px' }}
+                    style={{ 
+                      padding: '8px', 
+                      border: `1px solid ${accentColor}`, 
+                      borderRadius: '5px', 
+                      width: '100%', 
+                      maxWidth: '200px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = primaryColor;
+                      e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = accentColor;
+                      e.target.style.boxShadow = 'none';
+                    }}
                   />
                   <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
                     New rules effective from this date
@@ -1176,7 +1433,16 @@ const Settings = () => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#6a2352';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = primaryColor;
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 Update Rates
@@ -1211,7 +1477,21 @@ const Settings = () => {
                         onChange={(e) => handleTaxUpdate('taxRate', parseInt(e.target.value))}
                         min="0"
                         max="100"
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
@@ -1241,7 +1521,21 @@ const Settings = () => {
                         type="text"
                         value={taxSettings.orgName}
                         onChange={(e) => handleTaxUpdate('orgName', e.target.value)}
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                     <div>
@@ -1249,7 +1543,22 @@ const Settings = () => {
                       <textarea
                         value={taxSettings.orgAddress}
                         onChange={(e) => handleTaxUpdate('orgAddress', e.target.value)}
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', minHeight: '60px' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%', 
+                          minHeight: '60px',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                     <div>
@@ -1258,7 +1567,21 @@ const Settings = () => {
                         type="tel"
                         value={taxSettings.orgPhone}
                         onChange={(e) => handleTaxUpdate('orgPhone', e.target.value)}
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                   </div>
@@ -1278,8 +1601,23 @@ const Settings = () => {
                   <textarea
                     value={taxSettings.footerMessage}
                     onChange={(e) => handleTaxUpdate('footerMessage', e.target.value)}
-                    style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', minHeight: '80px' }}
+                    style={{ 
+                      padding: '8px', 
+                      border: `1px solid ${accentColor}`, 
+                      borderRadius: '5px', 
+                      width: '100%', 
+                      minHeight: '80px',
+                      transition: 'all 0.3s ease'
+                    }}
                     placeholder="Enter custom footer message for invoices..."
+                    onFocus={(e) => {
+                      e.target.style.borderColor = primaryColor;
+                      e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = accentColor;
+                      e.target.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
 
@@ -1298,7 +1636,21 @@ const Settings = () => {
                         type="text"
                         value={taxSettings.legalName}
                         onChange={(e) => handleTaxUpdate('legalName', e.target.value)}
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                     <div>
@@ -1307,7 +1659,21 @@ const Settings = () => {
                         type="text"
                         value={taxSettings.gstNumber}
                         onChange={(e) => handleTaxUpdate('gstNumber', e.target.value)}
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                     <div>
@@ -1316,7 +1682,21 @@ const Settings = () => {
                         type="tel"
                         value={taxSettings.billingPhone}
                         onChange={(e) => handleTaxUpdate('billingPhone', e.target.value)}
-                        style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%' }}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${accentColor}`, 
+                          borderRadius: '5px', 
+                          width: '100%',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = primaryColor;
+                          e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = accentColor;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                   </div>
@@ -1335,7 +1715,16 @@ const Settings = () => {
                 cursor: 'pointer',
                 fontSize: '16px',
                 fontWeight: 'bold',
-                marginTop: '20px'
+                marginTop: '20px',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#6a2352';
+                e.target.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = primaryColor;
+                e.target.style.transform = 'translateY(0)';
               }}
             >
               Save Changes
@@ -1357,7 +1746,24 @@ const Settings = () => {
               }}>
                 <h4 style={{ color: primaryColor, marginBottom: '15px' }}>Login Security</h4>
                 <div style={{ display: 'grid', gap: '15px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '15px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = accentColor;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div>
                       <div style={{ fontWeight: 'bold' }}>Two-Factor Authentication (2FA)</div>
                       <div style={{ fontSize: '14px', color: '#666' }}>Enable 2FA for all user accounts</div>
@@ -1377,7 +1783,22 @@ const Settings = () => {
                     <select
                       value={securitySettings.sessionTimeout}
                       onChange={(e) => handleSecurityUpdate('sessionTimeout', parseInt(e.target.value))}
-                      style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', maxWidth: '200px' }}
+                      style={{ 
+                        padding: '8px', 
+                        border: `1px solid ${accentColor}`, 
+                        borderRadius: '5px', 
+                        width: '100%', 
+                        maxWidth: '200px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     >
                       <option value={15}>15 minutes</option>
                       <option value={30}>30 minutes</option>
@@ -1385,7 +1806,24 @@ const Settings = () => {
                     </select>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '15px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = accentColor;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div>
                       <div style={{ fontWeight: 'bold' }}>Password Policy Enforcement</div>
                       <div style={{ fontSize: '14px', color: '#666' }}>Require strong passwords</div>
@@ -1411,7 +1849,24 @@ const Settings = () => {
               }}>
                 <h4 style={{ color: primaryColor, marginBottom: '15px' }}>Data Protection</h4>
                 <div style={{ display: 'grid', gap: '15px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '15px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = accentColor;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div>
                       <div style={{ fontWeight: 'bold' }}>PII Masking</div>
                       <div style={{ fontSize: '14px', color: '#666' }}>Mask personally identifiable information</div>
@@ -1433,7 +1888,22 @@ const Settings = () => {
                       value={securitySettings.dataRetention}
                       onChange={(e) => handleSecurityUpdate('dataRetention', parseInt(e.target.value))}
                       min="30"
-                      style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', maxWidth: '200px' }}
+                      style={{ 
+                        padding: '8px', 
+                        border: `1px solid ${accentColor}`, 
+                        borderRadius: '5px', 
+                        width: '100%', 
+                        maxWidth: '200px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
                 </div>
@@ -1460,7 +1930,14 @@ const Settings = () => {
                     </thead>
                     <tbody>
                       {securitySettings.auditLogs.map(log => (
-                        <tr key={log.id}>
+                        <tr key={log.id} style={{ transition: 'all 0.3s ease' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f9f9f9';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                          }}
+                        >
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{log.time}</td>
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{log.user}</td>
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{log.action}</td>
@@ -1485,7 +1962,16 @@ const Settings = () => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#6a2352';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = primaryColor;
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 Save Security Configuration
@@ -1520,7 +2006,14 @@ const Settings = () => {
                     </thead>
                     <tbody>
                       {complianceSettings.doctors.map(doctor => (
-                        <tr key={doctor.id}>
+                        <tr key={doctor.id} style={{ transition: 'all 0.3s ease' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f9f9f9';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                          }}
+                        >
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{doctor.name}</td>
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{doctor.license}</td>
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{doctor.specialization}</td>
@@ -1552,7 +2045,16 @@ const Settings = () => {
                                   border: 'none',
                                   borderRadius: '3px',
                                   cursor: 'pointer',
-                                  fontSize: '12px'
+                                  fontSize: '12px',
+                                  transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = '#218838';
+                                  e.target.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = '#28a745';
+                                  e.target.style.transform = 'translateY(0)';
                                 }}
                               >
                                 Approve
@@ -1566,7 +2068,16 @@ const Settings = () => {
                                   border: 'none',
                                   borderRadius: '3px',
                                   cursor: 'pointer',
-                                  fontSize: '12px'
+                                  fontSize: '12px',
+                                  transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = '#c82333';
+                                  e.target.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = '#dc3545';
+                                  e.target.style.transform = 'translateY(0)';
                                 }}
                               >
                                 Reject
@@ -1589,7 +2100,25 @@ const Settings = () => {
               }}>
                 <h4 style={{ color: primaryColor, marginBottom: '15px' }}>Prescription Approval Rules</h4>
                 <div style={{ display: 'grid', gap: '15px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                  <label style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px', 
+                    cursor: 'pointer',
+                    padding: '15px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = accentColor;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <input
                       type="checkbox"
                       checked={complianceSettings.rxRules.autoApprove}
@@ -1597,7 +2126,25 @@ const Settings = () => {
                     />
                     <span>Auto-approve prescriptions for verified doctors</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                  <label style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px', 
+                    cursor: 'pointer',
+                    padding: '15px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = accentColor;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <input
                       type="checkbox"
                       checked={complianceSettings.rxRules.highDosageReview}
@@ -1605,7 +2152,25 @@ const Settings = () => {
                     />
                     <span>Manual review for high-dosage prescriptions</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                  <label style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px', 
+                    cursor: 'pointer',
+                    padding: '15px',
+                    border: `1px solid ${accentColor}`,
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = primaryColor;
+                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = accentColor;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <input
                       type="checkbox"
                       checked={complianceSettings.rxRules.restrictedMedicineReview}
@@ -1626,7 +2191,16 @@ const Settings = () => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#6a2352';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = primaryColor;
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
                 Save Rules
@@ -1653,8 +2227,18 @@ const Settings = () => {
                     <div key={key.id} style={{
                       border: `1px solid ${accentColor}`,
                       borderRadius: '5px',
-                      padding: '15px'
-                    }}>
+                      padding: '15px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = primaryColor;
+                      e.currentTarget.style.boxShadow = `0 2px 8px rgba(124, 42, 98, 0.1)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = accentColor;
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                    >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                         <div>
                           <div style={{ fontWeight: 'bold' }}>{key.name}</div>
@@ -1675,7 +2259,16 @@ const Settings = () => {
                               border: `1px solid ${primaryColor}`,
                               borderRadius: '3px',
                               cursor: 'pointer',
-                              fontSize: '12px'
+                              fontSize: '12px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = primaryColor;
+                              e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'transparent';
+                              e.target.style.color = primaryColor;
                             }}
                           >
                             View Secret
@@ -1689,7 +2282,16 @@ const Settings = () => {
                               border: 'none',
                               borderRadius: '3px',
                               cursor: 'pointer',
-                              fontSize: '12px'
+                              fontSize: '12px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#e0a800';
+                              e.target.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = '#ffc107';
+                              e.target.style.transform = 'translateY(0)';
                             }}
                           >
                             Rotate
@@ -1707,7 +2309,18 @@ const Settings = () => {
                       border: `2px dashed ${primaryColor}`,
                       borderRadius: '5px',
                       cursor: 'pointer',
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = accentColor;
+                      e.target.style.borderStyle = 'solid';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.borderStyle = 'dashed';
+                      e.target.style.transform = 'translateY(0)';
                     }}
                   >
                     + Generate New API Key
@@ -1724,19 +2337,64 @@ const Settings = () => {
               }}>
                 <h4 style={{ color: primaryColor, marginBottom: '15px' }}>Integration Status</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-                  <div style={{ textAlign: 'center', padding: '15px', backgroundColor: accentColor, borderRadius: '5px' }}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: '15px', 
+                    backgroundColor: accentColor, 
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = `0 5px 15px rgba(124, 42, 98, 0.2)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>
                       {integrationSettings.status.uptime}%
                     </div>
                     <div style={{ fontSize: '14px', color: '#666' }}>Uptime</div>
                   </div>
-                  <div style={{ textAlign: 'center', padding: '15px', backgroundColor: accentColor, borderRadius: '5px' }}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: '15px', 
+                    backgroundColor: accentColor, 
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = `0 5px 15px rgba(124, 42, 98, 0.2)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: primaryColor }}>
                       {integrationSettings.status.latency}ms
                     </div>
                     <div style={{ fontSize: '14px', color: '#666' }}>Average Latency</div>
                   </div>
-                  <div style={{ textAlign: 'center', padding: '15px', backgroundColor: accentColor, borderRadius: '5px' }}>
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: '15px', 
+                    backgroundColor: accentColor, 
+                    borderRadius: '5px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = `0 5px 15px rgba(124, 42, 98, 0.2)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  >
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: integrationSettings.status.lastIncident === 'Up' ? 'green' : 'red' }}>
                       {integrationSettings.status.lastIncident}
                     </div>
@@ -1766,7 +2424,22 @@ const Settings = () => {
                     <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Backup Frequency</label>
                     <select
                       value={backupSettings.frequency}
-                      style={{ padding: '8px', border: `1px solid ${accentColor}`, borderRadius: '5px', width: '100%', maxWidth: '200px' }}
+                      style={{ 
+                        padding: '8px', 
+                        border: `1px solid ${accentColor}`, 
+                        borderRadius: '5px', 
+                        width: '100%', 
+                        maxWidth: '200px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = primaryColor;
+                        e.target.style.boxShadow = `0 0 0 2px ${accentColor}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = accentColor;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     >
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
@@ -1783,7 +2456,16 @@ const Settings = () => {
                       borderRadius: '5px',
                       cursor: 'pointer',
                       fontWeight: 'bold',
-                      width: 'fit-content'
+                      width: 'fit-content',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#6a2352';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = primaryColor;
+                      e.target.style.transform = 'translateY(0)';
                     }}
                   >
                     Download Backup
@@ -1811,7 +2493,14 @@ const Settings = () => {
                     </thead>
                     <tbody>
                       {backupSettings.logs.map(log => (
-                        <tr key={log.id}>
+                        <tr key={log.id} style={{ transition: 'all 0.3s ease' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f9f9f9';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                          }}
+                        >
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{log.time}</td>
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{log.user}</td>
                           <td style={{ padding: '10px', border: `1px solid ${accentColor}` }}>{log.action}</td>
@@ -1866,13 +2555,18 @@ const Settings = () => {
     <div>
       <h2 style={{ color: primaryColor, marginBottom: '20px' }}>System Settings</h2>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '20px', minHeight: '600px' }}>
         {/* Settings Navigation */}
         <div style={{
           backgroundColor: 'white',
           borderRadius: '8px',
           border: `1px solid ${accentColor}`,
-          padding: '10px 0'
+          padding: '10px 0',
+          height: 'fit-content',
+          maxHeight: 'calc(100vh - 200px)',
+          overflowY: 'auto',
+          position: 'sticky',
+          top: '20px'
         }}>
           {sections.map(section => (
             <button
@@ -1889,7 +2583,21 @@ const Settings = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                fontSize: '14px'
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                borderRadius: '0'
+              }}
+              onMouseEnter={(e) => {
+                if (activeSection !== section.id) {
+                  e.target.style.backgroundColor = '#f9f9f9';
+                  e.target.style.color = primaryColor;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeSection !== section.id) {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = '#333';
+                }
               }}
             >
               <span>{section.icon}</span>
@@ -1899,7 +2607,7 @@ const Settings = () => {
         </div>
 
         {/* Settings Content */}
-        <div>
+        <div style={{ overflow: 'visible' }}>
           {renderSection()}
         </div>
       </div>

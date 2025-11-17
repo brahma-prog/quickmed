@@ -1,23 +1,24 @@
 import React from 'react';
+import { styles } from './Styles';
 
-const UserDashboardHeader = ({
-  userProfile,
+const Header = ({
   activeView,
   setActiveView,
-  showProfileDropdown,
-  toggleProfileDropdown,
-  setShowProfileDropdown,
-  profileRef,
+  cart,
+  userProfile,
   showNotifications,
-  toggleNotifications,
+  setShowNotifications,
   notifications,
   markAsRead,
   markAllAsRead,
   getUnreadCount,
-  notificationRef,
-  cart,
-  showChatbot,
+  toggleNotifications,
+  toggleProfileDropdown,
+  showProfileDropdown,
+  setShowProfileDropdown,
+  handleLogoutClick,
   toggleChatbot,
+  showChatbot,
   chatMessages,
   userMessage,
   handleUserMessage,
@@ -26,13 +27,13 @@ const UserDashboardHeader = ({
   chatInputRef,
   chatMessagesEndRef,
   chatRef,
-  handleLogoutClick,
-  triggerProfilePhotoUpload,
+  notificationRef,
+  profileRef,
   profilePhotoInputRef,
   handleProfilePhotoUpload,
-  styles
+  triggerProfilePhotoUpload
 }) => {
-  const EnhancedHeader = () => (
+  return (
     <header style={styles.header}>
       <div style={styles.headerTop}>
         <div style={styles.logoSection}>
@@ -66,6 +67,7 @@ const UserDashboardHeader = ({
               )}
             </div>
             
+            {/* Profile Dropdown */}
             {showProfileDropdown && (
               <div style={styles.profileDropdown}>
                 <div style={styles.profileDropdownHeader}>
@@ -160,6 +162,7 @@ const UserDashboardHeader = ({
         </div>
 
         <div style={styles.headerActions}>
+          {/* AI Chatbot Icon */}
           <div 
             style={styles.chatbotIconContainer}
             onClick={toggleChatbot}
@@ -169,6 +172,7 @@ const UserDashboardHeader = ({
             </div>
           </div>
 
+          {/* Cart Icon */}
           <div 
             style={styles.cartIconContainer}
             onClick={() => setActiveView('cart')}
@@ -181,6 +185,7 @@ const UserDashboardHeader = ({
             </div>
           </div>
 
+          {/* Notification Bell */}
           <div 
             ref={notificationRef}
             style={styles.notificationContainer}
@@ -195,6 +200,7 @@ const UserDashboardHeader = ({
               )}
             </div>
 
+            {/* Notification Dropdown */}
             {showNotifications && (
               <div style={styles.notificationDropdown}>
                 <div style={styles.notificationHeader}>
@@ -253,6 +259,7 @@ const UserDashboardHeader = ({
         </div>
       </div>
 
+      {/* Hidden Profile Photo Input */}
       <input
         type="file"
         ref={profilePhotoInputRef}
@@ -261,6 +268,7 @@ const UserDashboardHeader = ({
         style={{ display: 'none' }}
       />
 
+      {/* AI Chatbot */}
       {showChatbot && (
         <div ref={chatRef} style={styles.chatbotContainer}>
           <div style={styles.chatbotHeader}>
@@ -319,8 +327,6 @@ const UserDashboardHeader = ({
       )}
     </header>
   );
-
-  return <EnhancedHeader />;
 };
 
-export default UserDashboardHeader;
+export default Header;

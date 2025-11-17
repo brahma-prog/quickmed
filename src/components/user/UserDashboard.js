@@ -1,11 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ProfileProvider, useProfile } from './UserDashboardHooks';
-import UserDashboardHeader from './UserDashboardHeader';
-import UserDashboardViews from './UserDashboardViews';
-import UserDashboardModals from './UserDashboardModals';
-import { styles } from './UserDashboardStyles';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import Header from './Header';
+import ProfileView from './ProfileView';
+import AppointmentsView from './AppointmentsView';
+import OrdersView from './OrdersView';
+import MedicineView from './MedicineView';
+import CartView from './CartView';
+import ConsultationView from './ConsultationView';
+import LiveTrackingView from './LiveTrackingView';
+import Modals from './Modals';
+import { styles } from './Styles';
 
-const UserDashboardContent = ({ user, onLogout }) => {
+// Create a context for global profile state
+const ProfileContext = React.createContext();
+
+// Profile Provider Component
+export const ProfileProvider = ({ children, user }) => {
+  const [profile, setProfile] = useState({
+    fullName: user?.fullName || 'Jagan',
+    email: user?.email || 'yerrajagan29@gmail.com',
+    phone: user?.phone || '6300604470',
+    profilePhoto: user?.profilePhoto || null,
+    address: user?.address || '',
+    city: user?.city || '',
+    pincode: user?.pincode || '',
+    dateOfBirth: user?.dateOfBirth || '',
+    age: user?.age || '',
+    gender: user?.gender || ''
+  });
+
+  const updateProfile = (newProfile) => {
+    setProfile(newProfile);
+  };
+
+  return (
+    <ProfileContext.Provider value={{ profile, updateProfile }}>
+      {children}
+    </ProfileContext.Provider>
+  );
+};
+
+// Hook to use profile context
+export const useProfile = () => {
+  const context = useContext(ProfileContext);
+  if (!context) {
+    throw new Error('useProfile must be used within a ProfileProvider');
+  }
+  return context;
+};
+
+const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   const { profile, updateProfile } = useProfile();
   
   const [activeView, setActiveView] = useState('dashboard');
@@ -16,30 +59,17 @@ const UserDashboardContent = ({ user, onLogout }) => {
   
   const [userProfile, setUserProfile] = useState(profile);
 
+  // Doctor Consultation State
   const [doctorSearchQuery, setDoctorSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
-  const [selectedExperience, setSelectedExperience] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('');
+  const [selectedExperience] = useState('');
+  const [selectedLanguage] = useState('');
 
+  // Payment State
   const [paymentLoading, setPaymentLoading] = useState(false);
 
-  // Address Management State
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [deliveryAddress, setDeliveryAddress] = useState({
-    street: '',
-    city: '',
-    state: '',
-    pincode: '',
-    landmark: '',
-    addressType: 'home'
-  });
-  const [savedAddresses, setSavedAddresses] = useState([]);
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
-
-  // Quantity state for pharmacy medicines
-  const [pharmacyQuantities, setPharmacyQuantities] = useState({});
-
+  // AI Chatbot State
   const [showChatbot, setShowChatbot] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     {
@@ -54,18 +84,26 @@ const UserDashboardContent = ({ user, onLogout }) => {
   const chatMessagesEndRef = useRef(null);
   const chatRef = useRef(null);
 
+  // Real-time Chat with Doctors State
   const [doctorChats, setDoctorChats] = useState({});
   const [activeDoctorChat, setActiveDoctorChat] = useState(null);
   const [showDoctorChat, setShowDoctorChat] = useState(false);
 
+  // Pharmacy Search State
   const [pharmacySearchQueries, setPharmacySearchQueries] = useState({});
 
+  // Logout Confirmation State
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  // Profile Dropdown State
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  // Profile Photo Upload State
   const [showProfilePhotoModal, setShowProfilePhotoModal] = useState(false);
   const [profilePhotoFile, setProfilePhotoFile] = useState(null);
-  const [profilePhotoPreview, setProfilePhotoPreview] = useState(profile?.profilePhoto || null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState(profile.profilePhoto);
 
+  // Appointments State
   const [appointments, setAppointments] = useState([
     {
       id: 'APT001',
@@ -149,9 +187,13 @@ const UserDashboardContent = ({ user, onLogout }) => {
     }
   ]);
 
+  // Appointments Filter State
   const [appointmentFilter, setAppointmentFilter] = useState('all');
+
+  // Orders Filter State
   const [orderFilter, setOrderFilter] = useState('all');
 
+  // New Features State - Enhanced notifications
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -183,6 +225,7 @@ const UserDashboardContent = ({ user, onLogout }) => {
   const [prescriptionPreview, setPrescriptionPreview] = useState(null);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   
+  // Live Tracking State
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [deliveryPartner] = useState({
     id: 'DP001',
@@ -198,15 +241,20 @@ const UserDashboardContent = ({ user, onLogout }) => {
     estimatedTime: '25 min'
   });
 
+  // Pharmacy Store State
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [showPharmacyStore, setShowPharmacyStore] = useState(false);
+
+  // Appointment Details State
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showAppointmentDetails, setShowAppointmentDetails] = useState(false);
 
+  // Refs for click outside detection
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
   const profilePhotoInputRef = useRef(null);
 
+  // Enhanced mock data for medicines
   const medicines = [
     { id: 1, name: 'Aspirin 75mg', price: 25, vendor: 'WellCare Store', category: 'OTC' },
     { id: 2, name: 'Paracetamol 500mg', price: 30, vendor: 'City Pharmacy', category: 'OTC' },
@@ -216,6 +264,7 @@ const UserDashboardContent = ({ user, onLogout }) => {
     { id: 6, name: 'Blood Pressure Monitor', price: 899, vendor: 'HealthPlus Medicines', category: 'Equipment' }
   ];
 
+  // Enhanced mock data for pharmacies with their medicines
   const pharmacies = [
     { 
       id: 1, 
@@ -224,10 +273,10 @@ const UserDashboardContent = ({ user, onLogout }) => {
       deliveryTime: '20 min', 
       rating: 4.5,
       medicines: [
-        { id: 2, name: 'Paracetamol 500mg', price: 30, category: 'OTC', stock: 15 },
-        { id: 5, name: 'Amoxicillin 500mg', price: 120, category: 'Prescription', stock: 8 },
-        { id: 7, name: 'Cetirizine 10mg', price: 25, category: 'OTC', stock: 20 },
-        { id: 8, name: 'Omeprazole 20mg', price: 45, category: 'Prescription', stock: 12 }
+        { id: 2, name: 'Paracetamol 500mg', price: 30, category: 'OTC' },
+        { id: 5, name: 'Amoxicillin 500mg', price: 120, category: 'Prescription' },
+        { id: 7, name: 'Cetirizine 10mg', price: 25, category: 'OTC' },
+        { id: 8, name: 'Omeprazole 20mg', price: 45, category: 'Prescription' }
       ]
     },
     { 
@@ -237,10 +286,10 @@ const UserDashboardContent = ({ user, onLogout }) => {
       deliveryTime: '25 min', 
       rating: 4.8,
       medicines: [
-        { id: 1, name: 'Aspirin 75mg', price: 25, category: 'OTC', stock: 25 },
-        { id: 4, name: 'Vitamin C 1000mg', price: 40, category: 'Vitamins', stock: 30 },
-        { id: 9, name: 'Multivitamin Tablets', price: 150, category: 'Vitamins', stock: 18 },
-        { id: 10, name: 'Calcium Supplements', price: 200, category: 'Vitamins', stock: 22 }
+        { id: 1, name: 'Aspirin 75mg', price: 25, category: 'OTC' },
+        { id: 4, name: 'Vitamin C 1000mg', price: 40, category: 'Vitamins' },
+        { id: 9, name: 'Multivitamin Tablets', price: 150, category: 'Vitamins' },
+        { id: 10, name: 'Calcium Supplements', price: 200, category: 'Vitamins' }
       ]
     },
     { 
@@ -250,69 +299,16 @@ const UserDashboardContent = ({ user, onLogout }) => {
       deliveryTime: '30 min', 
       rating: 4.3,
       medicines: [
-        { id: 3, name: 'Ibuprofen 400mg', price: 35, category: 'OTC', stock: 10 },
-        { id: 6, name: 'Blood Pressure Monitor', price: 899, category: 'Equipment', stock: 5 },
-        { id: 11, name: 'Diabetes Test Strips', price: 350, category: 'Equipment', stock: 15 },
-        { id: 12, name: 'Thermometer', price: 150, category: 'Equipment', stock: 8 }
+        { id: 3, name: 'Ibuprofen 400mg', price: 35, category: 'OTC' },
+        { id: 6, name: 'Blood Pressure Monitor', price: 899, category: 'Equipment' },
+        { id: 11, name: 'Diabetes Test Strips', price: 350, category: 'Equipment' },
+        { id: 12, name: 'Thermometer', price: 150, category: 'Equipment' }
       ]
     }
   ];
 
-  const doctors = [
-    {
-      id: 1,
-      name: 'Dr. Brahma Gadikoto',
-      specialty: 'General Physician',
-      rating: 5,
-      experience: '15 years',
-      languages: ['English', 'Telugu'],
-      consultationFee: 730,
-      availableSlots: generateTimeSlots(),
-      image: '👨‍⚕️',
-      bio: 'Specialized in general medicine with 15 years of experience. Available for online consultations.',
-      qualifications: 'MBBS, MD (General Medicine)'
-    },
-    {
-      id: 2,
-      name: 'Dr. Charitha Kasturi',
-      specialty: 'Pediatrician',
-      rating: 5,
-      experience: '12 years',
-      languages: ['English', 'Telugu'],
-      consultationFee: 505,
-      availableSlots: generateTimeSlots(),
-      image: '👩‍⚕️',
-      bio: 'Pediatric specialist with expertise in child healthcare and development.',
-      qualifications: 'MBBS, DCH (Diploma in Child Health)'
-    },
-    {
-      id: 3,
-      name: 'Dr. Rajesh Kumar',
-      specialty: 'Cardiologist',
-      rating: 4,
-      experience: '10 years',
-      languages: ['English', 'Hindi'],
-      consultationFee: 1200,
-      availableSlots: generateTimeSlots(),
-      image: '👨‍⚕️',
-      bio: 'Cardiology expert with extensive experience in heart-related conditions.',
-      qualifications: 'MBBS, DM (Cardiology)'
-    }
-  ];
-
-  const chatbotResponses = {
-    'hello': "Hello! I'm your QuickMed assistant. How can I help you with medicines or doctor consultations today?",
-    'hi': "Hi there! Welcome to QuickMed. How can I assist you with healthcare services?",
-    'medicine': "We offer a wide range of medicines. You can search for specific medicines, upload prescriptions, or browse categories. Would you like me to help you find something specific?",
-    'doctor': "We have certified doctors available for online consultations. You can book appointments by specialty, check availability, and consult via video. Would you like to book a consultation?",
-    'delivery': "We offer fast delivery within 2 hours for medicines and 24/7 doctor consultations. Delivery is free for orders above ₹499.",
-    'payment': "We accept all major payment methods including UPI, credit/debit cards, net banking, and wallet payments. All payments are secure and encrypted.",
-    'prescription': "You can upload your prescription in the Medicine section. We'll verify it and deliver your medicines. Supported formats: JPG, PNG, PDF.",
-    'emergency': "For medical emergencies, please contact your nearest hospital immediately or call emergency services at 108.",
-    'default': "I understand you're asking about healthcare services. I can help with medicine orders, doctor appointments, delivery tracking, and general health queries. Could you please provide more details?"
-  };
-
-  function generateTimeSlots() {
+  // Generate real-time slots for Indian timezone
+  const generateTimeSlots = () => {
     const slots = [];
     const now = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000;
@@ -334,675 +330,163 @@ const UserDashboardContent = ({ user, onLogout }) => {
     }
     
     return slots;
-  }
+  };
 
-  const filteredMedicines = medicines.filter(medicine =>
-    medicine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    medicine.vendor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    medicine.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredDoctors = doctors.filter(doctor => {
-    const matchesSearch = doctor.name.toLowerCase().includes(doctorSearchQuery.toLowerCase()) ||
-                         doctor.specialty.toLowerCase().includes(doctorSearchQuery.toLowerCase());
-    const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
-    const matchesTimeSlot = !selectedTimeSlot || doctor.availableSlots.includes(selectedTimeSlot);
-    const matchesExperience = !selectedExperience || doctor.experience.includes(selectedExperience);
-    const matchesLanguage = !selectedLanguage || doctor.languages.includes(selectedLanguage);
-    
-    return matchesSearch && matchesSpecialty && matchesTimeSlot && matchesExperience && matchesLanguage;
-  });
-
-  const specialties = [...new Set(doctors.map(doctor => doctor.specialty))];
-  const allTimeSlots = [...new Set(doctors.flatMap(doctor => doctor.availableSlots))].sort();
-
-  const filteredAppointments = appointments.filter(appointment => {
-    if (appointmentFilter === 'all') return true;
-    return appointment.status.toLowerCase() === appointmentFilter.toLowerCase();
-  });
-
-  const filteredOrders = orders.filter(order => {
-    if (orderFilter === 'all') return true;
-    
-    switch (orderFilter) {
-      case 'delivered':
-        return order.status === 'Delivered';
-      case 'in-transit':
-        return order.status === 'In Transit' || order.status === 'On the Way';
-      case 'pending':
-        return order.status === 'Pending';
-      default:
-        return true;
+  // Mock doctors data - Updated with additional doctors
+  const doctors = [
+    {
+      id: 1,
+      name: 'Dr. Brahma Gadikoto',
+      specialty: 'General Physician',
+      rating: 5,
+      experience: '15 years',
+      languages: ['English', 'Telugu'],
+      consultationFee: 730,
+      availableSlots: generateTimeSlots(),
+      image: '👨‍⚕️',
+      bio: 'Specialized in general medicine with 15 years of experience.',
+      qualifications: 'MBBS, MD (General Medicine)'
+    },
+    {
+      id: 2,
+      name: 'Dr. Charitha Kasturi',
+      specialty: 'Pediatrician',
+      rating: 4.8,
+      experience: '12 years',
+      languages: ['English', 'Hindi', 'Telugu'],
+      consultationFee: 505,
+      availableSlots: generateTimeSlots(),
+      image: '👩‍⚕️',
+      bio: 'Specialized in child care and pediatric medicine with 12 years of experience.',
+      qualifications: 'MBBS, MD (Pediatrics)'
+    },
+    {
+      id: 3,
+      name: 'Dr. Rajesh Kumar',
+      specialty: 'Cardiologist',
+      rating: 4.9,
+      experience: '18 years',
+      languages: ['English', 'Hindi'],
+      consultationFee: 1200,
+      availableSlots: generateTimeSlots(),
+      image: '👨‍⚕️',
+      bio: 'Expert in heart diseases and cardiovascular treatments with 18 years of experience.',
+      qualifications: 'MBBS, MD, DM (Cardiology)'
+    },
+    {
+      id: 4,
+      name: 'Dr. Priya Sharma',
+      specialty: 'Dermatologist',
+      rating: 4.7,
+      experience: '10 years',
+      languages: ['English', 'Hindi', 'Tamil'],
+      consultationFee: 800,
+      availableSlots: generateTimeSlots(),
+      image: '👩‍⚕️',
+      bio: 'Specialized in skin treatments and cosmetic dermatology with 10 years of experience.',
+      qualifications: 'MBBS, MD (Dermatology)'
+    },
+    {
+      id: 5,
+      name: 'Dr. Anil Kumar',
+      specialty: 'Orthopedic',
+      rating: 4.6,
+      experience: '14 years',
+      languages: ['English', 'Hindi'],
+      consultationFee: 950,
+      availableSlots: generateTimeSlots(),
+      image: '👨‍⚕️',
+      bio: 'Expert in bone and joint treatments with 14 years of surgical experience.',
+      qualifications: 'MBBS, MS (Orthopedics)'
     }
-  });
+  ];
 
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  const addToCart = (medicine) => {
-    const existingItem = cart.find(item => item.id === medicine.id);
-    if (existingItem) {
-      setCart(cart.map(item => 
-        item.id === medicine.id 
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
-    } else {
-      setCart([...cart, { ...medicine, quantity: 1 }]);
-    }
-    addNotification('Medicine Added', `${medicine.name} added to cart`, 'order');
-  };
-
-  const removeFromCart = (medicineId) => {
-    setCart(cart.filter(item => item.id !== medicineId));
-  };
-
-  const updateQuantity = (medicineId, newQuantity) => {
-    if (newQuantity === 0) {
-      removeFromCart(medicineId);
-    } else {
-      setCart(cart.map(item => 
-        item.id === medicineId 
-          ? { ...item, quantity: newQuantity }
-          : item
-      ));
-    }
-  };
-
-  const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
-  };
-
-  const markAsRead = (notificationId) => {
-    setNotifications(notifications.map(notif =>
-      notif.id === notificationId ? { ...notif, read: true } : notif
-    ));
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(notif => ({ ...notif, read: true })));
-  };
-
-  const getUnreadCount = () => {
-    return notifications.filter(notif => !notif.read).length;
-  };
-
-  const addNotification = (title, message, type = 'info') => {
-    const newNotification = {
-      id: Date.now(),
-      title,
-      message,
-      timestamp: new Date(),
-      read: false,
-      type
-    };
-    setNotifications(prev => [newNotification, ...prev]);
-  };
-
-  const scheduleAppointment = (doctor, date, time) => {
-    const newAppointment = {
-      id: `APT${Date.now()}`,
-      doctorName: doctor.name,
-      specialty: doctor.specialty,
-      date: date,
-      time: time,
-      status: 'Scheduled',
-      type: 'Video Consultation',
-      fee: doctor.consultationFee,
-      details: {
-        patientName: userProfile.fullName,
-        symptoms: 'General consultation',
-        notes: 'New appointment scheduled',
-        prescription: 'To be provided after consultation'
+  // Enhanced mock orders data with tracking
+  const initialOrders = [
+    {
+      id: 'ORD001',
+      date: '2024-01-15',
+      items: [
+        { name: 'Paracetamol 500mg', quantity: 2, price: 30 },
+        { name: 'Vitamin C 1000mg', quantity: 1, price: 40 }
+      ],
+      total: 100,
+      status: 'Delivered',
+      deliveryAddress: '123 Main St, City, 560001',
+      trackingAvailable: false
+    },
+    {
+      id: 'ORD002',
+      date: '2024-01-10',
+      items: [
+        { name: 'Aspirin 75mg', quantity: 1, price: 25 }
+      ],
+      total: 25,
+      status: 'In Transit',
+      deliveryAddress: '123 Main St, City, 560001',
+      trackingAvailable: true,
+      deliveryPartner: {
+        name: 'Rahul Kumar',
+        phone: '+91 9876543210',
+        estimatedTime: '25 min'
       }
-    };
-    setAppointments(prev => [newAppointment, ...prev]);
-    addNotification('Appointment Scheduled', `Appointment with ${doctor.name} scheduled for ${date} at ${time}`, 'appointment');
-    setActiveView('appointments');
-  };
-
-  const rescheduleAppointment = (appointmentId, newDate, newTime) => {
-    setAppointments(appointments.map(apt =>
-      apt.id === appointmentId 
-        ? { ...apt, date: newDate, time: newTime, status: 'Rescheduled' }
-        : apt
-    ));
-    addNotification('Appointment Rescheduled', 'Your appointment has been rescheduled successfully', 'appointment');
-  };
-
-  const cancelAppointment = (appointmentId) => {
-    setAppointments(appointments.map(apt =>
-      apt.id === appointmentId 
-        ? { ...apt, status: 'Cancelled' }
-        : apt
-    ));
-    addNotification('Appointment Cancelled', 'Your appointment has been cancelled', 'appointment');
-  };
-
-  const viewAppointmentDetails = (appointment) => {
-    setSelectedAppointment(appointment);
-    setShowAppointmentDetails(true);
-  };
-
-  // Enhanced pharmacy store view function
-  const viewPharmacyStore = (pharmacy) => {
-    setSelectedPharmacy(pharmacy);
-    setShowPharmacyStore(true);
-    
-    // Initialize search query for this pharmacy if not exists
-    if (!pharmacySearchQueries[pharmacy.id]) {
-      setPharmacySearchQueries(prev => ({
-        ...prev,
-        [pharmacy.id]: ''
-      }));
-    }
-  };
-
-  // Enhanced add to cart from pharmacy with better feedback
-  const addToCartFromPharmacy = (medicine) => {
-    return new Promise((resolve) => {
-      const existingItem = cart.find(item => item.id === medicine.id);
-      if (existingItem) {
-        setCart(cart.map(item => 
-          item.id === medicine.id 
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        ));
-      } else {
-        setCart([...cart, { ...medicine, quantity: 1, addedFrom: 'pharmacy' }]);
+    },
+    {
+      id: 'ORD003',
+      date: new Date().toISOString().split('T')[0],
+      items: [
+        { name: 'Amoxicillin 500mg', quantity: 1, price: 120 },
+        { name: 'Vitamin C 1000mg', quantity: 2, price: 40 }
+      ],
+      total: 200,
+      status: 'On the Way',
+      deliveryAddress: '456 Park Avenue, City, 560001',
+      trackingAvailable: true,
+      deliveryPartner: {
+        name: 'Rahul Kumar',
+        phone: '+91 9876543210',
+        estimatedTime: '15 min'
       }
-      
-      addNotification('Medicine Added', `${medicine.name} added to cart from pharmacy`, 'order');
-      
-      // Simulate API call delay for better UX
-      setTimeout(() => {
-        resolve();
-      }, 300);
-    });
-  };
-
-  // Enhanced quantity management for pharmacy medicines
-  const handlePharmacyQuantityChange = (medicineId, change) => {
-    setPharmacyQuantities(prev => {
-      const currentQuantity = prev[medicineId] || 0;
-      const newQuantity = Math.max(0, currentQuantity + change);
-      
-      return {
-        ...prev,
-        [medicineId]: newQuantity
-      };
-    });
-  };
-
-  const handleAddToCartFromPharmacy = async (medicine) => {
-    const quantity = pharmacyQuantities[medicine.id] || 1;
-    
-    if (quantity === 0) {
-      // If quantity is 0, add 1 by default
-      setPharmacyQuantities(prev => ({
-        ...prev,
-        [medicine.id]: 1
-      }));
-      await addToCartFromPharmacy(medicine);
-    } else {
-      // Add the specified quantity
-      for (let i = 0; i < quantity; i++) {
-        await addToCartFromPharmacy(medicine);
-      }
-      
-      // Reset quantity after adding to cart
-      setPharmacyQuantities(prev => ({
-        ...prev,
-        [medicine.id]: 0
-      }));
+    },
+    {
+      id: 'ORD004',
+      date: '2024-01-12',
+      items: [
+        { name: 'Ibuprofen 400mg', quantity: 1, price: 35 },
+        { name: 'Cetirizine 10mg', quantity: 2, price: 25 }
+      ],
+      total: 85,
+      status: 'Pending',
+      deliveryAddress: '789 Oak Street, City, 560001',
+      trackingAvailable: false
+    },
+    {
+      id: 'ORD005',
+      date: '2024-01-08',
+      items: [
+        { name: 'Blood Pressure Monitor', quantity: 1, price: 899 }
+      ],
+      total: 899,
+      status: 'Delivered',
+      deliveryAddress: '321 Pine Road, City, 560001',
+      trackingAvailable: false
     }
+  ];
+
+  // AI Chatbot Responses
+  const chatbotResponses = {
+    'hello': "Hello! I'm your QuickMed assistant. How can I help you with medicines or doctor consultations today?",
+    'hi': "Hi there! Welcome to QuickMed. How can I assist you with healthcare services?",
+    'medicine': "We offer a wide range of medicines. You can search for specific medicines, upload prescriptions, or browse categories.",
+    'doctor': "We have certified doctors available for online consultations.",
+    'delivery': "We offer fast delivery within 2 hours for medicines and 24/7 doctor consultations.",
+    'payment': "We accept all major payment methods including UPI, credit/debit cards, net banking, and wallet payments.",
+    'prescription': "You can upload your prescription in the Medicine section.",
+    'emergency': "For medical emergencies, please contact your nearest hospital immediately or call emergency services at 108.",
+    'default': "I understand you're asking about healthcare services. I can help with medicine orders, doctor appointments, delivery tracking, and general health queries."
   };
 
-  const handlePrescriptionUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-      if (!validTypes.includes(file.type)) {
-        alert('Please upload a valid prescription file (JPG, PNG, or PDF)');
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB');
-        return;
-      }
-
-      setPrescriptionFile(file);
-      
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setPrescriptionPreview(e.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setPrescriptionPreview(null);
-      }
-      
-      setShowPrescriptionModal(true);
-      addNotification('Prescription Uploaded', 'Your prescription has been uploaded successfully', 'prescription');
-    }
-  };
-
-  const handlePrescriptionSubmit = () => {
-    if (!prescriptionFile) {
-      alert('Please select a prescription file first');
-      return;
-    }
-    
-    alert(`Prescription "${prescriptionFile.name}" uploaded successfully! Our team will verify it shortly.`);
-    setShowPrescriptionModal(false);
-    setPrescriptionFile(null);
-    setPrescriptionPreview(null);
-  };
-
-  const startLiveTracking = (order) => {
-    setTrackingOrder(order);
-    setActiveView('live-tracking');
-    addNotification('Live Tracking Started', `You can now track your order ${order.id} in real-time`, 'tracking');
-  };
-
-  const callDeliveryPartner = () => {
-    alert(`Calling delivery partner: ${deliveryPartner.name}\nPhone: ${deliveryPartner.phone}`);
-  };
-
-  const getDeliveryStatusText = (status) => {
-    const statusMap = {
-      'ordered': 'Order Placed',
-      'confirmed': 'Order Confirmed',
-      'preparing': 'Preparing Your Order',
-      'picked_up': 'Picked Up',
-      'on_the_way': 'On the Way',
-      'delivered': 'Delivered'
-    };
-    return statusMap[status] || status;
-  };
-
-  const getDeliveryProgress = (status) => {
-    const progressMap = {
-      'ordered': 20,
-      'confirmed': 40,
-      'preparing': 60,
-      'picked_up': 80,
-      'on_the_way': 90,
-      'delivered': 100
-    };
-    return progressMap[status] || 0;
-  };
-
-  const handleLogoutClick = () => {
-    setShowLogoutConfirm(true);
-  };
-
-  const confirmLogout = () => {
-    setShowLogoutConfirm(false);
-    onLogout();
-  };
-
-  const cancelLogout = () => {
-    setShowLogoutConfirm(false);
-  };
-
-  const toggleProfileDropdown = () => {
-    setShowProfileDropdown(!showProfileDropdown);
-  };
-
-  // Address Management Functions
-  const saveAddressToProfile = (address) => {
-    const newAddress = {
-      id: `ADDR${Date.now()}`,
-      ...address,
-      isDefault: savedAddresses.length === 0
-    };
-    
-    setSavedAddresses(prev => [...prev, newAddress]);
-    
-    // Update user profile with address
-    const updatedProfile = {
-      ...userProfile,
-      address: address
-    };
-    setUserProfile(updatedProfile);
-    updateProfile(updatedProfile);
-  };
-
-  const handleAddressInputChange = (field, value) => {
-    setDeliveryAddress(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const selectSavedAddress = (addressId) => {
-    const address = savedAddresses.find(addr => addr.id === addressId);
-    if (address) {
-      setDeliveryAddress(address);
-      setSelectedAddressId(addressId);
-    }
-  };
-
-  const setDefaultAddress = (addressId) => {
-    setSavedAddresses(prev => 
-      prev.map(addr => ({
-        ...addr,
-        isDefault: addr.id === addressId
-      }))
-    );
-  };
-
-  const deleteAddress = (addressId) => {
-    if (savedAddresses.length <= 1) {
-      alert('You must have at least one saved address');
-      return;
-    }
-    
-    setSavedAddresses(prev => prev.filter(addr => addr.id !== addressId));
-    if (selectedAddressId === addressId) {
-      const defaultAddress = savedAddresses.find(addr => addr.isDefault) || savedAddresses[0];
-      setDeliveryAddress(defaultAddress);
-      setSelectedAddressId(defaultAddress.id);
-    }
-  };
-
-  // Updated Checkout Flow
-  const handleCheckoutConfirmation = () => {
-    if (cart.length === 0) {
-      alert('Your cart is empty!');
-      return;
-    }
-
-    // Check if user has saved addresses
-    if (savedAddresses.length > 0) {
-      setShowAddressModal(true);
-    } else {
-      // If no saved addresses, prompt to add one
-      setShowAddressModal(true);
-    }
-  };
-
-  const handleConfirmCheckout = () => {
-    // Validate address
-    if (!deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.pincode) {
-      alert('Please complete the delivery address before proceeding to payment.');
-      return;
-    }
-
-    setShowAddressModal(false);
-    setShowCheckoutConfirm(false);
-    
-    // Save address to profile if it's new
-    if (!savedAddresses.find(addr => 
-      addr.street === deliveryAddress.street && 
-      addr.pincode === deliveryAddress.pincode
-    )) {
-      saveAddressToProfile(deliveryAddress);
-    }
-    
-    initiatePayment();
-  };
-
-  const handleCancelCheckout = () => {
-    setShowCheckoutConfirm(false);
-  };
-
-  const initiatePayment = async () => {
-    if (cart.length === 0) {
-      alert('Your cart is empty!');
-      return;
-    }
-
-    if (!window.Razorpay) {
-      alert('Payment system is loading, please try again in a moment.');
-      return;
-    }
-
-    setPaymentLoading(true);
-
-    try {
-      const totalAmount = getTotalPrice() * 100;
-
-      const options = {
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-        amount: totalAmount,
-        currency: 'INR',
-        name: 'QuickMed Pharmacy',
-        description: 'Medicine Purchase',
-        image: 'https://cdn.razorpay.com/logos/FFATTsJeURNMxx_medium.png',
-        handler: function(response) {
-          handlePaymentSuccess(response);
-        },
-        prefill: {
-          name: userProfile.fullName,
-          email: userProfile.email,
-          contact: userProfile.phone
-        },
-        notes: {
-          address: `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.state} - ${deliveryAddress.pincode}`,
-          landmark: deliveryAddress.landmark || 'Not specified',
-          address_type: deliveryAddress.addressType
-        },
-        theme: {
-          color: '#7C2A62'
-        },
-        modal: {
-          ondismiss: function() {
-            setPaymentLoading(false);
-            alert('Payment was cancelled. You can try again.');
-          }
-        }
-      };
-
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
-      
-    } catch (error) {
-      console.error('Error initializing payment:', error);
-      alert('Error initializing payment. Please try again.');
-      setPaymentLoading(false);
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentResponse) => {
-    try {
-      const verificationResponse = await verifyPayment(paymentResponse);
-      
-      if (verificationResponse.success) {
-        const orderId = `ORD${Date.now()}`;
-        const newOrder = {
-          id: orderId,
-          date: new Date().toISOString().split('T')[0],
-          items: [...cart],
-          total: getTotalPrice(),
-          status: 'Confirmed',
-          deliveryAddress: `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.state} - ${deliveryAddress.pincode}`,
-          addressDetails: deliveryAddress,
-          paymentId: paymentResponse.razorpay_payment_id,
-          trackingAvailable: true,
-          deliveryPartner: {
-            name: 'Rahul Kumar',
-            phone: '+91 9876543210',
-            estimatedTime: '30 min'
-          }
-        };
-        
-        setOrders(prevOrders => [newOrder, ...prevOrders]);
-        setCart([]);
-        setActiveView('orders');
-        
-        addNotification('Order Confirmed', `Your order ${orderId} has been placed successfully`, 'order');
-        alert(`Payment successful! Order ID: ${orderId}\nYour order will be delivered to: ${deliveryAddress.street}, ${deliveryAddress.city}`);
-      } else {
-        alert('Payment verification failed. Please contact support.');
-      }
-    } catch (error) {
-      console.error('Payment verification failed:', error);
-      alert('Payment verification failed. Please contact support.');
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
-
-  const verifyPayment = async (paymentResponse) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true });
-      }, 1000);
-    });
-  };
-
-  const handleBookAppointment = (doctor, timeSlot) => {
-    const selectedDate = prompt('Enter appointment date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    
-    if (selectedDate && timeSlot) {
-      scheduleAppointment(doctor, selectedDate, timeSlot);
-      alert(`Appointment booked with ${doctor.name} on ${selectedDate} at ${timeSlot}`);
-    }
-  };
-
-  const toggleChatbot = () => {
-    setShowChatbot(!showChatbot);
-  };
-
-  const handleUserMessage = (e) => {
-    setUserMessage(e.target.value);
-  };
-
-  const sendMessage = () => {
-    if (!userMessage.trim()) return;
-
-    const newUserMessage = {
-      id: Date.now(),
-      text: userMessage,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setChatMessages(prev => [...prev, newUserMessage]);
-    setUserMessage('');
-    
-    setTimeout(() => {
-      const response = generateBotResponse(userMessage.toLowerCase());
-      const botMessage = {
-        id: Date.now() + 1,
-        text: response,
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [...prev, botMessage]);
-    }, 1000);
-
-    setTimeout(() => {
-      if (chatInputRef.current) {
-        chatInputRef.current.focus();
-      }
-    }, 50);
-  };
-
-  const generateBotResponse = (message) => {
-    if (message.includes('hello') || message.includes('hi')) {
-      return chatbotResponses.hello;
-    } else if (message.includes('medicine') || message.includes('drug') || message.includes('pill')) {
-      return chatbotResponses.medicine;
-    } else if (message.includes('doctor') || message.includes('consult') || message.includes('appointment')) {
-      return chatbotResponses.doctor;
-    } else if (message.includes('delivery') || message.includes('shipping') || message.includes('time')) {
-      return chatbotResponses.delivery;
-    } else if (message.includes('payment') || message.includes('pay') || message.includes('money')) {
-      return chatbotResponses.payment;
-    } else if (message.includes('prescription') || message.includes('upload')) {
-      return chatbotResponses.prescription;
-    } else if (message.includes('emergency') || message.includes('urgent') || message.includes('help')) {
-      return chatbotResponses.emergency;
-    } else {
-      return chatbotResponses.default;
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const startDoctorChat = (doctor) => {
-    setActiveDoctorChat(doctor);
-    setShowDoctorChat(true);
-    
-    if (!doctorChats[doctor.id]) {
-      setDoctorChats(prev => ({
-        ...prev,
-        [doctor.id]: [
-          {
-            id: 1,
-            text: `Hello! I'm ${doctor.name}. How can I help you today?`,
-            sender: 'doctor',
-            timestamp: new Date()
-          }
-        ]
-      }));
-    }
-  };
-
-  const sendDoctorMessage = (doctorId, message) => {
-    if (!message.trim()) return;
-
-    const newMessage = {
-      id: Date.now(),
-      text: message,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setDoctorChats(prev => ({
-      ...prev,
-      [doctorId]: [...(prev[doctorId] || []), newMessage]
-    }));
-
-    setTimeout(() => {
-      const doctorResponse = {
-        id: Date.now() + 1,
-        text: "Thank you for your message. I'll review your concerns and get back to you shortly. For urgent matters, please book an appointment.",
-        sender: 'doctor',
-        timestamp: new Date()
-      };
-
-      setDoctorChats(prev => ({
-        ...prev,
-        [doctorId]: [...(prev[doctorId] || []), doctorResponse]
-      }));
-    }, 2000);
-  };
-
-  // Enhanced pharmacy search function with real-time filtering
-  const handlePharmacySearch = (pharmacyId, query) => {
-    setPharmacySearchQueries(prev => ({
-      ...prev,
-      [pharmacyId]: query
-    }));
-    
-    // Add search analytics in real app
-    console.log(`Search in pharmacy ${pharmacyId}: ${query}`);
-  };
-
-  // Enhanced pharmacy medicine filtering
-  const getFilteredPharmacyMedicines = (pharmacy) => {
-    if (!pharmacy) return [];
-    const query = pharmacySearchQueries[pharmacy.id] || '';
-    if (!query.trim()) return pharmacy.medicines || [];
-    
-    return (pharmacy.medicines || []).filter(medicine =>
-      medicine.name.toLowerCase().includes(query.toLowerCase()) ||
-      medicine.category.toLowerCase().includes(query.toLowerCase())
-    );
-  };
-
+  // Profile Photo Upload Functions
   const handleProfilePhotoUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -1092,18 +576,7 @@ const UserDashboardContent = ({ user, onLogout }) => {
     profilePhotoInputRef.current?.click();
   };
 
-  // Auto-focus search input when pharmacy store modal opens
-  useEffect(() => {
-    if (showPharmacyStore && selectedPharmacy) {
-      setTimeout(() => {
-        const searchInput = document.querySelector(`[data-pharmacy-id="${selectedPharmacy.id}"]`);
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }, 100);
-    }
-  }, [showPharmacyStore, selectedPharmacy]);
-
+  // Load Razorpay script dynamically
   useEffect(() => {
     const loadRazorpayScript = () => {
       return new Promise((resolve) => {
@@ -1123,89 +596,18 @@ const UserDashboardContent = ({ user, onLogout }) => {
     loadRazorpayScript();
   }, []);
 
+  // Initialize orders and start live tracking simulation
   useEffect(() => {
-    // Move initialOrders inside useEffect to fix the warning
-    const initialOrders = [
-      {
-        id: 'ORD001',
-        date: '2024-01-15',
-        items: [
-          { name: 'Paracetamol 500mg', quantity: 2, price: 30 },
-          { name: 'Vitamin C 1000mg', quantity: 1, price: 40 }
-        ],
-        total: 100,
-        status: 'Delivered',
-        deliveryAddress: '123 Main St, City, 560001',
-        trackingAvailable: false
-      },
-      {
-        id: 'ORD002',
-        date: '2024-01-10',
-        items: [
-          { name: 'Aspirin 75mg', quantity: 1, price: 25 }
-        ],
-        total: 25,
-        status: 'In Transit',
-        deliveryAddress: '123 Main St, City, 560001',
-        trackingAvailable: true,
-        deliveryPartner: {
-          name: 'Rahul Kumar',
-          phone: '+91 9876543210',
-          estimatedTime: '25 min'
-        }
-      },
-      {
-        id: 'ORD003',
-        date: new Date().toISOString().split('T')[0],
-        items: [
-          { name: 'Amoxicillin 500mg', quantity: 1, price: 120 },
-          { name: 'Vitamin C 1000mg', quantity: 2, price: 40 }
-        ],
-        total: 200,
-        status: 'On the Way',
-        deliveryAddress: '456 Park Avenue, City, 560001',
-        trackingAvailable: true,
-        deliveryPartner: {
-          name: 'Rahul Kumar',
-          phone: '+91 9876543210',
-          estimatedTime: '15 min'
-        }
-      },
-      {
-        id: 'ORD004',
-        date: '2024-01-12',
-        items: [
-          { name: 'Ibuprofen 400mg', quantity: 1, price: 35 },
-          { name: 'Cetirizine 10mg', quantity: 2, price: 25 }
-        ],
-        total: 85,
-        status: 'Pending',
-        deliveryAddress: '789 Oak Street, City, 560001',
-        trackingAvailable: false
-      },
-      {
-        id: 'ORD005',
-        date: '2024-01-08',
-        items: [
-          { name: 'Blood Pressure Monitor', quantity: 1, price: 899 }
-        ],
-        total: 899,
-        status: 'Delivered',
-        deliveryAddress: '321 Pine Road, City, 560001',
-        trackingAvailable: false
-      }
-    ];
-
     setOrders(initialOrders);
-    
     const trackableOrder = initialOrders.find(order => 
       order.trackingAvailable && (order.status === 'In Transit' || order.status === 'On the Way')
     );
     if (trackableOrder) {
       setTrackingOrder(trackableOrder);
     }
-  }, []); // Empty dependency array since initialOrders is now inside
+  }, []);
 
+  // Close notifications when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -1225,6 +627,7 @@ const UserDashboardContent = ({ user, onLogout }) => {
     };
   }, []);
 
+  // Focus chat input when chatbot opens and scroll to bottom
   useEffect(() => {
     if (showChatbot) {
       setTimeout(() => {
@@ -1235,151 +638,766 @@ const UserDashboardContent = ({ user, onLogout }) => {
     }
   }, [showChatbot]);
 
+  // Scroll to bottom when new messages are added
   useEffect(() => {
     if (chatMessagesEndRef.current) {
       chatMessagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [chatMessages]);
 
-  const dashboardProps = {
-    activeView,
-    setActiveView,
-    userProfile,
-    cart,
-    searchQuery,
-    setSearchQuery,
-    filteredMedicines,
-    addToCart,
-    updateQuantity,
-    removeFromCart,
-    getTotalPrice,
-    handleCheckoutConfirmation,
-    handlePrescriptionUpload,
-    pharmacies,
-    viewPharmacyStore,
-    handlePharmacySearch,
-    getFilteredPharmacyMedicines,
-    addToCartFromPharmacy,
-    doctorSearchQuery,
-    setDoctorSearchQuery,
-    selectedSpecialty,
-    setSelectedSpecialty,
-    selectedTimeSlot,
-    setSelectedTimeSlot,
-    selectedExperience,
-    setSelectedExperience,
-    selectedLanguage,
-    setSelectedLanguage,
-    filteredDoctors,
-    specialties,
-    allTimeSlots,
-    handleBookAppointment,
-    startDoctorChat,
-    appointments,
-    appointmentFilter,
-    setAppointmentFilter,
-    filteredAppointments,
-    rescheduleAppointment,
-    cancelAppointment,
-    viewAppointmentDetails,
-    orders,
-    orderFilter,
-    setOrderFilter,
-    filteredOrders,
-    startLiveTracking,
-    trackingOrder,
-    deliveryPartner,
-    callDeliveryPartner,
-    getDeliveryStatusText,
-    getDeliveryProgress,
-    paymentLoading,
-    showCheckoutConfirm,
-    handleConfirmCheckout,
-    handleCancelCheckout,
-    showPrescriptionModal,
-    setShowPrescriptionModal,
-    prescriptionFile,
-    prescriptionPreview,
-    handlePrescriptionSubmit,
-    setPrescriptionFile,
-    setPrescriptionPreview,
-    showPharmacyStore,
-    setShowPharmacyStore,
-    selectedPharmacy,
-    showAppointmentDetails,
-    setShowAppointmentDetails,
-    selectedAppointment,
-    showDoctorChat,
-    setShowDoctorChat,
-    activeDoctorChat,
-    doctorChats,
-    sendDoctorMessage,
-    showLogoutConfirm,
-    handleLogoutClick,
-    confirmLogout,
-    cancelLogout,
-    showProfilePhotoModal,
-    setShowProfilePhotoModal,
-    profilePhotoFile,
-    profilePhotoPreview,
-    handleProfilePhotoUpload,
-    handleProfilePhotoSubmit,
-    removeProfilePhoto,
-    setProfilePhotoFile,
-    setProfilePhotoPreview,
-    triggerProfilePhotoUpload,
-    profilePhotoInputRef,
-    updateProfile,
-    showChatbot,
-    toggleChatbot,
-    chatMessages,
-    userMessage,
-    handleUserMessage,
-    sendMessage,
-    handleKeyPress,
-    chatInputRef,
-    chatMessagesEndRef,
-    chatRef,
-    showNotifications,
-    toggleNotifications,
-    notifications,
-    markAsRead,
-    markAllAsRead,
-    getUnreadCount,
-    showProfileDropdown,
-    toggleProfileDropdown,
-    setShowProfileDropdown,
-    profileRef,
-    notificationRef,
-    styles,
-    pharmacySearchQueries,
-    // Address Management Props
-    showAddressModal,
-    setShowAddressModal,
-    deliveryAddress,
-    setDeliveryAddress,
-    savedAddresses,
-    selectedAddressId,
-    handleAddressInputChange,
-    selectSavedAddress,
-    setDefaultAddress,
-    deleteAddress,
-    saveAddressToProfile,
-    // Pharmacy Quantity Management
-    pharmacyQuantities,
-    handlePharmacyQuantityChange,
-    handleAddToCartFromPharmacy
+  // AI Chatbot Functions
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
   };
+
+  const handleUserMessage = (e) => {
+    setUserMessage(e.target.value);
+  };
+
+  const sendMessage = () => {
+    if (!userMessage.trim()) return;
+
+    const newUserMessage = {
+      id: Date.now(),
+      text: userMessage,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, newUserMessage]);
+    setUserMessage('');
+    
+    setTimeout(() => {
+      const response = generateBotResponse(userMessage.toLowerCase());
+      const botMessage = {
+        id: Date.now() + 1,
+        text: response,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [...prev, botMessage]);
+    }, 1000);
+
+    setTimeout(() => {
+      if (chatInputRef.current) {
+        chatInputRef.current.focus();
+      }
+    }, 50);
+  };
+
+  const generateBotResponse = (message) => {
+    if (message.includes('hello') || message.includes('hi')) {
+      return chatbotResponses.hello;
+    } else if (message.includes('medicine') || message.includes('drug') || message.includes('pill')) {
+      return chatbotResponses.medicine;
+    } else if (message.includes('doctor') || message.includes('consult') || message.includes('appointment')) {
+      return chatbotResponses.doctor;
+    } else if (message.includes('delivery') || message.includes('shipping') || message.includes('time')) {
+      return chatbotResponses.delivery;
+    } else if (message.includes('payment') || message.includes('pay') || message.includes('money')) {
+      return chatbotResponses.payment;
+    } else if (message.includes('prescription') || message.includes('upload')) {
+      return chatbotResponses.prescription;
+    } else if (message.includes('emergency') || message.includes('urgent') || message.includes('help')) {
+      return chatbotResponses.emergency;
+    } else {
+      return chatbotResponses.default;
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  // Real-time Doctor Chat Functions
+  const startDoctorChat = (doctor) => {
+    setActiveDoctorChat(doctor);
+    setShowDoctorChat(true);
+    
+    if (!doctorChats[doctor.id]) {
+      setDoctorChats(prev => ({
+        ...prev,
+        [doctor.id]: [
+          {
+            id: 1,
+            text: `Hello! I'm ${doctor.name}. How can I help you today?`,
+            sender: 'doctor',
+            timestamp: new Date()
+          }
+        ]
+      }));
+    }
+  };
+
+  const sendDoctorMessage = (doctorId, message) => {
+    if (!message.trim()) return;
+
+    const newMessage = {
+      id: Date.now(),
+      text: message,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setDoctorChats(prev => ({
+      ...prev,
+      [doctorId]: [...(prev[doctorId] || []), newMessage]
+    }));
+
+    setTimeout(() => {
+      const doctorResponse = {
+        id: Date.now() + 1,
+        text: "Thank you for your message. I'll review your concerns and get back to you shortly.",
+        sender: 'doctor',
+        timestamp: new Date()
+      };
+
+      setDoctorChats(prev => ({
+        ...prev,
+        [doctorId]: [...(prev[doctorId] || []), doctorResponse]
+      }));
+    }, 2000);
+  };
+
+  // Pharmacy Search Functions
+  const handlePharmacySearch = (pharmacyId, query) => {
+    setPharmacySearchQueries(prev => ({
+      ...prev,
+      [pharmacyId]: query
+    }));
+  };
+
+  const getFilteredPharmacyMedicines = (pharmacy) => {
+    const query = pharmacySearchQueries[pharmacy.id] || '';
+    if (!query.trim()) return pharmacy.medicines;
+    
+    return pharmacy.medicines.filter(medicine =>
+      medicine.name.toLowerCase().includes(query.toLowerCase())
+    );
+  };
+
+  // Cart functions
+  const addToCart = (medicine) => {
+    const existingItem = cart.find(item => item.id === medicine.id);
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.id === medicine.id 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...medicine, quantity: 1 }]);
+    }
+    addNotification('Medicine Added', `${medicine.name} added to cart`, 'order');
+  };
+
+  const removeFromCart = (medicineId) => {
+    setCart(cart.filter(item => item.id !== medicineId));
+  };
+
+  const updateQuantity = (medicineId, newQuantity) => {
+    if (newQuantity === 0) {
+      removeFromCart(medicineId);
+    } else {
+      setCart(cart.map(item => 
+        item.id === medicineId 
+          ? { ...item, quantity: newQuantity }
+          : item
+      ));
+    }
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  // Filter medicines based on search
+  const filteredMedicines = medicines.filter(medicine =>
+    medicine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    medicine.vendor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    medicine.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Filter doctors based on search and filters
+  const filteredDoctors = doctors.filter(doctor => {
+    const matchesSearch = doctor.name.toLowerCase().includes(doctorSearchQuery.toLowerCase()) ||
+                         doctor.specialty.toLowerCase().includes(doctorSearchQuery.toLowerCase());
+    const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
+    const matchesTimeSlot = !selectedTimeSlot || doctor.availableSlots.includes(selectedTimeSlot);
+    const matchesExperience = !selectedExperience || doctor.experience.includes(selectedExperience);
+    const matchesLanguage = !selectedLanguage || doctor.languages.includes(selectedLanguage);
+    
+    return matchesSearch && matchesSpecialty && matchesTimeSlot && matchesExperience && matchesLanguage;
+  });
+
+  // Get unique specialties, languages, and time slots for filters
+  const specialties = [...new Set(doctors.map(doctor => doctor.specialty))];
+  const allTimeSlots = [...new Set(doctors.flatMap(doctor => doctor.availableSlots))].sort();
+
+  // Filter appointments based on selected filter
+  const filteredAppointments = appointments.filter(appointment => {
+    if (appointmentFilter === 'all') return true;
+    return appointment.status.toLowerCase() === appointmentFilter.toLowerCase();
+  });
+
+  // Filter orders based on selected filter
+  const filteredOrders = orders.filter(order => {
+    if (orderFilter === 'all') return true;
+    
+    switch (orderFilter) {
+      case 'delivered':
+        return order.status === 'Delivered';
+      case 'in-transit':
+        return order.status === 'In Transit' || order.status === 'On the Way';
+      case 'pending':
+        return order.status === 'Pending';
+      default:
+        return true;
+    }
+  });
+
+  // Notification functions
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  const markAsRead = (notificationId) => {
+    setNotifications(notifications.map(notif =>
+      notif.id === notificationId ? { ...notif, read: true } : notif
+    ));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+  };
+
+  const getUnreadCount = () => {
+    return notifications.filter(notif => !notif.read).length;
+  };
+
+  const addNotification = (title, message, type = 'info') => {
+    const newNotification = {
+      id: Date.now(),
+      title,
+      message,
+      timestamp: new Date(),
+      read: false,
+      type
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  // Appointment functions
+  const scheduleAppointment = (doctor, date, time) => {
+    const newAppointment = {
+      id: `APT${Date.now()}`,
+      doctorName: doctor.name,
+      specialty: doctor.specialty,
+      date: date,
+      time: time,
+      status: 'Scheduled',
+      type: 'Video Consultation',
+      fee: doctor.consultationFee,
+      details: {
+        patientName: userProfile.fullName,
+        symptoms: 'General consultation',
+        notes: 'New appointment scheduled',
+        prescription: 'To be provided after consultation'
+      }
+    };
+    setAppointments(prev => [newAppointment, ...prev]);
+    addNotification('Appointment Scheduled', `Appointment with ${doctor.name} scheduled for ${date} at ${time}`, 'appointment');
+    
+    setActiveView('appointments');
+  };
+
+  const rescheduleAppointment = (appointmentId, newDate, newTime) => {
+    setAppointments(appointments.map(apt =>
+      apt.id === appointmentId 
+        ? { ...apt, date: newDate, time: newTime, status: 'Rescheduled' }
+        : apt
+    ));
+    addNotification('Appointment Rescheduled', 'Your appointment has been rescheduled successfully', 'appointment');
+  };
+
+  const cancelAppointment = (appointmentId) => {
+    setAppointments(appointments.map(apt =>
+      apt.id === appointmentId 
+        ? { ...apt, status: 'Cancelled' }
+        : apt
+    ));
+    addNotification('Appointment Cancelled', 'Your appointment has been cancelled', 'appointment');
+  };
+
+  // View Appointment Details
+  const viewAppointmentDetails = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowAppointmentDetails(true);
+  };
+
+  // Pharmacy Store functions
+  const viewPharmacyStore = (pharmacy) => {
+    setSelectedPharmacy(pharmacy);
+    setShowPharmacyStore(true);
+  };
+
+  const addToCartFromPharmacy = (medicine) => {
+    addToCart(medicine);
+  };
+
+  // Prescription upload functions
+  const handlePrescriptionUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a valid prescription file (JPG, PNG, or PDF)');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+
+      setPrescriptionFile(file);
+      
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPrescriptionPreview(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPrescriptionPreview(null);
+      }
+      
+      setShowPrescriptionModal(true);
+      addNotification('Prescription Uploaded', 'Your prescription has been uploaded successfully', 'prescription');
+    }
+  };
+
+  const handlePrescriptionSubmit = () => {
+    if (!prescriptionFile) {
+      alert('Please select a prescription file first');
+      return;
+    }
+    
+    alert(`Prescription "${prescriptionFile.name}" uploaded successfully! Our team will verify it shortly.`);
+    setShowPrescriptionModal(false);
+    setPrescriptionFile(null);
+    setPrescriptionPreview(null);
+  };
+
+  // Live Tracking functions
+  const startLiveTracking = (order) => {
+    setTrackingOrder(order);
+    setActiveView('live-tracking');
+    addNotification('Live Tracking Started', `You can now track your order ${order.id} in real-time`, 'tracking');
+  };
+
+  const callDeliveryPartner = () => {
+    alert(`Calling delivery partner: ${deliveryPartner.name}\nPhone: ${deliveryPartner.phone}`);
+  };
+
+  const getDeliveryStatusText = (status) => {
+    const statusMap = {
+      'ordered': 'Order Placed',
+      'confirmed': 'Order Confirmed',
+      'preparing': 'Preparing Your Order',
+      'picked_up': 'Picked Up',
+      'on_the_way': 'On the Way',
+      'delivered': 'Delivered'
+    };
+    return statusMap[status] || status;
+  };
+
+  const getDeliveryProgress = (status) => {
+    const progressMap = {
+      'ordered': 20,
+      'confirmed': 40,
+      'preparing': 60,
+      'picked_up': 80,
+      'on_the_way': 90,
+      'delivered': 100
+    };
+    return progressMap[status] || 0;
+  };
+
+  // Logout functions
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    onLogout();
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
+  };
+
+  // Profile dropdown functions
+  const toggleProfileDropdown = () => {
+    setShowProfileDropdown(!showProfileDropdown);
+  };
+
+  // Razorpay Payment Integration
+  const initiatePayment = async () => {
+    if (cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    if (!window.Razorpay) {
+      alert('Payment system is loading, please try again in a moment.');
+      return;
+    }
+
+    setPaymentLoading(true);
+
+    try {
+      const totalAmount = getTotalPrice() * 100;
+
+      const options = {
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        amount: totalAmount,
+        currency: 'INR',
+        name: 'QuickMed Pharmacy',
+        description: 'Medicine Purchase',
+        image: 'https://cdn.razorpay.com/logos/FFATTsJeURNMxx_medium.png',
+        handler: function(response) {
+          handlePaymentSuccess(response);
+        },
+        prefill: {
+          name: userProfile.fullName,
+          email: userProfile.email,
+          contact: userProfile.phone
+        },
+        notes: {
+          address: userProfile.address,
+        },
+        theme: {
+          color: '#7C2A62'
+        },
+        modal: {
+          ondismiss: function() {
+            setPaymentLoading(false);
+            alert('Payment was cancelled. You can try again.');
+          }
+        }
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+      
+    } catch (error) {
+      console.error('Error initializing payment:', error);
+      alert('Error initializing payment. Please try again.');
+      setPaymentLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = async (paymentResponse) => {
+    try {
+      const verificationResponse = await verifyPayment(paymentResponse);
+      
+      if (verificationResponse.success) {
+        const orderId = `ORD${Date.now()}`;
+        const newOrder = {
+          id: orderId,
+          date: new Date().toISOString().split('T')[0],
+          items: [...cart],
+          total: getTotalPrice(),
+          status: 'Confirmed',
+          deliveryAddress: userProfile.address || 'Address not provided',
+          paymentId: paymentResponse.razorpay_payment_id,
+          trackingAvailable: true,
+          deliveryPartner: {
+            name: 'Rahul Kumar',
+            phone: '+91 9876543210',
+            estimatedTime: '30 min'
+          }
+        };
+        
+        setOrders(prevOrders => [newOrder, ...prevOrders]);
+        setCart([]);
+        setActiveView('orders');
+        
+        addNotification('Order Confirmed', `Your order ${orderId} has been placed successfully`, 'order');
+        alert(`Payment successful! Order ID: ${orderId}\nPayment ID: ${paymentResponse.razorpay_payment_id}`);
+      } else {
+        alert('Payment verification failed. Please contact support.');
+      }
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      alert('Payment verification failed. Please contact support.');
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const verifyPayment = async (paymentResponse) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true });
+      }, 1000);
+    });
+  };
+
+  // Checkout functions
+  const handleCheckoutConfirmation = () => {
+    setShowCheckoutConfirm(true);
+  };
+
+  const handleConfirmCheckout = () => {
+    setShowCheckoutConfirm(false);
+    initiatePayment();
+  };
+
+  const handleCancelCheckout = () => {
+    setShowCheckoutConfirm(false);
+  };
+
+  // Doctor consultation functions
+  const handleBookAppointment = (doctor, timeSlot) => {
+    const selectedDate = prompt('Enter appointment date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    
+    if (selectedDate && timeSlot) {
+      scheduleAppointment(doctor, selectedDate, timeSlot);
+      alert(`Appointment booked with ${doctor.name} on ${selectedDate} at ${timeSlot}`);
+    }
+  };
+
+  // Dashboard View Component
+  const DashboardView = () => (
+    <div style={styles.mainContent}>
+      <section style={styles.welcomeSection}>
+        <h2 style={styles.welcomeTitle}>
+          Welcome back, {userProfile.fullName || 'User'}! 👋
+        </h2>
+        <p style={styles.welcomeSubtitle}>
+          How can we help you today?
+        </p>
+      </section>
+
+      <section style={styles.servicesSection}>
+        <div style={styles.serviceGrid}>
+          <div 
+            style={styles.serviceCard}
+            onClick={() => setActiveView('medicine')}
+          >
+            <div style={styles.serviceIcon}>💊</div>
+            <h3 style={styles.serviceTitle}>Medicine Delivery</h3>
+            <p style={styles.serviceDescription}>
+              Get your prescribed medicines delivered to your doorstep within hours
+            </p>
+            <button style={styles.serviceButton} type="button">
+              Order Now
+            </button>
+          </div>
+
+          <div 
+            style={styles.serviceCard}
+            onClick={() => setActiveView('consultation')}
+          >
+            <div style={styles.serviceIcon}>👨‍⚕️</div>
+            <h3 style={styles.serviceTitle}>Doctor Consultation</h3>
+            <p style={styles.serviceDescription}>
+              Connect with certified doctors online for quick consultations
+            </p>
+            <button style={styles.serviceButton} type="button">
+              Book Consultation
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 
   return (
     <div style={styles.container}>
-      <UserDashboardHeader {...dashboardProps} />
-      <UserDashboardViews {...dashboardProps} />
-      <UserDashboardModals {...dashboardProps} />
+      <Header
+        activeView={activeView}
+        setActiveView={setActiveView}
+        cart={cart}
+        userProfile={userProfile}
+        showNotifications={showNotifications}
+        setShowNotifications={setShowNotifications}
+        notifications={notifications}
+        markAsRead={markAsRead}
+        markAllAsRead={markAllAsRead}
+        getUnreadCount={getUnreadCount}
+        toggleNotifications={toggleNotifications}
+        toggleProfileDropdown={toggleProfileDropdown}
+        showProfileDropdown={showProfileDropdown}
+        setShowProfileDropdown={setShowProfileDropdown}
+        handleLogoutClick={handleLogoutClick}
+        toggleChatbot={toggleChatbot}
+        showChatbot={showChatbot}
+        chatMessages={chatMessages}
+        userMessage={userMessage}
+        handleUserMessage={handleUserMessage}
+        sendMessage={sendMessage}
+        handleKeyPress={handleKeyPress}
+        chatInputRef={chatInputRef}
+        chatMessagesEndRef={chatMessagesEndRef}
+        chatRef={chatRef}
+        notificationRef={notificationRef}
+        profileRef={profileRef}
+        profilePhotoInputRef={profilePhotoInputRef}
+        handleProfilePhotoUpload={handleProfilePhotoUpload}
+        triggerProfilePhotoUpload={triggerProfilePhotoUpload}
+      />
+
+      {/* Single Modals component with all props */}
+      <Modals
+        // Modal visibility states
+        showProfilePhotoModal={showProfilePhotoModal}
+        showDoctorChat={showDoctorChat}
+        showCheckoutConfirm={showCheckoutConfirm}
+        showPrescriptionModal={showPrescriptionModal}
+        showLogoutConfirm={showLogoutConfirm}
+        showPharmacyStore={showPharmacyStore}
+        showAppointmentDetails={showAppointmentDetails}
+        
+        // Modal data
+        activeDoctorChat={activeDoctorChat}
+        doctorChats={doctorChats}
+        selectedPharmacy={selectedPharmacy}
+        selectedAppointment={selectedAppointment}
+        prescriptionFile={prescriptionFile}
+        prescriptionPreview={prescriptionPreview}
+        profilePhotoFile={profilePhotoFile}
+        profilePhotoPreview={profilePhotoPreview}
+        profile={profile}
+        cart={cart}
+        
+        // Functions
+        getTotalPrice={getTotalPrice}
+        paymentLoading={paymentLoading}
+        getFilteredPharmacyMedicines={getFilteredPharmacyMedicines}
+        pharmacySearchQueries={pharmacySearchQueries}
+        handlePharmacySearch={handlePharmacySearch}
+        addToCartFromPharmacy={addToCartFromPharmacy}
+        updateQuantity={updateQuantity}
+        sendDoctorMessage={sendDoctorMessage}
+        handlePrescriptionUpload={handlePrescriptionUpload}
+        handlePrescriptionSubmit={handlePrescriptionSubmit}
+        handleConfirmCheckout={handleConfirmCheckout}
+        handleCancelCheckout={handleCancelCheckout}
+        confirmLogout={confirmLogout}
+        cancelLogout={cancelLogout}
+        handleProfilePhotoSubmit={handleProfilePhotoSubmit}
+        removeProfilePhoto={removeProfilePhoto}
+        handleProfilePhotoUpload={handleProfilePhotoUpload}
+        
+        // Setter functions
+        setShowProfilePhotoModal={setShowProfilePhotoModal}
+        setShowDoctorChat={setShowDoctorChat}
+        setShowCheckoutConfirm={setShowCheckoutConfirm}
+        setShowPrescriptionModal={setShowPrescriptionModal}
+        setShowLogoutConfirm={setShowLogoutConfirm}
+        setShowPharmacyStore={setShowPharmacyStore}
+        setShowAppointmentDetails={setShowAppointmentDetails}
+        setActiveView={setActiveView}
+      />
+
+      {/* Main Content Views */}
+      {activeView === 'dashboard' && <DashboardView />}
+      {activeView === 'profile' && (
+        <ProfileView
+          setActiveView={setActiveView}
+          triggerProfilePhotoUpload={triggerProfilePhotoUpload}
+          removeProfilePhoto={removeProfilePhoto}
+          userProfile={userProfile}
+          updateProfile={updateProfile}
+        />
+      )}
+      {activeView === 'appointments' && (
+        <AppointmentsView
+          appointments={appointments}
+          filteredAppointments={filteredAppointments}
+          setActiveView={setActiveView}
+          rescheduleAppointment={rescheduleAppointment}
+          cancelAppointment={cancelAppointment}
+          viewAppointmentDetails={viewAppointmentDetails}
+          appointmentFilter={appointmentFilter}
+          setAppointmentFilter={setAppointmentFilter}
+        />
+      )}
+      {activeView === 'orders' && (
+        <OrdersView
+          orders={orders}
+          filteredOrders={filteredOrders}
+          setActiveView={setActiveView}
+          startLiveTracking={startLiveTracking}
+          orderFilter={orderFilter}
+          setOrderFilter={setOrderFilter}
+        />
+      )}
+      {activeView === 'medicine' && (
+        <MedicineView
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          medicines={medicines}
+          filteredMedicines={filteredMedicines}
+          cart={cart}
+          addToCart={addToCart}
+          updateQuantity={updateQuantity}
+          pharmacies={pharmacies}
+          viewPharmacyStore={viewPharmacyStore}
+          handlePrescriptionUpload={handlePrescriptionUpload}
+          setActiveView={setActiveView}
+        />
+      )}
+      {activeView === 'cart' && (
+        <CartView
+          cart={cart}
+          setActiveView={setActiveView}
+          updateQuantity={updateQuantity}
+          removeFromCart={removeFromCart}
+          getTotalPrice={getTotalPrice}
+          handleCheckoutConfirmation={handleCheckoutConfirmation}
+          paymentLoading={paymentLoading}
+        />
+      )}
+      {activeView === 'consultation' && (
+        <ConsultationView
+          doctors={doctors}
+          filteredDoctors={filteredDoctors}
+          doctorSearchQuery={doctorSearchQuery}
+          setDoctorSearchQuery={setDoctorSearchQuery}
+          selectedSpecialty={selectedSpecialty}
+          setSelectedSpecialty={setSelectedSpecialty}
+          selectedTimeSlot={selectedTimeSlot}
+          setSelectedTimeSlot={setSelectedTimeSlot}
+          specialties={specialties}
+          allTimeSlots={allTimeSlots}
+          setActiveView={setActiveView}
+          handleBookAppointment={handleBookAppointment}
+          startDoctorChat={startDoctorChat}
+        />
+      )}
+      {activeView === 'live-tracking' && (
+        <LiveTrackingView
+          trackingOrder={trackingOrder}
+          deliveryPartner={deliveryPartner}
+          setActiveView={setActiveView}
+          callDeliveryPartner={callDeliveryPartner}
+          getDeliveryProgress={getDeliveryProgress}
+          getDeliveryStatusText={getDeliveryStatusText}
+        />
+      )}
     </div>
   );
 };
 
+// Main UserDashboard component with ProfileProvider
 const UserDashboard = ({ user, onLogout }) => {
   return (
     <ProfileProvider user={user}>
@@ -1387,5 +1405,4 @@ const UserDashboard = ({ user, onLogout }) => {
     </ProfileProvider>
   );
 };
-
 export default UserDashboard;
