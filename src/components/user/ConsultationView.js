@@ -1,7 +1,6 @@
 import React from 'react';
 import DoctorCard from './DoctorCard';
-import styles from './Styles';
- 
+import { styles } from './Styles';
 
 const ConsultationView = ({
   doctorSearchQuery,
@@ -30,6 +29,14 @@ const ConsultationView = ({
       ← {text}
     </button>
   );
+
+  const handleClearFilters = () => {
+    setSelectedSpecialty('');
+    setSelectedTimeSlot('');
+    // Only clear these if the functions are provided
+    if (setSelectedExperience) setSelectedExperience('');
+    if (setSelectedLanguage) setSelectedLanguage('');
+  };
 
   return (
     <div style={styles.consultationContainer}>
@@ -88,14 +95,43 @@ const ConsultationView = ({
             </select>
           </div>
 
+          {/* Optional: Add Experience and Language filters if needed */}
+          {setSelectedExperience && (
+            <div style={styles.filterGroup}>
+              <label style={styles.filterLabel}>Experience</label>
+              <select 
+                value={selectedExperience}
+                onChange={(e) => setSelectedExperience(e.target.value)}
+                style={styles.filterSelect}
+              >
+                <option value="">Any Experience</option>
+                <option value="0-5">0-5 years</option>
+                <option value="5-10">5-10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+          )}
+
+          {setSelectedLanguage && (
+            <div style={styles.filterGroup}>
+              <label style={styles.filterLabel}>Language</label>
+              <select 
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                style={styles.filterSelect}
+              >
+                <option value="">Any Language</option>
+                <option value="English">English</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+              </select>
+            </div>
+          )}
+
           <button 
             style={styles.clearFiltersButton}
-            onClick={() => {
-              setSelectedSpecialty('');
-              setSelectedTimeSlot('');
-              setSelectedExperience('');
-              setSelectedLanguage('');
-            }}
+            onClick={handleClearFilters}
             type="button"
           >
             Clear Filters

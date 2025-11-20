@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import styles from './Styles';
- 
+import { styles } from './Styles';
 
 const CartView = ({
   cart,

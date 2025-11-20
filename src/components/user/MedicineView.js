@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Styles';
+import { styles } from './Styles';
 import MedicineCard from './MedicineCard';
 import PharmacyCard from './PharmacyCard';
 

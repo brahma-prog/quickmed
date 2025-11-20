@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ReviewModal = ({ onClose }) => {
+const ReviewModal = ({ onClose, onReviewSubmit }) => {
   const [review, setReview] = useState({
     name: '',
     email: '',
@@ -8,6 +8,7 @@ const ReviewModal = ({ onClose }) => {
     comment: ''
   });
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const styles = {
     modalOverlay: {
@@ -51,6 +52,13 @@ const ReviewModal = ({ onClose }) => {
       fontSize: '2rem',
       cursor: 'pointer',
       color: '#7C2A62',
+      width: '40px',
+      height: '40px',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      transition: 'all 0.3s ease',
     },
     reviewForm: {
       display: 'flex',
@@ -86,6 +94,7 @@ const ReviewModal = ({ onClose }) => {
       minHeight: '120px',
       resize: 'vertical',
       fontFamily: 'inherit',
+      transition: 'border-color 0.3s ease',
     },
     ratingSelection: {
       display: 'flex',
@@ -141,6 +150,10 @@ const ReviewModal = ({ onClose }) => {
       fontSize: '1.1rem',
       fontWeight: 'bold',
       transition: 'all 0.3s ease',
+    },
+    disabledButton: {
+      backgroundColor: '#ccc',
+      cursor: 'not-allowed',
     }
   };
 
@@ -162,6 +175,12 @@ const ReviewModal = ({ onClose }) => {
       ...prev,
       rating
     }));
+    if (errors.rating) {
+      setErrors(prev => ({
+        ...prev,
+        rating: ''
+      }));
+    }
   };
 
   const validateForm = () => {
@@ -175,7 +194,7 @@ const ReviewModal = ({ onClose }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     
@@ -184,19 +203,36 @@ const ReviewModal = ({ onClose }) => {
       return;
     }
 
-    // Save review to localStorage
-    const newReview = {
-      id: Date.now(),
-      ...review,
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending'
-    };
+    setIsSubmitting(true);
 
-    const existingReviews = JSON.parse(localStorage.getItem('pendingReviews') || '[]');
-    localStorage.setItem('pendingReviews', JSON.stringify([...existingReviews, newReview]));
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-    alert('Thank you for your review! It has been submitted for approval.');
-    onClose();
+      const newReview = {
+        id: Date.now(),
+        name: review.name.trim(),
+        email: review.email.trim(),
+        rating: review.rating,
+        comment: review.comment.trim(),
+        date: new Date().toISOString().split('T')[0],
+        status: 'approved'
+      };
+
+      // Call the callback to update parent component
+      if (onReviewSubmit) {
+        onReviewSubmit(newReview);
+      }
+
+      alert('Thank you for your review! It has been published successfully.');
+      onClose();
+
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('There was an error submitting your review. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -207,6 +243,17 @@ const ReviewModal = ({ onClose }) => {
           <button 
             style={styles.closeButton}
             onClick={onClose}
+            disabled={isSubmitting}
+            onMouseEnter={(e) => {
+              if (!isSubmitting) {
+                e.target.style.backgroundColor = '#F7D9EB';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting) {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
           >
             ×
           </button>
@@ -224,6 +271,13 @@ const ReviewModal = ({ onClose }) => {
                 ...styles.formInput,
                 ...(errors.name && styles.formInputError)
               }}
+              disabled={isSubmitting}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#7C2A62';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e1e1e1';
+              }}
             />
             {errors.name && <span style={styles.errorText}>{errors.name}</span>}
           </div>
@@ -239,6 +293,13 @@ const ReviewModal = ({ onClose }) => {
                 ...styles.formInput,
                 ...(errors.email && styles.formInputError)
               }}
+              disabled={isSubmitting}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#7C2A62';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e1e1e1';
+              }}
             />
             {errors.email && <span style={styles.errorText}>{errors.email}</span>}
           </div>
@@ -250,16 +311,26 @@ const ReviewModal = ({ onClose }) => {
                 <button
                   key={star}
                   type="button"
-                  style={styles.starButton}
+                  style={{
+                    ...styles.starButton,
+                    color: star <= review.rating ? '#FFD700' : '#e8e8e8'
+                  }}
                   onClick={() => handleStarClick(star)}
+                  disabled={isSubmitting}
                   onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.2)';
+                    if (!isSubmitting) {
+                      e.target.style.transform = 'scale(1.2)';
+                      e.target.style.backgroundColor = '#F7D9EB';
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
+                    if (!isSubmitting) {
+                      e.target.style.transform = 'scale(1)';
+                      e.target.style.backgroundColor = 'transparent';
+                    }
                   }}
                 >
-                  {star <= review.rating ? '⭐' : '☆'}
+                  ☆
                 </button>
               ))}
             </div>
@@ -284,6 +355,13 @@ const ReviewModal = ({ onClose }) => {
                 ...(errors.comment && styles.formInputError)
               }}
               maxLength={500}
+              disabled={isSubmitting}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#7C2A62';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e1e1e1';
+              }}
             />
             {errors.comment && <span style={styles.errorText}>{errors.comment}</span>}
             <div style={styles.charCount}>
@@ -293,21 +371,31 @@ const ReviewModal = ({ onClose }) => {
 
           <div style={styles.reviewNote}>
             <p style={styles.noteText}>
-              <strong>Note:</strong> Your review will be submitted for approval and will be visible once approved.
+              <strong>Note:</strong> Your review will be published immediately and visible to other users.
             </p>
           </div>
 
           <button 
             type="submit" 
-            style={styles.submitButton}
+            style={{
+              ...styles.submitButton,
+              ...(isSubmitting && styles.disabledButton)
+            }}
+            disabled={isSubmitting}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#5a1a4a';
+              if (!isSubmitting) {
+                e.target.style.backgroundColor = '#5a1a4a';
+                e.target.style.transform = 'scale(1.02)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#7C2A62';
+              if (!isSubmitting) {
+                e.target.style.backgroundColor = '#7C2A62';
+                e.target.style.transform = 'scale(1)';
+              }
             }}
           >
-            Submit Review
+            {isSubmitting ? 'Submitting...' : 'Submit Review'}
           </button>
         </form>
       </div>

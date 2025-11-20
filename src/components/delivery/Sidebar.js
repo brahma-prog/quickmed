@@ -766,7 +766,6 @@
 
 
 
-
 import React, { useState } from 'react';
 
 const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, onToggleAIChat, isMobile }) => {
@@ -1079,10 +1078,10 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
 
   const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'tasks', label: 'History', icon: '📦' },
+    { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'earnings', label: 'Earnings', icon: '💰' },
     { id: 'performance', label: 'Performance', icon: '📈' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'tasks', label: 'History', icon: '📦' },
   ];
 
   const getDisplayName = () => {
@@ -1225,10 +1224,10 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
 
           <button
             style={styles.mobileMenuItem}
-            onClick={() => handleMobileMenuItemClick('profile')}
+            onClick={() => handleMobileMenuItemClick('tasks')}
           >
-            <span style={styles.mobileMenuIcon}>👤</span>
-            Profile
+            <span style={styles.mobileMenuIcon}>📦</span>
+            History
           </button>
 
           <button

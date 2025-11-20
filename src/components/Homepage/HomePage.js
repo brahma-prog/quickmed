@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import Header from './Header';
+import Navbar from './Navbar';
 import Hero from './Hero';
 import AboutUs from './AboutUs';
 import Services from './Services';
 import Doctors from './Doctors';
 import Reviews from './Reviews';
-import Contact from './Contact';
 import Footer from './Footer';
 import AdminLoginModal from './AdminLoginModal';
 import ReviewModal from './ReviewModal';
 import ServiceDetailsModal from './ServiceDetailsModal';
+import Contact from './Contact';
 
-const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => {
+const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome, reviews, onWriteReview }) => {
   const [activeSection, setActiveSection] = useState('home');
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -22,7 +22,13 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
   const handleSectionChange = (section) => {
     setActiveSection(section);
     setIsMobileMenuOpen(false);
+    
+    // Scroll to top when changing sections
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleServiceLearnMore = (service) => {
@@ -30,30 +36,49 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome }) => 
     setShowServiceModal(true);
   };
 
+  // Use the provided onWriteReview prop or fall back to showing the modal
+  const handleWriteReview = () => {
+    if (onWriteReview) {
+      onWriteReview();
+    } else {
+      setShowReviewModal(true);
+    }
+  };
+
   const styles = {
     homepage: {
       minHeight: '100vh',
       fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    },
+    section: {
+      padding: '2rem',
     }
   };
 
   return (
     <div style={styles.homepage}>
-      <Header 
+      <Navbar 
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
         onNavigateToAuth={onNavigateToAuth}
         onNavigateToAdmin={() => setShowAdminModal(true)}
         isMobileMenuOpen={isMobileMenuOpen}
-        onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        onMobileMenuToggle={handleMobileMenuToggle}
       />
 
-      {activeSection === 'home' && <Hero onSectionChange={handleSectionChange} />}
-      {activeSection === 'about' && <AboutUs />}
-      {activeSection === 'services' && <Services onLearnMore={handleServiceLearnMore} />}
-      {activeSection === 'doctors' && <Doctors />}
-      {activeSection === 'reviews' && <Reviews onWriteReview={() => setShowReviewModal(true)} />}
-      {activeSection === 'contact' && <Contact />}
+      <main>
+        {activeSection === 'home' && <Hero onSectionChange={handleSectionChange} />}
+        {activeSection === 'about' && <AboutUs />}
+        {activeSection === 'services' && <Services onLearnMore={handleServiceLearnMore} />}
+        {activeSection === 'doctors' && <Doctors />}
+        {activeSection === 'reviews' && (
+          <Reviews 
+            onWriteReview={handleWriteReview}
+            reviews={reviews}
+          />
+        )}
+        {activeSection === 'contact' && <Contact />}
+      </main>
 
       <Footer onSectionChange={handleSectionChange} />
 

@@ -1,18 +1,16 @@
 import React from 'react';
-import styles from './Styles';
+import { useProfile } from './ProfileContext';
+import { styles } from './Styles';
 
 const Header = ({
   activeView,
   setActiveView,
   cart,
-  userProfile,
-  showNotifications,
-  setShowNotifications,
   notifications,
   markAsRead,
   markAllAsRead,
   getUnreadCount,
-  toggleNotifications,
+  handleNotificationsClick,
   toggleProfileDropdown,
   showProfileDropdown,
   setShowProfileDropdown,
@@ -33,6 +31,8 @@ const Header = ({
   handleProfilePhotoUpload,
   triggerProfilePhotoUpload
 }) => {
+  const { profile } = useProfile();
+
   return (
     <header style={styles.header}>
       <div style={styles.headerTop}>
@@ -48,7 +48,7 @@ const Header = ({
         <div style={styles.userSection}>
           <div style={styles.userWelcome}>
             <span style={styles.welcomeText}>Welcome,</span>
-            <span style={styles.userName}>{userProfile.fullName || 'User'}</span>
+            <span style={styles.userName}>{profile.fullName || 'User'}</span>
           </div>
           <div 
             ref={profileRef}
@@ -56,18 +56,17 @@ const Header = ({
             onClick={toggleProfileDropdown}
           >
             <div style={styles.userAvatar}>
-              {userProfile.profilePhoto ? (
+              {profile.profilePhoto ? (
                 <img
-                  src={userProfile.profilePhoto}
+                  src={profile.profilePhoto}
                   alt="Profile"
                   style={styles.avatarImage}
                 />
               ) : (
-                userProfile.fullName?.charAt(0) || 'U'
+                profile.fullName?.charAt(0) || 'U'
               )}
             </div>
             
-            {/* Profile Dropdown */}
             {showProfileDropdown && (
               <div style={styles.profileDropdown}>
                 <div style={styles.profileDropdownHeader}>
@@ -76,23 +75,44 @@ const Header = ({
                 <div style={styles.profileDropdownContent}>
                   <div style={styles.profileDetailItem}>
                     <span style={styles.profileDetailLabel}>Name:</span>
-                    <span style={styles.profileDetailValue}>{userProfile.fullName}</span>
+                    <span style={styles.profileDetailValue}>{profile.fullName}</span>
                   </div>
                   <div style={styles.profileDetailItem}>
                     <span style={styles.profileDetailLabel}>Email:</span>
-                    <span style={styles.profileDetailValue}>{userProfile.email}</span>
+                    <span style={styles.profileDetailValue}>{profile.email}</span>
                   </div>
                   <div style={styles.profileDetailItem}>
                     <span style={styles.profileDetailLabel}>Phone:</span>
-                    <span style={styles.profileDetailValue}>{userProfile.phone}</span>
+                    <span style={styles.profileDetailValue}>
+                      {profile.phone || 'Not provided'}
+                    </span>
                   </div>
                   <div style={styles.profileDetailItem}>
                     <span style={styles.profileDetailLabel}>Age:</span>
-                    <span style={styles.profileDetailValue}>{userProfile.age}</span>
+                    <span style={styles.profileDetailValue}>
+                      {profile.age ? `${profile.age} years` : 'Not provided'}
+                    </span>
                   </div>
                   <div style={styles.profileDetailItem}>
                     <span style={styles.profileDetailLabel}>Gender:</span>
-                    <span style={styles.profileDetailValue}>{userProfile.gender || 'Not specified'}</span>
+                    <span style={styles.profileDetailValue}>
+                      {profile.gender ? 
+                        profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1) 
+                        : 'Not specified'
+                      }
+                    </span>
+                  </div>
+                  <div style={styles.profileDetailItem}>
+                    <span style={styles.profileDetailLabel}>City:</span>
+                    <span style={styles.profileDetailValue}>
+                      {profile.city || 'Not provided'}
+                    </span>
+                  </div>
+                  <div style={styles.profileDetailItem}>
+                    <span style={styles.profileDetailLabel}>Address:</span>
+                    <span style={styles.profileDetailValue}>
+                      {profile.address || 'Not provided'}
+                    </span>
                   </div>
                 </div>
                 <div style={styles.profileDropdownActions}>
@@ -131,7 +151,7 @@ const Header = ({
               onClick={() => setActiveView('dashboard')}
               type="button"
             >
-              <span style={styles.navIcon}>🏠</span>
+              <span style={styles.navIcon}></span>
               Home
             </button>
             <button 
@@ -139,7 +159,7 @@ const Header = ({
               onClick={() => setActiveView('appointments')}
               type="button"
             >
-              <span style={styles.navIcon}>📅</span>
+              <span style={styles.navIcon}></span>
               Appointments
             </button>
             <button 
@@ -147,7 +167,7 @@ const Header = ({
               onClick={() => setActiveView('orders')}
               type="button"
             >
-              <span style={styles.navIcon}>📦</span>
+              <span style={styles.navIcon}></span>
               Orders
             </button>
             <button 
@@ -155,7 +175,7 @@ const Header = ({
               onClick={() => setActiveView('profile')}
               type="button"
             >
-              <span style={styles.navIcon}>👤</span>
+              <span style={styles.navIcon}></span>
               Profile
             </button>
           </nav>
@@ -185,67 +205,20 @@ const Header = ({
             </div>
           </div>
 
-          {/* Notification Bell */}
+          {/* Notification Bell - UPDATED for page navigation */}
           <div 
             ref={notificationRef}
             style={styles.notificationContainer}
           >
             <div 
               style={styles.notificationBell}
-              onClick={toggleNotifications}
+              onClick={handleNotificationsClick}
             >
               🔔
               {getUnreadCount() > 0 && (
                 <span style={styles.notificationBadge}>{getUnreadCount()}</span>
               )}
             </div>
-
-            {/* Notification Dropdown */}
-            {showNotifications && (
-              <div style={styles.notificationDropdown}>
-                <div style={styles.notificationHeader}>
-                  <h3 style={styles.notificationTitle}>Notifications</h3>
-                  <button 
-                    style={styles.markAllReadButton}
-                    onClick={markAllAsRead}
-                    type="button"
-                  >
-                    Mark all as read
-                  </button>
-                </div>
-                <div style={styles.notificationList}>
-                  {notifications.length === 0 ? (
-                    <p style={styles.noNotifications}>No notifications</p>
-                  ) : (
-                    notifications.map(notification => (
-                      <div 
-                        key={notification.id} 
-                        style={{
-                          ...styles.notificationItem,
-                          ...(notification.read ? styles.readNotification : styles.unreadNotification)
-                        }}
-                        onClick={() => markAsRead(notification.id)}
-                      >
-                        <div style={styles.notificationIcon}>
-                          {notification.type === 'order' && '📦'}
-                          {notification.type === 'delivery' && '🚚'}
-                          {notification.type === 'prescription' && '📄'}
-                          {notification.type === 'tracking' && '📍'}
-                          {notification.type === 'appointment' && '📅'}
-                        </div>
-                        <div style={styles.notificationContent}>
-                          <h4 style={styles.notificationItemTitle}>{notification.title}</h4>
-                          <p style={styles.notificationMessage}>{notification.message}</p>
-                          <span style={styles.notificationTime}>
-                            {new Date(notification.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           <button 
@@ -330,3 +303,4 @@ const Header = ({
 };
 
 export default Header;
+
