@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
   const [email, setEmail] = useState('');
@@ -13,6 +12,8 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   const userTypes = [
     { 
@@ -46,6 +47,54 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
   ];
 
   const currentUserType = userTypes.find(user => user.type === userType);
+
+  // Initialize userType from localStorage and handle responsive layout
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width <= 768);
+      setIsTablet(width > 768 && width <= 1024);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    // Check for remembered user type
+    const remembered = localStorage.getItem('rememberMe');
+    if (remembered) {
+      try {
+        const rememberData = JSON.parse(remembered);
+        setEmail(rememberData.email || '');
+        setUserType(rememberData.userType || 'user');
+        setRememberMe(true);
+      } catch (error) {
+        console.error('Error parsing remembered user:', error);
+      }
+    }
+    
+    // Check for last selected user type
+    const lastSelected = localStorage.getItem('lastSelectedUserType');
+    if (lastSelected) {
+      setUserType(lastSelected);
+    }
+    
+    // Check for recent signup type
+    const recentSignup = localStorage.getItem('recentSignupType');
+    if (recentSignup) {
+      setUserType(recentSignup);
+    }
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Generate floating elements for bubble animation
+  const floatingElements = Array.from({ length: isMobile ? 8 : 15 }, (_, i) => ({
+    id: i,
+    size: Math.random() * (isMobile ? 50 : 100) + (isMobile ? 30 : 50),
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    animationDelay: Math.random() * 5,
+  }));
 
   // Enhanced authentication function
   const authenticateUser = (email, password, userType) => {
@@ -168,19 +217,14 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
     }
   };
 
-  React.useEffect(() => {
-    const remembered = localStorage.getItem('rememberMe');
-    if (remembered) {
-      try {
-        const rememberData = JSON.parse(remembered);
-        setEmail(rememberData.email || '');
-        setUserType(rememberData.userType || 'user');
-        setRememberMe(true);
-      } catch (error) {
-        console.error('Error parsing remembered user:', error);
-      }
+  // Update user type and store it
+  const handleUserTypeChange = (newUserType) => {
+    if (!isLoading) {
+      setUserType(newUserType);
+      // Store the selected user type for persistence
+      localStorage.setItem('lastSelectedUserType', newUserType);
     }
-  }, []);
+  };
 
   const EyeIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -199,6 +243,23 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
   return (
     <div className="login-container">
       
+      {/* Bubble Animation Background */}
+      <div className="floating-elements">
+        {floatingElements.map((element) => (
+          <div
+            key={element.id}
+            className="floating-element"
+            style={{
+              width: element.size,
+              height: element.size,
+              left: `${element.left}%`,
+              top: `${element.top}%`,
+              animationDelay: `${element.animationDelay}s`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Back to Home Button */}
       <button 
         onClick={onBackToHome}
@@ -265,10 +326,10 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
           
           <div className="content-wrapper">
             <div className="user-icon">
-              {userType === 'user' && '👤'}
-              {userType === 'vendor' && '🏪'}
-              {userType === 'delivery' && '🚚'}
-              {userType === 'doctor' && '👨‍⚕️'}
+              {userType === 'user' }
+              {userType === 'vendor'}
+              {userType === 'delivery'}
+              {userType === 'doctor'}
             </div>
             
             <h2 className="user-title">
@@ -284,7 +345,7 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
                 <button
                   key={user.type}
                   type="button"
-                  onClick={() => !isLoading && setUserType(user.type)}
+                  onClick={() => handleUserTypeChange(user.type)}
                   className={`user-type-btn ${userType === user.type ? 'active' : ''}`}
                   disabled={isLoading}
                 >
@@ -399,9 +460,40 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
           justify-content: center;
           align-items: center;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          background-color: #f8fafc;
+          background: linear-gradient(135deg, #F7D9EB 0%, #ffffff 50%, #F7D9EB 100%);
           padding: 20px;
           position: relative;
+          overflow: hidden;
+        }
+
+        /* Bubble Animation Background */
+        .floating-elements {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .floating-element {
+          position: absolute;
+          background: rgba(124, 42, 98, 0.1);
+          border-radius: 50%;
+          animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          33% {
+            transform: translateY(-20px) rotate(120deg);
+          }
+          66% {
+            transform: translateY(20px) rotate(240deg);
+          }
         }
 
         /* Back to Home Button */
@@ -536,6 +628,8 @@ const Login = ({ onSwitchToSignup, onLoginSuccess, onBackToHome }) => {
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
           overflow: hidden;
           min-height: 600px;
+          position: relative;
+          z-index: 2;
         }
 
         /* Left Section */

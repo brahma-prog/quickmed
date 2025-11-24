@@ -588,7 +588,7 @@ const Footer = ({ onSectionChange }) => {
             textAlign: 'center'
           }}>
             <p style={{ color: '#666', fontSize: '0.9rem' }}>
-              Last updated: December 2024 | For questions, contact legal@quickmed.com
+              Last updated: November 2025 | For questions, contact legal@quickmed.com
             </p>
           </div>
         </div>

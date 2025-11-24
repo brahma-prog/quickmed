@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 const Reviews = ({ onWriteReview, reviews: propReviews }) => {
   const [reviews, setReviews] = useState([]);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Use propReviews if provided, otherwise load from localStorage
   useEffect(() => {
@@ -70,6 +73,22 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
     }
   }, [propReviews]);
 
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width <= 768);
+      setIsTablet(width <= 1024 && width > 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Add fade-in animation
+    setIsVisible(true);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   // Save reviews to localStorage whenever reviews change
   useEffect(() => {
     if (reviews.length > 0) {
@@ -104,56 +123,94 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
   const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 6);
 
   const styles = {
+    // Main Reviews Section with Bubble Background
     reviews: {
-      padding: '5rem 2rem',
-      backgroundColor: 'white',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #F7D9EB 0%, #ffffff 50%, #F7D9EB 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+      padding: isMobile ? '4rem 1rem' : isTablet ? '5rem 2rem' : '6rem 2rem',
+    },
+    floatingElements: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    floatingElement: {
+      position: 'absolute',
+      background: 'rgba(124, 42, 98, 0.1)',
+      borderRadius: '50%',
+      animation: 'float 6s ease-in-out infinite',
     },
     container: {
       maxWidth: '1200px',
       margin: '0 auto',
+      position: 'relative',
+      zIndex: 2,
     },
     sectionTitle: {
-      fontSize: '3rem',
+      fontSize: isMobile ? '2.5rem' : isTablet ? '3rem' : '3.5rem',
       textAlign: 'center',
       marginBottom: '1rem',
       color: '#7C2A62',
       fontWeight: '700',
+      background: 'linear-gradient(45deg, #7C2A62, #9C3A7A)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out',
     },
     sectionSubtitle: {
-      fontSize: '1.2rem',
+      fontSize: isMobile ? '1rem' : isTablet ? '1.1rem' : '1.2rem',
       textAlign: 'center',
-      marginBottom: '4rem',
+      marginBottom: isMobile ? '3rem' : '4rem',
       color: '#666',
       maxWidth: '600px',
       marginLeft: 'auto',
       marginRight: 'auto',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.2s',
     },
     ratingSummary: {
       display: 'grid',
-      gridTemplateColumns: '1fr 2fr',
-      gap: '3rem',
-      marginBottom: '4rem',
-      padding: '3rem',
-      backgroundColor: '#f8f9fa',
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr',
+      gap: isMobile ? '2rem' : '3rem',
+      marginBottom: isMobile ? '3rem' : '4rem',
+      padding: isMobile ? '2rem' : '3rem',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
       borderRadius: '20px',
+      boxShadow: '0 8px 30px rgba(124, 42, 98, 0.1)',
+      backdropFilter: 'blur(10px)',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.4s',
     },
     overallRating: {
       textAlign: 'center',
-      padding: '2rem',
+      padding: isMobile ? '1rem' : '2rem',
     },
     overallScore: {
-      fontSize: '4rem',
+      fontSize: isMobile ? '3rem' : '4rem',
       fontWeight: 'bold',
       color: '#7C2A62',
       margin: '0 0 1rem 0',
+      background: 'linear-gradient(45deg, #7C2A62, #D32F2F)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
     },
     starsLarge: {
-      fontSize: '2rem',
+      fontSize: isMobile ? '1.5rem' : '2rem',
       marginBottom: '1rem',
     },
     ratingCount: {
       color: '#666',
-      fontSize: '1.1rem',
+      fontSize: isMobile ? '1rem' : '1.1rem',
     },
     ratingBreakdown: {
       display: 'flex',
@@ -163,7 +220,7 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
     ratingBar: {
       display: 'flex',
       alignItems: 'center',
-      gap: '1rem',
+      gap: isMobile ? '0.5rem' : '1rem',
     },
     barContainer: {
       flex: 1,
@@ -175,29 +232,38 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
     barFill: {
       height: '100%',
       backgroundColor: '#7C2A62',
+      transition: 'width 0.5s ease-in-out',
     },
     reviewsGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-      gap: '2rem',
+      gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+      gap: isMobile ? '1.5rem' : '2rem',
       marginBottom: '3rem',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.6s',
     },
     reviewsGridScrollable: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-      gap: '2rem',
+      gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+      gap: isMobile ? '1.5rem' : '2rem',
       marginBottom: '3rem',
       maxHeight: '600px',
       overflowY: 'auto',
       padding: '1rem',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.6s',
     },
     reviewCard: {
-      padding: '2rem',
-      backgroundColor: '#f8f9fa',
+      padding: isMobile ? '1.5rem' : '2rem',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
       borderRadius: '15px',
       boxShadow: '0 5px 20px rgba(124, 42, 98, 0.1)',
       transition: 'all 0.3s ease',
       position: 'relative',
+      backdropFilter: 'blur(10px)',
+      border: '2px solid transparent',
     },
     newReviewBadge: {
       position: 'absolute',
@@ -216,7 +282,7 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
       alignItems: 'flex-start',
       marginBottom: '1.5rem',
       position: 'relative',
-      paddingRight: '70px', // Add padding to prevent overlap with NEW badge
+      paddingRight: '70px',
     },
     reviewerInfo: {
       display: 'flex',
@@ -224,8 +290,8 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
       gap: '1rem',
     },
     avatar: {
-      width: '50px',
-      height: '50px',
+      width: isMobile ? '40px' : '50px',
+      height: isMobile ? '40px' : '50px',
       borderRadius: '50%',
       backgroundColor: '#F7D9EB',
       display: 'flex',
@@ -233,51 +299,59 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
       justifyContent: 'center',
       fontWeight: 'bold',
       color: '#7C2A62',
-      fontSize: '1rem',
+      fontSize: isMobile ? '0.9rem' : '1rem',
+      border: '2px solid #7C2A62',
     },
     reviewerName: {
       margin: '0 0 0.5rem 0',
       color: '#333',
-      fontSize: '1.2rem',
+      fontSize: isMobile ? '1.1rem' : '1.2rem',
       fontWeight: '600',
     },
     reviewStars: {
       color: '#FFD700',
-      fontSize: '1rem',
+      fontSize: isMobile ? '0.9rem' : '1rem',
     },
     reviewDate: {
       color: '#666',
-      fontSize: '0.9rem',
+      fontSize: isMobile ? '0.8rem' : '0.9rem',
       textAlign: 'right',
-      minWidth: '120px',
+      minWidth: isMobile ? '100px' : '120px',
     },
     reviewComment: {
       color: '#333',
       lineHeight: '1.6',
-      fontSize: '1rem',
+      fontSize: isMobile ? '0.9rem' : '1rem',
       margin: 0,
     },
     viewMoreButton: {
-      padding: '1rem 2rem',
+      padding: isMobile ? '0.8rem 1.5rem' : '1rem 2rem',
       backgroundColor: 'transparent',
       border: '2px solid #7C2A62',
       borderRadius: '25px',
       cursor: 'pointer',
-      fontSize: '1rem',
+      fontSize: isMobile ? '0.9rem' : '1rem',
       fontWeight: 'bold',
       color: '#7C2A62',
       transition: 'all 0.3s ease',
       margin: '0 auto 3rem',
       display: 'block',
+      position: 'relative',
+      overflow: 'hidden',
     },
     addReviewSection: {
       textAlign: 'center',
-      padding: '3rem',
-      backgroundColor: '#F7D9EB',
+      padding: isMobile ? '2rem' : '3rem',
+      backgroundColor: 'rgba(247, 217, 235, 0.8)',
       borderRadius: '20px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 8px 30px rgba(124, 42, 98, 0.1)',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.8s',
     },
     addReviewTitle: {
-      fontSize: '2rem',
+      fontSize: isMobile ? '1.5rem' : '2rem',
       marginBottom: '1rem',
       color: '#7C2A62',
       fontWeight: '600',
@@ -285,26 +359,29 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
     addReviewText: {
       color: '#666',
       marginBottom: '2rem',
-      fontSize: '1.1rem',
+      fontSize: isMobile ? '1rem' : '1.1rem',
       maxWidth: '500px',
       marginLeft: 'auto',
       marginRight: 'auto',
     },
     addReviewButton: {
-      padding: '1rem 2.5rem',
+      padding: isMobile ? '0.8rem 2rem' : '1rem 2.5rem',
       backgroundColor: '#7C2A62',
       border: 'none',
       borderRadius: '25px',
       cursor: 'pointer',
-      fontSize: '1.1rem',
+      fontSize: isMobile ? '1rem' : '1.1rem',
       fontWeight: 'bold',
       color: 'white',
       transition: 'all 0.3s ease',
+      boxShadow: '0 5px 15px rgba(124, 42, 98, 0.3)',
+      position: 'relative',
+      overflow: 'hidden',
     },
     scrollIndicator: {
       textAlign: 'center',
       color: '#7C2A62',
-      fontSize: '0.9rem',
+      fontSize: isMobile ? '0.8rem' : '0.9rem',
       marginBottom: '1rem',
       fontStyle: 'italic',
     }
@@ -316,7 +393,7 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
       if (i <= rating) {
         // Filled star (golden)
         stars.push(
-          <span key={i} style={{ color: '#fffdf3ff', fontSize: 'inherit' }}>
+          <span key={i} style={{ color: '#FFD700', fontSize: 'inherit' }}>
             ⭐
           </span>
         );
@@ -345,8 +422,34 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
     return diffDays <= 7; // Consider reviews from last 7 days as new
   };
 
+  // Generate floating elements
+  const floatingElements = Array.from({ length: isMobile ? 8 : 15 }, (_, i) => ({
+    id: i,
+    size: Math.random() * (isMobile ? 50 : 100) + (isMobile ? 30 : 50),
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    animationDelay: Math.random() * 5,
+  }));
+
   return (
     <section style={styles.reviews}>
+      {/* Floating Background Elements */}
+      <div style={styles.floatingElements}>
+        {floatingElements.map((element) => (
+          <div
+            key={element.id}
+            style={{
+              ...styles.floatingElement,
+              width: element.size,
+              height: element.size,
+              left: `${element.left}%`,
+              top: `${element.top}%`,
+              animationDelay: `${element.animationDelay}s`,
+            }}
+          />
+        ))}
+      </div>
+
       <div style={styles.container}>
         <h2 style={styles.sectionTitle}>
           Patient Reviews
@@ -367,11 +470,11 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
           <div style={styles.ratingBreakdown}>
             {ratingBars.map((bar, index) => (
               <div key={index} style={styles.ratingBar}>
-                <span>{bar.stars} stars</span>
+                <span style={{fontSize: isMobile ? '0.9rem' : '1rem'}}>{bar.stars} stars</span>
                 <div style={styles.barContainer}>
                   <div style={{...styles.barFill, width: `${bar.percentage}%`}}></div>
                 </div>
-                <span>{bar.count} ({bar.percentage}%)</span>
+                <span style={{fontSize: isMobile ? '0.8rem' : '0.9rem'}}>{bar.count} ({bar.percentage}%)</span>
               </div>
             ))}
           </div>
@@ -390,12 +493,14 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
               key={review.id}
               style={styles.reviewCard}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(124, 42, 98, 0.15)';
+                e.currentTarget.style.transform = 'translateY(-10px)';
+                e.currentTarget.style.boxShadow = '0 15px 40px rgba(124, 42, 98, 0.15)';
+                e.currentTarget.style.borderColor = '#7C2A62';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = '0 5px 20px rgba(124, 42, 98, 0.1)';
+                e.currentTarget.style.borderColor = 'transparent';
               }}
             >
               {isNewReview(review.date) && (
@@ -425,10 +530,12 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = '#7C2A62';
               e.target.style.color = 'white';
+              e.target.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = 'transparent';
               e.target.style.color = '#7C2A62';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             {showAllReviews ? `Show Less (Viewing ${reviews.length} reviews)` : `View All Reviews (${reviews.length} total)`}
@@ -446,9 +553,13 @@ const Reviews = ({ onWriteReview, reviews: propReviews }) => {
             onClick={onWriteReview}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = '#5a1a4a';
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 8px 20px rgba(124, 42, 98, 0.4)';
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = '#7C2A62';
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 5px 15px rgba(124, 42, 98, 0.3)';
             }}
           >
             Write a Review

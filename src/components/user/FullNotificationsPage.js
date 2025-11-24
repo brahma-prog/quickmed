@@ -1,59 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const NotificationsPage = ({ 
-  showNotifications, 
-  notifications, 
-  onClose, 
-  onViewAll,
+const FullNotificationsPage = ({ 
+  notifications = [],
+  onBack,
   markAsRead,
   markAllAsRead,
   deleteNotification,
-  loadMoreNotifications
+  deleteAllNotifications,
+  loadMoreNotifications 
 }) => {
   const [localNotifications, setLocalNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const notificationsRef = useRef(null);
 
-  // Initialize local notifications when props change
   useEffect(() => {
     if (notifications && Array.isArray(notifications)) {
       setLocalNotifications(notifications);
     }
   }, [notifications]);
-
-  // Handle click outside to close
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-
-    if (showNotifications) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showNotifications, onClose]);
-
-  // Add safety checks
-  if (!showNotifications) {
-    return null;
-  }
-
-  if (!localNotifications || !Array.isArray(localNotifications)) {
-    return null;
-  }
-
-  const handleViewAll = () => {
-    if (onViewAll) {
-      onViewAll();
-    }
-  };
 
   const handleLoadMore = async () => {
     if (isLoading || !hasMore) return;
@@ -72,11 +37,11 @@ const NotificationsPage = ({
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        const mockNotifications = generateMockNotifications(currentPage * 5, 5);
+        const mockNotifications = generateMockNotifications(currentPage * 10, 10);
         setLocalNotifications(prev => [...prev, ...mockNotifications]);
         setCurrentPage(prev => prev + 1);
         
-        if (currentPage >= 3) {
+        if (currentPage >= 5) {
           setHasMore(false);
         }
       }
@@ -119,6 +84,14 @@ const NotificationsPage = ({
     }
   };
 
+  const handleDeleteAll = () => {
+    if (deleteAllNotifications) {
+      deleteAllNotifications();
+    } else {
+      setLocalNotifications([]);
+    }
+  };
+
   const getNotificationIcon = (type) => {
     const icons = {
       order: '📦',
@@ -158,70 +131,74 @@ const NotificationsPage = ({
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'transparent',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       zIndex: 1000,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      padding: '20px'
     },
-    notificationsPage: {
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      width: '420px',
+    container: {
       backgroundColor: 'white',
       borderRadius: '12px',
-      boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-      zIndex: 1001,
-      maxHeight: '80vh',
+      width: '90%',
+      maxWidth: '800px',
+      maxHeight: '90vh',
       overflow: 'hidden',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
     },
-    notificationsHeader: {
+    header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '20px',
+      padding: '24px',
       borderBottom: '1px solid #e5e7eb',
       backgroundColor: '#f8fafc'
     },
     headerActions: {
       display: 'flex',
       alignItems: 'center',
-      gap: '10px'
+      gap: '16px'
     },
-    unreadBadge: {
-      backgroundColor: '#ef4444',
-      color: 'white',
-      borderRadius: '10px',
-      padding: '2px 8px',
-      fontSize: '12px',
-      fontWeight: '600'
-    },
-    closeButton: {
+    backButton: {
       backgroundColor: 'transparent',
       border: 'none',
       fontSize: '20px',
       cursor: 'pointer',
       color: '#6b7280',
-      padding: '4px'
+      padding: '8px'
     },
-    markAllReadButton: {
+    actionButton: {
       backgroundColor: 'transparent',
       border: 'none',
       color: '#7C2A62',
       cursor: 'pointer',
-      fontSize: '12px',
+      fontSize: '14px',
       fontWeight: '500',
-      padding: '4px 8px',
-      borderRadius: '4px'
+      padding: '8px 16px',
+      borderRadius: '6px',
+    },
+    deleteAllButton: {
+      backgroundColor: 'transparent',
+      border: 'none',
+      color: '#ef4444',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      padding: '8px 16px',
+      borderRadius: '6px',
+
     },
     notificationsList: {
       flex: 1,
       overflowY: 'auto',
-      maxHeight: '400px'
+      padding: '0'
     },
     notificationItem: {
       display: 'flex',
-      padding: '16px 20px',
+      padding: '20px 24px',
       borderBottom: '1px solid #f3f4f6',
       transition: 'background-color 0.3s ease',
       position: 'relative',
@@ -232,8 +209,8 @@ const NotificationsPage = ({
       backgroundColor: '#f0f9ff'
     },
     notificationIcon: {
-      fontSize: '20px',
-      marginRight: '12px',
+      fontSize: '24px',
+      marginRight: '16px',
       marginTop: '2px',
       flexShrink: 0
     },
@@ -242,23 +219,22 @@ const NotificationsPage = ({
       minWidth: 0
     },
     notificationTitle: {
-      fontSize: '14px',
+      fontSize: '16px',
       fontWeight: '600',
       color: '#1f2937',
-      margin: '0 0 4px 0',
+      margin: '0 0 8px 0',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'flex-start'
     },
     notificationMessage: {
-      fontSize: '13px',
+      fontSize: '14px',
       color: '#6b7280',
-      margin: '0 0 4px 0',
-      lineHeight: '1.4',
-      wordWrap: 'break-word'
+      margin: '0 0 8px 0',
+      lineHeight: '1.5'
     },
     notificationTime: {
-      fontSize: '11px',
+      fontSize: '12px',
       color: '#9ca3af'
     },
     deleteButton: {
@@ -266,49 +242,34 @@ const NotificationsPage = ({
       border: 'none',
       color: '#ef4444',
       cursor: 'pointer',
-      fontSize: '12px',
-      padding: '2px 6px',
-      borderRadius: '3px',
-      marginLeft: '8px'
+      fontSize: '14px',
+      padding: '4px 8px',
+      borderRadius: '4px'
     },
     emptyState: {
+      padding: '60px 20px',
+      textAlign: 'center',
+      color: '#6b7280',
+      fontSize: '16px'
+    },
+    loadingState: {
       padding: '40px 20px',
       textAlign: 'center',
       color: '#6b7280'
     },
-    loadingState: {
-      padding: '20px',
-      textAlign: 'center',
-      color: '#6b7280'
-    },
-    notificationsFooter: {
-      padding: '16px 20px',
-      borderTop: '1px solid #e5e7eb',
-      backgroundColor: '#f8fafc'
-    },
-    viewAllButton: {
-      width: '100%',
-      padding: '12px',
-      backgroundColor: '#7C2A62',
-      color: 'white',
-      border: 'none',
-      borderRadius: '6px',
-      cursor: 'pointer',
-      fontWeight: '500',
-      fontSize: '14px',
-      transition: 'background-color 0.2s ease'
-    },
     loadMoreButton: {
       width: '100%',
-      padding: '10px',
+      padding: '16px',
       backgroundColor: 'transparent',
       color: '#7C2A62',
       border: '1px solid #7C2A62',
-      borderRadius: '6px',
+      borderRadius: '8px',
       cursor: 'pointer',
       fontWeight: '500',
-      fontSize: '14px',
-      marginBottom: '10px'
+      fontSize: '16px',
+      margin: '20px',
+      maxWidth: '200px',
+      alignSelf: 'center'
     },
     loadMoreButtonDisabled: {
       opacity: 0.6,
@@ -336,50 +297,62 @@ const NotificationsPage = ({
       title: `Notification ${startId + i + 1}`,
       message: messages[Math.floor(Math.random() * messages.length)],
       type: types[Math.floor(Math.random() * types.length)],
-      time: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-      read: false
+      time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      read: Math.random() > 0.7
     }));
   };
 
   return (
-    <>
-      {/* Overlay for catching outside clicks */}
-      <div style={styles.overlay} />
-      
-      {/* Notifications Popup */}
-      <div ref={notificationsRef} style={styles.notificationsPage}>
-        <div style={styles.notificationsHeader}>
-          <div>
-            <h3 style={{ margin: 0 }}>Notifications</h3>
+    <div style={styles.overlay} onClick={onBack}>
+      <div style={styles.container} onClick={(e) => e.stopPropagation()}>
+        <div style={styles.header}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button
+              style={styles.backButton}
+              onClick={onBack}
+              aria-label="Go back"
+            >
+              ←
+            </button>
+            <h2 style={{ margin: 0 }}>All Notifications</h2>
             {unreadCount > 0 && (
-              <span style={styles.unreadBadge}>
+              <span style={{
+                backgroundColor: '#ef4444',
+                color: 'white',
+                borderRadius: '10px',
+                padding: '4px 12px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
                 {unreadCount} unread
               </span>
             )}
           </div>
+          
           <div style={styles.headerActions}>
             {unreadCount > 0 && (
               <button
-                style={styles.markAllReadButton}
+                style={styles.actionButton}
                 onClick={handleMarkAllAsRead}
               >
-                Mark all read
+                Mark all as read
               </button>
             )}
-            <button
-              style={styles.closeButton}
-              onClick={onClose}
-              aria-label="Close notifications"
-            >
-              ✕
-            </button>
+            {localNotifications.length > 0 && (
+              <button
+                style={styles.deleteAllButton}
+                onClick={handleDeleteAll}
+              >
+                Delete all
+              </button>
+            )}
           </div>
         </div>
         
         <div style={styles.notificationsList}>
           {localNotifications.length > 0 ? (
             <>
-              {localNotifications.slice(0, 5).map(notification => (
+              {localNotifications.map(notification => (
                 <div 
                   key={notification.id} 
                   style={{
@@ -402,7 +375,7 @@ const NotificationsPage = ({
                         }}
                         aria-label="Delete notification"
                       >
-                        ×
+                        Delete
                       </button>
                     </div>
                     <p style={styles.notificationMessage}>
@@ -414,6 +387,19 @@ const NotificationsPage = ({
                   </div>
                 </div>
               ))}
+              
+              {hasMore && (
+                <button
+                  style={{
+                    ...styles.loadMoreButton,
+                    ...(isLoading ? styles.loadMoreButtonDisabled : {})
+                  }}
+                  onClick={handleLoadMore}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Loading...' : 'Load More Notifications'}
+                </button>
+              )}
             </>
           ) : (
             <div style={styles.emptyState}>
@@ -421,18 +407,9 @@ const NotificationsPage = ({
             </div>
           )}
         </div>
-        
-        <div style={styles.notificationsFooter}>
-          <button
-            style={styles.viewAllButton}
-            onClick={handleViewAll}
-          >
-            View All Notifications
-          </button>
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default NotificationsPage;
+export default FullNotificationsPage;

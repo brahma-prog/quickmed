@@ -1,13 +1,15 @@
 export const user = {
-  fullName: 'John Pharmacy',
-  email: 'john@pharmacy.com',
-  phone: '+91 98765 43210',
-  pharmacyName: 'John Medical Store',
-  licenseNumber: 'MH-PHR-2024-12345',
-  address: 'Shop No. 15, Main Market, Sector 18, Noida',
+  fullName: 'Dr. doctor',
+  email: 'doctor@gmail.com',
+  phone: '8877996655',
+  pharmacyName: 'City General Hospital',
+  licenseNumber: 'MED-2024-12345',
+  address: 'Medical Complex, Sector 15, Noida',
   city: 'Noida',
   state: 'Uttar Pradesh',
-  pincode: '201301'
+  pincode: '201301',
+  experience: '12 years',
+  role: 'General Physician'
 };
 
 export const initialData = {
@@ -141,7 +143,7 @@ export const initialData = {
       id: 1,
       orderId: 'ORD-002',
       customerName: 'Priya Sharma',
-      doctorName: ' Sharma',
+      doctorName: 'Sharma',
       uploadedTime: '2024-01-15 11:15',
       status: 'pending',
       medicines: ['Amoxicillin 250mg', 'Azithromycin 500mg'],
@@ -151,7 +153,7 @@ export const initialData = {
       id: 2,
       orderId: 'ORD-003',
       customerName: 'Amit Patel',
-      doctorName: ' Gupta',
+      doctorName: 'Gupta',
       uploadedTime: '2024-01-15 09:45',
       status: 'pending',
       medicines: ['Insulin Syringes', 'Diabetes Strips', 'Metformin 500mg'],
@@ -164,7 +166,8 @@ export const navigationItems = [
   { id: 'stock', label: 'Stock Management', icon: '📦' },
   { id: 'orders', label: 'Orders', icon: '📋' },
   { id: 'prescriptions', label: 'Prescription Verification', icon: '🩺' },
-  { id: 'analytics', label: 'Analytics', icon: '📊' }
+  { id: 'analytics', label: 'Analytics', icon: '📊' },
+  { id: 'profile', label: 'Profile', icon: '👤' }
 ];
 
 export const stockFilters = [

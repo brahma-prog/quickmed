@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './Header';
-import ProfileView from './ProfileView';
 import AppointmentsView from './AppointmentsView';
 import OrdersView from './OrdersView';
 import MedicineView from './MedicineView';
@@ -8,46 +7,13 @@ import CartView from './CartView';
 import ConsultationView from './ConsultationView';
 import LiveTrackingView from './LiveTrackingView';
 import NotificationsPage from './NotificationsPage';
+import FullNotificationsPage from './FullNotificationsPage';
 import Modals from './Modals';
-import { styles } from './Styles';
+import Products from './Products';
+import AIChatbotWidget from './AIChatbotWidget';
+import { ProfileProvider, useProfile } from './ProfileContext';
+import ProfileView from './ProfileView';
 
-// Create a context for global profile state
-const ProfileContext = React.createContext();
-
-// Profile Provider Component
-export const ProfileProvider = ({ children, user }) => {
-  const [profile, setProfile] = useState({
-    fullName: user?.fullName || 'Jagan',
-    email: user?.email || 'yerrajagan29@gmail.com',
-    phone: user?.phone || '6300604470',
-    profilePhoto: user?.profilePhoto || null,
-    address: user?.address || '',
-    city: user?.city || '',
-    pincode: user?.pincode || '',
-    dateOfBirth: user?.dateOfBirth || '',
-    age: user?.age || '',
-    gender: user?.gender || ''
-  });
-
-  const updateProfile = (newProfile) => {
-    setProfile(newProfile);
-  };
-
-  return (
-    <ProfileContext.Provider value={{ profile, updateProfile }}>
-      {children}
-    </ProfileContext.Provider>
-  );
-};
-
-// Hook to use profile context
-export const useProfile = () => {
-  const context = useContext(ProfileContext);
-  if (!context) {
-    throw new Error('useProfile must be used within a ProfileProvider');
-  }
-  return context;
-};
 
 const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   const { profile, updateProfile } = useProfile();
@@ -57,8 +23,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [orders, setOrders] = useState([]);
   const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
-  
-  const [userProfile, setUserProfile] = useState(profile);
 
   // Doctor Consultation State
   const [doctorSearchQuery, setDoctorSearchQuery] = useState('');
@@ -83,7 +47,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   const [userMessage, setUserMessage] = useState('');
   const chatInputRef = useRef(null);
   const chatMessagesEndRef = useRef(null);
-  const chatRef = useRef(null);
 
   // Real-time Chat with Doctors State
   const [doctorChats, setDoctorChats] = useState({});
@@ -102,7 +65,11 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   // Profile Photo Upload State
   const [showProfilePhotoModal, setShowProfilePhotoModal] = useState(false);
   const [profilePhotoFile, setProfilePhotoFile] = useState(null);
-  const [profilePhotoPreview, setProfilePhotoPreview] = useState(profile.profilePhoto);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState(profile?.profilePhoto || null);
+
+  // Notifications State
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showFullNotifications, setShowFullNotifications] = useState(false);
 
   // Appointments State
   const [appointments, setAppointments] = useState([
@@ -110,13 +77,13 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       id: 'APT001',
       doctorName: 'Dr. Brahma Gadikoto',
       specialty: 'General Physician',
-      date: '2024-01-20',
+      date: new Date().toISOString().split('T')[0],
       time: '10:00 AM',
       status: 'Scheduled',
       type: 'Video Consultation',
       fee: 730,
       details: {
-        patientName: 'User',
+        patientName: profile?.fullName || 'User',
         symptoms: 'Fever and cold',
         notes: 'Regular checkup scheduled',
         prescription: 'To be provided after consultation'
@@ -126,64 +93,16 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       id: 'APT002',
       doctorName: 'Dr. Charitha Kasturi',
       specialty: 'Pediatrician',
-      date: '2024-01-18',
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       time: '2:00 PM',
       status: 'Completed',
       type: 'In-Person',
       fee: 505,
       details: {
-        patientName: 'User',
+        patientName: profile?.fullName || 'User',
         symptoms: 'Child vaccination',
         notes: 'Vaccination completed successfully',
         prescription: 'Next vaccination due in 2 months'
-      }
-    },
-    {
-      id: 'APT003',
-      doctorName: 'Dr. Rajesh Kumar',
-      specialty: 'Cardiologist',
-      date: '2024-01-22',
-      time: '11:30 AM',
-      status: 'Cancelled',
-      type: 'Video Consultation',
-      fee: 1200,
-      details: {
-        patientName: 'User',
-        symptoms: 'Chest pain',
-        notes: 'Appointment cancelled by patient',
-        prescription: 'None'
-      }
-    },
-    {
-      id: 'APT004',
-      doctorName: 'Dr. Priya Sharma',
-      specialty: 'Dermatologist',
-      date: '2024-01-25',
-      time: '3:00 PM',
-      status: 'Pending',
-      type: 'Video Consultation',
-      fee: 800,
-      details: {
-        patientName: 'User',
-        symptoms: 'Skin allergy',
-        notes: 'Awaiting confirmation',
-        prescription: 'To be provided after consultation'
-      }
-    },
-    {
-      id: 'APT005',
-      doctorName: 'Dr. Anil Kumar',
-      specialty: 'Orthopedic',
-      date: '2024-01-19',
-      time: '4:30 PM',
-      status: 'Rescheduled',
-      type: 'In-Person',
-      fee: 950,
-      details: {
-        patientName: 'User',
-        symptoms: 'Knee pain',
-        notes: 'Rescheduled from original date',
-        prescription: 'To be provided after consultation'
       }
     }
   ]);
@@ -211,18 +130,9 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       timestamp: new Date(Date.now() - 600000),
       read: false,
       type: 'delivery'
-    },
-    {
-      id: 3,
-      title: 'Prescription Approved',
-      message: 'Your uploaded prescription has been verified',
-      timestamp: new Date(Date.now() - 86400000),
-      read: true,
-      type: 'prescription'
     }
   ]);
 
-  // Remove the showNotifications state since we're using a page now
   const [prescriptionFile, setPrescriptionFile] = useState(null);
   const [prescriptionPreview, setPrescriptionPreview] = useState(null);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
@@ -258,12 +168,12 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
 
   // Enhanced mock data for medicines
   const medicines = [
-    { id: 1, name: 'Aspirin 75mg', price: 25, vendor: 'WellCare Store', category: 'OTC' },
-    { id: 2, name: 'Paracetamol 500mg', price: 30, vendor: 'City Pharmacy', category: 'OTC' },
-    { id: 3, name: 'Ibuprofen 400mg', price: 35, vendor: 'HealthPlus Medicines', category: 'OTC' },
-    { id: 4, name: 'Vitamin C 1000mg', price: 40, vendor: 'WellCare Store', category: 'Vitamins' },
-    { id: 5, name: 'Amoxicillin 500mg', price: 120, vendor: 'City Pharmacy', category: 'Prescription' },
-    { id: 6, name: 'Blood Pressure Monitor', price: 899, vendor: 'HealthPlus Medicines', category: 'Equipment' }
+    { id: 1, name: 'Aspirin 75mg', price: 25, vendor: 'WellCare Store', category: 'OTC', description: 'Low-dose aspirin for heart health' },
+    { id: 2, name: 'Paracetamol 500mg', price: 30, vendor: 'City Pharmacy', category: 'OTC', description: 'Effective relief from fever and pain' },
+    { id: 3, name: 'Ibuprofen 400mg', price: 35, vendor: 'HealthPlus Medicines', category: 'OTC', description: 'Anti-inflammatory pain relief' },
+    { id: 4, name: 'Vitamin C 1000mg', price: 40, vendor: 'WellCare Store', category: 'Vitamins', description: 'Immune system support' },
+    { id: 5, name: 'Amoxicillin 500mg', price: 120, vendor: 'City Pharmacy', category: 'Prescription', description: 'Antibiotic for bacterial infections' },
+    { id: 6, name: 'Blood Pressure Monitor', price: 899, vendor: 'HealthPlus Medicines', category: 'Equipment', description: 'Digital automatic monitoring' }
   ];
 
   // Enhanced mock data for pharmacies with their medicines
@@ -276,9 +186,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       rating: 4.5,
       medicines: [
         { id: 2, name: 'Paracetamol 500mg', price: 30, category: 'OTC' },
-        { id: 5, name: 'Amoxicillin 500mg', price: 120, category: 'Prescription' },
-        { id: 7, name: 'Cetirizine 10mg', price: 25, category: 'OTC' },
-        { id: 8, name: 'Omeprazole 20mg', price: 45, category: 'Prescription' }
+        { id: 5, name: 'Amoxicillin 500mg', price: 120, category: 'Prescription' }
       ]
     },
     { 
@@ -289,22 +197,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       rating: 4.8,
       medicines: [
         { id: 1, name: 'Aspirin 75mg', price: 25, category: 'OTC' },
-        { id: 4, name: 'Vitamin C 1000mg', price: 40, category: 'Vitamins' },
-        { id: 9, name: 'Multivitamin Tablets', price: 150, category: 'Vitamins' },
-        { id: 10, name: 'Calcium Supplements', price: 200, category: 'Vitamins' }
-      ]
-    },
-    { 
-      id: 3, 
-      name: 'HealthPlus Medicines', 
-      distance: '1.9 km', 
-      deliveryTime: '30 min', 
-      rating: 4.3,
-      medicines: [
-        { id: 3, name: 'Ibuprofen 400mg', price: 35, category: 'OTC' },
-        { id: 6, name: 'Blood Pressure Monitor', price: 899, category: 'Equipment' },
-        { id: 11, name: 'Diabetes Test Strips', price: 350, category: 'Equipment' },
-        { id: 12, name: 'Thermometer', price: 150, category: 'Equipment' }
+        { id: 4, name: 'Vitamin C 1000mg', price: 40, category: 'Vitamins' }
       ]
     }
   ];
@@ -334,7 +227,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
     return slots;
   };
 
-  // Mock doctors data - Updated with additional doctors
+  // Mock doctors data
   const doctors = [
     {
       id: 1,
@@ -361,119 +254,40 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       image: '👩‍⚕️',
       bio: 'Specialized in child care and pediatric medicine with 12 years of experience.',
       qualifications: 'MBBS, MD (Pediatrics)'
-    },
-    {
-      id: 3,
-      name: 'Dr. Rajesh Kumar',
-      specialty: 'Cardiologist',
-      rating: 4.9,
-      experience: '18 years',
-      languages: ['English', 'Hindi'],
-      consultationFee: 1200,
-      availableSlots: generateTimeSlots(),
-      image: '👨‍⚕️',
-      bio: 'Expert in heart diseases and cardiovascular treatments with 18 years of experience.',
-      qualifications: 'MBBS, MD, DM (Cardiology)'
-    },
-    {
-      id: 4,
-      name: 'Dr. Priya Sharma',
-      specialty: 'Dermatologist',
-      rating: 4.7,
-      experience: '10 years',
-      languages: ['English', 'Hindi', 'Tamil'],
-      consultationFee: 800,
-      availableSlots: generateTimeSlots(),
-      image: '👩‍⚕️',
-      bio: 'Specialized in skin treatments and cosmetic dermatology with 10 years of experience.',
-      qualifications: 'MBBS, MD (Dermatology)'
-    },
-    {
-      id: 5,
-      name: 'Dr. Anil Kumar',
-      specialty: 'Orthopedic',
-      rating: 4.6,
-      experience: '14 years',
-      languages: ['English', 'Hindi'],
-      consultationFee: 950,
-      availableSlots: generateTimeSlots(),
-      image: '👨‍⚕️',
-      bio: 'Expert in bone and joint treatments with 14 years of surgical experience.',
-      qualifications: 'MBBS, MS (Orthopedics)'
     }
   ];
 
   // Enhanced mock orders data with tracking
-  const initialOrders = [
+  const initialOrders = useCallback(() => [
     {
       id: 'ORD001',
-      date: '2024-01-15',
+      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       items: [
         { name: 'Paracetamol 500mg', quantity: 2, price: 30 },
         { name: 'Vitamin C 1000mg', quantity: 1, price: 40 }
       ],
       total: 100,
       status: 'Delivered',
-      deliveryAddress: '123 Main St, City, 560001',
+      deliveryAddress: profile?.address || '123 Main St, City, 560001',
       trackingAvailable: false
     },
     {
       id: 'ORD002',
-      date: '2024-01-10',
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       items: [
         { name: 'Aspirin 75mg', quantity: 1, price: 25 }
       ],
       total: 25,
       status: 'In Transit',
-      deliveryAddress: '123 Main St, City, 560001',
+      deliveryAddress: profile?.address || '123 Main St, City, 560001',
       trackingAvailable: true,
       deliveryPartner: {
         name: 'Rahul Kumar',
         phone: '+91 9876543210',
         estimatedTime: '25 min'
       }
-    },
-    {
-      id: 'ORD003',
-      date: new Date().toISOString().split('T')[0],
-      items: [
-        { name: 'Amoxicillin 500mg', quantity: 1, price: 120 },
-        { name: 'Vitamin C 1000mg', quantity: 2, price: 40 }
-      ],
-      total: 200,
-      status: 'On the Way',
-      deliveryAddress: '456 Park Avenue, City, 560001',
-      trackingAvailable: true,
-      deliveryPartner: {
-        name: 'Rahul Kumar',
-        phone: '+91 9876543210',
-        estimatedTime: '15 min'
-      }
-    },
-    {
-      id: 'ORD004',
-      date: '2024-01-12',
-      items: [
-        { name: 'Ibuprofen 400mg', quantity: 1, price: 35 },
-        { name: 'Cetirizine 10mg', quantity: 2, price: 25 }
-      ],
-      total: 85,
-      status: 'Pending',
-      deliveryAddress: '789 Oak Street, City, 560001',
-      trackingAvailable: false
-    },
-    {
-      id: 'ORD005',
-      date: '2024-01-08',
-      items: [
-        { name: 'Blood Pressure Monitor', quantity: 1, price: 899 }
-      ],
-      total: 899,
-      status: 'Delivered',
-      deliveryAddress: '321 Pine Road, City, 560001',
-      trackingAvailable: false
     }
-  ];
+  ], [profile?.address]);
 
   // AI Chatbot Responses
   const chatbotResponses = {
@@ -486,6 +300,14 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
     'prescription': "You can upload your prescription in the Medicine section.",
     'emergency': "For medical emergencies, please contact your nearest hospital immediately or call emergency services at 108.",
     'default': "I understand you're asking about healthcare services. I can help with medicine orders, doctor appointments, delivery tracking, and general health queries."
+  };
+
+  // Enhanced navigation handler that scrolls to top
+  const handleNavigation = (view) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setActiveView(view);
+    }, 100);
   };
 
   // Profile Photo Upload Functions
@@ -531,7 +353,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
           profilePhoto: profilePhotoPreview
         };
         updateProfile(updatedProfile);
-        setUserProfile(updatedProfile);
 
         setProfilePhotoFile(null);
         if (profilePhotoInputRef.current) {
@@ -552,7 +373,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   const updateProfilePhotoAPI = async (profileData) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        console.log('Profile photo updated:', profileData);
         resolve({ success: true, data: profileData });
       }, 1000);
     });
@@ -564,7 +384,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       profilePhoto: null
     };
     updateProfile(updatedProfile);
-    setUserProfile(updatedProfile);
     setProfilePhotoPreview(null);
     setProfilePhotoFile(null);
     if (profilePhotoInputRef.current) {
@@ -600,23 +419,21 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
 
   // Initialize orders and start live tracking simulation
   useEffect(() => {
-    setOrders(initialOrders);
-    const trackableOrder = initialOrders.find(order => 
+    const ordersData = initialOrders();
+    setOrders(ordersData);
+    const trackableOrder = ordersData.find(order => 
       order.trackingAvailable && (order.status === 'In Transit' || order.status === 'On the Way')
     );
     if (trackableOrder) {
       setTrackingOrder(trackableOrder);
     }
-  }, []);
+  }, [initialOrders]);
 
-  // Update the click outside handler to remove notifications dropdown logic
+  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileDropdown(false);
-      }
-      if (chatRef.current && !chatRef.current.contains(event.target)) {
-        setShowChatbot(false);
       }
     };
 
@@ -643,6 +460,13 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       chatMessagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [chatMessages]);
+
+  // Update profile photo preview when profile changes
+  useEffect(() => {
+    if (profile?.profilePhoto) {
+      setProfilePhotoPreview(profile.profilePhoto);
+    }
+  }, [profile?.profilePhoto]);
 
   // AI Chatbot Functions
   const toggleChatbot = () => {
@@ -858,9 +682,22 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
     }
   });
 
-  // Notification functions - UPDATED
+  // Notification functions
   const handleNotificationsClick = () => {
-    setActiveView('notifications');
+    setShowNotifications(!showNotifications);
+  };
+
+  const handleCloseNotifications = () => {
+    setShowNotifications(false);
+  };
+
+  const handleViewAllNotifications = () => {
+    setShowNotifications(false);
+    setShowFullNotifications(true);
+  };
+
+  const handleCloseFullNotifications = () => {
+    setShowFullNotifications(false);
   };
 
   const markAsRead = (notificationId) => {
@@ -901,7 +738,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
       type: 'Video Consultation',
       fee: doctor.consultationFee,
       details: {
-        patientName: userProfile.fullName,
+        patientName: profile?.fullName || 'User',
         symptoms: 'General consultation',
         notes: 'New appointment scheduled',
         prescription: 'To be provided after consultation'
@@ -910,7 +747,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
     setAppointments(prev => [newAppointment, ...prev]);
     addNotification('Appointment Scheduled', `Appointment with ${doctor.name} scheduled for ${date} at ${time}`, 'appointment');
     
-    setActiveView('appointments');
+    handleNavigation('appointments');
   };
 
   const rescheduleAppointment = (appointmentId, newDate, newTime) => {
@@ -994,7 +831,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
   // Live Tracking functions
   const startLiveTracking = (order) => {
     setTrackingOrder(order);
-    setActiveView('live-tracking');
+    handleNavigation('live-tracking');
     addNotification('Live Tracking Started', `You can now track your order ${order.id} in real-time`, 'tracking');
   };
 
@@ -1040,9 +877,9 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
     setShowLogoutConfirm(false);
   };
 
-  // Profile dropdown functions
+  // Toggle Profile Dropdown
   const toggleProfileDropdown = () => {
-    setShowProfileDropdown(!showProfileDropdown);
+    setShowProfileDropdown(prev => !prev);
   };
 
   // Razorpay Payment Integration
@@ -1073,12 +910,12 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
           handlePaymentSuccess(response);
         },
         prefill: {
-          name: userProfile.fullName,
-          email: userProfile.email,
-          contact: userProfile.phone
+          name: profile?.fullName || 'Customer',
+          email: profile?.email || 'customer@example.com',
+          contact: profile?.phone || '0000000000'
         },
         notes: {
-          address: userProfile.address,
+          address: profile?.address || 'Address not provided',
         },
         theme: {
           color: '#7C2A62'
@@ -1113,7 +950,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
           items: [...cart],
           total: getTotalPrice(),
           status: 'Confirmed',
-          deliveryAddress: userProfile.address || 'Address not provided',
+          deliveryAddress: profile?.address || 'Address not provided',
           paymentId: paymentResponse.razorpay_payment_id,
           trackingAvailable: true,
           deliveryPartner: {
@@ -1125,7 +962,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         
         setOrders(prevOrders => [newOrder, ...prevOrders]);
         setCart([]);
-        setActiveView('orders');
+        handleNavigation('orders');
         
         addNotification('Order Confirmed', `Your order ${orderId} has been placed successfully`, 'order');
         alert(`Payment successful! Order ID: ${orderId}\nPayment ID: ${paymentResponse.razorpay_payment_id}`);
@@ -1172,71 +1009,584 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
     }
   };
 
-  // Dashboard View Component
+  // OPTIMIZED Dashboard Styles - Better spacing and alignment
+  const dashboardStyles = {
+    container: {
+      minHeight: '100vh',
+      backgroundColor: '#f8f9fa',
+      overflowX: 'hidden',
+    },
+    mainContent: {
+      padding: '20px',
+      maxWidth: '1400px',
+      margin: '0 auto',
+      marginTop: '130px',
+      minHeight: 'calc(100vh - 80px)',
+      boxSizing: 'border-box',
+      width: '100%',
+    },
+    welcomeSection: {
+      textAlign: 'center',
+      marginBottom: '40px',
+      padding: '30px 25px',
+      backgroundColor: 'white',
+      borderRadius: '20px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      width: '100%',
+    },
+    welcomeTitle: {
+      fontSize: 'clamp(2rem, 5vw, 3rem)',
+      fontWeight: 'bold',
+      color: '#7C2A62',
+      marginBottom: '15px',
+      lineHeight: '1.2',
+    },
+    welcomeSubtitle: {
+      fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+      color: '#666',
+      lineHeight: '1.5',
+      maxWidth: '800px',
+      margin: '0 auto',
+    },
+    servicesSection: {
+      marginBottom: '40px',
+      width: '100%',
+    },
+    serviceGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+      gap: '30px',
+      marginBottom: '30px',
+      width: '100%',
+      alignItems: 'stretch',
+    },
+    serviceCard: {
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      padding: '30px 25px',
+      textAlign: 'center',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      border: '1px solid #e0e0e0',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      width: '100%',
+      minHeight: '380px',
+      boxSizing: 'border-box',
+    },
+    serviceIcon: {
+      fontSize: '3.5rem',
+      marginBottom: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '80px',
+    },
+    serviceTitle: {
+      fontSize: '1.5rem',
+      fontWeight: 'bold',
+      color: '#7C2A62',
+      marginBottom: '15px',
+      lineHeight: '1.3',
+      textAlign: 'center',
+    },
+    serviceDescription: {
+      fontSize: '1rem',
+      color: '#666',
+      marginBottom: '25px',
+      lineHeight: '1.6',
+      flexGrow: 1,
+      textAlign: 'center',
+    },
+    serviceButton: {
+      backgroundColor: '#7C2A62',
+      color: 'white',
+      border: 'none',
+      padding: '15px 25px',
+      borderRadius: '25px',
+      fontSize: '1rem',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      width: '100%',
+    },
+    featuredSection: {
+      backgroundColor: 'white',
+      borderRadius: '20px',
+      padding: '35px 30px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      marginBottom: '40px',
+      width: '100%',
+      boxSizing: 'border-box',
+    },
+    sectionTitle: {
+      fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+      fontWeight: 'bold',
+      color: '#7C2A62',
+      marginBottom: '15px',
+      textAlign: 'center',
+      width: '100%',
+    },
+    sectionSubtitle: {
+      fontSize: '1.2rem',
+      color: '#666',
+      marginBottom: '35px',
+      textAlign: 'center',
+      width: '100%',
+    },
+    featuredGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: '25px',
+      width: '100%',
+      alignItems: 'stretch',
+    },
+    featuredCard: {
+      backgroundColor: '#f8f9fa',
+      borderRadius: '15px',
+      padding: '25px 20px',
+      textAlign: 'center',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      border: '1px solid #e0e0e0',
+      height: '100%',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      boxSizing: 'border-box',
+      minHeight: '280px',
+    },
+    featuredImage: {
+      fontSize: '3rem',
+      marginBottom: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '80px',
+      width: '100%',
+    },
+    featuredInfo: {
+      textAlign: 'center',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      flexGrow: 1,
+      justifyContent: 'space-between',
+    },
+    featuredName: {
+      fontSize: '1.3rem',
+      fontWeight: 'bold',
+      color: '#333',
+      marginBottom: '8px',
+      lineHeight: '1.3',
+      textAlign: 'center',
+      width: '100%',
+    },
+    featuredBrand: {
+      fontSize: '0.9rem',
+      color: '#7C2A62',
+      marginBottom: '10px',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      width: '100%',
+    },
+    featuredDescription: {
+      fontSize: '0.9rem',
+      color: '#666',
+      marginBottom: '15px',
+      lineHeight: '1.4',
+      textAlign: 'center',
+      width: '100%',
+      flexGrow: 1,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    featuredPrice: {
+      fontSize: '1.3rem',
+      fontWeight: 'bold',
+      color: '#7C2A62',
+      textAlign: 'center',
+      width: '100%',
+      marginTop: 'auto',
+    },
+    // Healthcare Information Section - OPTIMIZED
+    healthcareInfoSection: {
+      backgroundColor: 'white',
+      borderRadius: '20px',
+      padding: '40px 35px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      marginBottom: '40px',
+      width: '100%',
+      boxSizing: 'border-box',
+    },
+    infoTitle: {
+      fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+      fontWeight: 'bold',
+      color: '#7C2A62',
+      marginBottom: '35px',
+      textAlign: 'center',
+    },
+    infoGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+      gap: '30px',
+      width: '100%',
+    },
+    infoCard: {
+      backgroundColor: '#f8f9fa',
+      borderRadius: '15px',
+      padding: '30px 25px',
+      border: '1px solid #e0e0e0',
+      height: '100%',
+      width: '100%',
+      boxSizing: 'border-box',
+      minHeight: '320px',
+    },
+    infoCardTitle: {
+      fontSize: '1.4rem',
+      fontWeight: 'bold',
+      color: '#7C2A62',
+      marginBottom: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+    },
+    infoCardContent: {
+      fontSize: '1rem',
+      color: '#555',
+      lineHeight: '1.6',
+    },
+    infoList: {
+      paddingLeft: '20px',
+      margin: '15px 0',
+    },
+    infoListItem: {
+      marginBottom: '8px',
+      lineHeight: '1.5',
+      fontSize: '1rem',
+    },
+    highlightText: {
+      color: '#7C2A62',
+      fontWeight: '600',
+    }
+  };
+
+  // Featured Products Section Component with Fixed Alignment
+  const FeaturedProductsSection = () => (
+    <section style={dashboardStyles.featuredSection}>
+      <h2 style={dashboardStyles.sectionTitle}>Featured Medicines 💊</h2>
+      <p style={dashboardStyles.sectionSubtitle}>Popular and essential medicines for your health needs</p>
+      
+      <div style={dashboardStyles.featuredGrid}>
+        {[
+          {
+            id: 1,
+            name: 'Aspirin 75mg',
+            brand: 'Bayer',
+            price: 25,
+            description: 'Low-dose aspirin for heart health and blood thinning',
+            image: '💊'
+          },
+          {
+            id: 2,
+            name: 'Paracetamol 500mg',
+            brand: 'Crocin',
+            price: 30,
+            description: 'Effective relief from fever and mild to moderate pain',
+            image: '🌡️'
+          },
+          {
+            id: 4,
+            name: 'Vitamin C 1000mg',
+            brand: 'NatureMade',
+            price: 40,
+            description: 'Immune system support and antioxidant protection',
+            image: '🍊'
+          },
+          {
+            id: 6,
+            name: 'BP Monitor',
+            brand: 'Omron',
+            price: 899,
+            description: 'Digital automatic blood pressure monitoring device',
+            image: '🩺'
+          }
+        ].map(product => (
+          <div 
+            key={product.id} 
+            style={dashboardStyles.featuredCard}
+            onClick={() => handleNavigation('products')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            }}
+          >
+            <div style={dashboardStyles.featuredImage}>
+              {product.image}
+            </div>
+            <div style={dashboardStyles.featuredInfo}>
+              <h4 style={dashboardStyles.featuredName}>{product.name}</h4>
+              <p style={dashboardStyles.featuredBrand}>{product.brand}</p>
+              <p style={dashboardStyles.featuredDescription}>{product.description}</p>
+              <div style={dashboardStyles.featuredPrice}>₹{product.price}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  // Dashboard View Component - OPTIMIZED
   const DashboardView = () => (
-    <div style={styles.mainContent}>
-      <section style={styles.welcomeSection}>
-        <h2 style={styles.welcomeTitle}>
-          Welcome back, {userProfile.fullName || 'User'}! 👋
+    <div style={dashboardStyles.mainContent}>
+      {/* Welcome Section */}
+      <section style={dashboardStyles.welcomeSection}>
+        <h2 style={dashboardStyles.welcomeTitle}>
+          Welcome back, {profile?.fullName || 'User'}! 👋
         </h2>
-        <p style={styles.welcomeSubtitle}>
-          How can we help you today?
+        <p style={dashboardStyles.welcomeSubtitle}>
+          Your health is our priority. Access quality healthcare services instantly with QuickMed's comprehensive platform.
         </p>
       </section>
 
-      <section style={styles.servicesSection}>
-        <div style={styles.serviceGrid}>
+      {/* Services Section */}
+      <section style={dashboardStyles.servicesSection}>
+        <div style={dashboardStyles.serviceGrid}>
           <div 
-            style={styles.serviceCard}
-            onClick={() => setActiveView('medicine')}
+            style={dashboardStyles.serviceCard}
+            onClick={() => handleNavigation('medicine')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            }}
           >
-            <div style={styles.serviceIcon}>💊</div>
-            <h3 style={styles.serviceTitle}>Medicine Delivery</h3>
-            <p style={styles.serviceDescription}>
-              Get your prescribed medicines delivered to your doorstep within hours
+            <div style={dashboardStyles.serviceIcon}>💊</div>
+            <h3 style={dashboardStyles.serviceTitle}>Medicine Delivery</h3>
+            <p style={dashboardStyles.serviceDescription}>
+              Get prescribed medicines delivered within 2 hours. Upload prescriptions for quick verification and enjoy fast, reliable service.
             </p>
-            <button style={styles.serviceButton} type="button">
-              Order Now
+            <button 
+              style={dashboardStyles.serviceButton} 
+              type="button"
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#6a2460'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#7C2A62'}
+            >
+              Order Medicines
             </button>
           </div>
 
           <div 
-            style={styles.serviceCard}
-            onClick={() => setActiveView('consultation')}
+            style={dashboardStyles.serviceCard}
+            onClick={() => handleNavigation('consultation')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            }}
           >
-            <div style={styles.serviceIcon}>👨‍⚕️</div>
-            <h3 style={styles.serviceTitle}>Doctor Consultation</h3>
-            <p style={styles.serviceDescription}>
-              Connect with certified doctors online for quick consultations
+            <div style={dashboardStyles.serviceIcon}>👨‍⚕️</div>
+            <h3 style={dashboardStyles.serviceTitle}>Doctor Consultation</h3>
+            <p style={dashboardStyles.serviceDescription}>
+              Connect with certified doctors online for video consultations. Available 24/7 for all your healthcare needs.
             </p>
-            <button style={styles.serviceButton} type="button">
-              Book Consultation
+            <button 
+              style={dashboardStyles.serviceButton} 
+              type="button"
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#6a2460'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#7C2A62'}
+            >
+              Consult Doctors
             </button>
+          </div>
+
+          <div 
+            style={dashboardStyles.serviceCard}
+            onClick={() => handleNavigation('products')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            }}
+          >
+            <div style={dashboardStyles.serviceIcon}>📚</div>
+            <h3 style={dashboardStyles.serviceTitle}>Product Catalog</h3>
+            <p style={dashboardStyles.serviceDescription}>
+              Browse complete medicine catalog with detailed information, health guides, and expert recommendations.
+            </p>
+            <button 
+              style={dashboardStyles.serviceButton} 
+              type="button"
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#6a2460'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#7C2A62'}
+            >
+              Browse Products
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products Section - USING FIXED COMPONENT */}
+      <FeaturedProductsSection />
+
+      {/* Healthcare Information Section */}
+      <section style={dashboardStyles.healthcareInfoSection}>
+        <h2 style={dashboardStyles.infoTitle}>Healthcare Information & Guidelines</h2>
+        
+        <div style={dashboardStyles.infoGrid}>
+          {/* QuickMed Services Info */}
+          <div style={dashboardStyles.infoCard}>
+            <h3 style={dashboardStyles.infoCardTitle}>
+              <span>🏥</span> About QuickMed Services
+            </h3>
+            <div style={dashboardStyles.infoCardContent}>
+              <p>
+                <span style={dashboardStyles.highlightText}>QuickMed</span> is your comprehensive digital healthcare platform offering:
+              </p>
+              <ul style={dashboardStyles.infoList}>
+                <li style={dashboardStyles.infoListItem}><strong>Instant Medicine Delivery:</strong> Within 2 hours at your doorstep</li>
+                <li style={dashboardStyles.infoListItem}><strong>Online Doctor Consultations:</strong> 24/7 access to certified professionals</li>
+                <li style={dashboardStyles.infoListItem}><strong>Digital Prescription Management:</strong> Secure storage and easy access</li>
+                <li style={dashboardStyles.infoListItem}><strong>Live Order Tracking:</strong> Real-time updates on your deliveries</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Medicine Safety Guidelines */}
+          <div style={dashboardStyles.infoCard}>
+            <h3 style={dashboardStyles.infoCardTitle}>
+              <span>💊</span> Medicine Safety Guidelines
+            </h3>
+            <div style={dashboardStyles.infoCardContent}>
+              <p>Your safety is our priority. Follow these guidelines:</p>
+              <ul style={dashboardStyles.infoList}>
+                <li style={dashboardStyles.infoListItem}>Always follow prescription instructions carefully</li>
+                <li style={dashboardStyles.infoListItem}>Check expiry dates before consumption</li>
+                <li style={dashboardStyles.infoListItem}>Store medicines in proper conditions</li>
+                <li style={dashboardStyles.infoListItem}>Avoid self-medication without consultation</li>
+                <li style={dashboardStyles.infoListItem}>Read dosage instructions thoroughly</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Doctor Consultation Benefits */}
+          <div style={dashboardStyles.infoCard}>
+            <h3 style={dashboardStyles.infoCardTitle}>
+              <span>👨‍⚕️</span> Online Consultation Benefits
+            </h3>
+            <div style={dashboardStyles.infoCardContent}>
+              <p>Advantages of telemedicine include:</p>
+              <ul style={dashboardStyles.infoList}>
+                <li style={dashboardStyles.infoListItem}>Time-saving with no travel required</li>
+                <li style={dashboardStyles.infoListItem}>Access specialists from anywhere</li>
+                <li style={dashboardStyles.infoListItem}>Private and confidential consultations</li>
+                <li style={dashboardStyles.infoListItem}>Easy follow-up appointments</li>
+                <li style={dashboardStyles.infoListItem}>Digital medical records access</li>
+                <li style={dashboardStyles.infoListItem}>Cost-effective healthcare services</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Emergency Preparedness */}
+          <div style={dashboardStyles.infoCard}>
+            <h3 style={dashboardStyles.infoCardTitle}>
+              <span>🚨</span> Emergency Preparedness
+            </h3>
+            <div style={dashboardStyles.infoCardContent}>
+              <p>For medical emergencies, remember:</p>
+              <ul style={dashboardStyles.infoList}>
+                <li style={dashboardStyles.infoListItem}>Contact emergency services immediately (108)</li>
+                <li style={dashboardStyles.infoListItem}>Maintain a well-stocked first aid kit</li>
+                <li style={dashboardStyles.infoListItem}>Keep emergency medical contacts ready</li>
+                <li style={dashboardStyles.infoListItem}>Have medical records easily accessible</li>
+                <li style={dashboardStyles.infoListItem}>Know your allergies and medical conditions</li>
+              </ul>
+              <p style={{marginTop: '15px', fontWeight: '600'}}>
+                <strong>Note:</strong> Online consultations are for non-emergency medical issues only.
+              </p>
+            </div>
           </div>
         </div>
       </section>
     </div>
   );
 
+  // Main container style - OPTIMIZED
+  const containerStyle = {
+    minHeight: '100vh',
+    backgroundColor: '#f8f9fa',
+    overflowX: 'hidden',
+    position: 'relative',
+    width: '100%',
+    margin: 0,
+    padding: 0,
+  };
+
   return (
-    <div style={styles.container}>
+    <div style={containerStyle}>
       <Header
         activeView={activeView}
-        setActiveView={setActiveView}
+        setActiveView={handleNavigation}
         cart={cart}
-        // REMOVED: showNotifications, setShowNotifications, toggleNotifications props
         notifications={notifications}
         markAsRead={markAsRead}
         markAllAsRead={markAllAsRead}
         getUnreadCount={getUnreadCount}
-        // ADDED: handleNotificationsClick for navigation
         handleNotificationsClick={handleNotificationsClick}
         toggleProfileDropdown={toggleProfileDropdown}
         showProfileDropdown={showProfileDropdown}
         setShowProfileDropdown={setShowProfileDropdown}
         handleLogoutClick={handleLogoutClick}
-        toggleChatbot={toggleChatbot}
+        notificationRef={notificationRef}
+        profileRef={profileRef}
+        profilePhotoInputRef={profilePhotoInputRef}
+        handleProfilePhotoUpload={handleProfilePhotoUpload}
+        triggerProfilePhotoUpload={triggerProfilePhotoUpload}
+        profile={profile}
+      />
+
+      {/* Notifications Popup */}
+      <NotificationsPage
+        showNotifications={showNotifications}
+        notifications={notifications}
+        onClose={handleCloseNotifications}
+        onViewAll={handleViewAllNotifications}
+      />
+
+      {/* Full Notifications Page */}
+      {showFullNotifications && (
+        <FullNotificationsPage
+          notifications={notifications}
+          onBack={handleCloseFullNotifications}
+          markAsRead={markAsRead}
+          markAllAsRead={markAllAsRead}
+        />
+      )}
+
+      {/* AI Chatbot Widget */}
+      <AIChatbotWidget
         showChatbot={showChatbot}
+        toggleChatbot={toggleChatbot}
         chatMessages={chatMessages}
         userMessage={userMessage}
         handleUserMessage={handleUserMessage}
@@ -1244,17 +1594,10 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         handleKeyPress={handleKeyPress}
         chatInputRef={chatInputRef}
         chatMessagesEndRef={chatMessagesEndRef}
-        chatRef={chatRef}
-        notificationRef={notificationRef}
-        profileRef={profileRef}
-        profilePhotoInputRef={profilePhotoInputRef}
-        handleProfilePhotoUpload={handleProfilePhotoUpload}
-        triggerProfilePhotoUpload={triggerProfilePhotoUpload}
       />
 
-      {/* Single Modals component with all props */}
+      {/* Single Modals component */}
       <Modals
-        // Modal visibility states
         showProfilePhotoModal={showProfilePhotoModal}
         showDoctorChat={showDoctorChat}
         showCheckoutConfirm={showCheckoutConfirm}
@@ -1262,8 +1605,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         showLogoutConfirm={showLogoutConfirm}
         showPharmacyStore={showPharmacyStore}
         showAppointmentDetails={showAppointmentDetails}
-        
-        // Modal data
         activeDoctorChat={activeDoctorChat}
         doctorChats={doctorChats}
         selectedPharmacy={selectedPharmacy}
@@ -1274,8 +1615,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         profilePhotoPreview={profilePhotoPreview}
         profile={profile}
         cart={cart}
-        
-        // Functions
         getTotalPrice={getTotalPrice}
         paymentLoading={paymentLoading}
         getFilteredPharmacyMedicines={getFilteredPharmacyMedicines}
@@ -1293,8 +1632,6 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         handleProfilePhotoSubmit={handleProfilePhotoSubmit}
         removeProfilePhoto={removeProfilePhoto}
         handleProfilePhotoUpload={handleProfilePhotoUpload}
-        
-        // Setter functions
         setShowProfilePhotoModal={setShowProfilePhotoModal}
         setShowDoctorChat={setShowDoctorChat}
         setShowCheckoutConfirm={setShowCheckoutConfirm}
@@ -1302,26 +1639,25 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         setShowLogoutConfirm={setShowLogoutConfirm}
         setShowPharmacyStore={setShowPharmacyStore}
         setShowAppointmentDetails={setShowAppointmentDetails}
-        setActiveView={setActiveView}
+        setActiveView={handleNavigation}
       />
 
-      {/* Main Content Views - ADD NotificationsPage */}
+      {/* Main Content Views */}
       {activeView === 'dashboard' && <DashboardView />}
       {activeView === 'notifications' && (
-        <NotificationsPage
+        <FullNotificationsPage
           notifications={notifications}
+          onBack={() => handleNavigation('dashboard')}
           markAsRead={markAsRead}
           markAllAsRead={markAllAsRead}
-          getUnreadCount={getUnreadCount}
-          setActiveView={setActiveView}
         />
       )}
       {activeView === 'profile' && (
         <ProfileView
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
           triggerProfilePhotoUpload={triggerProfilePhotoUpload}
           removeProfilePhoto={removeProfilePhoto}
-          userProfile={userProfile}
+          userProfile={profile}
           updateProfile={updateProfile}
         />
       )}
@@ -1329,7 +1665,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         <AppointmentsView
           appointments={appointments}
           filteredAppointments={filteredAppointments}
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
           rescheduleAppointment={rescheduleAppointment}
           cancelAppointment={cancelAppointment}
           viewAppointmentDetails={viewAppointmentDetails}
@@ -1341,7 +1677,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         <OrdersView
           orders={orders}
           filteredOrders={filteredOrders}
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
           startLiveTracking={startLiveTracking}
           orderFilter={orderFilter}
           setOrderFilter={setOrderFilter}
@@ -1359,13 +1695,25 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
           pharmacies={pharmacies}
           viewPharmacyStore={viewPharmacyStore}
           handlePrescriptionUpload={handlePrescriptionUpload}
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
+        />
+      )}
+      {activeView === 'products' && (
+        <Products
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          medicines={medicines}
+          filteredMedicines={filteredMedicines}
+          cart={cart}
+          addToCart={addToCart}
+          updateQuantity={updateQuantity}
+          setActiveView={handleNavigation}
         />
       )}
       {activeView === 'cart' && (
         <CartView
           cart={cart}
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
           updateQuantity={updateQuantity}
           removeFromCart={removeFromCart}
           getTotalPrice={getTotalPrice}
@@ -1385,7 +1733,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
           setSelectedTimeSlot={setSelectedTimeSlot}
           specialties={specialties}
           allTimeSlots={allTimeSlots}
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
           handleBookAppointment={handleBookAppointment}
           startDoctorChat={startDoctorChat}
         />
@@ -1394,7 +1742,7 @@ const UserDashboardContent = ({ user, onLogout, onNavigate }) => {
         <LiveTrackingView
           trackingOrder={trackingOrder}
           deliveryPartner={deliveryPartner}
-          setActiveView={setActiveView}
+          setActiveView={handleNavigation}
           callDeliveryPartner={callDeliveryPartner}
           getDeliveryProgress={getDeliveryProgress}
           getDeliveryStatusText={getDeliveryStatusText}

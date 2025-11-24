@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { styles } from './Styles';
+import React, { useState, useMemo, useEffect } from 'react';
 
 const OrdersView = ({
   orders,
@@ -8,205 +7,929 @@ const OrdersView = ({
   setActiveView,
   startLiveTracking
 }) => {
-  const [hoveredTab, setHoveredTab] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [dateFilter, setDateFilter] = useState('recent');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  // Update current time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleBackToDashboard = () => {
+    setActiveView('dashboard');
+  };
+
+  const handleShopMedicines = () => {
+    setActiveView('medicine');
+  };
+
+  // Filter orders based on selected filters
+  const filteredOrders = useMemo(() => {
+    if (!orders || orders.length === 0) return [];
+    
+    let filtered = orders;
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => {
+        switch (statusFilter) {
+          case 'delivered':
+            return order.status === 'Delivered';
+          case 'cancelled':
+            return order.status === 'Cancelled';
+          case 'returned':
+            return order.status === 'Returned';
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Date filter
+    const now = new Date();
+    filtered = filtered.filter(order => {
+      const orderDate = new Date(order.date);
+      switch (dateFilter) {
+        case 'recent':
+          return (now - orderDate) <= 7 * 24 * 60 * 60 * 1000; // Last 7 days
+        case '30days':
+          return (now - orderDate) <= 30 * 24 * 60 * 60 * 1000; // Last 30 days
+        case '6months':
+          return (now - orderDate) <= 6 * 30 * 24 * 60 * 60 * 1000; // Last 6 months
+        default:
+            return true;
+      }
+    });
+
+    return filtered;
+  }, [orders, statusFilter, dateFilter]);
+
+  // Get status color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Delivered': return '#4CAF50';
+      case 'Cancelled': return '#F44336';
+      case 'Returned': return '#FF9800';
+      case 'In Transit': return '#2196F3';
+      case 'On the Way': return '#2196F3';
+      case 'Confirmed': return '#9C27B0';
+      case 'Pending': return '#FFC107';
+      default: return '#9E9E9E';
+    }
+  };
+
+  // Get status icon
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Delivered': return '✅';
+      case 'Cancelled': return '❌';
+      case 'Returned': return '🔄';
+      case 'In Transit': return '🚚';
+      case 'On the Way': return '🛵';
+      case 'Confirmed': return '📦';
+      case 'Pending': return '⏳';
+      default: return '📋';
+    }
+  };
+
+  // Get vendor information
+  const getVendorInfo = (vendorId) => {
+    const vendors = {
+      'MEDSTORE_001': {
+        name: 'MedPlus Mart',
+        address: '123 Healthcare Street, Medical Complex',
+        rating: '4.5',
+        deliveryTime: '30-45 mins',
+        contact: '+91-9876543210',
+        license: 'DL-12345-MUM'
+      },
+      'APOLLO_002': {
+        name: 'Apollo Pharmacy',
+        address: '456 Wellness Road, Health District',
+        rating: '4.7',
+        deliveryTime: '25-40 mins',
+        contact: '+91-9876543211',
+        license: 'DL-12346-MUM'
+      },
+      'PHARMACY_003': {
+        name: 'Wellness Forever',
+        address: '789 Cure Lane, Treatment Area',
+        rating: '4.3',
+        deliveryTime: '35-50 mins',
+        contact: '+91-9876543212',
+        license: 'DL-12347-MUM'
+      },
+      'QUICKMED_004': {
+        name: 'QuickMed Express',
+        address: '321 Fast Track, Delivery Zone',
+        rating: '4.8',
+        deliveryTime: '15-30 mins',
+        contact: '+91-9876543213',
+        license: 'DL-12348-MUM'
+      }
+    };
+    return vendors[vendorId] || {
+      name: 'Local Pharmacy',
+      address: 'Nearby location',
+      rating: '4.0',
+      deliveryTime: '40-60 mins',
+    };
+  };
+
+  // Get order timeline
+  const getOrderTimeline = (order) => {
+    const timeline = [
+      {
+        status: 'Order Placed',
+        timestamp: new Date(order.date),
+        icon: '🛒',
+        completed: true
+      },
+      {
+        status: 'Vendor Confirmed',
+        timestamp: new Date(new Date(order.date).getTime() + 5 * 60000),
+        icon: '🏪',
+        completed: order.status !== 'Pending'
+      },
+      {
+        status: 'Medicine Packed',
+        timestamp: new Date(new Date(order.date).getTime() + 10 * 60000),
+        icon: '📦',
+        completed: order.status === 'On the Way' || order.status === 'In Transit' || order.status === 'Delivered'
+      },
+      {
+        status: 'Out for Delivery',
+        timestamp: new Date(new Date(order.date).getTime() + 15 * 60000),
+        icon: '🛵',
+        completed: order.status === 'In Transit' || order.status === 'Delivered'
+      },
+      {
+        status: 'Delivered',
+        timestamp: order.status === 'Delivered' ? new Date(new Date(order.date).getTime() + 45 * 60000) : null,
+        icon: '✅',
+        completed: order.status === 'Delivered'
+      }
+    ];
+    return timeline;
+  };
+
+  // Filter option styles
+  const getFilterOptionStyle = (isSelected) => ({
+    padding: '0.6rem 0.8rem',
+    backgroundColor: isSelected ? '#7C2A62' : 'white',
+    color: isSelected ? 'white' : '#7C2A62',
+    border: `2px solid ${isSelected ? '#7C2A62' : '#F7D9EB'}`,
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    textAlign: 'left',
+    marginBottom: '0.4rem',
+  });
 
   const BackButton = ({ onClick, text = 'Back' }) => (
     <button 
-      style={styles.backButton}
+      style={{
+        padding: '0.5rem 1rem',
+        backgroundColor: 'transparent',
+        color: '#7C2A62',
+        border: '1px solid #7C2A62',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        transition: 'all 0.3s ease',
+        marginBottom: '1rem',
+      }}
       onClick={onClick}
       type="button"
+      onMouseEnter={(e) => {
+        e.target.style.backgroundColor = '#7C2A62';
+        e.target.style.color = 'white';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.backgroundColor = 'transparent';
+        e.target.style.color = '#7C2A62';
+      }}
     >
       ← {text}
     </button>
   );
 
-  // Enhanced filter tab handler
-  const handleFilterClick = (filterType) => {
-    setOrderFilter(filterType);
-    console.log(`Filter activated: ${filterType}`);
+  // Common section container style
+  const sectionContainerStyle = {
+    backgroundColor: '#f8f5ff',
+    borderRadius: '15px',
+    padding: '1.5rem',
+    border: '2px solid #F7D9EB',
+    marginBottom: '2rem',
+    boxShadow: '0 4px 15px rgba(124, 42, 98, 0.1)',
   };
 
-  // Helper function to get tab styles with hover and active states
-  const getTabStyle = (filterType) => {
-    const isActive = orderFilter === filterType;
-    const isHovered = hoveredTab === filterType;
-    
-    let style = { ...styles.filterTab };
-    
-    if (isActive) {
-      style = { ...style, ...styles.activeFilterTab };
-    }
-    
-    if (isHovered && !isActive) {
-      style = { ...style, ...styles.filterTabHover };
-    }
-    
-    return style;
+  // Common section header style
+  const sectionHeaderStyle = {
+    color: '#7C2A62',
+    margin: '0 0 1rem 0',
+    fontSize: '1.3rem',
+    fontWeight: '800',
+    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
   };
 
-  // Filter types configuration
-  const filterTypes = [
-    { key: 'all', label: 'All Orders' },
-    { key: 'delivered', label: 'Delivered' },
-    { key: 'in-transit', label: 'In Transit' },
-    { key: 'pending', label: 'Pending' }
-  ];
+  // Common content box style
+  const contentBoxStyle = {
+    backgroundColor: 'white',
+    padding: '1.2rem',
+    borderRadius: '10px',
+    border: '1px solid #F7D9EB',
+  };
 
-  // Filter orders based on selected filter
-  const filteredOrders = useMemo(() => {
-    if (!orders || orders.length === 0) return [];
-    
-    switch (orderFilter) {
-      case 'delivered':
-        return orders.filter(order => 
-          order.status === 'Delivered' || 
-          order.status.toLowerCase().includes('delivered')
-        );
-      
-      case 'in-transit':
-        return orders.filter(order => 
-          order.status === 'In Transit' || 
-          order.status === 'On the Way' ||
-          order.status.toLowerCase().includes('transit') ||
-          order.status.toLowerCase().includes('shipped')
-        );
-      
-      case 'pending':
-        return orders.filter(order => 
-          order.status === 'Pending' || 
-          order.status === 'Confirmed' ||
-          order.status.toLowerCase().includes('pending') ||
-          order.status.toLowerCase().includes('confirmed')
-        );
-      
-      case 'all':
-      default:
-        return orders;
-    }
-  }, [orders, orderFilter]);
-
-  // Get display text for empty state
-  const getEmptyStateText = () => {
-    switch (orderFilter) {
-      case 'delivered':
-        return 'No delivered orders';
-      case 'in-transit':
-        return 'No orders in transit';
-      case 'pending':
-        return 'No pending orders';
-      case 'all':
-      default:
-        return 'No orders yet';
-    }
+  // Common subheader style
+  const subheaderStyle = {
+    color: '#7C2A62',
+    margin: '0 0 0.8rem 0',
+    fontSize: '1rem',
+    fontWeight: '700',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
   };
 
   return (
-    <div style={styles.ordersContainer}>
-      <div style={styles.pageHeader}>
-        <BackButton onClick={() => setActiveView('dashboard')} text="" />
-        <h2 style={styles.sectionTitle}>My Orders</h2>
-      </div>
-      
-      {/* Enhanced Orders Filter Tabs */}
-      <div style={styles.filterTabs}>
-        {filterTypes.map((filter) => (
-          <button
-            key={filter.key}
-            style={getTabStyle(filter.key)}
-            onClick={() => handleFilterClick(filter.key)}
-            onMouseEnter={() => setHoveredTab(filter.key)}
-            onMouseLeave={() => setHoveredTab(null)}
-            onFocus={() => setHoveredTab(filter.key)}
-            onBlur={() => setHoveredTab(null)}
-            type="button"
-            aria-pressed={orderFilter === filter.key}
-          >
-            {filter.label}
-          </button>
-        ))}
-      </div>
-      
-      {/* Show filtered orders or empty state */}
-      {filteredOrders.length === 0 ? (
-        <div style={styles.noOrders}>
-          <p style={styles.noOrdersText}>
-            {getEmptyStateText()}
-          </p>
-          <button 
-            style={styles.shopNowButton}
-            onClick={() => setActiveView('medicine')}
-            type="button"
-          >
-            Shop Now
-          </button>
+    <div style={{
+      marginTop: '120px',
+      padding: '1.5rem',
+      maxWidth: '1400px',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      minHeight: '80vh',
+    }}>
+      {/* Header Section with Back Button on Left */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '2rem',
+        marginBottom: '2rem',
+      }}>
+        {/* Back Button - Left Side */}
+        <div style={{
+          flexShrink: 0,
+        }}>
+          <BackButton onClick={handleBackToDashboard} text="Dashboard" />
         </div>
-      ) : (
-        <div style={styles.ordersList}>
-          {/* Show filter indicator */}
-          {orderFilter !== 'all' && (
-            <div style={styles.filterIndicator}>
-              Showing {filteredOrders.length} {orderFilter} order{filteredOrders.length !== 1 ? 's' : ''}
-            </div>
-          )}
+
+        {/* Main Header Content */}
+        <div style={{
+          flex: 1,
+          textAlign: 'center',
+        }}>
+          <h2 style={{
+            color: '#7C2A62',
+            fontSize: '2.2rem',
+            margin: '0 0 0.5rem 0',
+            fontWeight: '800',
+            background: 'linear-gradient(135deg, #7C2A62, #E91E63)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>Order History</h2>
+          <p style={{
+            color: '#666',
+            fontSize: '1rem',
+            textAlign: 'center',
+            maxWidth: '600px',
+            margin: '0 auto',
+          }}>
+            Track your medicine orders from vendors and view your complete purchase history
+          </p>
+        </div>
+
+        {/* Empty div for balance */}
+        <div style={{ width: '100px' }}></div>
+      </div>
+
+      {/* Safety Precautions Section */}
+      <div style={sectionContainerStyle}>
+        <h3 style={sectionHeaderStyle}>
+          🛡️ Safety & Quality Assurance
+        </h3>
+        
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '1.5rem',
+        }}>
+          {/* Vendor Precautions */}
+          <div style={contentBoxStyle}>
+            <h4 style={subheaderStyle}>
+              🏪 Vendor Precautions
+            </h4>
+            <ul style={{
+              margin: 0,
+              paddingLeft: '1.2rem',
+              color: '#666',
+              fontSize: '0.85rem',
+              lineHeight: '1.6',
+            }}>
+              <li><strong>Authentic Medicines:</strong> All medicines sourced from licensed distributors with proper batch verification</li>
+              <li><strong>Temperature Control:</strong> Storage facilities maintain optimal temperature for medicine preservation</li>
+              <li><strong>Expiry Monitoring:</strong> Regular checks to ensure no expired medicines are dispensed</li>
+              <li><strong>Quality Checks:</strong> Every order undergoes multiple quality verification steps</li>
+              <li><strong>Prescription Validation:</strong> Strict verification of prescriptions for scheduled drugs</li>
+              <li><strong>Hygiene Standards:</strong> Regular sanitization of packing areas and equipment</li>
+            </ul>
+          </div>
+
+          {/* Delivery Agent Precautions */}
+          <div style={contentBoxStyle}>
+            <h4 style={subheaderStyle}>
+              🛵 Delivery Agent Precautions
+            </h4>
+            <ul style={{
+              margin: 0,
+              paddingLeft: '1.2rem',
+              color: '#666',
+              fontSize: '0.85rem',
+              lineHeight: '1.6',
+            }}>
+              <li><strong>Contactless Delivery:</strong> Zero-contact delivery options available for all orders</li>
+              <li><strong>Sanitization:</strong> Regular hand sanitization and use of masks during deliveries</li>
+              <li><strong>Temperature Maintenance:</strong> Insulated bags used for temperature-sensitive medicines</li>
+              <li><strong>Secure Packaging:</strong> Tamper-evident packaging to ensure medicine integrity</li>
+              <li><strong>Training:</strong> Specialized training in handling medical products safely</li>
+              <li><strong>Real-time Tracking:</strong> Live GPS tracking for transparency and safety</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Additional Safety Notes */}
+        <div style={{
+          marginTop: '1rem',
+          padding: '1rem',
+          backgroundColor: '#E8F5E8',
+          borderRadius: '8px',
+          border: '1px solid #4CAF50',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            color: '#2E7D32',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+          }}>
+            💡 <strong>Important:</strong> Always verify medicine packaging, check expiry dates, and consult your doctor before consuming any new medication.
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Section */}
+      <div style={sectionContainerStyle}>
+        <h3 style={sectionHeaderStyle}>
+          📋 Your Orders
+        </h3>
+        
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '280px 1fr',
+          gap: '2rem',
+        }}>
           
-          {filteredOrders.map(order => (
-            <div key={order.id} style={styles.orderCard}>
-              <div style={styles.orderHeader}>
-                <div>
-                  <h3 style={styles.orderId}>Order #{order.id}</h3>
-                  <p style={styles.orderDate}>Placed on {order.date}</p>
-                  {order.paymentId && (
-                    <p style={styles.paymentId}>Payment ID: {order.paymentId}</p>
-                  )}
-                </div>
-                <div style={styles.orderStatus}>
-                  <span style={{
-                    ...styles.statusBadge,
-                    backgroundColor: 
-                      order.status === 'Delivered' ? '#4CAF50' :
-                      order.status === 'In Transit' ? '#FF9800' :
-                      order.status === 'On the Way' ? '#2196F3' :
-                      order.status === 'Confirmed' ? '#9C27B0' :
-                      order.status === 'Pending' ? '#FFC107' : '#9E9E9E'
-                  }}>
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-              
-              <div style={styles.orderItems}>
-                {order.items.map((item, index) => (
-                  <div key={index} style={styles.orderItem}>
-                    <span style={styles.itemName}>{item.name}</span>
-                    <span style={styles.itemQuantity}>Qty: {item.quantity}</span>
-                    <span style={styles.itemPrice}>₹{item.price * item.quantity}</span>
-                  </div>
+          {/* Filters Sidebar - Compact Version */}
+          <div style={{
+            ...contentBoxStyle,
+            padding: '1rem',
+            height: 'fit-content',
+          }}>
+            <h4 style={{
+              ...subheaderStyle,
+              fontSize: '0.95rem',
+              marginBottom: '1rem',
+            }}>
+               Filters
+            </h4>
+
+            {/* Order Status Filter */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h5 style={{
+                color: '#7C2A62',
+                margin: '0 0 0.8rem 0',
+                fontSize: '0.9rem',
+                fontWeight: '700',
+              }}>
+                Order Status
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {[
+                  { key: 'all', label: 'All Status', count: orders?.length || 0 },
+                  { key: 'delivered', label: 'Delivered', count: orders?.filter(o => o.status === 'Delivered').length || 0 },
+                  { key: 'cancelled', label: 'Cancelled', count: orders?.filter(o => o.status === 'Cancelled').length || 0 },
+                  { key: 'returned', label: 'Returned', count: orders?.filter(o => o.status === 'Returned').length || 0 }
+                ].map((filter) => (
+                  <button
+                    key={filter.key}
+                    style={getFilterOptionStyle(statusFilter === filter.key)}
+                    onClick={() => setStatusFilter(filter.key)}
+                    type="button"
+                  >
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                    }}>
+                      <span style={{ fontSize: '0.8rem' }}>{filter.label}</span>
+                      <span style={{
+                        backgroundColor: statusFilter === filter.key ? 'rgba(255,255,255,0.3)' : '#F7D9EB',
+                        color: statusFilter === filter.key ? 'white' : '#7C2A62',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '10px',
+                        fontSize: '0.7rem',
+                        fontWeight: '600',
+                        minWidth: '25px',
+                        textAlign: 'center',
+                      }}>
+                        {filter.count}
+                      </span>
+                    </div>
+                  </button>
                 ))}
               </div>
-              
-              <div style={styles.orderFooter}>
-                <div style={styles.orderAddress}>
-                  <strong>Delivery Address:</strong> {order.deliveryAddress}
-                </div>
-                <div style={styles.orderActions}>
-                  <div style={styles.orderTotal}>
-                    <strong>Total: ₹{order.total}</strong>
-                  </div>
-                  {order.trackingAvailable && (order.status === 'In Transit' || order.status === 'On the Way') && (
-                    <button 
-                      style={styles.trackButton}
-                      onClick={() => startLiveTracking(order)}
-                      type="button"
-                    >
-                      📍 Live Track
-                    </button>
-                  )}
+            </div>
+
+            {/* Order Date Filter */}
+            <div>
+              <h5 style={{
+                color: '#7C2A62',
+                margin: '0 0 0.8rem 0',
+                fontSize: '0.9rem',
+                fontWeight: '700',
+              }}>
+                Order Date
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {[
+                  { key: 'recent', label: 'Recent' },
+                  { key: '30days', label: 'Last 30 days' },
+                  { key: '6months', label: 'Last 6 months' }
+                ].map((filter) => (
+                  <button
+                    key={filter.key}
+                    style={getFilterOptionStyle(dateFilter === filter.key)}
+                    onClick={() => setDateFilter(filter.key)}
+                    type="button"
+                  >
+                    <span style={{ fontSize: '0.8rem' }}>{filter.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Orders Content */}
+          <div>
+            {/* Orders Count */}
+            <div style={{
+              ...contentBoxStyle,
+              marginBottom: '1.5rem',
+              padding: '1rem',
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <h4 style={{
+                  color: '#7C2A62',
+                  margin: 0,
+                  fontSize: '1.1rem',
+                  fontWeight: '700',
+                }}>
+                  {filteredOrders.length} Order{filteredOrders.length !== 1 ? 's' : ''} Found
+                </h4>
+                <div style={{
+                  fontSize: '0.8rem',
+                  color: '#666',
+                  backgroundColor: '#f8f5ff',
+                  padding: '0.3rem 0.7rem',
+                  borderRadius: '6px',
+                  border: '1px solid #F7D9EB',
+                }}>
+                  Updated: {currentTime.toLocaleTimeString()}
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Orders List or Empty State */}
+            {filteredOrders.length === 0 ? (
+              <div style={{
+                ...contentBoxStyle,
+                textAlign: 'center',
+                padding: '2.5rem 1.5rem',
+              }}>
+                <div style={{
+                  fontSize: '3.5rem',
+                  marginBottom: '1.2rem',
+                  opacity: 0.7,
+                }}>
+                  📦
+                </div>
+                <h4 style={{
+                  fontSize: '1.2rem',
+                  color: '#7C2A62',
+                  marginBottom: '0.8rem',
+                  fontWeight: '700',
+                }}>
+                  No Orders Found
+                </h4>
+                <p style={{
+                  fontSize: '0.9rem',
+                  color: '#888',
+                  marginBottom: '1.5rem',
+                  lineHeight: '1.6',
+                }}>
+                  {statusFilter !== 'all' || dateFilter !== 'recent' 
+                    ? 'Try changing your filters to see more orders'
+                    : 'Start your healthcare journey with QuickMed - Fast, reliable medicine delivery at your doorstep'
+                  }
+                </p>
+                <button 
+                  style={{
+                    padding: '0.8rem 1.5rem',
+                    backgroundColor: '#7C2A62',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '700',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 15px rgba(124, 42, 98, 0.3)',
+                  }}
+                  onClick={handleShopMedicines}
+                  type="button"
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#6a2460';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 20px rgba(124, 42, 98, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#7C2A62';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(124, 42, 98, 0.3)';
+                  }}
+                >
+                  🛍️ Continue Shopping
+                </button>
+              </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.2rem',
+              }}>
+                {filteredOrders.map(order => {
+                  const vendor = getVendorInfo(order.vendorId);
+                  const timeline = getOrderTimeline(order);
+                  
+                  return (
+                    <div key={order.id} style={{
+                      ...contentBoxStyle,
+                      transition: 'all 0.3s ease',
+                      padding: '1rem',
+                    }}>
+                      {/* Order Header with Vendor Info */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        marginBottom: '1.2rem',
+                      }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.8rem',
+                            marginBottom: '0.6rem',
+                          }}>
+                            <h4 style={{
+                              margin: 0,
+                              color: '#7C2A62',
+                              fontSize: '1rem',
+                              fontWeight: '800',
+                            }}>Order #{order.id}</h4>
+                            <span style={{
+                              padding: '0.3rem 0.8rem',
+                              borderRadius: '15px',
+                              color: 'white',
+                              fontSize: '0.7rem',
+                              fontWeight: '700',
+                              backgroundColor: getStatusColor(order.status),
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                            }}>
+                              {getStatusIcon(order.status)} {order.status}
+                            </span>
+                          </div>
+                          
+                          {/* Vendor Information */}
+                          <div style={{
+                            backgroundColor: '#f8f5ff',
+                            padding: '0.8rem',
+                            borderRadius: '6px',
+                            border: '1px solid #F7D9EB',
+                            marginBottom: '0.8rem',
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                            }}>
+                              <div>
+                                <h5 style={{
+                                  margin: '0 0 0.4rem 0',
+                                  color: '#7C2A62',
+                                  fontSize: '0.9rem',
+                                  fontWeight: '700',
+                                }}>
+                                  🏪 {vendor.name}
+                                </h5>
+                                <div style={{
+                                  fontSize: '0.75rem',
+                                  color: '#666',
+                                  marginBottom: '0.2rem',
+                                }}>
+                                  📍 {vendor.address}
+                                </div>
+                                <div style={{
+                                  fontSize: '0.75rem',
+                                  color: '#666',
+                                }}>
+                                  ⭐ {vendor.rating} • 🕒 {vendor.deliveryTime}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{
+                            display: 'flex',
+                            gap: '1.2rem',
+                            fontSize: '0.75rem',
+                            color: '#666',
+                            flexWrap: 'wrap',
+                          }}>
+                            <span>📅 {order.date}</span>
+                            <span>💰 ₹{order.total}</span>
+                            <span>💊 {order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Order Timeline */}
+                      <div style={{
+                        marginBottom: '1.2rem',
+                        padding: '0.8rem',
+                        backgroundColor: '#f8f5ff',
+                        borderRadius: '6px',
+                        border: '1px solid #F7D9EB',
+                      }}>
+                        <h5 style={{
+                          margin: '0 0 0.8rem 0',
+                          color: '#7C2A62',
+                          fontSize: '0.9rem',
+                          fontWeight: '700',
+                        }}>
+                          Order Journey
+                        </h5>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}>
+                          {timeline.map((step, index) => (
+                            <div key={index} style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              flex: 1,
+                              textAlign: 'center',
+                            }}>
+                              <div style={{
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '50%',
+                                backgroundColor: step.completed ? '#7C2A62' : '#E0E0E0',
+                                color: step.completed ? 'white' : '#999',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.9rem',
+                                marginBottom: '0.4rem',
+                                position: 'relative',
+                              }}>
+                                {step.icon}
+                                {index < timeline.length - 1 && (
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '100%',
+                                    width: 'calc(100% - 30px)',
+                                    height: '2px',
+                                    backgroundColor: step.completed ? '#7C2A62' : '#E0E0E0',
+                                    transform: 'translateY(-50%)',
+                                  }} />
+                                )}
+                              </div>
+                              <div style={{
+                                fontSize: '0.65rem',
+                                color: step.completed ? '#7C2A62' : '#999',
+                                fontWeight: '600',
+                              }}>
+                                {step.status}
+                              </div>
+                              {step.timestamp && (
+                                <div style={{
+                                  fontSize: '0.6rem',
+                                  color: '#888',
+                                  marginTop: '0.2rem',
+                                }}>
+                                  {step.timestamp.toLocaleTimeString('en-IN', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Order Items */}
+                      <div style={{
+                        marginBottom: '1rem',
+                      }}>
+                        <h5 style={{
+                          margin: '0 0 0.8rem 0',
+                          color: '#7C2A62',
+                          fontSize: '0.9rem',
+                          fontWeight: '700',
+                        }}>
+                          Medicines Ordered
+                        </h5>
+                        {order.items.map((item, index) => (
+                          <div key={index} style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '0.6rem',
+                            borderBottom: '1px solid #F7D9EB',
+                            backgroundColor: index % 2 === 0 ? 'white' : '#fafafa',
+                            borderRadius: '5px',
+                          }}>
+                            <div style={{ flex: 2 }}>
+                              <div style={{
+                                color: '#333',
+                                fontSize: '0.8rem',
+                                fontWeight: '600',
+                                marginBottom: '0.2rem',
+                              }}>
+                                💊 {item.name}
+                              </div>
+                              {item.prescriptionRequired && (
+                                <div style={{
+                                  fontSize: '0.65rem',
+                                  color: '#7C2A62',
+                                  backgroundColor: '#F7D9EB',
+                                  padding: '0.15rem 0.4rem',
+                                  borderRadius: '3px',
+                                  display: 'inline-block',
+                                }}>
+                                  📋 Prescription Required
+                                </div>
+                              )}
+                            </div>
+                            <div style={{
+                              display: 'flex',
+                              gap: '0.6rem',
+                              alignItems: 'center',
+                              flex: 1,
+                              justifyContent: 'flex-end',
+                            }}>
+                              <span style={{
+                                color: '#666',
+                                fontSize: '0.75rem',
+                                backgroundColor: '#f8f5ff',
+                                padding: '0.25rem 0.6rem',
+                                borderRadius: '5px',
+                              }}>
+                                Qty: {item.quantity}
+                              </span>
+                              <span style={{
+                                color: '#7C2A62',
+                                fontWeight: '700',
+                                fontSize: '0.8rem',
+                              }}>
+                                ₹{item.price * item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Order Footer */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingTop: '0.8rem',
+                        borderTop: '2px solid #F7D9EB',
+                      }}>
+                        <div style={{
+                          color: '#666',
+                          fontSize: '0.75rem',
+                          flex: 2,
+                          fontWeight: '500',
+                        }}>
+                          <strong>🏠 Delivery Address:</strong> {order.deliveryAddress}
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.6rem',
+                        }}>
+                          {(order.status === 'On the Way' || order.status === 'In Transit') && (
+                            <button 
+                              style={{
+                                padding: '0.4rem 0.8rem',
+                                backgroundColor: '#7C2A62',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                transition: 'all 0.3s ease',
+                              }}
+                              onClick={() => startLiveTracking(order)}
+                              type="button"
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#6a2460';
+                                e.target.style.transform = 'translateY(-2px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = '#7C2A62';
+                                e.target.style.transform = 'translateY(0)';
+                              }}
+                            >
+                              🗺️ Track
+                            </button>
+                          )}
+                          {order.status === 'Delivered' && (
+                            <button 
+                              style={{
+                                padding: '0.4rem 0.8rem',
+                                backgroundColor: 'white',
+                                color: '#7C2A62',
+                                border: '2px solid #7C2A62',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                transition: 'all 0.3s ease',
+                              }}
+                              onClick={() => {/* Handle reorder */}}
+                              type="button"
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#7C2A62';
+                                e.target.style.color = 'white';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'white';
+                                e.target.style.color = '#7C2A62';
+                              }}
+                            >
+                              🔄 Reorder
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

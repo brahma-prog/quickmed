@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useProfile } from './ProfileContext';
-import { styles } from './Styles';
 
 const Header = ({
   activeView,
@@ -16,125 +15,406 @@ const Header = ({
   setShowProfileDropdown,
   handleLogoutClick,
   toggleChatbot,
-  showChatbot,
-  chatMessages,
-  userMessage,
-  handleUserMessage,
-  sendMessage,
-  handleKeyPress,
-  chatInputRef,
-  chatMessagesEndRef,
-  chatRef,
-  notificationRef,
-  profileRef,
   profilePhotoInputRef,
   handleProfilePhotoUpload,
   triggerProfilePhotoUpload
 }) => {
   const { profile } = useProfile();
+  const profileRef = useRef(null);
+  const notificationRef = useRef(null);
+
+  // Debug: Log profile changes
+  useEffect(() => {
+    console.log('Header - Current profile:', profile);
+  }, [profile]);
+
+  // Enhanced navigation handler that scrolls to top
+  const handleNavigation = (view) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setActiveView(view);
+    }, 100);
+  };
+
+  // Enhanced profile click handler with event prevention
+  const handleProfileClick = (e) => {
+    e.stopPropagation();
+    console.log('Profile clicked, calling toggleProfileDropdown');
+    toggleProfileDropdown();
+  };
+
+  // Enhanced profile navigation handler
+  const handleProfileNavigation = (view) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setActiveView(view);
+      setShowProfileDropdown(false);
+    }, 100);
+  };
+
+  // Enhanced cart navigation handler
+  const handleCartNavigation = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setActiveView('cart');
+    }, 100);
+  };
+
+  // Handle clicks outside profile dropdown and notifications
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [setShowProfileDropdown]);
+
+  // Navigation items configuration for better maintainability
+  const navItems = [
+    { key: 'dashboard', label: 'Home' },
+    { key: 'products', label: 'Products' },
+    { key: 'appointments', label: 'Appointments' },
+    { key: 'orders', label: 'Orders' }
+  ];
 
   return (
-    <header style={styles.header}>
-      <div style={styles.headerTop}>
-        <div style={styles.logoSection}>
-          <div style={styles.logoContainer}>
-            <h1 style={styles.logo}>QUICKMED</h1>
-            <div style={styles.logoSubtitle}>
-              <span style={styles.subtitleText}>Quick Care, Smarter Health</span>
+    <header style={{
+      backgroundColor: '#7C2A62',
+      color: 'white',
+      boxShadow: '0 4px 20px rgba(124, 42, 98, 0.3)',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 1000,
+    }}>
+      {/* Top Section: Logo and User Info */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.8rem 1rem',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        flexWrap: 'wrap',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          marginLeft: '-25px', // Pulls the logo closer to the left edge
+        }}>
+          {/* Logo Image - Positioned at left edge */}
+          <div style={{
+            width: '80px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            flexShrink: 0,
+            marginLeft: '0',
+            paddingLeft: '0',
+          }}>
+            <img 
+              src="/Quickmed img.png"
+              alt="QuickMed Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block',
+              }}
+              onError={(e) => {
+                // Fallback if image fails to load
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+          
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}>
+            <h1 style={{
+              fontSize: '1.4rem',
+              margin: 0,
+              fontWeight: 'bold',
+              background: 'linear-gradient(135deg, #fff, #F7D9EB)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>QUICKMED</h1>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginTop: '0.25rem',
+            }}>
+              <span style={{
+                fontSize: '0.85rem',
+                opacity: 0.9,
+                fontWeight: '500',
+              }}>Quick Care, Smarter Health</span>
             </div>
           </div>
         </div>
         
-        <div style={styles.userSection}>
-          <div style={styles.userWelcome}>
-            <span style={styles.welcomeText}>Welcome,</span>
-            <span style={styles.userName}>{profile.fullName || 'User'}</span>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          flexShrink: 0,
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+          }}>
+            <span style={{
+              fontSize: '0.8rem',
+              opacity: 0.8,
+            }}>Welcome,</span>
+            <span style={{
+              fontSize: '0.85rem',
+              fontWeight: '500',
+            }}>{profile.fullName || 'User'}</span>
           </div>
           <div 
             ref={profileRef}
-            style={styles.userAvatarContainer}
-            onClick={toggleProfileDropdown}
+            style={{
+              position: 'relative',
+              cursor: 'pointer',
+            }}
+            onClick={handleProfileClick}
           >
-            <div style={styles.userAvatar}>
+            <div style={{
+              width: '34px',
+              height: '34px',
+              fontSize: '1rem',
+              borderRadius: '50%',
+              backgroundColor: '#F7D9EB',
+              color: '#7C2A62',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              border: '2px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.3s ease',
+              overflow: 'hidden',
+            }}>
               {profile.profilePhoto ? (
                 <img
                   src={profile.profilePhoto}
                   alt="Profile"
-                  style={styles.avatarImage}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
                 />
               ) : (
-                profile.fullName?.charAt(0) || 'U'
+                profile.fullName?.charAt(0)?.toUpperCase() || 'U'
               )}
             </div>
             
+            {/* Profile Dropdown */}
             {showProfileDropdown && (
-              <div style={styles.profileDropdown}>
-                <div style={styles.profileDropdownHeader}>
-                  <h4 style={styles.profileDropdownTitle}>Profile Details</h4>
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                width: '300px',
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                zIndex: 2000,
+                marginTop: '0.5rem',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  padding: '1rem 1.5rem',
+                  backgroundColor: '#7C2A62',
+                  color: 'white',
+                }}>
+                  <h4 style={{
+                    margin: 0,
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
+                  }}>Profile Details</h4>
                 </div>
-                <div style={styles.profileDropdownContent}>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>Name:</span>
-                    <span style={styles.profileDetailValue}>{profile.fullName}</span>
+                <div style={{
+                  padding: '1rem 1.5rem',
+                  borderBottom: '1px solid #f0f0f0',
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>Name:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>{profile.fullName || 'Not provided'}</span>
                   </div>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>Email:</span>
-                    <span style={styles.profileDetailValue}>{profile.email}</span>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>Email:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>{profile.email || 'Not provided'}</span>
                   </div>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>Phone:</span>
-                    <span style={styles.profileDetailValue}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>Phone:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>
                       {profile.phone || 'Not provided'}
                     </span>
                   </div>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>Age:</span>
-                    <span style={styles.profileDetailValue}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>Age:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>
                       {profile.age ? `${profile.age} years` : 'Not provided'}
                     </span>
                   </div>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>Gender:</span>
-                    <span style={styles.profileDetailValue}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>Gender:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>
                       {profile.gender ? 
                         profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1) 
                         : 'Not specified'
                       }
                     </span>
                   </div>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>City:</span>
-                    <span style={styles.profileDetailValue}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>City:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>
                       {profile.city || 'Not provided'}
                     </span>
                   </div>
-                  <div style={styles.profileDetailItem}>
-                    <span style={styles.profileDetailLabel}>Address:</span>
-                    <span style={styles.profileDetailValue}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: '1px solid #f8f8f8',
+                  }}>
+                    <span style={{
+                      color: '#666',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}>Address:</span>
+                    <span style={{
+                      color: '#333',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                    }}>
                       {profile.address || 'Not provided'}
                     </span>
                   </div>
                 </div>
-                <div style={styles.profileDropdownActions}>
+                <div style={{
+                  padding: '1rem 1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                }}>
                   <button 
-                    style={styles.viewProfileButton}
-                    onClick={() => {
-                      setActiveView('profile');
-                      setShowProfileDropdown(false);
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      backgroundColor: '#7C2A62',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '0.9rem',
                     }}
+                    onClick={() => handleProfileNavigation('profile')}
                     type="button"
                   >
                     View Full Profile
-                  </button>
-                  <button 
-                    style={styles.uploadPhotoButton}
-                    onClick={() => {
-                      triggerProfilePhotoUpload();
-                      setShowProfileDropdown(false);
-                    }}
-                    type="button"
-                  >
-                    Update Photo
                   </button>
                 </div>
               </div>
@@ -143,90 +423,174 @@ const Header = ({
         </div>
       </div>
 
-      <div style={styles.headerBottom}>
-        <div style={styles.navSection}>
-          <nav style={styles.nav}>
-            <button 
-              style={activeView === 'dashboard' ? {...styles.navButton, ...styles.activeNavButton} : styles.navButton}
-              onClick={() => setActiveView('dashboard')}
-              type="button"
-            >
-              <span style={styles.navIcon}></span>
-              Home
-            </button>
-            <button 
-              style={activeView === 'appointments' ? {...styles.navButton, ...styles.activeNavButton} : styles.navButton}
-              onClick={() => setActiveView('appointments')}
-              type="button"
-            >
-              <span style={styles.navIcon}></span>
-              Appointments
-            </button>
-            <button 
-              style={activeView === 'orders' ? {...styles.navButton, ...styles.activeNavButton} : styles.navButton}
-              onClick={() => setActiveView('orders')}
-              type="button"
-            >
-              <span style={styles.navIcon}></span>
-              Orders
-            </button>
-            <button 
-              style={activeView === 'profile' ? {...styles.navButton, ...styles.activeNavButton} : styles.navButton}
-              onClick={() => setActiveView('profile')}
-              type="button"
-            >
-              <span style={styles.navIcon}></span>
-              Profile
-            </button>
+      {/* Bottom Section: Navigation and Actions */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.5rem 1rem',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        overflowX: 'auto',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}>
+          <nav style={{
+            display: 'flex',
+            gap: '0.3rem',
+            flexWrap: 'nowrap',
+          }}>
+            {navItems.map(item => (
+              <button 
+                key={item.key}
+                style={activeView === item.key ? {
+                  padding: '0.45rem 0.75rem',
+                  fontSize: '0.78rem',
+                  borderRadius: '6px',
+                  whiteSpace: 'nowrap',
+                  border: 'none',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                } : {
+                  padding: '0.45rem 0.75rem',
+                  fontSize: '0.78rem',
+                  borderRadius: '6px',
+                  whiteSpace: 'nowrap',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+                onClick={() => handleNavigation(item.key)}
+                type="button"
+              >
+                <span style={{ fontSize: '1.1rem' }}></span>
+                {item.label}
+              </button>
+            ))}
           </nav>
         </div>
 
-        <div style={styles.headerActions}>
-          {/* AI Chatbot Icon */}
-          <div 
-            style={styles.chatbotIconContainer}
-            onClick={toggleChatbot}
-          >
-            <div style={styles.chatbotIcon}>
-              💬
-            </div>
-          </div>
-
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+        }}>
           {/* Cart Icon */}
           <div 
-            style={styles.cartIconContainer}
-            onClick={() => setActiveView('cart')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0.5rem',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+            onClick={handleCartNavigation}
           >
-            <div style={styles.cartIcon}>
+            <div style={{
+              position: 'relative',
+              fontSize: '1.5rem',
+            }}>
               🛒
               {cart.length > 0 && (
-                <span style={styles.cartBadge}>{cart.length}</span>
+                <span style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  backgroundColor: '#FF6B6B',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  border: '2px solid #7C2A62',
+                }}>{cart.length}</span>
               )}
             </div>
           </div>
 
-          {/* Notification Bell - UPDATED for page navigation */}
+          {/* Notification Bell */}
           <div 
             ref={notificationRef}
-            style={styles.notificationContainer}
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0.5rem',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
           >
             <div 
-              style={styles.notificationBell}
+              style={{
+                position: 'relative',
+                fontSize: '1.5rem',
+              }}
               onClick={handleNotificationsClick}
             >
               🔔
               {getUnreadCount() > 0 && (
-                <span style={styles.notificationBadge}>{getUnreadCount()}</span>
+                <span style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  backgroundColor: '#FF6B6B',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  border: '2px solid #7C2A62',
+                }}>{getUnreadCount()}</span>
               )}
             </div>
           </div>
 
+          {/* Logout Button */}
           <button 
-            style={styles.logoutButton}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'all 0.3s ease',
+            }}
             onClick={handleLogoutClick}
             type="button"
           >
-            <span style={styles.logoutIcon}></span>
+            <span style={{ fontSize: '1.1rem' }}></span>
             Logout
           </button>
         </div>
@@ -240,67 +604,8 @@ const Header = ({
         accept="image/*"
         style={{ display: 'none' }}
       />
-
-      {/* AI Chatbot */}
-      {showChatbot && (
-        <div ref={chatRef} style={styles.chatbotContainer}>
-          <div style={styles.chatbotHeader}>
-            <h3 style={styles.chatbotTitle}>QuickMed Assistant</h3>
-            <button 
-              style={styles.closeChatbot}
-              onClick={toggleChatbot}
-              type="button"
-            >
-              ×
-            </button>
-          </div>
-          <div style={styles.chatMessages}>
-            {chatMessages.map(message => (
-              <div
-                key={message.id}
-                style={{
-                  ...styles.chatMessage,
-                  ...styles[`${message.sender}Message`]
-                }}
-              >
-                <div style={{
-                  ...styles.messageBubble,
-                  ...styles[`${message.sender}MessageBubble`]
-                }}>
-                  {message.text}
-                </div>
-                <span style={styles.messageTime}>
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-            ))}
-            <div ref={chatMessagesEndRef} />
-          </div>
-          <div style={styles.chatInputContainer}>
-            <input
-              ref={chatInputRef}
-              type="text"
-              value={userMessage}
-              onChange={handleUserMessage}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              style={styles.chatInput}
-              autoFocus
-            />
-            <button 
-              style={styles.sendButton}
-              onClick={sendMessage}
-              type="button"
-              disabled={!userMessage.trim()}
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
 
 export default Header;
-

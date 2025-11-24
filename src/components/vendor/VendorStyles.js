@@ -14,11 +14,24 @@ export const styles = {
     position: 'fixed',
     height: '100vh',
     left: 0,
-    top: 0
+    top: 0,
+    zIndex: 1000,
+    overflow: 'hidden',
+    '@media (max-width: 768px)': {
+      transform: 'translateX(-100%)',
+      transition: 'transform 0.3s ease'
+    }
+  },
+  sidebarMobileActive: {
+    '@media (max-width: 768px)': {
+      transform: 'translateX(0)'
+    }
   },
   sidebarHeader: {
     padding: '30px 24px 20px',
-    borderBottom: '1px solid rgba(255,255,255,0.1)'
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    position: 'relative',
+    flexShrink: 0
   },
   logo: {
     fontSize: '24px',
@@ -31,9 +44,24 @@ export const styles = {
     opacity: 0.8,
     margin: 0
   },
+  mobileCloseButton: {
+    display: 'none',
+    position: 'absolute',
+    right: '20px',
+    top: '30px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: 'white',
+    fontSize: '20px',
+    cursor: 'pointer',
+    '@media (max-width: 768px)': {
+      display: 'block'
+    }
+  },
   navigation: {
     flex: 1,
-    padding: '20px 0'
+    padding: '20px 0',
+    overflow: 'hidden'
   },
   navButton: {
     display: 'flex',
@@ -62,59 +90,39 @@ export const styles = {
   navLabel: {
     fontWeight: '500'
   },
-  profileSection: {
+  sidebarFooter: {
     padding: '20px 24px',
     borderTop: '1px solid rgba(255,255,255,0.1)',
-    borderBottom: '1px solid rgba(255,255,255,0.1)'
+    flexShrink: 0
   },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'flex-start',
+  vendorSection: {
     marginBottom: '16px'
   },
-  userAvatar: {
-    fontSize: '32px',
-    marginRight: '12px',
-    marginTop: '4px'
+  vendorInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '12px',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease'
   },
-  userDetails: {
+  vendorAvatar: {
+    fontSize: '24px',
+    marginRight: '12px'
+  },
+  vendorDetails: {
     flex: 1
   },
-  userName: {
+  vendorName: {
     margin: '0 0 4px 0',
     fontWeight: '600',
     fontSize: '14px'
   },
-  userEmail: {
-    margin: '0 0 4px 0',
+  vendorEmail: {
+    margin: 0,
     fontSize: '12px',
     opacity: 0.8
-  },
-  pharmacyName: {
-    margin: 0,
-    fontSize: '11px',
-    opacity: 0.7,
-    fontStyle: 'italic'
-  },
-  profileActions: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  profileButton: {
-    width: '100%',
-    padding: '8px 12px',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: '500',
-    transition: 'background-color 0.3s ease'
-  },
-  sidebarFooter: {
-    padding: '20px 24px'
   },
   logoutButton: {
     width: '100%',
@@ -127,25 +135,90 @@ export const styles = {
     fontWeight: '500',
     transition: 'background-color 0.3s ease'
   },
+  
+  // Mobile Styles
+  mobileHeader: {
+    display: 'none',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    padding: '15px 20px',
+    zIndex: 999,
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    '@media (max-width: 768px)': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }
+  },
+  mobileMenuButton: {
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: 'white',
+    fontSize: '20px',
+    cursor: 'pointer',
+    padding: '8px'
+  },
+  mobileLogo: {
+    textAlign: 'center',
+    flex: 1
+  },
+  mobileActions: {
+    display: 'flex',
+    gap: '10px'
+  },
+  mobileOverlay: {
+    display: 'none',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 998,
+    '@media (max-width: 768px)': {
+      display: 'block'
+    }
+  },
+
   content: {
     flex: 1,
     marginLeft: '280px',
-    padding: '0'
+    padding: '0',
+    minHeight: '100vh',
+    '@media (max-width: 768px)': {
+      marginLeft: '0',
+      marginTop: '70px'
+    }
   },
   mainContent: {
     padding: '30px',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    '@media (max-width: 768px)': {
+      padding: '20px 15px'
+    }
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '30px'
+    marginBottom: '30px',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      gap: '15px'
+    }
   },
   headerActions: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px'
+    gap: '16px',
+    '@media (max-width: 768px)': {
+      width: '100%',
+      justifyContent: 'space-between'
+    }
   },
   notificationBell: {
     position: 'relative',
@@ -157,6 +230,27 @@ export const styles = {
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  },
+  chatbotWidget: {
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    zIndex: 1000
+  },
+  chatbotWidgetButton: {
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '60px',
+    height: '60px',
+    fontSize: '24px',
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   notificationBadge: {
     position: 'absolute',
@@ -177,12 +271,18 @@ export const styles = {
     fontSize: '28px',
     fontWeight: '700',
     color: '#1f2937',
-    margin: '0 0 8px 0'
+    margin: '0 0 8px 0',
+    '@media (max-width: 768px)': {
+      fontSize: '24px'
+    }
   },
   subtitle: {
     fontSize: '16px',
     color: '#6b7280',
-    margin: 0
+    margin: 0,
+    '@media (max-width: 768px)': {
+      fontSize: '14px'
+    }
   },
   dateDisplay: {
     fontSize: '14px',
@@ -298,7 +398,8 @@ export const styles = {
   filterTabs: {
     display: 'flex',
     gap: '8px',
-    marginBottom: '24px'
+    marginBottom: '24px',
+    flexWrap: 'wrap'
   },
   filterTab: {
     padding: '10px 20px',
@@ -319,7 +420,13 @@ export const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '20px',
-    marginBottom: '30px'
+    marginBottom: '30px',
+    '@media (max-width: 1024px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)'
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr'
+    }
   },
   statCard: {
     backgroundColor: 'white',
@@ -384,7 +491,8 @@ export const styles = {
   },
   table: {
     width: '100%',
-    borderCollapse: 'collapse'
+    borderCollapse: 'collapse',
+    minWidth: '800px'
   },
   tableHeader: {
     backgroundColor: '#f8fafc',
@@ -423,7 +531,8 @@ export const styles = {
   },
   actionButtons: {
     display: 'flex',
-    gap: '4px'
+    gap: '4px',
+    flexWrap: 'wrap'
   },
   orderTabs: {
     display: 'flex',
@@ -432,18 +541,19 @@ export const styles = {
     padding: '4px',
     borderRadius: '8px',
     border: '1px solid #e5e7eb',
-    marginBottom: '24px'
+    marginBottom: '24px',
+    flexWrap: 'wrap'
   },
   orderTab: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '12px 20px',
+    gap: '6px',
+    padding: '8px 16px',
     backgroundColor: 'transparent',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '13px',
     fontWeight: '500',
     transition: 'all 0.3s ease'
   },
@@ -454,16 +564,20 @@ export const styles = {
   orderCount: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     color: 'inherit',
-    padding: '2px 8px',
-    borderRadius: '12px',
-    fontSize: '12px',
+    padding: '2px 6px',
+    borderRadius: '10px',
+    fontSize: '11px',
     fontWeight: '600'
   },
-  contentGrid: {
+  contentGrid: (hasSelection) => ({
     display: 'grid',
-    gridTemplateColumns: '1fr 400px',
-    gap: '24px'
-  },
+    gridTemplateColumns: hasSelection ? '1fr 1fr' : '1fr',
+    gap: '24px',
+    transition: 'grid-template-columns 0.3s ease',
+    '@media (max-width: 1024px)': {
+      gridTemplateColumns: '1fr'
+    }
+  }),
   ordersList: {
     display: 'flex',
     flexDirection: 'column',
@@ -696,7 +810,8 @@ export const styles = {
     backgroundColor: 'white',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #e5e7eb',
+    height: 'fit-content'
   },
   viewerHeader: {
     padding: '20px',
@@ -713,10 +828,13 @@ export const styles = {
     color: '#6b7280'
   },
   viewerContent: {
-    padding: '20px'
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px'
   },
   prescriptionImage: {
-    marginBottom: '20px'
+    flex: 1
   },
   prescriptionImg: {
     width: '100%',
@@ -729,10 +847,11 @@ export const styles = {
   imageControls: {
     display: 'flex',
     gap: '8px',
-    marginTop: '8px'
+    marginTop: '8px',
+    flexWrap: 'wrap'
   },
   extractedMedicines: {
-    marginBottom: '20px'
+    flex: 1
   },
   medicinesTitle: {
     fontSize: '16px',
@@ -754,7 +873,8 @@ export const styles = {
   },
   verificationActions: {
     display: 'flex',
-    gap: '8px'
+    gap: '8px',
+    flexWrap: 'wrap'
   },
   periodSelector: {
     display: 'flex',
@@ -771,7 +891,13 @@ export const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '20px',
-    marginBottom: '30px'
+    marginBottom: '30px',
+    '@media (max-width: 1024px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)'
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr'
+    }
   },
   kpiCard: {
     backgroundColor: 'white',
@@ -810,7 +936,10 @@ export const styles = {
   analyticsGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: '24px'
+    gap: '24px',
+    '@media (max-width: 1024px)': {
+      gridTemplateColumns: '1fr'
+    }
   },
   chartSection: {
     backgroundColor: 'white',
@@ -957,6 +1086,114 @@ export const styles = {
     borderRadius: '4px 4px 0 0',
     minHeight: '10px'
   },
+  // Profile Page Styles - Updated to match the image
+  profileMainContent: {
+    padding: '30px',
+    minHeight: '100vh',
+    '@media (max-width: 768px)': {
+      padding: '20px 15px'
+    }
+  },
+  profileHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '30px',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      gap: '15px'
+    }
+  },
+  profileGreeting: {
+    fontSize: '28px',
+    fontWeight: '700',
+    color: '#1f2937',
+    margin: '0 0 8px 0',
+    '@media (max-width: 768px)': {
+      fontSize: '24px'
+    }
+  },
+  profileSubtitle: {
+    fontSize: '16px',
+    color: '#6b7280',
+    margin: 0,
+    '@media (max-width: 768px)': {
+      fontSize: '14px'
+    }
+  },
+  profileHeaderActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px'
+  },
+  profileGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '24px',
+    maxWidth: '800px',
+    margin: '0 auto'
+  },
+  profileCard: {
+    backgroundColor: 'white',
+    padding: '30px',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    border: '1px solid #e5e7eb'
+  },
+  profileCardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '30px',
+    paddingBottom: '20px',
+    borderBottom: '1px solid #e5e7eb'
+  },
+  profileCardTitle: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#7C2A62',
+    margin: 0
+  },
+  editPencilIcon: {
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    border: 'none',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  },
+  profileForm: {
+    width: '100%'
+  },
+  profileFormSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px'
+  },
+  profileFormRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    padding: '16px 0',
+    borderBottom: '1px solid #f3f4f6'
+  },
+  profileFormLabel: {
+    width: '200px',
+    fontWeight: '600',
+    color: '#374151',
+    fontSize: '14px',
+    flexShrink: 0
+  },
+  profileFormValue: {
+    flex: 1,
+    color: '#6b7280',
+    fontSize: '14px',
+    lineHeight: '1.5'
+  },
   modalOverlay: {
     position: 'fixed',
     top: 0,
@@ -1007,13 +1244,13 @@ export const styles = {
     padding: '20px',
     borderTop: '1px solid #e5e7eb'
   },
-  formRow: {
-    marginBottom: '16px'
-  },
   formGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: '16px'
+  },
+  formRow: {
+    marginBottom: '16px'
   },
   label: {
     display: 'block',
@@ -1189,5 +1426,79 @@ export const styles = {
   notificationTime: {
     color: '#9ca3af',
     fontSize: '11px'
+  },
+  chatModal: {
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    width: '350px',
+    height: '500px',
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+    zIndex: 1001,
+    display: 'flex',
+    flexDirection: 'column',
+    border: '1px solid #e5e7eb'
+  },
+  chatHeader: {
+    padding: '16px',
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    borderRadius: '12px 12px 0 0',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  chatTitle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    margin: 0
+  },
+  chatContent: {
+    flex: 1,
+    padding: '16px',
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    backgroundColor: '#f8fafc'
+  },
+  chatMessage: {
+    padding: '8px 12px',
+    borderRadius: '12px',
+    maxWidth: '80%',
+    fontSize: '14px',
+    wordWrap: 'break-word'
+  },
+  userMessage: {
+    backgroundColor: '#7C2A62',
+    color: 'white',
+    alignSelf: 'flex-end'
+  },
+  botMessage: {
+    backgroundColor: 'white',
+    color: '#374151',
+    alignSelf: 'flex-start',
+    border: '1px solid #e5e7eb'
+  },
+  chatInputContainer: {
+    display: 'flex',
+    padding: '12px',
+    borderTop: '1px solid #e5e7eb',
+    backgroundColor: 'white',
+    borderRadius: '0 0 12px 12px'
+  },
+  chatInput: {
+    flex: 1,
+    padding: '8px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '6px',
+    fontSize: '14px',
+    outline: 'none',
+    marginRight: '8px'
+  },
+  checkbox: {
+    margin: 0
   }
 };

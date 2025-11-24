@@ -313,26 +313,55 @@ const DeliveryHistory = ({ deliveryData }) => {
     return `₹${amount.toLocaleString('en-IN')}`;
   };
 
+  // Helper function to check if a date is today
+  const isToday = (dateString) => {
+    const today = new Date();
+    const taskDate = new Date(dateString);
+    
+    return (
+      taskDate.getDate() === today.getDate() &&
+      taskDate.getMonth() === today.getMonth() &&
+      taskDate.getFullYear() === today.getFullYear()
+    );
+  };
+
+  // Helper function to check if a date is within the current week
+  const isThisWeek = (dateString) => {
+    const today = new Date();
+    const taskDate = new Date(dateString);
+    
+    // Get the start of the week (Monday)
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Get the end of the week (Sunday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    return taskDate >= startOfWeek && taskDate <= endOfWeek;
+  };
+
   // Filter tasks based on search and filter - Only show delivered tasks
   const getFilteredTasks = () => {
-    let filtered = deliveryData.completedTasks;
+    let filtered = deliveryData.completedTasks || [];
 
-    if (taskFilter !== 'all') {
-      if (taskFilter === 'today') {
-        const today = new Date().toISOString().split('T')[0];
-        filtered = filtered.filter(task => task.deliveryDate === today);
-      } else if (taskFilter === 'week') {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        filtered = filtered.filter(task => new Date(task.deliveryDate) >= oneWeekAgo);
-      }
+    // Apply time filter
+    if (taskFilter === 'today') {
+      filtered = filtered.filter(task => isToday(task.deliveryDate));
+    } else if (taskFilter === 'week') {
+      filtered = filtered.filter(task => isThisWeek(task.deliveryDate));
     }
+    // 'all' filter shows all tasks, no additional filtering needed
 
+    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(task =>
-        task.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase())
+        task.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.pickupLocation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.deliveryLocation?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -341,12 +370,25 @@ const DeliveryHistory = ({ deliveryData }) => {
 
   const filteredTasks = getFilteredTasks();
 
+  // Get filter summary text
+  const getFilterSummary = () => {
+    const totalTasks = filteredTasks.length;
+    
+    if (taskFilter === 'today') {
+      return `Showing ${totalTasks} delivery${totalTasks !== 1 ? 's' : ''} from today`;
+    } else if (taskFilter === 'week') {
+      return `Showing ${totalTasks} delivery${totalTasks !== 1 ? 's' : ''} from this week`;
+    } else {
+      return `Showing ${totalTasks} delivery${totalTasks !== 1 ? 's' : ''} from all time`;
+    }
+  };
+
   return (
     <div style={styles.mainContent}>
       <div style={styles.header}>
         <div>
           <h1 style={styles.greeting}>Delivery History</h1>
-          <p style={styles.subtitle}>View your delivered orders</p>
+          <p style={styles.subtitle}>{getFilterSummary()}</p>
         </div>
         <div style={styles.taskHeaderActions}>
           <div style={styles.searchBox}>
@@ -357,17 +399,17 @@ const DeliveryHistory = ({ deliveryData }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={styles.searchInput}
             />
-            <span style={styles.searchIcon}>🔍</span>
+            <span style={styles.searchIcon}></span>
           </div>
           <div style={styles.taskFilters}>
             <button
               style={{
                 ...styles.filterButton,
-                ...(taskFilter === 'all' ? styles.filterButtonActive : {})
+                ...(taskFilter === 'today' ? styles.filterButtonActive : {})
               }}
-              onClick={() => setTaskFilter('all')}
+              onClick={() => setTaskFilter('today')}
             >
-              All Time
+              Today
             </button>
             <button
               style={{
@@ -381,11 +423,11 @@ const DeliveryHistory = ({ deliveryData }) => {
             <button
               style={{
                 ...styles.filterButton,
-                ...(taskFilter === 'today' ? styles.filterButtonActive : {})
+                ...(taskFilter === 'all' ? styles.filterButtonActive : {})
               }}
-              onClick={() => setTaskFilter('today')}
+              onClick={() => setTaskFilter('all')}
             >
-              Today
+              All Time
             </button>
           </div>
         </div>
@@ -395,9 +437,16 @@ const DeliveryHistory = ({ deliveryData }) => {
         {filteredTasks.length === 0 ? (
           <div style={styles.noTasks}>
             <div style={styles.noTasksIcon}>📦</div>
-            <h3 style={styles.noTasksText}>No delivery history found</h3>
+            <h3 style={styles.noTasksText}>
+              {taskFilter === 'today' ? 'No deliveries today' : 
+               taskFilter === 'week' ? 'No deliveries this week' : 
+               'No delivery history found'}
+            </h3>
             <p style={styles.noTasksSubtext}>
-              {searchTerm ? 'Try adjusting your search terms' : 'Complete some deliveries to see your history here!'}
+              {searchTerm ? 'Try adjusting your search terms' : 
+               taskFilter === 'today' ? 'Complete some deliveries today to see them here!' :
+               taskFilter === 'week' ? 'Complete some deliveries this week to see them here!' :
+               'Complete some deliveries to see your history here!'}
             </p>
           </div>
         ) : (
@@ -408,8 +457,8 @@ const DeliveryHistory = ({ deliveryData }) => {
                   <div style={styles.orderHeader}>
                     <h3 style={styles.orderId}>{task.orderId}</h3>
                     <div style={styles.ratingDisplay}>
-                      {'⭐'.repeat(task.rating)}
-                      <span style={styles.ratingText}>{task.rating}/5</span>
+                      {'⭐'.repeat(task.rating || 0)}
+                      <span style={styles.ratingText}>{task.rating || 0}/5</span>
                     </div>
                   </div>
                   <p style={styles.customerInfo}>

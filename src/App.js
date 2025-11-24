@@ -8,7 +8,7 @@ import DoctorDashboard from './components/doctor/DoctorDashboard';
 import DeliveryDashboard from './components/delivery/DeliveryDashboard';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminDashboard from './components/admin/AdminDashboard';
-import ReviewModal from './components/Homepage/ReviewModal'; // Updated import path
+import ReviewModal from './components/Homepage/ReviewModal';
 
 import { ProfileProvider } from './components/user/ProfileContext';
 import './App.css';
@@ -81,6 +81,12 @@ function App() {
 
   const handleBackToHome = () => setCurrentPage('home');
 
+  // NEW FUNCTION: Handle navigation to login from services
+  const handleNavigateToLogin = () => {
+    setCurrentPage('auth');
+    setAuthMode('login');
+  };
+
   // Review Modal Functions
   const handleWriteReview = () => {
     setShowReviewModal(true);
@@ -126,6 +132,7 @@ function App() {
           <HomePage
             onNavigateToAuth={navigateToAuth}
             onNavigateToAdmin={navigateToAdmin}
+            onNavigateToLogin={handleNavigateToLogin} // ADD THIS PROP
             onWriteReview={handleWriteReview}
             reviews={reviews}
           />
@@ -188,6 +195,7 @@ function App() {
           <HomePage
             onNavigateToAuth={navigateToAuth}
             onNavigateToAdmin={navigateToAdmin}
+            onNavigateToLogin={handleNavigateToLogin} // ADD THIS PROP
             onWriteReview={handleWriteReview}
             reviews={reviews}
           />

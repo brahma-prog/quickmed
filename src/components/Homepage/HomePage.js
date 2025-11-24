@@ -3,15 +3,15 @@ import Navbar from './Navbar';
 import Hero from './Hero';
 import AboutUs from './AboutUs';
 import Services from './Services';
-import Doctors from './Doctors';
 import Reviews from './Reviews';
 import Footer from './Footer';
 import AdminLoginModal from './AdminLoginModal';
 import ReviewModal from './ReviewModal';
 import ServiceDetailsModal from './ServiceDetailsModal';
 import Contact from './Contact';
+import Doctors from './Doctors';
 
-const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome, reviews, onWriteReview }) => {
+const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome, onNavigateToLogin, reviews, onWriteReview }) => {
   const [activeSection, setActiveSection] = useState('home');
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -67,10 +67,28 @@ const HomePage = ({ onNavigateToAuth, onNavigateToAdmin, onNavigateToHome, revie
       />
 
       <main>
-        {activeSection === 'home' && <Hero onSectionChange={handleSectionChange} />}
-        {activeSection === 'about' && <AboutUs />}
-        {activeSection === 'services' && <Services onLearnMore={handleServiceLearnMore} />}
-        {activeSection === 'doctors' && <Doctors />}
+        {activeSection === 'home' && (
+          <Hero 
+            onSectionChange={handleSectionChange}
+            onNavigateToAuth={onNavigateToLogin}
+          />
+        )}
+        {activeSection === 'about' && (
+          <AboutUs 
+            onNavigateToAuth={onNavigateToLogin}
+          />
+        )}
+        {activeSection === 'services' && (
+          <Services 
+            onLearnMore={handleServiceLearnMore}
+            onNavigateToLogin={onNavigateToLogin}
+          />
+        )}
+        {activeSection === 'doctors' && (
+          <Doctors 
+            onNavigateToLogin={onNavigateToLogin}
+          />
+        )}
         {activeSection === 'reviews' && (
           <Reviews 
             onWriteReview={handleWriteReview}

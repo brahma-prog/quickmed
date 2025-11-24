@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 
-const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
+const Signup = ({ onSwitchToLogin, onSignupSuccess, onBackToHome }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -60,7 +59,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
   const currentUserType = userTypes.find(user => user.type === formData.userType);
 
-  // Handle responsive layout
+  // Handle responsive layout and initialize userType
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -70,8 +69,27 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
     handleResize();
     window.addEventListener('resize', handleResize);
+    
+    // Initialize userType from localStorage if available
+    const lastSelected = localStorage.getItem('lastSelectedUserType');
+    if (lastSelected) {
+      setFormData(prev => ({
+        ...prev,
+        userType: lastSelected
+      }));
+    }
+    
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Generate floating elements for bubble animation
+  const floatingElements = Array.from({ length: isMobile ? 8 : 15 }, (_, i) => ({
+    id: i,
+    size: Math.random() * (isMobile ? 50 : 100) + (isMobile ? 30 : 50),
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    animationDelay: Math.random() * 5,
+  }));
 
   // Validation functions
   const validateName = (name) => {
@@ -167,6 +185,16 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
     });
   };
 
+  // Handle user type change
+  const handleUserTypeChange = (newUserType) => {
+    setFormData({
+      ...formData,
+      userType: newUserType
+    });
+    // Store the selected user type
+    localStorage.setItem('lastSelectedUserType', newUserType);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -240,6 +268,10 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
     const updatedUsers = [...existingUsers, newUser];
     localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+    
+    // Store the recent signup type for login page
+    localStorage.setItem('recentSignupType', formData.userType);
+    localStorage.setItem('lastSelectedUserType', formData.userType);
 
     setToastMessage(`Account created! Welcome ${formData.fullName}`);
     setToastType('success');
@@ -252,7 +284,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
       phone: '',
       password: '',
       confirmPassword: '',
-      userType: 'user'
+      userType: formData.userType // Keep the same user type
     });
     setFormErrors({
       fullName: '',
@@ -307,11 +339,67 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
       justifyContent: 'center',
       alignItems: 'center',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      backgroundColor: '#f8fafc',
+      background: 'linear-gradient(135deg, #F7D9EB 0%, #ffffff 50%, #F7D9EB 100%)',
       padding: isMobile ? '10px' : '20px',
-      position: 'relative'
+      position: 'relative',
+      overflow: 'hidden'
     }}>
       
+      {/* Bubble Animation Background */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }}>
+        {floatingElements.map((element) => (
+          <div
+            key={element.id}
+            style={{
+              position: 'absolute',
+              background: 'rgba(124, 42, 98, 0.1)',
+              borderRadius: '50%',
+              animation: 'float 6s ease-in-out infinite',
+              width: element.size,
+              height: element.size,
+              left: `${element.left}%`,
+              top: `${element.top}%`,
+              animationDelay: `${element.animationDelay}s`,
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Back to Home Button */}
+      <button 
+        onClick={onBackToHome}
+        style={{
+          position: isMobile ? 'fixed' : 'absolute',
+          top: isMobile ? '16px' : '20px',
+          left: isMobile ? '16px' : '20px',
+          padding: isMobile ? '8px 16px' : '10px 20px',
+          backgroundColor: 'white',
+          color: '#7C2A62',
+          border: '2px solid #7C2A62',
+          borderRadius: '8px',
+          fontSize: isMobile ? '12px' : '14px',
+          fontWeight: '500',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          zIndex: 10,
+          opacity: isLoading ? 0.7 : 1
+        }}
+        disabled={isLoading}
+        onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = '#7C2A62', e.target.style.color = 'white')}
+        onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = 'white', e.target.style.color = '#7C2A62')}
+      >
+        ← Back to Home
+      </button>
+
       {showToast && (
         <div style={{
           position: 'fixed',
@@ -343,7 +431,10 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
         boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
         overflow: 'hidden',
         minHeight: isMobile ? 'auto' : '650px',
-        flexDirection: isMobile ? 'column' : 'row'
+        flexDirection: isMobile ? 'column' : 'row',
+        marginTop: isMobile ? '60px' : '0',
+        position: 'relative',
+        zIndex: 2
       }}>
 
         {/* Left Side - Dynamic Content */}
@@ -381,10 +472,10 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
               marginBottom: isMobile ? '15px' : '20px',
               opacity: 0.9
             }}>
-              {formData.userType === 'user' }
-              {formData.userType === 'vendor' }
+              {formData.userType === 'user'}
+              {formData.userType === 'vendor'}
               {formData.userType === 'delivery' }
-              {formData.userType === 'doctor' }
+              {formData.userType === 'doctor'}
             </div>
             
             <h2 style={{
@@ -420,7 +511,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 <button
                   key={user.type}
                   type="button"
-                  onClick={() => setFormData({...formData, userType: user.type})}
+                  onClick={() => handleUserTypeChange(user.type)}
                   style={{
                     padding: isMobile ? '8px 12px' : '10px 16px',
                     border: `2px solid ${formData.userType === user.type ? 'white' : 'rgba(255,255,255,0.3)'}`,
@@ -434,8 +525,10 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                     alignItems: 'center',
                     gap: '6px',
                     transition: 'all 0.3s ease',
-                    minWidth: isMobile ? '70px' : 'auto'
+                    minWidth: isMobile ? '70px' : 'auto',
+                    opacity: isLoading ? 0.7 : 1
                   }}
+                  disabled={isLoading}
                 >
                   <span style={{ fontSize: isMobile ? '14px' : '16px' }}>
                     {user.type === 'user' && '👤'}
@@ -514,6 +607,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                   color: '#333333'
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#7C2A62'}
+                disabled={isLoading}
               />
               {formErrors.fullName && (
                 <div style={{
@@ -558,6 +652,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                   color: '#333333'
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#7C2A62'}
+                disabled={isLoading}
               />
               {formErrors.email && (
                 <div style={{
@@ -602,6 +697,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                   color: '#333333'
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#7C2A62'}
+                disabled={isLoading}
               />
               {formErrors.phone && (
                 <div style={{
@@ -647,6 +743,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                     color: '#333333'
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#7C2A62'}
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -666,8 +763,10 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: '30px',
-                    height: '30px'
+                    height: '30px',
+                    opacity: isLoading ? 0.7 : 1
                   }}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
@@ -726,6 +825,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                     color: '#333333'
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#7C2A62'}
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
@@ -745,8 +845,10 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: '30px',
-                    height: '30px'
+                    height: '30px',
+                    opacity: isLoading ? 0.7 : 1
                   }}
+                  disabled={isLoading}
                 >
                   {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
@@ -782,6 +884,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                     width: isMobile ? '14px' : '16px',
                     height: isMobile ? '14px' : '16px'
                   }}
+                  disabled={isLoading}
                 />
                 <span>
                   I agree to the{' '}
@@ -853,8 +956,13 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 style={{
                   color: '#7C2A62',
                   fontWeight: '600',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  transition: 'all 0.2s ease'
                 }}
+                onMouseOver={(e) => !isLoading && (e.target.style.color = '#5a1a4a', e.target.style.backgroundColor = '#F7D9EB')}
+                onMouseOut={(e) => !isLoading && (e.target.style.color = '#7C2A62', e.target.style.backgroundColor = 'transparent')}
               >
                 Sign in
               </span>
@@ -865,6 +973,18 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
       <style>
         {`
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0) rotate(0deg);
+            }
+            33% {
+              transform: translateY(-20px) rotate(120deg);
+            }
+            66% {
+              transform: translateY(20px) rotate(240deg);
+            }
+          }
+
           @keyframes slideInRight {
             from {
               transform: translateX(100%);
@@ -884,6 +1004,7 @@ const Signup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
           button:disabled {
             animation: pulse 1.5s ease-in-out infinite;
+            cursor: not-allowed;
           }
 
           /* Mobile-specific improvements */

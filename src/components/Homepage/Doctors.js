@@ -5,54 +5,147 @@ const Doctors = ({ onNavigateToLogin }) => {
   const [availableSlots, setAvailableSlots] = useState({});
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width <= 768);
+      setIsTablet(width <= 1024 && width > 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Add fade-in animation
+    setIsVisible(true);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Hide navbar and body overflow when modal is open
+  useEffect(() => {
+    if (selectedDoctor) {
+      // Hide body overflow
+      document.body.style.overflow = 'hidden';
+      
+      // Hide all navbar elements
+      const navbarSelectors = [
+        'header',
+        'nav',
+        '.navbar',
+        '[class*="navbar"]',
+        '[class*="header"]',
+        '[class*="nav"]'
+      ];
+      
+      navbarSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          // Store original display style and hide
+          if (!element.hasAttribute('data-original-display')) {
+            element.setAttribute('data-original-display', element.style.display || '');
+          }
+          element.style.display = 'none';
+        });
+      });
+    } else {
+      // Restore body overflow
+      document.body.style.overflow = 'unset';
+      
+      // Restore all navbar elements
+      const elements = document.querySelectorAll('[data-original-display]');
+      elements.forEach(element => {
+        const originalDisplay = element.getAttribute('data-original-display');
+        element.style.display = originalDisplay;
+        element.removeAttribute('data-original-display');
+      });
+    }
+  }, [selectedDoctor]);
 
   const styles = {
+    // Main Doctors Section with Bubble Background
     doctors: {
-      padding: '5rem 2rem',
-      backgroundColor: '#f8f9fa',
       minHeight: '100vh',
+      background: 'linear-gradient(135deg, #F7D9EB 0%, #ffffff 50%, #F7D9EB 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+      padding: isMobile ? '4rem 1rem' : isTablet ? '5rem 2rem' : '6rem 2rem',
+    },
+    floatingElements: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    floatingElement: {
+      position: 'absolute',
+      background: 'rgba(124, 42, 98, 0.1)',
+      borderRadius: '50%',
+      animation: 'float 6s ease-in-out infinite',
     },
     container: {
       maxWidth: '1200px',
       margin: '0 auto',
+      position: 'relative',
+      zIndex: 2,
     },
     sectionTitle: {
-      fontSize: '3rem',
+      fontSize: isMobile ? '2.5rem' : isTablet ? '3rem' : '3.5rem',
       textAlign: 'center',
       marginBottom: '1rem',
       color: '#7C2A62',
       fontWeight: '700',
+      background: 'linear-gradient(45deg, #7C2A62, #9C3A7A)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out',
     },
     sectionSubtitle: {
-      fontSize: '1.2rem',
+      fontSize: isMobile ? '1rem' : isTablet ? '1.1rem' : '1.2rem',
       textAlign: 'center',
-      marginBottom: '4rem',
+      marginBottom: isMobile ? '3rem' : '4rem',
       color: '#666',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.2s',
     },
     doctorsGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '2rem',
+      gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+      gap: isMobile ? '1.5rem' : '2rem',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.4s',
     },
     doctorCard: {
-      padding: '2rem',
-      backgroundColor: 'white',
+      padding: isMobile ? '1.5rem' : '2rem',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
       borderRadius: '20px',
-      boxShadow: '0 5px 20px rgba(124, 42, 98, 0.1)',
+      boxShadow: '0 8px 30px rgba(124, 42, 98, 0.1)',
       textAlign: 'center',
       transition: 'all 0.3s ease',
       position: 'relative',
+      backdropFilter: 'blur(10px)',
+      border: '2px solid transparent',
     },
     doctorImage: {
-      width: '120px',
-      height: '120px',
+      width: isMobile ? '100px' : '120px',
+      height: isMobile ? '100px' : '120px',
       borderRadius: '50%',
       backgroundColor: '#F7D9EB',
       margin: '0 auto 1.5rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '2rem',
+      fontSize: isMobile ? '1.5rem' : '2rem',
       color: '#7C2A62',
       border: '4px solid #7C2A62',
     },
@@ -68,13 +161,13 @@ const Doctors = ({ onNavigateToLogin }) => {
       fontWeight: 'bold',
     },
     doctorName: {
-      fontSize: '1.3rem',
+      fontSize: isMobile ? '1.2rem' : '1.3rem',
       marginBottom: '0.5rem',
       color: '#333',
       fontWeight: '600',
     },
     doctorSpecialty: {
-      fontSize: '1.1rem',
+      fontSize: isMobile ? '1rem' : isTablet ? '1.1rem' : '1.2rem',
       marginBottom: '0.5rem',
       color: '#7C2A62',
       fontWeight: '500',
@@ -82,6 +175,7 @@ const Doctors = ({ onNavigateToLogin }) => {
     doctorExperience: {
       color: '#666',
       marginBottom: '1.5rem',
+      fontSize: isMobile ? '0.9rem' : '1rem',
     },
     buttonContainer: {
       display: 'flex',
@@ -89,7 +183,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       gap: '0.8rem',
     },
     viewProfileButton: {
-      padding: '0.8rem 1.5rem',
+      padding: isMobile ? '0.6rem 1.2rem' : '0.8rem 1.5rem',
       backgroundColor: 'transparent',
       color: '#7C2A62',
       border: '2px solid #7C2A62',
@@ -97,9 +191,12 @@ const Doctors = ({ onNavigateToLogin }) => {
       cursor: 'pointer',
       fontWeight: '600',
       transition: 'all 0.3s ease',
+      fontSize: isMobile ? '0.9rem' : '1rem',
+      position: 'relative',
+      overflow: 'hidden',
     },
     bookConsultationButton: {
-      padding: '0.8rem 1.5rem',
+      padding: isMobile ? '0.6rem 1.2rem' : '0.8rem 1.5rem',
       backgroundColor: '#7C2A62',
       color: 'white',
       border: 'none',
@@ -107,6 +204,10 @@ const Doctors = ({ onNavigateToLogin }) => {
       cursor: 'pointer',
       fontWeight: '600',
       transition: 'all 0.3s ease',
+      fontSize: isMobile ? '0.9rem' : '1rem',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: '0 5px 15px rgba(124, 42, 98, 0.3)',
     },
     // Profile Modal Styles
     profileModal: {
@@ -115,22 +216,24 @@ const Doctors = ({ onNavigateToLogin }) => {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 1000,
-      padding: '1rem',
+      padding: isMobile ? '1rem' : '2rem',
+      backdropFilter: 'blur(5px)',
     },
     profileContent: {
       backgroundColor: 'white',
-      padding: '2.5rem',
+      padding: isMobile ? '1.5rem' : '2.5rem',
       borderRadius: '20px',
       maxWidth: '600px',
       width: '100%',
       maxHeight: '90vh',
       overflowY: 'auto',
       position: 'relative',
+      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)',
     },
     closeButton: {
       position: 'absolute',
@@ -155,26 +258,26 @@ const Doctors = ({ onNavigateToLogin }) => {
       marginBottom: '2rem',
     },
     profileImage: {
-      width: '150px',
-      height: '150px',
+      width: isMobile ? '120px' : '150px',
+      height: isMobile ? '120px' : '150px',
       borderRadius: '50%',
       backgroundColor: '#F7D9EB',
       margin: '0 auto 1.5rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '2.5rem',
+      fontSize: isMobile ? '2rem' : '2.5rem',
       color: '#7C2A62',
       border: '4px solid #7C2A62',
     },
     profileName: {
-      fontSize: '1.8rem',
+      fontSize: isMobile ? '1.5rem' : '1.8rem',
       marginBottom: '0.5rem',
       color: '#333',
       fontWeight: '600',
     },
     profileSpecialty: {
-      fontSize: '1.3rem',
+      fontSize: isMobile ? '1.1rem' : '1.3rem',
       marginBottom: '0.5rem',
       color: '#7C2A62',
       fontWeight: '500',
@@ -191,7 +294,7 @@ const Doctors = ({ onNavigateToLogin }) => {
     },
     profileDetails: {
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
       gap: '1rem',
       marginBottom: '2rem',
     },
@@ -205,21 +308,21 @@ const Doctors = ({ onNavigateToLogin }) => {
       fontWeight: '600',
       color: '#333',
       marginBottom: '0.3rem',
-      fontSize: '0.9rem',
+      fontSize: isMobile ? '0.85rem' : '0.9rem',
     },
     detailValue: {
       color: '#666',
-      fontSize: '0.9rem',
+      fontSize: isMobile ? '0.85rem' : '0.9rem',
     },
     fullWidthDetail: {
       gridColumn: '1 / -1',
     },
-    // Slots Section Styles
+    // Slots Section Styles - Updated for hour-wise slots
     slotsSection: {
       margin: '2rem 0',
     },
     slotsHeader: {
-      fontSize: '1.3rem',
+      fontSize: isMobile ? '1.1rem' : '1.3rem',
       fontWeight: '600',
       color: '#333',
       marginBottom: '1rem',
@@ -227,18 +330,18 @@ const Doctors = ({ onNavigateToLogin }) => {
     },
     slotsContainer: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+      gridTemplateColumns: isMobile ? 'repeat(auto-fill, minmax(80px, 1fr))' : 'repeat(auto-fill, minmax(100px, 1fr))',
       gap: '0.8rem',
       marginBottom: '1.5rem',
     },
     slotButton: {
-      padding: '0.8rem 0.5rem',
+      padding: isMobile ? '0.8rem 0.3rem' : '1rem 0.5rem',
       backgroundColor: '#f8f9fa',
       border: '2px solid #e9ecef',
       borderRadius: '10px',
       cursor: 'pointer',
       fontWeight: '500',
-      fontSize: '0.9rem',
+      fontSize: isMobile ? '0.8rem' : '0.9rem',
       transition: 'all 0.3s ease',
       textAlign: 'center',
     },
@@ -264,21 +367,25 @@ const Doctors = ({ onNavigateToLogin }) => {
       color: '#666',
     },
     modalBookConsultationButton: {
-      padding: '1rem 2rem',
+      padding: isMobile ? '0.8rem 1.5rem' : '1rem 2rem',
       backgroundColor: '#7C2A62',
       color: 'white',
       border: 'none',
       borderRadius: '25px',
       cursor: 'pointer',
       fontWeight: '600',
-      fontSize: '1.1rem',
+      fontSize: isMobile ? '1rem' : '1.1rem',
       transition: 'all 0.3s ease',
       width: '100%',
       marginTop: '1rem',
+      boxShadow: '0 5px 15px rgba(124, 42, 98, 0.3)',
+      position: 'relative',
+      overflow: 'hidden',
     },
     disabledButton: {
       backgroundColor: '#ccc',
       cursor: 'not-allowed',
+      boxShadow: 'none',
     },
     loginMessage: {
       backgroundColor: '#FFF3CD',
@@ -288,6 +395,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       marginTop: '1rem',
       color: '#856404',
       textAlign: 'center',
+      fontSize: isMobile ? '0.85rem' : '0.9rem',
     },
     loginLink: {
       color: '#7C2A62',
@@ -303,6 +411,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       borderRadius: '10px',
       marginBottom: '1rem',
       textAlign: 'center',
+      fontSize: isMobile ? '0.9rem' : '1rem',
     }
   };
 
@@ -318,6 +427,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       languages: 'English, Hindi, Tamil',
       consultationFee: '₹500',
       availability: 'Mon-Sat: 9 AM - 6 PM',
+      workingHours: { start: 9, end: 18 }, // 9 AM to 6 PM
       about: 'Specialized in general medicine with 10 years of experience. Expertise in chronic disease management and preventive healthcare.',
       patients: '5000+'
     },
@@ -332,6 +442,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       languages: 'English, Hindi',
       consultationFee: '₹800',
       availability: 'Mon-Fri: 10 AM - 4 PM',
+      workingHours: { start: 10, end: 16 }, // 10 AM to 4 PM
       about: 'Senior cardiologist with expertise in heart disease prevention and treatment. Performed 1000+ successful procedures.',
       patients: '3000+'
     },
@@ -346,6 +457,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       languages: 'English, Hindi, Gujarati',
       consultationFee: '₹600',
       availability: 'Mon-Sat: 8 AM - 5 PM',
+      workingHours: { start: 8, end: 17 }, // 8 AM to 5 PM
       about: 'Dedicated pediatrician with expertise in child healthcare, vaccination, and growth monitoring.',
       patients: '4000+'
     },
@@ -360,6 +472,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       languages: 'English, Hindi, Punjabi',
       consultationFee: '₹700',
       availability: 'Tue-Sat: 11 AM - 7 PM',
+      workingHours: { start: 11, end: 19 }, // 11 AM to 7 PM
       about: 'Orthopedic surgeon specializing in joint replacement and sports injuries. 15 years of surgical experience.',
       patients: '6000+'
     },
@@ -374,6 +487,7 @@ const Doctors = ({ onNavigateToLogin }) => {
       languages: 'English, Hindi, Bengali',
       consultationFee: '₹750',
       availability: 'Mon-Fri: 9 AM - 5 PM',
+      workingHours: { start: 9, end: 17 }, // 9 AM to 5 PM
       about: 'Skin and hair specialist with expertise in cosmetic dermatology and skin disease treatment.',
       patients: '3500+'
     },
@@ -388,40 +502,53 @@ const Doctors = ({ onNavigateToLogin }) => {
       languages: 'English, Hindi, Marathi',
       consultationFee: '₹900',
       availability: 'Mon-Sat: 10 AM - 6 PM',
+      workingHours: { start: 10, end: 18 }, // 10 AM to 6 PM
       about: 'Mental health specialist with expertise in anxiety, depression, and relationship counseling.',
       patients: '2000+'
     }
   ];
 
-  // Function to generate time slots
-  const generateTimeSlots = () => {
+  // Function to generate hour-wise time slots based on doctor's working hours
+  const generateHourWiseSlots = (doctor) => {
     const slots = [];
-    const startHour = 9;
-    const endHour = 18;
+    const startHour = doctor.workingHours.start;
+    const endHour = doctor.workingHours.end;
     
     for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        slots.push(timeString);
-      }
+      const timeString = `${hour.toString().padStart(2, '0')}:00`;
+      slots.push(timeString);
     }
     return slots;
   };
 
   // Simulate fetching available slots from API
-  const fetchAvailableSlots = async (doctorId) => {
+  const fetchAvailableSlots = async (doctor) => {
     setLoadingSlots(true);
     
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const allSlots = generateTimeSlots();
+    const allSlots = generateHourWiseSlots(doctor);
     const available = {};
     
     // Randomly mark some slots as available (simulating real-time availability)
+    // But ensure at least 30% of slots are available
     allSlots.forEach(slot => {
-      available[slot] = Math.random() > 0.3; // 70% chance of being available
+      // Higher chance of availability during peak hours (10 AM - 2 PM)
+      const hour = parseInt(slot.split(':')[0]);
+      const isPeakHour = hour >= 10 && hour <= 14;
+      const availabilityChance = isPeakHour ? 0.6 : 0.8; // 60% chance during peak, 80% otherwise
+      available[slot] = Math.random() > (1 - availabilityChance);
     });
+    
+    // Ensure at least 2 slots are always available
+    const availableSlotsList = Object.keys(available).filter(slot => available[slot]);
+    if (availableSlotsList.length < 2) {
+      // Make first two slots available
+      allSlots.slice(0, 2).forEach(slot => {
+        available[slot] = true;
+      });
+    }
     
     setAvailableSlots(available);
     setLoadingSlots(false);
@@ -430,7 +557,7 @@ const Doctors = ({ onNavigateToLogin }) => {
   const handleViewProfile = async (doctor) => {
     setSelectedDoctor(doctor);
     setSelectedSlot(null);
-    await fetchAvailableSlots(doctor.id);
+    await fetchAvailableSlots(doctor);
   };
 
   const handleCloseProfile = () => {
@@ -447,83 +574,100 @@ const Doctors = ({ onNavigateToLogin }) => {
 
   const handleBookConsultation = (doctor = null) => {
     const doctorName = doctor ? doctor.name : (selectedDoctor ? selectedDoctor.name : 'the doctor');
-    const slotInfo = selectedSlot ? ` for ${selectedSlot}` : '';
+    const slotInfo = selectedSlot ? ` for ${formatSlotTime(selectedSlot)}` : '';
     
-    if (selectedSlot) {
-      alert(`Booking consultation with ${doctorName}${slotInfo}. Please login to confirm.`);
-    } else {
+    if (!selectedSlot && selectedDoctor) {
       alert('Please select a time slot first to book consultation with ' + doctorName);
       return;
     }
     
-    // Close the profile modal if open
-    if (selectedDoctor) {
-      handleCloseProfile();
-    }
+    // Show confirmation message
+    const confirmMessage = selectedSlot 
+      ? `Booking consultation with ${doctorName}${slotInfo}. Please login to confirm.`
+      : `Booking consultation with ${doctorName}. Please login to confirm.`;
     
-    // Navigate to login page after a short delay
-    setTimeout(() => {
+    const userConfirmed = window.confirm(confirmMessage + '\n\nClick OK to proceed to login page.');
+    
+    if (userConfirmed) {
+      // Close the profile modal if open
+      if (selectedDoctor) {
+        handleCloseProfile();
+      }
+      
+      // Navigate to login page
       if (onNavigateToLogin) {
         onNavigateToLogin();
       }
-    }, 500);
+    }
   };
 
   const handleLoginLinkClick = () => {
-    handleBookConsultation();
+    if (selectedSlot) {
+      handleBookConsultation();
+    } else {
+      alert('Please select a time slot first to book consultation.');
+    }
   };
 
-  // Format slot time for display
+  // Format slot time for display (hour-wise only)
   const formatSlotTime = (slot) => {
-    const [hours, minutes] = slot.split(':');
+    const [hours] = slot.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${displayHour} ${ampm}`;
   };
+
+  // Generate floating elements
+  const floatingElements = Array.from({ length: isMobile ? 8 : 15 }, (_, i) => ({
+    id: i,
+    size: Math.random() * (isMobile ? 50 : 100) + (isMobile ? 30 : 50),
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    animationDelay: Math.random() * 5,
+  }));
 
   return (
     <section style={styles.doctors}>
+      {/* Floating Background Elements */}
+      <div style={styles.floatingElements}>
+        {floatingElements.map((element) => (
+          <div
+            key={element.id}
+            style={{
+              ...styles.floatingElement,
+              width: element.size,
+              height: element.size,
+              left: `${element.left}%`,
+              top: `${element.top}%`,
+              animationDelay: `${element.animationDelay}s`,
+            }}
+          />
+        ))}
+      </div>
+
       <div style={styles.container}>
-        <h2 style={{
-          ...styles.sectionTitle,
-          ...(window.innerWidth <= 768 && { fontSize: '2rem' }),
-          ...(window.innerWidth <= 480 && { fontSize: '1.8rem' })
-        }}>
+        <h2 style={styles.sectionTitle}>
           Our Medical Experts
         </h2>
-        <p style={{
-          ...styles.sectionSubtitle,
-          ...(window.innerWidth <= 768 && { fontSize: '1rem', marginBottom: '3rem' }),
-          ...(window.innerWidth <= 480 && { fontSize: '0.9rem', padding: '0 1rem' })
-        }}>
+        <p style={styles.sectionSubtitle}>
           Connect with certified healthcare professionals online
         </p>
         
-        <div style={{
-          ...styles.doctorsGrid,
-          ...(window.innerWidth <= 768 && { 
-            gridTemplateColumns: '1fr',
-            gap: '1.5rem'
-          })
-        }}>
+        <div style={styles.doctorsGrid}>
           {doctors.map((doctor, index) => (
             <div
               key={doctor.id}
-              style={{
-                ...styles.doctorCard,
-                ...(window.innerWidth <= 768 && { 
-                  padding: '1.5rem',
-                  margin: '0 0.5rem'
-                })
-              }}
+              style={styles.doctorCard}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 15px 40px rgba(124, 42, 98, 0.15)';
+                e.currentTarget.style.transform = 'translateY(-10px)';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(124, 42, 98, 0.15)';
+                e.currentTarget.style.borderColor = '#7C2A62';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 5px 20px rgba(124, 42, 98, 0.1)';
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(124, 42, 98, 0.1)';
+                e.currentTarget.style.borderColor = 'transparent';
               }}
             >
               <div style={styles.rating}>⭐ {doctor.rating}</div>
@@ -531,45 +675,40 @@ const Doctors = ({ onNavigateToLogin }) => {
               <h3 style={styles.doctorName}>{doctor.name}</h3>
               <p style={styles.doctorSpecialty}>{doctor.specialty}</p>
               <p style={styles.doctorExperience}>Experience: {doctor.experience}</p>
+              <p style={{...styles.doctorExperience, fontSize: '0.8rem', color: '#7C2A62', fontWeight: '500'}}>
+                Available: {doctor.availability}
+              </p>
               
               <div style={styles.buttonContainer}>
                 <button
-                  style={{
-                    ...styles.viewProfileButton,
-                    ...(window.innerWidth <= 480 && { 
-                      padding: '0.6rem 1.2rem',
-                      fontSize: '0.9rem'
-                    })
-                  }}
+                  style={styles.viewProfileButton}
                   onClick={() => handleViewProfile(doctor)}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor = '#7C2A62';
                     e.target.style.color = 'white';
+                    e.target.style.transform = 'translateY(-2px)';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.backgroundColor = 'transparent';
                     e.target.style.color = '#7C2A62';
+                    e.target.style.transform = 'translateY(0)';
                   }}
                 >
                   View Profile
                 </button>
                 
                 <button
-                  style={{
-                    ...styles.bookConsultationButton,
-                    ...(window.innerWidth <= 480 && { 
-                      padding: '0.6rem 1.2rem',
-                      fontSize: '0.9rem'
-                    })
-                  }}
+                  style={styles.bookConsultationButton}
                   onClick={() => handleBookConsultation(doctor)}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor = '#5a1a4a';
-                    e.target.style.transform = 'scale(1.05)';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(124, 42, 98, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.backgroundColor = '#7C2A62';
-                    e.target.style.transform = 'scale(1)';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 5px 15px rgba(124, 42, 98, 0.3)';
                   }}
                 >
                   Book Consultation
@@ -582,27 +721,17 @@ const Doctors = ({ onNavigateToLogin }) => {
         {/* Doctor Profile Modal */}
         {selectedDoctor && (
           <div style={styles.profileModal} onClick={handleCloseProfile}>
-            <div style={{
-              ...styles.profileContent,
-              ...(window.innerWidth <= 480 && { 
-                padding: '1.5rem',
-                margin: '1rem'
-              })
-            }} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.profileContent} onClick={(e) => e.stopPropagation()}>
               <button 
-                style={{
-                  ...styles.closeButton,
-                  ...(window.innerWidth <= 480 && {
-                    top: '0.5rem',
-                    right: '0.5rem'
-                  })
-                }}
+                style={styles.closeButton}
                 onClick={handleCloseProfile}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = '#F7D9EB';
+                  e.target.style.color = '#7C2A62';
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = '#7C2A62';
                 }}
               >
                 ×
@@ -642,7 +771,7 @@ const Doctors = ({ onNavigateToLogin }) => {
                 </div>
               </div>
 
-              {/* Available Slots Section */}
+              {/* Available Slots Section - Now Hour-wise based on doctor availability */}
               <div style={styles.slotsSection}>
                 <h3 style={styles.slotsHeader}>Available Time Slots (Today)</h3>
                 
@@ -687,6 +816,12 @@ const Doctors = ({ onNavigateToLogin }) => {
                         </button>
                       ))}
                     </div>
+                    
+                    {Object.keys(availableSlots).length === 0 && !loadingSlots && (
+                      <div style={{...styles.loginMessage, backgroundColor: '#f8d7da', color: '#721c24'}}>
+                        No slots available for today. Please check back tomorrow.
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -701,13 +836,15 @@ const Doctors = ({ onNavigateToLogin }) => {
                 onMouseEnter={(e) => {
                   if (selectedSlot) {
                     e.target.style.backgroundColor = '#5a1a4a';
-                    e.target.style.transform = 'scale(1.05)';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(124, 42, 98, 0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedSlot) {
                     e.target.style.backgroundColor = '#7C2A62';
-                    e.target.style.transform = 'scale(1)';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 5px 15px rgba(124, 42, 98, 0.3)';
                   }
                 }}
               >

@@ -1,733 +1,3 @@
-// import { useState, useEffect } from 'react';
-
-// // Complete Mock Data
-// export const dashboardData = {
-//   appointments: {
-//     today: 8,
-//     week: 42,
-//     month: 156
-//   },
-//   consultations: {
-//     today: 6,
-//     week: 38,
-//     month: 142
-//   },
-//   rescheduled: {
-//     today: 2,
-//     week: 8,
-//     month: 25
-//   },
-//   cancelled: {
-//     today: 1,
-//     week: 5,
-//     month: 18
-//   },
-//   recentConsultations: [
-//     {
-//       id: 1,
-//       patientName: 'Sarah Johnson',
-//       time: '10:30 AM',
-//       date: '2024-01-15',
-//       issue: 'Regular checkup and prescription renewal',
-//       age: 45,
-//       status: 'completed',
-//       prescription: 'Medication A, Medication B',
-//       notes: 'Patient responding well to treatment'
-//     },
-//     {
-//       id: 2,
-//       patientName: 'Michael Chen',
-//       time: '11:15 AM',
-//       date: '2024-01-15',
-//       issue: 'Follow-up for blood pressure medication',
-//       age: 62,
-//       status: 'completed',
-//       prescription: 'Blood Pressure Meds',
-//       notes: 'BP under control, continue medication'
-//     },
-//     {
-//       id: 3,
-//       patientName: 'Emily Rodriguez',
-//       time: '2:00 PM',
-//       date: '2024-01-15',
-//       issue: 'Initial consultation for chronic pain',
-//       age: 38,
-//       status: 'completed',
-//       prescription: 'Pain Management',
-//       notes: 'Referred to physiotherapy'
-//     },
-//     {
-//       id: 4,
-//       patientName: 'Robert Williams',
-//       time: '3:30 PM',
-//       date: '2024-01-15',
-//       issue: 'Diabetes management review',
-//       age: 55,
-//       status: 'completed',
-//       prescription: 'Insulin, Diet Plan',
-//       notes: 'Blood sugar levels improving'
-//     }
-//   ],
-//   upcomingAppointments: [
-//     {
-//       id: 5,
-//       patientName: 'Lisa Thompson',
-//       time: '10:00 AM',
-//       date: '2024-01-16',
-//       issue: 'Annual physical examination',
-//       age: 42,
-//       duration: '30 mins',
-//       type: 'Follow-up',
-//       priority: 'normal',
-//       status: 'scheduled'
-//     },
-//     {
-//       id: 6,
-//       patientName: 'David Miller',
-//       time: '11:00 AM',
-//       date: '2024-01-16',
-//       issue: 'Cardiac follow-up consultation',
-//       age: 68,
-//       duration: '45 mins',
-//       type: 'Specialist',
-//       priority: 'high',
-//       status: 'scheduled'
-//     },
-//     {
-//       id: 7,
-//       patientName: 'Priya Sharma',
-//       time: '2:30 PM',
-//       date: '2024-01-16',
-//       issue: 'Pregnancy checkup',
-//       age: 29,
-//       duration: '30 mins',
-//       type: 'Routine',
-//       priority: 'normal',
-//       status: 'scheduled'
-//     }
-//   ],
-//   rescheduledAppointments: [
-//     {
-//       id: 8,
-//       patientName: 'Amit Patel',
-//       time: '9:00 AM',
-//       date: '2024-01-15',
-//       issue: 'Fever and cold',
-//       age: 35,
-//       status: 'rescheduled',
-//       originalDate: '2024-01-14',
-//       newDate: '2024-01-15',
-//       reason: 'Patient requested change'
-//     }
-//   ],
-//   cancelledAppointments: [
-//     {
-//       id: 9,
-//       patientName: 'Rajesh Kumar',
-//       time: '3:00 PM',
-//       date: '2024-01-17',
-//       issue: 'General health checkup',
-//       age: 40,
-//       status: 'cancelled',
-//       cancelledDate: '2024-01-15',
-//       reason: 'Patient emergency'
-//     }
-//   ],
-//   pendingAppointments: [
-//     {
-//       id: 10,
-//       patientName: 'Rahul Verma',
-//       time: '3:00 PM',
-//       date: '2024-01-17',
-//       issue: 'General health checkup',
-//       age: 40,
-//       duration: '30 mins',
-//       type: 'New Patient',
-//       priority: 'normal',
-//       status: 'pending',
-//       requestedDate: '2024-01-15'
-//     }
-//   ],
-//   patients: [
-//     {
-//       id: 1,
-//       name: 'Sarah Johnson',
-//       lastVisit: '2024-01-15',
-//       totalVisits: 12,
-//       conditions: ['Hypertension', 'Diabetes'],
-//       phone: '+91 98765 43210',
-//       email: 'sarah.j@email.com',
-//       bloodGroup: 'A+',
-//       emergencyContact: '+91 98765 43211',
-//       age: 45,
-//       medicalHistory: [
-//         { date: '2024-01-15', diagnosis: 'Regular checkup', prescription: 'Medication A, Medication B' },
-//         { date: '2023-12-10', diagnosis: 'Diabetes follow-up', prescription: 'Insulin adjustment' }
-//       ]
-//     },
-//     {
-//       id: 2,
-//       name: 'Michael Chen',
-//       lastVisit: '2024-01-15',
-//       totalVisits: 8,
-//       conditions: ['High Blood Pressure'],
-//       phone: '+91 98765 43212',
-//       email: 'michael.c@email.com',
-//       bloodGroup: 'B+',
-//       emergencyContact: '+91 98765 43213',
-//       age: 62,
-//       medicalHistory: [
-//         { date: '2024-01-15', diagnosis: 'BP follow-up', prescription: 'Blood Pressure Meds' }
-//       ]
-//     },
-//     {
-//       id: 3,
-//       name: 'Emily Rodriguez',
-//       lastVisit: '2024-01-15',
-//       totalVisits: 3,
-//       conditions: ['Chronic Back Pain'],
-//       phone: '+91 98765 43214',
-//       email: 'emily.r@email.com',
-//       bloodGroup: 'O+',
-//       emergencyContact: '+91 98765 43215',
-//       age: 38,
-//       medicalHistory: [
-//         { date: '2024-01-15', diagnosis: 'Chronic pain consultation', prescription: 'Pain Management' }
-//       ]
-//     },
-//     {
-//       id: 4,
-//       name: 'Robert Williams',
-//       lastVisit: '2024-01-15',
-//       totalVisits: 5,
-//       conditions: ['Diabetes'],
-//       phone: '+91 98765 43216',
-//       email: 'robert.w@email.com',
-//       bloodGroup: 'AB+',
-//       emergencyContact: '+91 98765 43217',
-//       age: 55,
-//       medicalHistory: [
-//         { date: '2024-01-15', diagnosis: 'Diabetes review', prescription: 'Insulin, Diet Plan' }
-//       ]
-//     }
-//   ],
-//   earningsHistory: {
-//     daily: [
-//       { date: '2024-01-15', amount: 2400, consultations: 6 },
-//       { date: '2024-01-14', amount: 3200, consultations: 8 },
-//       { date: '2024-01-13', amount: 2800, consultations: 7 },
-//       { date: '2024-01-12', amount: 3600, consultations: 9 }
-//     ],
-//     weekly: [
-//       { week: 'Week 2, Jan 2024', amount: 15200, consultations: 38 },
-//       { week: 'Week 1, Jan 2024', amount: 16800, consultations: 42 },
-//       { week: 'Week 4, Dec 2023', amount: 14400, consultations: 36 }
-//     ],
-//     monthly: [
-//       { month: 'January 2024', amount: 56800, consultations: 142 },
-//       { month: 'December 2023', amount: 61200, consultations: 153 },
-//       { month: 'November 2023', amount: 52400, consultations: 131 }
-//     ]
-//   }
-// };
-
-// export const navigationItems = [
-//   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-//   { id: 'appointments', label: 'Appointments', icon: '📅' },
-//   { id: 'patients', label: 'Patients', icon: '👥' },
-//   { id: 'earnings', label: 'Earnings', icon: '💰' },
-//   { id: 'messages', label: 'Messages', icon: '💬' }
-// ];
-
-// // Custom Hook for State Management
-// export const useDoctorState = (user) => {
-//   const [activePage, setActivePage] = useState('dashboard');
-//   const [timeRange, setTimeRange] = useState('today');
-//   const [consultationDetails, setConsultationDetails] = useState(null);
-//   const [appointmentFilter, setAppointmentFilter] = useState('upcoming');
-//   const [patientSearch, setPatientSearch] = useState('');
-//   const [earningFilter, setEarningFilter] = useState('daily');
-//   const [showProfileModal, setShowProfileModal] = useState(false);
-//   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
-//   const [showMessagesModal, setShowMessagesModal] = useState(false);
-//   const [selectedPatient, setSelectedPatient] = useState(null);
-//   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-//   const [userProfile, setUserProfile] = useState({
-//     fullName: user?.fullName || 'Dr. John Doe',
-//     email: user?.email || 'doctor@example.com',
-//     phone: user?.phone || '+91 98765 43210',
-//     specialization: user?.specialization || 'General Physician',
-//     licenseNumber: user?.licenseNumber || 'MED-2024-12345',
-//     experience: user?.experience || '12 years',
-//     hospital: user?.hospital || 'City General Hospital',
-//     address: user?.address || 'Medical Complex, Sector 15, Noida',
-//     city: user?.city || 'Noida',
-//     state: user?.state || 'Uttar Pradesh',
-//     pincode: user?.pincode || '201301'
-//   });
-
-//   const [notifications, setNotifications] = useState([
-//     {
-//       id: 1,
-//       type: 'appointment',
-//       title: 'New Appointment Request',
-//       message: 'Rahul Verma requested an appointment for general health checkup',
-//       time: '10 minutes ago',
-//       read: false,
-//       priority: 'high'
-//     },
-//     {
-//       id: 2,
-//       type: 'message',
-//       title: 'New Message from Patient',
-//       message: 'Sarah Johnson sent a message about prescription follow-up',
-//       time: '25 minutes ago',
-//       read: false,
-//       priority: 'medium'
-//     },
-//     {
-//       id: 3,
-//       type: 'reminder',
-//       title: 'Upcoming Appointment',
-//       message: 'You have an appointment with Lisa Thompson in 30 minutes',
-//       time: '1 hour ago',
-//       read: true,
-//       priority: 'high'
-//     }
-//   ]);
-
-//   const [appointments, setAppointments] = useState({
-//     upcoming: [],
-//     rescheduled: [],
-//     cancelled: [],
-//     pending: []
-//   });
-
-//   const [patientNotes, setPatientNotes] = useState({});
-//   const [patientMessages, setPatientMessages] = useState({});
-//   const [formErrors, setFormErrors] = useState({});
-
-//   useEffect(() => {
-//     // Initialize appointments
-//     setAppointments({
-//       upcoming: dashboardData.upcomingAppointments,
-//       rescheduled: dashboardData.rescheduledAppointments,
-//       cancelled: dashboardData.cancelledAppointments,
-//       pending: dashboardData.pendingAppointments
-//     });
-
-//     // Initialize messages
-//     const initialMessages = {
-//       'Sarah Johnson': [
-//         {
-//           id: 1,
-//           from: 'patient',
-//           message: 'Hello Doctor, I wanted to follow up on my prescription.',
-//           timestamp: '2024-01-15T14:30:00',
-//           read: true
-//         },
-//         {
-//           id: 2,
-//           from: 'doctor',
-//           message: 'Hello Sarah, your prescription has been updated. You can collect it from the pharmacy.',
-//           timestamp: '2024-01-15T14:35:00',
-//           read: true
-//         }
-//       ],
-//       'Michael Chen': [
-//         {
-//           id: 1,
-//           from: 'patient',
-//           message: 'Dr. John, my blood pressure readings have been normal this week.',
-//           timestamp: '2024-01-15T10:15:00',
-//           read: true
-//         }
-//       ],
-//       'Emily Rodriguez': [
-//         {
-//           id: 1,
-//           from: 'patient',
-//           message: 'When should I schedule my next physiotherapy session?',
-//           timestamp: '2024-01-14T16:20:00',
-//           read: false
-//         }
-//       ]
-//     };
-
-//     setPatientMessages(initialMessages);
-//   }, []);
-
-//   return {
-//     activePage,
-//     setActivePage,
-//     timeRange,
-//     setTimeRange,
-//     consultationDetails,
-//     setConsultationDetails,
-//     appointmentFilter,
-//     setAppointmentFilter,
-//     patientSearch,
-//     setPatientSearch,
-//     earningFilter,
-//     setEarningFilter,
-//     showProfileModal,
-//     setShowProfileModal,
-//     showNotificationsModal,
-//     setShowNotificationsModal,
-//     showMessagesModal,
-//     setShowMessagesModal,
-//     selectedPatient,
-//     setSelectedPatient,
-//     showLogoutConfirm,
-//     setShowLogoutConfirm,
-//     userProfile,
-//     setUserProfile,
-//     notifications,
-//     setNotifications,
-//     appointments,
-//     setAppointments,
-//     patientNotes,
-//     setPatientNotes,
-//     patientMessages,
-//     setPatientMessages,
-//     formErrors,
-//     setFormErrors
-//   };
-// };
-
-// // Custom Hook for Actions
-// export const useDoctorActions = (state) => {
-//   const {
-//     userProfile,
-//     setUserProfile,
-//     appointments,
-//     setAppointments,
-//     patientMessages,
-//     setPatientMessages,
-//     patientNotes,
-//     setPatientNotes,
-//     notifications,
-//     setNotifications,
-//     setConsultationDetails,
-//     setFormErrors,
-//     setShowMessagesModal,
-//     setSelectedPatient,
-//     setShowProfileModal,
-//     setShowNotificationsModal,
-//     setShowLogoutConfirm
-//   } = state;
-
-//   const getUnreadMessagesCount = () => {
-//     let count = 0;
-//     Object.values(patientMessages).forEach(messages => {
-//       messages.forEach(msg => {
-//         if (msg.from === 'patient' && !msg.read) {
-//           count++;
-//         }
-//       });
-//     });
-//     return count;
-//   };
-
-//   const getUnreadNotificationsCount = () => {
-//     return notifications.filter(notification => !notification.read).length;
-//   };
-
-//   const handleStartConversation = (patient) => {
-//     if (!patient || !patient.name) return;
-//     setSelectedPatient(patient);
-//     setShowMessagesModal(true);
-//     handleMarkAsRead(patient.name);
-//   };
-
-//   const handleMarkAsRead = (patientName) => {
-//     setPatientMessages(prev => {
-//       const updated = { ...prev };
-//       if (updated[patientName]) {
-//         updated[patientName] = updated[patientName].map(msg => ({
-//           ...msg,
-//           read: true
-//         }));
-//       }
-//       return updated;
-//     });
-//   };
-
-//   const handleSendMessage = (patientName, message) => {
-//     if (!message.trim()) return;
-
-//     const newMessage = {
-//       id: Date.now(),
-//       from: 'doctor',
-//       message: message,
-//       timestamp: new Date().toISOString(),
-//       read: true
-//     };
-
-//     setPatientMessages(prev => ({
-//       ...prev,
-//       [patientName]: [...(prev[patientName] || []), newMessage]
-//     }));
-//   };
-
-//   const handleStartConsultation = (appointmentId) => {
-//     const appointment = appointments.upcoming.find(apt => apt.id === appointmentId);
-//     if (appointment) {
-//       setAppointments(prev => ({
-//         ...prev,
-//         upcoming: prev.upcoming.filter(apt => apt.id !== appointmentId)
-//       }));
-//     }
-//   };
-
-//   const handleRescheduleAppointment = (appointmentId) => {
-//     const appointment = appointments.upcoming.find(apt => apt.id === appointmentId);
-//     if (appointment) {
-//       const newDate = prompt(`Reschedule appointment with ${appointment.patientName}. Enter new date (YYYY-MM-DD):`, appointment.date);
-//       const newTime = prompt('Enter new time (HH:MM AM/PM):', appointment.time);
-      
-//       if (newDate && newTime) {
-//         const rescheduledAppointment = {
-//           ...appointment,
-//           id: Date.now(),
-//           originalDate: appointment.date,
-//           originalTime: appointment.time,
-//           date: newDate,
-//           time: newTime,
-//           status: 'rescheduled',
-//           reason: 'Doctor rescheduled'
-//         };
-
-//         setAppointments(prev => ({
-//           ...prev,
-//           upcoming: prev.upcoming.filter(apt => apt.id !== appointmentId),
-//           rescheduled: [...prev.rescheduled, rescheduledAppointment]
-//         }));
-//       }
-//     }
-//   };
-
-//   const handleCancelAppointment = (appointmentId) => {
-//     const appointment = appointments.upcoming.find(apt => apt.id === appointmentId);
-//     if (appointment && window.confirm(`Are you sure you want to cancel the appointment with ${appointment.patientName}?`)) {
-//       const cancelledAppointment = {
-//         ...appointment,
-//         status: 'cancelled',
-//         cancelledDate: new Date().toISOString().split('T')[0],
-//         reason: 'Doctor cancelled'
-//       };
-
-//       setAppointments(prev => ({
-//         ...prev,
-//         upcoming: prev.upcoming.filter(apt => apt.id !== appointmentId),
-//         cancelled: [...prev.cancelled, cancelledAppointment]
-//       }));
-//     }
-//   };
-
-//   const handleApproveAppointment = (appointmentId) => {
-//     const appointment = appointments.pending.find(apt => apt.id === appointmentId);
-//     if (appointment) {
-//       setAppointments(prev => ({
-//         ...prev,
-//         pending: prev.pending.filter(apt => apt.id !== appointmentId),
-//         upcoming: [...prev.upcoming, { ...appointment, status: 'scheduled' }]
-//       }));
-//     }
-//   };
-
-//   const handleRejectAppointment = (appointmentId) => {
-//     const appointment = appointments.pending.find(apt => apt.id === appointmentId);
-//     if (appointment && window.confirm(`Are you sure you want to reject the appointment request from ${appointment.patientName}?`)) {
-//       setAppointments(prev => ({
-//         ...prev,
-//         pending: prev.pending.filter(apt => apt.id !== appointmentId)
-//       }));
-//     }
-//   };
-
-//   const handleAddNotes = (patientName) => {
-//     const notes = prompt(`Add notes for ${patientName}:`, patientNotes[patientName] || '');
-//     if (notes !== null) {
-//       setPatientNotes(prev => ({
-//         ...prev,
-//         [patientName]: notes
-//       }));
-//     }
-//   };
-
-//   const handleViewFullHistory = (patientName) => {
-//     const patient = dashboardData.patients.find(p => p.name === patientName);
-//     if (patient) {
-//       const historyWindow = window.open('', '_blank');
-//       historyWindow.document.write(`
-//         <html>
-//           <head>
-//             <title>Medical History - ${patientName}</title>
-//             <style>
-//               body { font-family: Arial, sans-serif; margin: 20px; }
-//               .header { border-bottom: 2px solid #7C2A62; padding-bottom: 10px; margin-bottom: 20px; }
-//               .history-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-//               .diagnosis { font-weight: bold; color: #7C2A62; }
-//               .prescription { color: #2d5016; }
-//             </style>
-//           </head>
-//           <body>
-//             <div class="header">
-//               <h1>Medical History - ${patientName}</h1>
-//               <p><strong>Age:</strong> ${patient.age} | <strong>Blood Group:</strong> ${patient.bloodGroup}</p>
-//               <p><strong>Conditions:</strong> ${patient.conditions.join(', ')}</p>
-//             </div>
-//             <h2>Medical Records</h2>
-//             ${patient.medicalHistory.map(record => `
-//               <div class="history-item">
-//                 <p><strong>Date:</strong> ${record.date}</p>
-//                 <p class="diagnosis">Diagnosis: ${record.diagnosis}</p>
-//                 <p class="prescription">Prescription: ${record.prescription}</p>
-//               </div>
-//             `).join('')}
-//           </body>
-//         </html>
-//       `);
-//       historyWindow.document.close();
-//     }
-//   };
-
-//   const handleProfileUpdate = (updatedProfile) => {
-//     if (validateForm(updatedProfile)) {
-//       setUserProfile(updatedProfile);
-//       setShowProfileModal(false);
-//       setFormErrors({});
-//     }
-//   };
-
-//   const handleMarkNotificationAsRead = (notificationId) => {
-//     setNotifications(prev =>
-//       prev.map(notification =>
-//         notification.id === notificationId
-//           ? { ...notification, read: true }
-//           : notification
-//       )
-//     );
-//   };
-
-//   const handleMarkAllNotificationsAsRead = () => {
-//     setNotifications(prev =>
-//       prev.map(notification => ({ ...notification, read: true }))
-//     );
-//   };
-
-//   const handleClearAllNotifications = () => {
-//     setNotifications([]);
-//   };
-
-//   const showNotification = (title, message) => {
-//     console.log(`Notification: ${title} - ${message}`);
-//   };
-
-//   // Complete form validation
-//   const validateForm = (formData) => {
-//     const errors = {};
-
-//     const validateEmail = (email) => {
-//       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//       return emailRegex.test(email);
-//     };
-
-//     const validatePhone = (phone) => {
-//       const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-//       return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
-//     };
-
-//     const validateName = (name) => {
-//       const nameRegex = /^[a-zA-Z\s]*$/;
-//       return nameRegex.test(name) && name.trim().length > 0;
-//     };
-
-//     const validatePincode = (pincode) => {
-//       if (!pincode) return true; // Optional field
-//       const pincodeRegex = /^[1-9][0-9]{5}$/;
-//       return pincodeRegex.test(pincode);
-//     };
-
-//     const validateLicenseNumber = (license) => {
-//       const licenseRegex = /^[A-Za-z0-9\-]+$/;
-//       return licenseRegex.test(license) && license.trim().length > 0;
-//     };
-
-//     const validateExperience = (experience) => {
-//       const experienceRegex = /^[0-9]+\s*(years|yrs)?$/i;
-//       return experienceRegex.test(experience) && experience.trim().length > 0;
-//     };
-
-//     if (!validateName(formData.fullName)) {
-//       errors.fullName = 'Please enter a valid name (letters and spaces only)';
-//     }
-
-//     if (!validateEmail(formData.email)) {
-//       errors.email = 'Please enter a valid email address';
-//     }
-
-//     if (!validatePhone(formData.phone)) {
-//       errors.phone = 'Please enter a valid phone number';
-//     }
-
-//     if (!formData.specialization.trim()) {
-//       errors.specialization = 'Specialization is required';
-//     }
-
-//     if (!validateLicenseNumber(formData.licenseNumber)) {
-//       errors.licenseNumber = 'Please enter a valid license number';
-//     }
-
-//     if (!validateExperience(formData.experience)) {
-//       errors.experience = 'Please enter valid experience (e.g., "12 years")';
-//     }
-
-//     if (formData.pincode && !validatePincode(formData.pincode)) {
-//       errors.pincode = 'Please enter a valid 6-digit pincode';
-//     }
-
-//     setFormErrors(errors);
-//     return Object.keys(errors).length === 0;
-//   };
-
-//   return {
-//     getUnreadMessagesCount,
-//     getUnreadNotificationsCount,
-//     handleStartConversation,
-//     handleMarkAsRead,
-//     handleSendMessage,
-//     handleStartConsultation,
-//     handleRescheduleAppointment,
-//     handleCancelAppointment,
-//     handleApproveAppointment,
-//     handleRejectAppointment,
-//     handleAddNotes,
-//     handleViewFullHistory,
-//     handleProfileUpdate,
-//     handleMarkNotificationAsRead,
-//     handleMarkAllNotificationsAsRead,
-//     handleClearAllNotifications,
-//     showNotification,
-//     validateForm,
-//     setShowProfileModal,
-//     setShowNotificationsModal,
-//     setShowMessagesModal,
-//     setShowLogoutConfirm,
-//     setConsultationDetails,
-//     setFormErrors
-//   };
-// };
-
-
-
-
-
-
-
-
 import { useState, useEffect } from 'react';
 
 // Complete Mock Data
@@ -965,8 +235,8 @@ export const navigationItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'appointments', label: 'Appointments', icon: '📅' },
   { id: 'patients', label: 'Patients', icon: '👥' },
-  { id: 'earnings', label: 'Earnings', icon: '💰' },
-  { id: 'messages', label: 'Messages', icon: '💬' }
+  { id: 'earnings', label: 'Earnings', icon: '💰' }
+  // Removed messages from navigation
 ];
 
 // Custom Hook for Window Size Detection
@@ -998,18 +268,6 @@ export const useWindowSize = () => {
   return windowSize;
 };
 
-// Helper function to check if mobile
-export const isMobile = () => {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth <= 768;
-};
-
-// Helper function to check if tablet
-export const isTablet = () => {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth <= 1024;
-};
-
 // Custom Hook for State Management
 export const useDoctorState = (user) => {
   const [activePage, setActivePage] = useState('dashboard');
@@ -1021,6 +279,7 @@ export const useDoctorState = (user) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showMessagesModal, setShowMessagesModal] = useState(false);
+  const [showChatbotModal, setShowChatbotModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -1158,6 +417,8 @@ export const useDoctorState = (user) => {
     setShowNotificationsModal,
     showMessagesModal,
     setShowMessagesModal,
+    showChatbotModal,
+    setShowChatbotModal,
     selectedPatient,
     setSelectedPatient,
     showLogoutConfirm,
@@ -1202,18 +463,22 @@ export const useDoctorActions = (state) => {
     setShowLogoutConfirm,
     setIsSidebarOpen,
     windowSize,
-    setActivePage // Added missing dependency
+    setActivePage
   } = state;
 
   const getUnreadMessagesCount = () => {
     let count = 0;
-    Object.values(patientMessages).forEach(messages => {
-      messages.forEach(msg => {
-        if (msg.from === 'patient' && !msg.read) {
-          count++;
+    if (patientMessages && typeof patientMessages === 'object') {
+      Object.values(patientMessages).forEach(messages => {
+        if (Array.isArray(messages)) {
+          messages.forEach(msg => {
+            if (msg.from === 'patient' && !msg.read) {
+              count++;
+            }
+          });
         }
       });
-    });
+    }
     return count;
   };
 
@@ -1227,7 +492,7 @@ export const useDoctorActions = (state) => {
     setShowMessagesModal(true);
     
     // Auto-close sidebar on mobile when opening messages
-    if (windowSize.width <= 768) {
+    if (windowSize && windowSize.width <= 768) {
       setIsSidebarOpen(false);
     }
     
@@ -1273,41 +538,8 @@ export const useDoctorActions = (state) => {
       }));
       
       // Show mobile-friendly notification
-      if (windowSize.width <= 768) {
+      if (windowSize && windowSize.width <= 768) {
         showNotification('Consultation Started', `Started consultation with ${appointment.patientName}`);
-      }
-    }
-  };
-
-  const handleRescheduleAppointment = (appointmentId) => {
-    const appointment = appointments.upcoming.find(apt => apt.id === appointmentId);
-    if (appointment) {
-      // Mobile-friendly reschedule using window.prompt
-      const newDate = prompt(`Reschedule appointment with ${appointment.patientName}. Enter new date (YYYY-MM-DD):`, appointment.date);
-      const newTime = prompt('Enter new time (HH:MM AM/PM):', appointment.time);
-      
-      if (newDate && newTime) {
-        const rescheduledAppointment = {
-          ...appointment,
-          id: Date.now(),
-          originalDate: appointment.date,
-          originalTime: appointment.time,
-          date: newDate,
-          time: newTime,
-          status: 'rescheduled',
-          reason: 'Doctor rescheduled'
-        };
-
-        setAppointments(prev => ({
-          ...prev,
-          upcoming: prev.upcoming.filter(apt => apt.id !== appointmentId),
-          rescheduled: [...prev.rescheduled, rescheduledAppointment]
-        }));
-
-        // Mobile notification
-        if (windowSize.width <= 768) {
-          showNotification('Appointment Rescheduled', `Rescheduled with ${appointment.patientName}`);
-        }
       }
     }
   };
@@ -1332,7 +564,7 @@ export const useDoctorActions = (state) => {
         }));
 
         // Mobile notification
-        if (windowSize.width <= 768) {
+        if (windowSize && windowSize.width <= 768) {
           showNotification('Appointment Cancelled', `Cancelled appointment with ${appointment.patientName}`);
         }
       }
@@ -1349,7 +581,7 @@ export const useDoctorActions = (state) => {
       }));
 
       // Mobile notification
-      if (windowSize.width <= 768) {
+      if (windowSize && windowSize.width <= 768) {
         showNotification('Appointment Approved', `Approved appointment with ${appointment.patientName}`);
       }
     }
@@ -1367,7 +599,7 @@ export const useDoctorActions = (state) => {
         }));
 
         // Mobile notification
-        if (windowSize.width <= 768) {
+        if (windowSize && windowSize.width <= 768) {
           showNotification('Appointment Rejected', `Rejected appointment with ${appointment.patientName}`);
         }
       }
@@ -1384,7 +616,7 @@ export const useDoctorActions = (state) => {
       }));
 
       // Mobile notification
-      if (windowSize.width <= 768) {
+      if (windowSize && windowSize.width <= 768) {
         showNotification('Notes Added', `Added notes for ${patientName}`);
       }
     }
@@ -1393,8 +625,11 @@ export const useDoctorActions = (state) => {
   const handleViewFullHistory = (patientName) => {
     const patient = dashboardData.patients.find(p => p.name === patientName);
     if (patient) {
+      // Use windowSize safely with fallback
+      const isMobileView = windowSize ? windowSize.width <= 768 : window.innerWidth <= 768;
+      
       // Mobile-friendly history view
-      if (windowSize.width <= 768) {
+      if (isMobileView) {
         // For mobile, open in same window with responsive design
         const historyHTML = `
           <html>
@@ -1464,41 +699,45 @@ export const useDoctorActions = (state) => {
         `;
         
         const historyWindow = window.open('', '_blank');
-        historyWindow.document.write(historyHTML);
-        historyWindow.document.close();
+        if (historyWindow) {
+          historyWindow.document.write(historyHTML);
+          historyWindow.document.close();
+        }
       } else {
         // For desktop, use the original design
         const historyWindow = window.open('', '_blank');
-        historyWindow.document.write(`
-          <html>
-            <head>
-              <title>Medical History - ${patientName}</title>
-              <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                .header { border-bottom: 2px solid #7C2A62; padding-bottom: 10px; margin-bottom: 20px; }
-                .history-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-                .diagnosis { font-weight: bold; color: #7C2A62; }
-                .prescription { color: #2d5016; }
-              </style>
-            </head>
-            <body>
-              <div class="header">
-                <h1>Medical History - ${patientName}</h1>
-                <p><strong>Age:</strong> ${patient.age} | <strong>Blood Group:</strong> ${patient.bloodGroup}</p>
-                <p><strong>Conditions:</strong> ${patient.conditions.join(', ')}</p>
-              </div>
-              <h2>Medical Records</h2>
-              ${patient.medicalHistory.map(record => `
-                <div class="history-item">
-                  <p><strong>Date:</strong> ${record.date}</p>
-                  <p class="diagnosis">Diagnosis: ${record.diagnosis}</p>
-                  <p class="prescription">Prescription: ${record.prescription}</p>
+        if (historyWindow) {
+          historyWindow.document.write(`
+            <html>
+              <head>
+                <title>Medical History - ${patientName}</title>
+                <style>
+                  body { font-family: Arial, sans-serif; margin: 20px; }
+                  .header { border-bottom: 2px solid #7C2A62; padding-bottom: 10px; margin-bottom: 20px; }
+                  .history-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+                  .diagnosis { font-weight: bold; color: #7C2A62; }
+                  .prescription { color: #2d5016; }
+                </style>
+              </head>
+              <body>
+                <div class="header">
+                  <h1>Medical History - ${patientName}</h1>
+                  <p><strong>Age:</strong> ${patient.age} | <strong>Blood Group:</strong> ${patient.bloodGroup}</p>
+                  <p><strong>Conditions:</strong> ${patient.conditions.join(', ')}</p>
                 </div>
-              `).join('')}
-            </body>
-          </html>
-        `);
-        historyWindow.document.close();
+                <h2>Medical Records</h2>
+                ${patient.medicalHistory.map(record => `
+                  <div class="history-item">
+                    <p><strong>Date:</strong> ${record.date}</p>
+                    <p class="diagnosis">Diagnosis: ${record.diagnosis}</p>
+                    <p class="prescription">Prescription: ${record.prescription}</p>
+                  </div>
+                `).join('')}
+              </body>
+            </html>
+          `);
+          historyWindow.document.close();
+        }
       }
     }
   };
@@ -1510,7 +749,7 @@ export const useDoctorActions = (state) => {
       setFormErrors({});
       
       // Mobile notification
-      if (windowSize.width <= 768) {
+      if (windowSize && windowSize.width <= 768) {
         showNotification('Profile Updated', 'Your profile has been updated successfully');
       }
     }
@@ -1532,7 +771,7 @@ export const useDoctorActions = (state) => {
     );
     
     // Mobile notification
-    if (windowSize.width <= 768) {
+    if (windowSize && windowSize.width <= 768) {
       showNotification('Notifications', 'All notifications marked as read');
     }
   };
@@ -1541,7 +780,7 @@ export const useDoctorActions = (state) => {
     setNotifications([]);
     
     // Mobile notification
-    if (windowSize.width <= 768) {
+    if (windowSize && windowSize.width <= 768) {
       showNotification('Notifications', 'All notifications cleared');
     }
   };
@@ -1632,19 +871,6 @@ export const useDoctorActions = (state) => {
     return Object.keys(errors).length === 0;
   };
 
-  // Mobile-specific actions
-  const handleMobileMenuToggle = () => {
-    setIsSidebarOpen(prev => !prev);
-  };
-
-  const handlePageChange = (pageId) => {
-    setActivePage(pageId);
-    // Auto-close sidebar on mobile when changing pages
-    if (windowSize.width <= 768) {
-      setIsSidebarOpen(false);
-    }
-  };
-
   return {
     getUnreadMessagesCount,
     getUnreadNotificationsCount,
@@ -1652,7 +878,6 @@ export const useDoctorActions = (state) => {
     handleMarkAsRead,
     handleSendMessage,
     handleStartConsultation,
-    handleRescheduleAppointment,
     handleCancelAppointment,
     handleApproveAppointment,
     handleRejectAppointment,
@@ -1663,38 +888,6 @@ export const useDoctorActions = (state) => {
     handleMarkAllNotificationsAsRead,
     handleClearAllNotifications,
     showNotification,
-    validateForm,
-    setShowProfileModal,
-    setShowNotificationsModal,
-    setShowMessagesModal,
-    setShowLogoutConfirm,
-    setConsultationDetails,
-    setFormErrors,
-    handleMobileMenuToggle,
-    handlePageChange,
-    setIsSidebarOpen
-  };
-};
-
-// Export responsive utility functions
-export const getResponsiveStyles = (windowWidth) => {
-  const isMobile = windowWidth <= 768;
-  const isTablet = windowWidth <= 1024;
-  
-  return {
-    isMobile,
-    isTablet,
-    padding: isMobile ? '15px' : '30px',
-    gridColumns: {
-      analytics: isMobile ? '1fr' : isTablet ? '1fr 1fr' : '1fr 1fr 1fr 1fr 200px',
-      content: isMobile ? '1fr' : isTablet ? '1fr' : '2fr 1fr',
-      patients: isMobile ? '1fr' : isTablet ? '1fr 1fr' : 'repeat(auto-fill, minmax(350px, 1fr))',
-      messages: isMobile ? '1fr' : isTablet ? '1fr' : 'repeat(auto-fill, minmax(400px, 1fr))'
-    },
-    fontSize: {
-      heading: isMobile ? '20px' : '28px',
-      subheading: isMobile ? '14px' : '16px',
-      body: isMobile ? '12px' : '14px'
-    }
+    validateForm
   };
 };

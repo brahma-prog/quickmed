@@ -4,6 +4,7 @@ const AboutUs = ({ onNavigateToAuth }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -14,6 +15,9 @@ const AboutUs = ({ onNavigateToAuth }) => {
 
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
+    
+    // Add fade-in animation
+    setIsVisible(true);
     
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
@@ -43,18 +47,41 @@ const AboutUs = ({ onNavigateToAuth }) => {
   };
 
   const styles = {
+    // Main About Section with Bubble Background
     about: {
-      padding: isMobile ? '60px 20px' : isTablet ? '70px 30px' : '80px 20px',
-      backgroundColor: '#f8f9fa',
       minHeight: '100vh',
+      background: 'linear-gradient(135deg, #F7D9EB 0%, #ffffff 50%, #F7D9EB 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+      padding: isMobile ? '60px 20px' : isTablet ? '70px 30px' : '80px 20px',
+    },
+    floatingElements: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    floatingElement: {
+      position: 'absolute',
+      background: 'rgba(124, 42, 98, 0.1)',
+      borderRadius: '50%',
+      animation: 'float 6s ease-in-out infinite',
     },
     container: {
       maxWidth: '1200px',
       margin: '0 auto',
+      position: 'relative',
+      zIndex: 2,
     },
     header: {
       textAlign: 'center',
       marginBottom: isMobile ? '40px' : '60px',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out',
     },
     sectionTitle: {
       fontSize: isMobile ? '36px' : isTablet ? '42px' : '48px',
@@ -79,6 +106,9 @@ const AboutUs = ({ onNavigateToAuth }) => {
       gap: isMobile ? '30px' : '40px',
       alignItems: 'start',
       marginBottom: isMobile ? '60px' : '80px',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.2s',
     },
     textSection: {
       display: 'flex',
@@ -112,6 +142,9 @@ const AboutUs = ({ onNavigateToAuth }) => {
       gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
       gap: isMobile ? '25px' : '40px',
       marginBottom: isMobile ? '40px' : '60px',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.4s',
     },
     missionCard: {
       backgroundColor: 'white',
@@ -121,6 +154,7 @@ const AboutUs = ({ onNavigateToAuth }) => {
       textAlign: 'center',
       transition: 'all 0.3s ease',
       border: '2px solid transparent',
+      backdropFilter: 'blur(10px)',
     },
     missionIcon: {
       fontSize: isMobile ? '40px' : '48px',
@@ -169,6 +203,7 @@ const AboutUs = ({ onNavigateToAuth }) => {
       boxShadow: '0 5px 20px rgba(124, 42, 98, 0.1)',
       textAlign: 'center',
       transition: 'all 0.3s ease',
+      backdropFilter: 'blur(10px)',
     },
     statNumber: {
       fontSize: isMobile ? '32px' : isTablet ? '36px' : '42px',
@@ -185,11 +220,15 @@ const AboutUs = ({ onNavigateToAuth }) => {
       fontWeight: '500',
     },
     valuesSection: {
-      backgroundColor: 'white',
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
       padding: isMobile ? '40px 20px' : '60px 40px',
       borderRadius: '25px',
       boxShadow: '0 10px 40px rgba(124, 42, 98, 0.1)',
       marginBottom: isMobile ? '40px' : '60px',
+      backdropFilter: 'blur(10px)',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.6s',
     },
     valuesTitle: {
       fontSize: isMobile ? '28px' : isTablet ? '32px' : '36px',
@@ -209,6 +248,7 @@ const AboutUs = ({ onNavigateToAuth }) => {
       borderRadius: '15px',
       textAlign: 'center',
       transition: 'all 0.3s ease',
+      backdropFilter: 'blur(5px)',
     },
     valueIcon: {
       fontSize: isMobile ? '35px' : '40px',
@@ -268,11 +308,15 @@ const AboutUs = ({ onNavigateToAuth }) => {
       fontSize: isMobile ? '28px' : '32px',
     },
     teamSection: {
-      backgroundColor: 'white',
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
       padding: isMobile ? '40px 20px' : '60px 40px',
       borderRadius: '25px',
       boxShadow: '0 10px 40px rgba(124, 42, 98, 0.1)',
       marginBottom: isMobile ? '40px' : '60px',
+      backdropFilter: 'blur(10px)',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 0.8s',
     },
     teamTitle: {
       fontSize: isMobile ? '28px' : isTablet ? '32px' : '36px',
@@ -292,6 +336,7 @@ const AboutUs = ({ onNavigateToAuth }) => {
       borderRadius: '20px',
       textAlign: 'center',
       transition: 'all 0.3s ease',
+      backdropFilter: 'blur(5px)',
     },
     memberAvatar: {
       fontSize: isMobile ? '50px' : '60px',
@@ -320,6 +365,10 @@ const AboutUs = ({ onNavigateToAuth }) => {
       borderRadius: '25px',
       textAlign: 'center',
       marginBottom: '40px',
+      backdropFilter: 'blur(10px)',
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s ease-out 1s',
     },
     ctaTitle: {
       fontSize: isMobile ? '28px' : isTablet ? '32px' : '36px',
@@ -488,23 +537,32 @@ const AboutUs = ({ onNavigateToAuth }) => {
   const teamMembers = [
     {
       avatar: '👨‍💼',
-      name: 'Dr. Michael Rodriguez',
+      name: 'Dr. Simhadri Naidu',
       role: 'Chief Medical Officer',
       bio: '20+ years of experience in healthcare management and patient care.'
     },
     {
-      avatar: '👩‍💼',
-      name: 'Sarah Chen',
+      avatar: '👨‍💼',
+      name: 'Sai Krishna',
       role: 'CEO & Founder',
       bio: 'Visionary leader passionate about healthcare technology and accessibility.'
     },
     {
       avatar: '👨‍💻',
-      name: 'David Park',
+      name: 'Sankar Rao',
       role: 'CTO',
       bio: 'Technology expert driving innovation in healthcare platforms.'
     }
   ];
+
+  // Generate floating elements
+  const floatingElements = Array.from({ length: isMobile ? 8 : 15 }, (_, i) => ({
+    id: i,
+    size: Math.random() * (isMobile ? 50 : 100) + (isMobile ? 30 : 50),
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    animationDelay: Math.random() * 5,
+  }));
 
   // Learn More Modal Component
   const LearnMoreModal = ({ onClose }) => {
@@ -636,6 +694,23 @@ const AboutUs = ({ onNavigateToAuth }) => {
   return (
     <>
       <section style={styles.about}>
+        {/* Floating Background Elements */}
+        <div style={styles.floatingElements}>
+          {floatingElements.map((element) => (
+            <div
+              key={element.id}
+              style={{
+                ...styles.floatingElement,
+                width: element.size,
+                height: element.size,
+                left: `${element.left}%`,
+                top: `${element.top}%`,
+                animationDelay: `${element.animationDelay}s`,
+              }}
+            />
+          ))}
+        </div>
+
         <div style={styles.container}>
           {/* Header Section */}
           <div style={styles.header}>
