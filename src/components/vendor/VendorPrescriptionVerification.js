@@ -13,6 +13,7 @@ const VendorPrescriptionVerification = ({
   const mainContentStyle = {
     padding: '24px',
     minHeight: '100vh',
+    backgroundColor: '#E0F2F1',
     '@media (max-width: 768px)': {
       padding: '16px'
     }
@@ -41,8 +42,8 @@ const VendorPrescriptionVerification = ({
 
   const notificationBellStyle = {
     position: 'relative',
-    backgroundColor: 'white',
-    border: '1px solid #e5e7eb',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     padding: '10px 12px',
     fontSize: '18px',
@@ -55,8 +56,8 @@ const VendorPrescriptionVerification = ({
     position: 'absolute',
     top: '-5px',
     right: '-5px',
-    backgroundColor: '#EF4444',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     borderRadius: '50%',
     width: '18px',
     height: '18px',
@@ -70,7 +71,7 @@ const VendorPrescriptionVerification = ({
   const greetingStyle = {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0',
     '@media (max-width: 768px)': {
       fontSize: '24px'
@@ -79,7 +80,7 @@ const VendorPrescriptionVerification = ({
 
   const subtitleStyle = {
     fontSize: '16px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0,
     '@media (max-width: 768px)': {
       fontSize: '14px'
@@ -87,7 +88,7 @@ const VendorPrescriptionVerification = ({
   };
 
   const realtimeIndicatorStyle = {
-    color: '#10B981',
+    color: '#009688',
     fontWeight: '600'
   };
 
@@ -97,8 +98,8 @@ const VendorPrescriptionVerification = ({
   };
 
   const pendingCountStyle = {
-    backgroundColor: '#FEF3C7',
-    color: '#D97706',
+    backgroundColor: '#4DB6AC',
+    color: '#124441',
     padding: '8px 16px',
     borderRadius: '20px',
     fontSize: '14px',
@@ -116,11 +117,11 @@ const VendorPrescriptionVerification = ({
   };
 
   const sectionStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: '24px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC'
   };
 
   const sectionHeaderStyle = {
@@ -133,13 +134,13 @@ const VendorPrescriptionVerification = ({
   const sectionTitleStyle = {
     fontSize: '20px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
   const viewAllStyle = {
     fontSize: '14px',
-    color: '#7C2A62',
+    color: '#009688',
     fontWeight: '500',
     cursor: 'pointer'
   };
@@ -152,7 +153,7 @@ const VendorPrescriptionVerification = ({
 
   const prescriptionCardStyle = {
     padding: '16px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
@@ -161,18 +162,18 @@ const VendorPrescriptionVerification = ({
   };
 
   const prescriptionCardSelectedStyle = {
-    borderColor: '#7C2A62',
-    backgroundColor: '#F7D9EB'
+    borderColor: '#009688',
+    backgroundColor: '#E0F2F1'
   };
 
   const prescriptionApprovedStyle = {
-    borderColor: '#10B981',
-    backgroundColor: '#F0FDF4'
+    borderColor: '#009688',
+    backgroundColor: '#E0F2F1'
   };
 
   const prescriptionRejectedStyle = {
-    borderColor: '#EF4444',
-    backgroundColor: '#FEF2F2'
+    borderColor: '#FF6B6B',
+    backgroundColor: '#FFE5E5'
   };
 
   const prescriptionHeaderStyle = {
@@ -189,19 +190,19 @@ const VendorPrescriptionVerification = ({
   const orderIdStyle = {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 4px 0'
   };
 
   const customerNameStyle = {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: '0 0 2px 0'
   };
 
   const doctorNameStyle = {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: '2px 0 0 0'
   };
 
@@ -214,12 +215,12 @@ const VendorPrescriptionVerification = ({
 
   const uploadTimeStyle = {
     fontSize: '12px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const statusTimeStyle = {
     fontSize: '11px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontStyle: 'italic'
   };
 
@@ -238,8 +239,8 @@ const VendorPrescriptionVerification = ({
   };
 
   const medicineTagStyle = {
-    backgroundColor: '#F7D9EB',
-    color: '#7C2A62',
+    backgroundColor: '#E0F2F1',
+    color: '#124441',
     padding: '4px 8px',
     borderRadius: '6px',
     fontSize: '11px',
@@ -256,8 +257,8 @@ const VendorPrescriptionVerification = ({
   };
 
   const statusBadgeStyle = {
-    backgroundColor: '#F59E0B',
-    color: 'white',
+    backgroundColor: '#4DB6AC',
+    color: '#124441',
     padding: '4px 8px',
     borderRadius: '8px',
     fontSize: '10px',
@@ -265,38 +266,39 @@ const VendorPrescriptionVerification = ({
   };
 
   const statusApprovedStyle = {
-    backgroundColor: '#10B981',
-    color: 'white'
+    backgroundColor: '#009688',
+    color: '#FFFFFF'
   };
 
   const statusRejectedStyle = {
-    backgroundColor: '#EF4444',
-    color: 'white'
+    backgroundColor: '#FF6B6B',
+    color: '#FFFFFF'
   };
 
   const prescriptionViewerStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC',
     height: 'fit-content'
   };
 
   const viewerHeaderStyle = {
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #4DB6AC',
+    backgroundColor: '#E0F2F1'
   };
 
   const viewerTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 12px 0'
   };
 
   const prescriptionInfoDetailedStyle = {
     fontSize: '14px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const statusTextStyle = {
@@ -322,9 +324,9 @@ const VendorPrescriptionVerification = ({
     width: '100%',
     height: '300px',
     objectFit: 'contain',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
-    backgroundColor: '#f8fafc'
+    backgroundColor: '#F0F9F8'
   };
 
   const imageControlsStyle = {
@@ -335,8 +337,8 @@ const VendorPrescriptionVerification = ({
   };
 
   const smallButtonStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '6px 12px',
     borderRadius: '4px',
@@ -353,7 +355,8 @@ const VendorPrescriptionVerification = ({
   const medicinesTitleStyle = {
     fontSize: '16px',
     fontWeight: '600',
-    margin: '0 0 12px 0'
+    margin: '0 0 12px 0',
+    color: '#124441'
   };
 
   const medicineListStyle = {
@@ -379,8 +382,8 @@ const VendorPrescriptionVerification = ({
   };
 
   const successButtonStyle = {
-    backgroundColor: '#10B981',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',
@@ -390,8 +393,8 @@ const VendorPrescriptionVerification = ({
   };
 
   const dangerButtonStyle = {
-    backgroundColor: '#EF4444',
-    color: 'white',
+    backgroundColor: '#FF6B6B',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',
@@ -402,8 +405,8 @@ const VendorPrescriptionVerification = ({
 
   const secondaryButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
@@ -419,7 +422,7 @@ const VendorPrescriptionVerification = ({
 
   const resultTextStyle = {
     marginBottom: '16px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontSize: '14px'
   };
 
@@ -494,8 +497,8 @@ const VendorPrescriptionVerification = ({
                 
                 <div style={medicinesListStyle}>
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <strong style={{ marginRight: '8px' }}>Medicines:</strong>
-                    <span style={{ fontSize: '11px', color: '#6b7280' }}>
+                    <strong style={{ marginRight: '8px', color: '#124441' }}>Medicines:</strong>
+                    <span style={{ fontSize: '11px', color: '#4F6F6B' }}>
                       {prescription.medicines.length} items
                     </span>
                   </div>
@@ -528,10 +531,10 @@ const VendorPrescriptionVerification = ({
             <div style={viewerHeaderStyle}>
               <h3 style={viewerTitleStyle}>Prescription Verification</h3>
               <div style={prescriptionInfoDetailedStyle}>
-                <p><strong>Order:</strong> {selectedPrescription.orderId}</p>
-                <p><strong>Customer:</strong> {selectedPrescription.customerName}</p>
-                <p><strong>Doctor:</strong> Dr. {selectedPrescription.doctorName}</p>
-                <p><strong>Status:</strong> 
+                <p><strong style={{ color: '#124441' }}>Order:</strong> {selectedPrescription.orderId}</p>
+                <p><strong style={{ color: '#124441' }}>Customer:</strong> {selectedPrescription.customerName}</p>
+                <p><strong style={{ color: '#124441' }}>Doctor:</strong> Dr. {selectedPrescription.doctorName}</p>
+                <p><strong style={{ color: '#124441' }}>Status:</strong> 
                   <span style={{
                     ...statusTextStyle,
                     ...(selectedPrescription.status === 'approved' ? statusApprovedStyle : {}),
@@ -566,7 +569,7 @@ const VendorPrescriptionVerification = ({
                   {selectedPrescription.medicines.map((medicine, index) => (
                     <div key={index} style={medicineItemStyle}>
                       <input type="checkbox" defaultChecked style={checkboxStyle} />
-                      <span>{medicine}</span>
+                      <span style={{ color: '#4F6F6B' }}>{medicine}</span>
                     </div>
                   ))}
                 </div>

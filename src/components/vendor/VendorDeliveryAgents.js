@@ -24,7 +24,8 @@ const VendorDeliveryAgents = ({
   // Inline CSS Styles
   const mainContentStyle = {
     padding: '24px',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    backgroundColor: '#E0F2F1' // softbg
   };
 
   const headerStyle = {
@@ -42,13 +43,14 @@ const VendorDeliveryAgents = ({
 
   const notificationBellStyle = {
     position: 'relative',
-    backgroundColor: 'white',
-    border: '1px solid #e5e7eb',
+    backgroundColor: '#FFFFFF', // white
+    border: '1px solid #4DB6AC', // mint border
     borderRadius: '8px',
     padding: '10px 12px',
     fontSize: '18px',
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    color: '#009688' // primary
   };
 
   const notificationBadgeStyle = {
@@ -70,13 +72,13 @@ const VendorDeliveryAgents = ({
   const greetingStyle = {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441', // darktext
     margin: '0 0 8px 0'
   };
 
   const subtitleStyle = {
     fontSize: '16px',
-    color: '#6b7280',
+    color: '#4F6F6B', // softtext
     margin: 0
   };
 
@@ -88,8 +90,8 @@ const VendorDeliveryAgents = ({
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: 'white',
-    border: '1px solid #e5e7eb',
+    backgroundColor: '#FFFFFF', // white
+    border: '1px solid #4DB6AC', // mint
     borderRadius: '8px',
     padding: '8px 12px'
   };
@@ -99,15 +101,16 @@ const VendorDeliveryAgents = ({
     border: 'none',
     outline: 'none',
     fontSize: '14px',
-    padding: '4px 0'
+    padding: '4px 0',
+    color: '#124441' // darktext
   };
 
   const sectionStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF', // white
     borderRadius: '12px',
     padding: '24px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC' // mint
   };
 
   const sectionHeaderStyle = {
@@ -120,13 +123,13 @@ const VendorDeliveryAgents = ({
   const sectionTitleStyle = {
     fontSize: '20px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441', // darktext
     margin: 0
   };
 
   const viewAllStyle = {
     fontSize: '14px',
-    color: '#7C2A62',
+    color: '#009688', // primary
     fontWeight: '500'
   };
 
@@ -138,9 +141,9 @@ const VendorDeliveryAgents = ({
 
   const agentCardStyle = {
     padding: '20px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC', // mint
     borderRadius: '12px',
-    backgroundColor: '#f8fafc'
+    backgroundColor: '#E0F2F1' // softbg
   };
 
   const agentHeaderStyle = {
@@ -157,7 +160,7 @@ const VendorDeliveryAgents = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688', // primary
     color: 'white',
     borderRadius: '50%'
   };
@@ -169,20 +172,20 @@ const VendorDeliveryAgents = ({
   const agentNameStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441', // darktext
     margin: '0 0 4px 0'
   };
 
   const agentVehicleStyle = {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B', // softtext
     margin: 0
   };
 
   const agentPhoneStyle = {
     fontSize: '16px',
     fontWeight: '500',
-    color: '#1f2937',
+    color: '#124441', // darktext
     margin: '0 0 16px 0'
   };
 
@@ -297,7 +300,7 @@ const VendorDeliveryAgents = ({
         </div>
 
         {filteredAgents.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+          <div style={{ textAlign: 'center', padding: '40px', color: '#4F6F6B' }}> {/* softtext */}
             <p>No delivery agents found matching your search.</p>
           </div>
         )}
@@ -311,8 +314,8 @@ const VendorDeliveryAgents = ({
           <button 
             style={{
               padding: '16px',
-              backgroundColor: '#F7D9EB',
-              border: '1px solid #7C2A62',
+              backgroundColor: '#E0F2F1', // softbg
+              border: '1px solid #009688', // primary
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '500',
@@ -320,7 +323,8 @@ const VendorDeliveryAgents = ({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              color: '#124441' // darktext
             }}
             onClick={() => {
               if (deliveryAgents.length > 0) {
@@ -335,8 +339,8 @@ const VendorDeliveryAgents = ({
           <button 
             style={{
               padding: '16px',
-              backgroundColor: '#F0FDF4',
-              border: '1px solid #10B981',
+              backgroundColor: '#E0F2F1', // softbg
+              border: '1px solid #009688', // primary
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '500',
@@ -344,7 +348,8 @@ const VendorDeliveryAgents = ({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              color: '#124441' // darktext
             }}
             onClick={() => {
               const message = `Medicines ready for pickup at pharmacy.`;

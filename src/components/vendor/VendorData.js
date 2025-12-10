@@ -907,3 +907,41 @@ export const getCategorySampleData = (categoryId) => {
   
   return sampleData[categoryId] || sampleData.all;
 };
+
+// Color constants based on your specifications
+export const colors = {
+  primary: '#009688',
+  mint: '#4DB6AC',
+  softbg: '#E0F2F1',
+  white: '#FFFFFF',
+  darktext: '#124441',
+  softtext: '#4F6F6B'
+};
+
+// Theme configuration for the entire application
+export const theme = {
+  primary: colors.primary,
+  secondary: colors.mint,
+  background: colors.softbg,
+  surface: colors.white,
+  text: {
+    primary: colors.darktext,
+    secondary: colors.softtext,
+    white: colors.white
+  },
+  status: {
+    success: '#4CAF50',
+    warning: '#FF9800',
+    error: '#F44336',
+    info: '#2196F3'
+  },
+  borders: {
+    light: '#B2DFDB',
+    medium: '#80CBC4'
+  },
+  shadows: {
+    small: '0 2px 4px rgba(0, 150, 136, 0.1)',
+    medium: '0 4px 8px rgba(0, 150, 136, 0.15)',
+    large: '0 8px 16px rgba(0, 150, 136, 0.2)'
+  }
+};

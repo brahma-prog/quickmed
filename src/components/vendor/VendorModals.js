@@ -114,7 +114,7 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
   };
 
   const modalStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: 0,
     width: '500px',
@@ -129,13 +129,13 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const modalTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
@@ -144,7 +144,7 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const modalContentStyle = {
@@ -168,7 +168,7 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
     display: 'block',
     marginBottom: '6px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   };
 
@@ -177,14 +177,14 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
     alignItems: 'center',
     gap: '8px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   };
 
   const inputStyle = {
     width: '100%',
     padding: '10px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px',
     transition: 'border-color 0.3s ease',
@@ -204,7 +204,7 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
 
   const requiredNoteStyle = {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontStyle: 'italic',
     marginTop: '16px'
   };
@@ -214,13 +214,13 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
     justifyContent: 'flex-end',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   };
 
   const secondaryButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
@@ -230,8 +230,8 @@ const AddMedicineModal = ({ show, onClose, onAdd, newMedicine, setNewMedicine })
   };
 
   const primaryButtonStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',
@@ -444,7 +444,7 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
   };
 
   const modalStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: 0,
     width: '500px',
@@ -459,13 +459,13 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const modalTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
@@ -474,7 +474,7 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const modalContentStyle = {
@@ -498,7 +498,7 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
     display: 'block',
     marginBottom: '6px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   };
 
@@ -507,14 +507,14 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
     alignItems: 'center',
     gap: '8px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   };
 
   const inputStyle = {
     width: '100%',
     padding: '10px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px',
     transition: 'border-color 0.3s ease',
@@ -526,13 +526,13 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
     justifyContent: 'flex-end',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   };
 
   const secondaryButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
@@ -542,8 +542,8 @@ const EditStockModal = ({ show, onClose, onUpdate, editingMedicine, setEditingMe
   };
 
   const primaryButtonStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',
@@ -680,7 +680,7 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
   };
 
   const modalStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: 0,
     width: '500px',
@@ -695,13 +695,13 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const modalTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
@@ -710,7 +710,7 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const modalContentStyle = {
@@ -734,14 +734,14 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
     display: 'block',
     marginBottom: '6px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   };
 
   const inputStyle = {
     width: '100%',
     padding: '10px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px',
     transition: 'border-color 0.3s ease',
@@ -754,14 +754,14 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
   };
 
   const lockedFieldStyle = {
-    backgroundColor: '#f9fafb',
-    color: '#6b7280',
+    backgroundColor: '#F9FAFB',
+    color: '#4F6F6B',
     cursor: 'not-allowed'
   };
 
   const lockedNoteStyle = {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontStyle: 'italic',
     marginTop: '4px'
   };
@@ -774,7 +774,7 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
 
   const requiredNoteStyle = {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontStyle: 'italic',
     marginTop: '16px'
   };
@@ -784,13 +784,13 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
     justifyContent: 'flex-end',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   };
 
   const secondaryButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
@@ -800,8 +800,8 @@ const ProfileModal = ({ show, onClose, onUpdate, userProfile, setUserProfile, fo
   };
 
   const primaryButtonStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',
@@ -1076,7 +1076,7 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
   };
 
   const modalStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: 0,
     width: '500px',
@@ -1091,13 +1091,13 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const modalTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
@@ -1106,7 +1106,7 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const modalContentStyle = {
@@ -1116,13 +1116,13 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
   const settingsSectionStyle = {
     marginBottom: '24px',
     paddingBottom: '16px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const settingsTitleStyle = {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 12px 0'
   };
 
@@ -1138,13 +1138,13 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
     alignItems: 'center',
     gap: '8px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   };
 
   const settingDescriptionStyle = {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     marginLeft: '24px'
   };
 
@@ -1157,13 +1157,13 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
     justifyContent: 'flex-end',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   };
 
   const secondaryButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
@@ -1173,8 +1173,8 @@ const NotificationsModal = ({ show, onClose, onSave, notificationSettings, setNo
   };
 
   const primaryButtonStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',
@@ -1366,7 +1366,7 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
   };
 
   const modalStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: 0,
     width: '400px',
@@ -1381,7 +1381,7 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const notificationHeaderActionsStyle = {
@@ -1393,13 +1393,13 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
   const modalTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
   const clearAllButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
+    color: '#009688',
     border: 'none',
     padding: '6px 12px',
     borderRadius: '4px',
@@ -1414,7 +1414,7 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const modalContentStyle = {
@@ -1433,7 +1433,7 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
   };
 
   const noNotificationsTextStyle = {
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontSize: '16px',
     margin: 0
   };
@@ -1447,10 +1447,10 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
     display: 'flex',
     alignItems: 'flex-start',
     padding: '12px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #E0F2F1',
     borderRadius: '8px',
     marginBottom: '8px',
-    backgroundColor: '#f8fafc'
+    backgroundColor: '#F8FAFC'
   };
 
   const notificationIconStyle = {
@@ -1465,19 +1465,19 @@ const NotificationsBellModal = ({ show, onClose, notifications, onClearAll }) =>
 
   const notificationTitleStyle = {
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 4px 0',
     fontSize: '14px'
   };
 
   const notificationMessageStyle = {
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: '0 0 4px 0',
     fontSize: '13px'
   };
 
   const notificationTimeStyle = {
-    color: '#9ca3af',
+    color: '#9CA3AF',
     fontSize: '11px'
   };
 
@@ -1557,13 +1557,13 @@ const ChatModal = ({ show, onClose, chatMessages, newMessage, setNewMessage, onS
     right: '20px',
     width: '350px',
     height: '500px',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
     zIndex: 1001,
     display: 'flex',
     flexDirection: 'column',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #E0F2F1',
     '@media (max-width: 768px)': {
       width: '90vw',
       height: '70vh',
@@ -1574,8 +1574,8 @@ const ChatModal = ({ show, onClose, chatMessages, newMessage, setNewMessage, onS
 
   const chatHeaderStyle = {
     padding: '16px',
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     borderRadius: '12px 12px 0 0',
     display: 'flex',
     justifyContent: 'space-between',
@@ -1593,7 +1593,7 @@ const ChatModal = ({ show, onClose, chatMessages, newMessage, setNewMessage, onS
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: 'white'
+    color: '#FFFFFF'
   };
 
   const chatContentStyle = {
@@ -1603,7 +1603,7 @@ const ChatModal = ({ show, onClose, chatMessages, newMessage, setNewMessage, onS
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
-    backgroundColor: '#f8fafc'
+    backgroundColor: '#F8FAFC'
   };
 
   const chatMessageStyle = {
@@ -1615,30 +1615,30 @@ const ChatModal = ({ show, onClose, chatMessages, newMessage, setNewMessage, onS
   };
 
   const userMessageStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     alignSelf: 'flex-end'
   };
 
   const botMessageStyle = {
-    backgroundColor: 'white',
-    color: '#374151',
+    backgroundColor: '#FFFFFF',
+    color: '#124441',
     alignSelf: 'flex-start',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #E0F2F1'
   };
 
   const chatInputContainerStyle = {
     display: 'flex',
     padding: '12px',
-    borderTop: '1px solid #e5e7eb',
-    backgroundColor: 'white',
+    borderTop: '1px solid #E0F2F1',
+    backgroundColor: '#FFFFFF',
     borderRadius: '0 0 12px 12px'
   };
 
   const chatInputStyle = {
     flex: 1,
     padding: '8px 12px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px',
     outline: 'none',
@@ -1646,8 +1646,8 @@ const ChatModal = ({ show, onClose, chatMessages, newMessage, setNewMessage, onS
   };
 
   const primaryButtonStyle = {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '8px 16px',
     borderRadius: '6px',
@@ -1717,7 +1717,7 @@ const LogoutConfirmationModal = ({ show, onClose, onConfirm }) => {
   };
 
   const modalStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: 0,
     width: '400px',
@@ -1732,13 +1732,13 @@ const LogoutConfirmationModal = ({ show, onClose, onConfirm }) => {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   };
 
   const modalTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   };
 
@@ -1747,7 +1747,7 @@ const LogoutConfirmationModal = ({ show, onClose, onConfirm }) => {
     border: 'none',
     fontSize: '18px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   };
 
   const modalContentStyle = {
@@ -1756,7 +1756,7 @@ const LogoutConfirmationModal = ({ show, onClose, onConfirm }) => {
 
   const confirmationTextStyle = {
     fontSize: '16px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     textAlign: 'center',
     margin: '20px 0'
   };
@@ -1766,13 +1766,13 @@ const LogoutConfirmationModal = ({ show, onClose, onConfirm }) => {
     justifyContent: 'flex-end',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   };
 
   const secondaryButtonStyle = {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
@@ -1783,7 +1783,7 @@ const LogoutConfirmationModal = ({ show, onClose, onConfirm }) => {
 
   const dangerButtonStyle = {
     backgroundColor: '#EF4444',
-    color: 'white',
+    color: '#FFFFFF',
     border: 'none',
     padding: '12px 20px',
     borderRadius: '8px',

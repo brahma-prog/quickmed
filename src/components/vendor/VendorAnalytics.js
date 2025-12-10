@@ -9,6 +9,7 @@ const VendorAnalytics = ({
   const mainContentStyle = {
     padding: '24px',
     minHeight: '100vh',
+    backgroundColor: '#E0F2F1',
     '@media (max-width: 768px)': {
       padding: '16px'
     }
@@ -37,8 +38,8 @@ const VendorAnalytics = ({
 
   const notificationBellStyle = {
     position: 'relative',
-    backgroundColor: 'white',
-    border: '1px solid #e5e7eb',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     padding: '10px 12px',
     fontSize: '18px',
@@ -51,8 +52,8 @@ const VendorAnalytics = ({
     position: 'absolute',
     top: '-5px',
     right: '-5px',
-    backgroundColor: '#EF4444',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     borderRadius: '50%',
     width: '18px',
     height: '18px',
@@ -66,7 +67,7 @@ const VendorAnalytics = ({
   const greetingStyle = {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0',
     '@media (max-width: 768px)': {
       fontSize: '24px'
@@ -75,7 +76,7 @@ const VendorAnalytics = ({
 
   const subtitleStyle = {
     fontSize: '16px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0,
     '@media (max-width: 768px)': {
       fontSize: '14px'
@@ -96,13 +97,13 @@ const VendorAnalytics = ({
   };
 
   const kpiCardStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '24px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     display: 'flex',
     alignItems: 'center',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC'
   };
 
   const kpiIconStyle = {
@@ -114,7 +115,7 @@ const VendorAnalytics = ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '12px',
-    backgroundColor: '#F7D9EB'
+    backgroundColor: '#E0F2F1'
   };
 
   const kpiContentStyle = {
@@ -124,13 +125,13 @@ const VendorAnalytics = ({
   const kpiNumberStyle = {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 4px 0'
   };
 
   const kpiLabelStyle = {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   };
 
@@ -144,17 +145,17 @@ const VendorAnalytics = ({
   };
 
   const chartSectionStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '24px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC'
   };
 
   const chartTitleStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 20px 0'
   };
 
@@ -180,7 +181,7 @@ const VendorAnalytics = ({
   };
 
   const chartBarStyle = {
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     width: '30px',
     borderRadius: '4px 4px 0 0',
     minHeight: '10px'
@@ -188,13 +189,13 @@ const VendorAnalytics = ({
 
   const chartLabelStyle = {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     marginTop: '8px'
   };
 
   const chartValueStyle = {
     fontSize: '10px',
-    color: '#7C2A62',
+    color: '#009688',
     fontWeight: '600',
     marginTop: '4px'
   };
@@ -213,37 +214,37 @@ const VendorAnalytics = ({
 
   const efficiencyLabelStyle = {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     minWidth: '120px'
   };
 
   const efficiencyBarStyle = {
     flex: 1,
     height: '8px',
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#E0F2F1',
     borderRadius: '4px',
     overflow: 'hidden'
   };
 
   const efficiencyFillStyle = {
     height: '100%',
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     borderRadius: '4px'
   };
 
   const efficiencyValueStyle = {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#7C2A62',
+    color: '#009688',
     minWidth: '40px'
   };
 
   const heatmapSectionStyle = {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '24px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC'
   };
 
   const heatmapContainerStyle = {
@@ -260,27 +261,27 @@ const VendorAnalytics = ({
 
   const localityNameStyle = {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     minWidth: '80px'
   };
 
   const heatmapBarStyle = {
     flex: 1,
     height: '8px',
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#E0F2F1',
     borderRadius: '4px',
     overflow: 'hidden'
   };
 
   const heatmapFillStyle = {
     height: '100%',
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     borderRadius: '4px'
   };
 
   const localityOrdersStyle = {
     fontSize: '12px',
-    color: '#7C2A62',
+    color: '#009688',
     fontWeight: '600',
     minWidth: '60px'
   };
@@ -307,7 +308,7 @@ const VendorAnalytics = ({
   };
 
   const revenueBarStyle = {
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     width: '30px',
     borderRadius: '4px 4px 0 0',
     minHeight: '10px'

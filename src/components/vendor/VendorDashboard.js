@@ -697,7 +697,7 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
     <div style={{
       display: 'flex',
       minHeight: '100vh',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
     }}>
       {/* Mobile Header */}
@@ -707,8 +707,8 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#7C2A62',
-        color: 'white',
+        backgroundColor: '#009688',
+        color: '#FFFFFF',
         padding: '12px 16px',
         zIndex: 999,
         borderBottom: '1px solid rgba(255,255,255,0.1)',
@@ -723,7 +723,7 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
           style={{
             backgroundColor: 'transparent',
             border: 'none',
-            color: 'white',
+            color: '#FFFFFF',
             fontSize: '18px',
             cursor: 'pointer',
             padding: '6px',
@@ -738,7 +738,7 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
             fontSize: '22px',
             fontWeight: '700',
             margin: '0 0 4px 0',
-            color: 'white',
+            color: '#FFFFFF',
             letterSpacing: '0.5px'
           }}>QUICKMED</h1>
           <p style={{
@@ -752,8 +752,8 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
           <button 
             style={{
               position: 'relative',
-              backgroundColor: 'white',
-              border: '1px solid #e5e7eb',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #4DB6AC',
               borderRadius: '8px',
               padding: '10px 12px',
               fontSize: '18px',
@@ -768,8 +768,8 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
                 position: 'absolute',
                 top: '-5px',
                 right: '-5px',
-                backgroundColor: '#EF4444',
-                color: 'white',
+                backgroundColor: '#009688',
+                color: '#FFFFFF',
                 borderRadius: '50%',
                 width: '18px',
                 height: '18px',
@@ -902,8 +902,8 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
       }}>
         <button 
           style={{
-            backgroundColor: '#7C2A62',
-            color: 'white',
+            backgroundColor: '#009688',
+            color: '#FFFFFF',
             border: 'none',
             borderRadius: '50%',
             width: '60px',

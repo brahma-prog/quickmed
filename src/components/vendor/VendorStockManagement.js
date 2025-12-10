@@ -7,8 +7,8 @@ const SearchBar = ({ searchTerm, onSearchChange, onClearSearch, filteredStock })
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: 'white',
-        border: '1px solid #e5e7eb',
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #4DB6AC',
         borderRadius: '8px',
         padding: '8px 12px',
         transition: 'border-color 0.3s ease'
@@ -20,7 +20,8 @@ const SearchBar = ({ searchTerm, onSearchChange, onClearSearch, filteredStock })
             border: 'none',
             outline: 'none',
             fontSize: '14px',
-            padding: '4px 0'
+            padding: '4px 0',
+            color: '#124441'
           }}
           placeholder="Search medicines by name, category, or batch number..."
           value={searchTerm}
@@ -32,7 +33,7 @@ const SearchBar = ({ searchTerm, onSearchChange, onClearSearch, filteredStock })
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#6b7280',
+              color: '#4F6F6B',
               fontSize: '16px',
               padding: '4px'
             }}
@@ -44,7 +45,7 @@ const SearchBar = ({ searchTerm, onSearchChange, onClearSearch, filteredStock })
         )}
       </div>
       {searchTerm && (
-        <div style={{ marginTop: '8px', fontSize: '14px', color: '#6b7280' }}>
+        <div style={{ marginTop: '8px', fontSize: '14px', color: '#4F6F6B' }}>
           Found {filteredStock.length} medicine(s) matching "{searchTerm}"
         </div>
       )}
@@ -77,10 +78,10 @@ const CategoryTopBar = ({
       marginBottom: '24px',
       flexWrap: 'wrap',
       padding: '16px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       borderRadius: '12px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      border: '1px solid #e5e7eb'
+      border: '1px solid #4DB6AC'
     }}>
       {categories.map(category => (
         <button
@@ -90,9 +91,9 @@ const CategoryTopBar = ({
             alignItems: 'center',
             gap: '8px',
             padding: '12px 20px',
-            backgroundColor: activeCategory === category.id ? '#7C2A62' : 'white',
-            color: activeCategory === category.id ? 'white' : 'inherit',
-            border: '1px solid #e5e7eb',
+            backgroundColor: activeCategory === category.id ? '#009688' : '#FFFFFF',
+            color: activeCategory === category.id ? '#FFFFFF' : '#124441',
+            border: '1px solid #4DB6AC',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '14px',
@@ -101,9 +102,9 @@ const CategoryTopBar = ({
             minWidth: '120px',
             justifyContent: 'center',
             ...(activeCategory === category.id ? {
-              borderColor: '#7C2A62',
+              borderColor: '#009688',
               transform: 'translateY(-2px)',
-              boxShadow: '0 4px 12px rgba(124, 42, 98, 0.2)'
+              boxShadow: '0 4px 12px rgba(0, 150, 136, 0.2)'
             } : {})
           }}
           onClick={() => onCategoryClick(category.id)}
@@ -111,8 +112,8 @@ const CategoryTopBar = ({
           <span style={{ fontSize: '16px' }}>{categoryIcons[category.id] || '💊'}</span>
           <span>{category.name}</span>
           <span style={{
-            backgroundColor: activeCategory === category.id ? 'rgba(255, 255, 255, 0.3)' : '#e5e7eb',
-            color: activeCategory === category.id ? 'white' : 'inherit',
+            backgroundColor: activeCategory === category.id ? 'rgba(255, 255, 255, 0.3)' : '#E0F2F1',
+            color: activeCategory === category.id ? '#FFFFFF' : '#124441',
             borderRadius: '12px',
             padding: '2px 8px',
             fontSize: '12px',
@@ -509,7 +510,7 @@ const VendorStockManagement = ({
   const currentCategory = categories.find(c => c.id === selectedCategory);
 
   return (
-    <div style={{ padding: '24px', minHeight: '100vh' }}>
+    <div style={{ padding: '24px', minHeight: '100vh', backgroundColor: '#E0F2F1' }}>
       {/* Header */}
       <div style={{
         display: 'flex',
@@ -518,10 +519,10 @@ const VendorStockManagement = ({
         marginBottom: '30px'
       }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', margin: '0 0 8px 0' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#124441', margin: '0 0 8px 0' }}>
             {getCurrentGreeting()}, {userProfile.fullName?.split(' ')[0] || 'User'}
           </h1>
-          <p style={{ fontSize: '16px', color: '#6b7280', margin: 0 }}>
+          <p style={{ fontSize: '16px', color: '#4F6F6B', margin: 0 }}>
             Manage your medicine inventory and stock levels
           </p>
         </div>
@@ -529,13 +530,14 @@ const VendorStockManagement = ({
           <button 
             style={{
               position: 'relative',
-              backgroundColor: 'white',
-              border: '1px solid #e5e7eb',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #4DB6AC',
               borderRadius: '8px',
               padding: '10px 12px',
               fontSize: '18px',
               cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              color: '#124441'
             }}
             onClick={() => setShowNotificationsBellModal(true)}
           >
@@ -546,7 +548,7 @@ const VendorStockManagement = ({
                 top: '-5px',
                 right: '-5px',
                 backgroundColor: '#EF4444',
-                color: 'white',
+                color: '#FFFFFF',
                 borderRadius: '50%',
                 width: '18px',
                 height: '18px',
@@ -562,8 +564,8 @@ const VendorStockManagement = ({
           </button>
           <button 
             style={{
-              backgroundColor: '#7C2A62',
-              color: 'white',
+              backgroundColor: '#009688',
+              color: '#FFFFFF',
               border: 'none',
               padding: '12px 20px',
               borderRadius: '8px',
@@ -585,9 +587,9 @@ const VendorStockManagement = ({
             key={filter.id}
             style={{
               padding: '10px 20px',
-              backgroundColor: stockFilter === filter.id ? '#7C2A62' : 'white',
-              color: stockFilter === filter.id ? 'white' : 'inherit',
-              border: '1px solid #e5e7eb',
+              backgroundColor: stockFilter === filter.id ? '#009688' : '#FFFFFF',
+              color: stockFilter === filter.id ? '#FFFFFF' : '#124441',
+              border: '1px solid #4DB6AC',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '14px',
@@ -608,74 +610,74 @@ const VendorStockManagement = ({
         marginBottom: '30px'
       }}>
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#FFFFFF',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #4DB6AC'
         }}>
-          <div style={{ fontSize: '24px', marginRight: '16px' }}>📦</div>
+          <div style={{ fontSize: '24px', marginRight: '16px', color: '#009688' }}>📦</div>
           <div>
-            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', margin: '0 0 4px 0' }}>
+            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#124441', margin: '0 0 4px 0' }}>
               {initialStock.length}
             </h3>
-            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>Total Items</p>
+            <p style={{ fontSize: '14px', color: '#4F6F6B', margin: 0 }}>Total Items</p>
           </div>
         </div>
 
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#FFFFFF',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #4DB6AC'
         }}>
-          <div style={{ fontSize: '24px', marginRight: '16px' }}>⚠️</div>
+          <div style={{ fontSize: '24px', marginRight: '16px', color: '#009688' }}>⚠️</div>
           <div>
-            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', margin: '0 0 4px 0' }}>
+            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#124441', margin: '0 0 4px 0' }}>
               {initialStock.filter(isLowStock).length}
             </h3>
-            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>Low Stock</p>
+            <p style={{ fontSize: '14px', color: '#4F6F6B', margin: 0 }}>Low Stock</p>
           </div>
         </div>
 
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#FFFFFF',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #4DB6AC'
         }}>
-          <div style={{ fontSize: '24px', marginRight: '16px' }}>📅</div>
+          <div style={{ fontSize: '24px', marginRight: '16px', color: '#009688' }}>📅</div>
           <div>
-            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', margin: '0 0 4px 0' }}>
+            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#124441', margin: '0 0 4px 0' }}>
               {initialStock.filter(isExpiringSoon).length}
             </h3>
-            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>Expiring Soon</p>
+            <p style={{ fontSize: '14px', color: '#4F6F6B', margin: 0 }}>Expiring Soon</p>
           </div>
         </div>
 
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#FFFFFF',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #4DB6AC'
         }}>
-          <div style={{ fontSize: '24px', marginRight: '16px' }}>🩺</div>
+          <div style={{ fontSize: '24px', marginRight: '16px', color: '#009688' }}>🩺</div>
           <div>
-            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', margin: '0 0 4px 0' }}>
+            <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#124441', margin: '0 0 4px 0' }}>
               {initialStock.filter(m => m.prescriptionRequired).length}
             </h3>
-            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>Prescription Only</p>
+            <p style={{ fontSize: '14px', color: '#4F6F6B', margin: 0 }}>Prescription Only</p>
           </div>
         </div>
       </div>
@@ -693,23 +695,24 @@ const VendorStockManagement = ({
         display: 'flex',
         alignItems: 'center',
         gap: '16px',
-        backgroundColor: '#F8FAFC',
+        backgroundColor: '#FFFFFF',
         padding: '12px 16px',
         borderRadius: '8px',
-        marginBottom: '20px'
+        marginBottom: '20px',
+        border: '1px solid #4DB6AC'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#124441' }}>
           <span>Showing:</span>
           <span style={{ fontWeight: '600' }}>
             {selectedCategory === 'all' ? 'All Items' : currentCategory?.name}
             {stockFilter !== 'all' && ` (${stockFilters.find(f => f.id === stockFilter)?.label})`}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#124441' }}>
           <span>Items:</span>
           <span style={{ fontWeight: '600' }}>{displayStock.length}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#124441' }}>
           <span>Category Count:</span>
           <span style={{ fontWeight: '600' }}>{categoryStats[selectedCategory] || 0}</span>
         </div>
@@ -720,8 +723,8 @@ const VendorStockManagement = ({
               fontSize: '12px',
               padding: '6px 12px',
               backgroundColor: 'transparent',
-              border: '1px solid #7C2A62',
-              color: '#7C2A62',
+              border: '1px solid #009688',
+              color: '#009688',
               borderRadius: '4px',
               cursor: 'pointer'
             }}
@@ -737,11 +740,11 @@ const VendorStockManagement = ({
 
       {/* Main Content */}
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         borderRadius: '12px',
         padding: '24px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        border: '1px solid #e5e7eb'
+        border: '1px solid #4DB6AC'
       }}>
         <div style={{
           display: 'flex',
@@ -750,16 +753,16 @@ const VendorStockManagement = ({
           marginBottom: '20px'
         }}>
           <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#124441', margin: 0 }}>
               {selectedCategory === 'all' ? 'Medicine & Equipment Inventory' : currentCategory?.name}
               {stockFilter !== 'all' && ` (${stockFilters.find(f => f.id === stockFilter)?.label})`}
             </h2>
-            <p style={{ fontSize: '14px', color: '#6b7280', margin: '4px 0 0 0' }}>
+            <p style={{ fontSize: '14px', color: '#4F6F6B', margin: '4px 0 0 0' }}>
               {displayStock.length} of {categoryStats[selectedCategory] || 0} items shown
               {stockFilter !== 'all' ? ` after applying ${stockFilters.find(f => f.id === stockFilter)?.label.toLowerCase()} filter` : ''}
             </p>
           </div>
-          <div style={{ fontSize: '14px', color: '#7C2A62', fontWeight: '500' }}>
+          <div style={{ fontSize: '14px', color: '#009688', fontWeight: '500' }}>
             <span>{displayStock.length} items</span>
           </div>
         </div>
@@ -783,37 +786,38 @@ const VendorStockManagement = ({
         <div style={{ overflowX: 'auto', marginTop: '20px' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
             <thead>
-              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e5e7eb' }}>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Name</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Category</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Quantity</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Price</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Expiry Date</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Prescription</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px' }}>Actions</th>
+              <tr style={{ backgroundColor: '#E0F2F1', borderBottom: '2px solid #4DB6AC' }}>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Name</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Category</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Quantity</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Price</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Expiry Date</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Prescription</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', color: '#124441' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {displayStock.map(item => (
-                <tr key={item.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '12px 16px', fontSize: '14px' }}>
+                <tr key={item.id} style={{ borderBottom: '1px solid #E0F2F1' }}>
+                  <td style={{ padding: '12px 16px', fontSize: '14px', color: '#124441' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <strong>{item.name}</strong>
-                      <span style={{ fontSize: '12px', color: '#6b7280' }}>{item.batchNo}</span>
+                      <span style={{ fontSize: '12px', color: '#4F6F6B' }}>{item.batchNo}</span>
                     </div>
                   </td>
                   <td style={{ padding: '12px 16px', fontSize: '14px' }}>
                     <span style={{
                       fontWeight: '500',
                       backgroundColor: 
-                        item.category === 'Pregnancy Care' ? '#F7D9EB' :
-                        item.category === 'Baby & Child Care' ? '#E0F2FE' : 
-                        item.category === 'Medical Equipment' ? '#E0E7FF' :
-                        item.category === 'Vitamins & Supplements' ? '#FEF3C7' :
-                        item.category === 'Pain Relief' ? '#FEE2E2' :
-                        item.category === 'Antibiotics' ? '#DCFCE7' :
-                        item.category === 'Chronic Care' ? '#F3E8FF' :
-                        item.category === 'First Aid' ? '#FEF9C3' : '#F3F4F6',
+                        item.category === 'Pregnancy Care' ? '#E0F2F1' :
+                        item.category === 'Baby & Child Care' ? '#E0F2F1' : 
+                        item.category === 'Medical Equipment' ? '#E0F2F1' :
+                        item.category === 'Vitamins & Supplements' ? '#E0F2F1' :
+                        item.category === 'Pain Relief' ? '#E0F2F1' :
+                        item.category === 'Antibiotics' ? '#E0F2F1' :
+                        item.category === 'Chronic Care' ? '#E0F2F1' :
+                        item.category === 'First Aid' ? '#E0F2F1' : '#E0F2F1',
+                      color: '#124441',
                       padding: '4px 8px',
                       borderRadius: '4px',
                       fontSize: '12px',
@@ -822,17 +826,18 @@ const VendorStockManagement = ({
                       {item.category}
                     </span>
                   </td>
-                  <td style={{ padding: '12px 16px', fontSize: '14px' }}>
+                  <td style={{ padding: '12px 16px', fontSize: '14px', color: '#124441' }}>
                     <span style={{ fontWeight: '600', ...(isLowStock(item) ? { color: '#EF4444' } : {}) }}>
                       {item.quantity}
                       {isLowStock(item) && ' ⚠️'}
                     </span>
                   </td>
-                  <td style={{ padding: '12px 16px', fontSize: '14px' }}>
+                  <td style={{ padding: '12px 16px', fontSize: '14px', color: '#124441' }}>
                     {formatIndianCurrency(item.price)}
                   </td>
                   <td style={{ padding: '12px 16px', fontSize: '14px' }}>
                     <span style={{
+                      color: '#124441',
                       ...(isExpired(item) ? { color: '#EF4444', fontWeight: '600' } : {}),
                       ...(isExpiringSoon(item) && !isExpired(item) ? { color: '#F59E0B' } : {})
                     }}>
@@ -845,14 +850,14 @@ const VendorStockManagement = ({
                     {item.prescriptionRequired ? (
                       <span style={{ color: '#EF4444', fontWeight: '500' }}>Yes</span>
                     ) : (
-                      <span style={{ color: '#10B981', fontWeight: '500' }}>No</span>
+                      <span style={{ color: '#009688', fontWeight: '500' }}>No</span>
                     )}
                   </td>
                   <td style={{ padding: '12px 16px', fontSize: '14px' }}>
                     <button 
                       style={{
-                        backgroundColor: '#7C2A62',
-                        color: 'white',
+                        backgroundColor: '#009688',
+                        color: '#FFFFFF',
                         border: 'none',
                         padding: '6px 12px',
                         borderRadius: '4px',
@@ -872,14 +877,14 @@ const VendorStockManagement = ({
         </div>
 
         {displayStock.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+          <div style={{ textAlign: 'center', padding: '40px', color: '#4F6F6B' }}>
             <p style={{ fontSize: '16px', marginBottom: '8px' }}>
               No items found 
               {selectedCategory !== 'all' ? ` in ${currentCategory?.name}` : ''}
               {stockFilter !== 'all' ? ` with ${stockFilters.find(f => f.id === stockFilter)?.label.toLowerCase()} filter` : ''}
               {searchTerm ? ` matching "${searchTerm}"` : ''}.
             </p>
-            <p style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: '#4F6F6B', marginBottom: '16px' }}>
               {selectedCategory !== 'all' 
                 ? `There are ${categoryStats[selectedCategory] || 0} items in this category. Try changing the stock filter or search term.`
                 : 'Try changing filters or adding new items to your inventory.'}
@@ -889,8 +894,8 @@ const VendorStockManagement = ({
                 <button 
                   style={{
                     backgroundColor: 'transparent',
-                    color: '#7C2A62',
-                    border: '2px solid #7C2A62',
+                    color: '#009688',
+                    border: '2px solid #009688',
                     padding: '10px 18px',
                     borderRadius: '8px',
                     fontSize: '14px',
@@ -910,8 +915,8 @@ const VendorStockManagement = ({
               {selectedCategory !== 'all' && (
                 <button 
                   style={{
-                    backgroundColor: '#7C2A62',
-                    color: 'white',
+                    backgroundColor: '#009688',
+                    color: '#FFFFFF',
                     border: 'none',
                     padding: '10px 18px',
                     borderRadius: '8px',

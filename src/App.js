@@ -20,11 +20,6 @@ import VendorSignup from './components/VendorSignup';
 import DeliverySignup from './components/DeliverySignup';
 import DoctorSignup from './components/DoctorSignup';
 
-// Import Guardian/Wife Components
-import GuardianLogin from './components/GuardianLogin';
-import WifeLogin from './components/WifeLogin';
-import GuardianDashboard from './components/dashboards/GuardianDashboard';
-import WifeDashboard from './components/dashboards/WifeDashboard';
 
 // Import Dashboard Components
 import DoctorDashboard from './components/doctor/DoctorDashboard';
@@ -254,11 +249,7 @@ const AppWrapper = () => {
   const GuardianRouteHandler = useCallback(() => {
     return (
       <ProtectedRoute requiredType="guardian">
-        <GuardianDashboard
-          user={currentUser}
-          onLogout={handleLogout}
-        />
-      </ProtectedRoute>
+          </ProtectedRoute>
     );
   }, [ProtectedRoute, currentUser, handleLogout]);
 
@@ -266,10 +257,7 @@ const AppWrapper = () => {
   const WifeRouteHandler = useCallback(() => {
     return (
       <ProtectedRoute requiredType="wife">
-        <WifeDashboard
-          user={currentUser}
-          onLogout={handleLogout}
-        />
+
       </ProtectedRoute>
     );
   }, [ProtectedRoute, currentUser, handleLogout]);
@@ -433,7 +421,6 @@ const AppWrapper = () => {
             path="/login/guardian" 
             element={
               <PublicRoute>
-                <GuardianLogin onLoginSuccess={handleIndividualLoginSuccess} />
               </PublicRoute>
             } 
           />
@@ -441,7 +428,6 @@ const AppWrapper = () => {
             path="/login/wife" 
             element={
               <PublicRoute>
-                <WifeLogin onLoginSuccess={handleIndividualLoginSuccess} />
               </PublicRoute>
             } 
           />

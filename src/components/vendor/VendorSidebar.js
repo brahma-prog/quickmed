@@ -10,10 +10,19 @@ const VendorSidebar = ({
   handleVendorClick, 
   handleLogout 
 }) => {
+  const colors = {
+    primary: '#009688',
+    mint: '#4DB6AC',
+    softbg: '#E0F2F1',
+    white: '#FFFFFF',
+    darktext: '#124441',
+    softtext: '#4F6F6B'
+  };
+
   const sidebarStyle = {
     width: '280px',
-    backgroundColor: '#F7D9EB',
-    color: '#333333',
+    backgroundColor: colors.softbg,
+    color: colors.darktext,
     display: 'flex',
     flexDirection: 'column',
     position: 'fixed',
@@ -30,7 +39,6 @@ const VendorSidebar = ({
 
   const sidebarHeaderStyle = {
     padding: '24px 20px 16px',
-    // Removed borderBottom
     position: 'relative',
     flexShrink: 0
   };
@@ -55,7 +63,7 @@ const VendorSidebar = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: colors.mint,
     borderRadius: '8px'
   };
 
@@ -68,7 +76,7 @@ const VendorSidebar = ({
     fontSize: '22px',
     fontWeight: '700',
     margin: '0 0 4px 0',
-    color: '#333333',
+    color: colors.primary,
     letterSpacing: '0.5px'
   };
 
@@ -77,7 +85,7 @@ const VendorSidebar = ({
     opacity: 0.8,
     margin: 0,
     fontWeight: '400',
-    color: '#333333'
+    color: colors.softtext
   };
 
   const mobileCloseButtonStyle = {
@@ -87,7 +95,7 @@ const VendorSidebar = ({
     top: '24px',
     backgroundColor: 'transparent',
     border: 'none',
-    color: '#333333',
+    color: colors.darktext,
     fontSize: '18px',
     cursor: 'pointer',
     padding: '4px',
@@ -99,25 +107,23 @@ const VendorSidebar = ({
 
   const vendorProfileSectionStyle = {
     padding: '16px 20px',
-    // Removed borderBottom
     flexShrink: 0,
-    backgroundColor: 'rgba(0,0,0,0.05)'
+    backgroundColor: colors.white
   };
 
   const vendorProfileStyle = {
     display: 'flex',
     alignItems: 'center',
     padding: '12px',
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: colors.white,
     borderRadius: '10px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    // Removed border
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
     '&:hover': {
-      backgroundColor: 'rgba(0,0,0,0.12)',
+      backgroundColor: colors.softbg,
       transform: 'translateY(-1px)',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
     }
   };
 
@@ -129,10 +135,10 @@ const VendorSidebar = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: colors.mint,
     borderRadius: '10px',
     flexShrink: 0,
-    border: '2px solid rgba(0,0,0,0.2)'
+    border: `2px solid ${colors.primary}`
   };
 
   const vendorDetailsStyle = {
@@ -144,7 +150,7 @@ const VendorSidebar = ({
     margin: '0 0 4px 0',
     fontWeight: '600',
     fontSize: '14px',
-    color: '#333333',
+    color: colors.darktext,
     lineHeight: '1.2',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -155,7 +161,7 @@ const VendorSidebar = ({
     margin: '0 0 2px 0',
     fontSize: '11px',
     opacity: 0.9,
-    color: '#333333',
+    color: colors.softtext,
     lineHeight: '1.2',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -175,7 +181,7 @@ const VendorSidebar = ({
     padding: '14px 20px',
     backgroundColor: 'transparent',
     border: 'none',
-    color: '#333333',
+    color: colors.darktext,
     fontSize: '14px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
@@ -183,10 +189,11 @@ const VendorSidebar = ({
   };
 
   const navButtonActiveStyle = {
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: colors.white,
+    color: colors.primary,
     opacity: 1,
-    // Removed borderRight - this was the sidebar line for active items
-    fontWeight: '600'
+    fontWeight: '600',
+    borderRight: `3px solid ${colors.primary}`
   };
 
   const navIconStyle = {
@@ -204,16 +211,15 @@ const VendorSidebar = ({
 
   const sidebarFooterStyle = {
     padding: '16px 20px',
-    // Removed borderTop
     flexShrink: 0,
-    backgroundColor: 'rgba(0,0,0,0.05)'
+    backgroundColor: colors.white
   };
 
   const logoutButtonStyle = {
     width: '100%',
     padding: '10px 16px',
-    backgroundColor: 'rgba(0,0,0,0.08)',
-    color: '#333333',
+    backgroundColor: colors.mint,
+    color: colors.darktext,
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -221,7 +227,8 @@ const VendorSidebar = ({
     fontSize: '14px',
     transition: 'all 0.3s ease',
     '&:hover': {
-      backgroundColor: 'rgba(0,0,0,0.12)'
+      backgroundColor: colors.primary,
+      color: colors.white
     }
   };
 
