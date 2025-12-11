@@ -822,7 +822,7 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
               ))}
             </div>
             
-            <div style={styles.packageActions}>
+            {/* <div style={styles.packageActions}>
               <button 
                 style={styles.explainButton}
                 onClick={() => {
@@ -831,7 +831,7 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
               >
                 Explain Package
               </button>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>
@@ -981,14 +981,14 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: '#1a1a1a',
+    background: '#124441',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 2000
   },
   videoModal: {
-    background: '#ffffff',
+    background: '#FFFFFF',
     borderRadius: '12px',
     width: '95%',
     maxWidth: '1400px',
@@ -996,16 +996,17 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+    boxShadow: '0 20px 60px rgba(18, 68, 65, 0.3)',
+    border: '2px solid #4DB6AC'
   },
   videoHeader: {
-    background: '#7C2A62',
-    color: 'white',
+    background: '#009688',
+    color: '#FFFFFF',
     padding: '15px 25px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid rgba(255,255,255,0.1)'
+    borderBottom: '1px solid #4DB6AC'
   },
   videoHeaderInfo: {
     display: 'flex',
@@ -1020,7 +1021,7 @@ const styles = {
     fontWeight: '500'
   },
   connectedDot: {
-    color: '#4ade80',
+    color: '#10B981',
     fontSize: '12px'
   },
   callTimer: {
@@ -1031,8 +1032,8 @@ const styles = {
     fontWeight: '600'
   },
   endCallButton: {
-    background: '#ef4444',
-    color: 'white',
+    background: '#EF4444',
+    color: '#FFFFFF',
     border: 'none',
     padding: '8px 20px',
     borderRadius: '6px',
@@ -1041,7 +1042,7 @@ const styles = {
     fontSize: '14px',
     transition: 'background 0.2s',
     ':hover': {
-      background: '#dc2626'
+      background: '#DC2626'
     }
   },
   videoMainArea: {
@@ -1053,12 +1054,12 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    background: '#f9fafb'
+    background: '#E0F2F1'
   },
   patientVideoHeader: {
     padding: '15px 25px',
-    borderBottom: '1px solid #e5e7eb',
-    background: 'white'
+    borderBottom: '1px solid #4DB6AC',
+    background: '#FFFFFF'
   },
   patientVideoInfo: {
     display: 'flex',
@@ -1069,15 +1070,16 @@ const styles = {
     margin: 0,
     fontSize: '18px',
     fontWeight: '600',
-    color: '#111827'
+    color: '#124441'
   },
   trimesterIndicator: {
-    background: '#F7D9EB',
-    color: '#7C2A62',
+    background: '#E0F2F1',
+    color: '#009688',
     padding: '4px 12px',
     borderRadius: '20px',
     fontSize: '14px',
-    fontWeight: '500'
+    fontWeight: '500',
+    border: '1px solid #4DB6AC'
   },
   videoFeed: {
     flex: 1,
@@ -1089,7 +1091,7 @@ const styles = {
   },
   videoMock: {
     flex: 1,
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #009688 0%, #4DB6AC 100%)',
     borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
@@ -1099,7 +1101,7 @@ const styles = {
   },
   videoMockContent: {
     textAlign: 'center',
-    color: 'white'
+    color: '#FFFFFF'
   },
   videoMockAvatar: {
     fontSize: '80px',
@@ -1118,9 +1120,9 @@ const styles = {
   },
   selfView: {
     width: '200px',
-    background: 'white',
+    background: '#FFFFFF',
     borderRadius: '12px',
-    border: '2px solid #e5e7eb',
+    border: '2px solid #4DB6AC',
     position: 'absolute',
     bottom: '20px',
     right: '20px',
@@ -1128,61 +1130,62 @@ const styles = {
     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
   },
   selfViewHeader: {
-    background: '#f9fafb',
+    background: '#E0F2F1',
     padding: '8px 12px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #4DB6AC'
   },
   selfViewLabel: {
     fontSize: '12px',
     fontWeight: '600',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   selfViewToggle: {
     background: 'transparent',
-    border: '1px solid #d1d5db',
+    border: '1px solid #4DB6AC',
     padding: '3px 8px',
     borderRadius: '4px',
     fontSize: '10px',
     cursor: 'pointer',
-    color: '#4b5563'
+    color: '#4F6F6B'
   },
   selfViewVideo: {
     padding: '15px',
     textAlign: 'center'
   },
   selfViewMock: {
-    background: '#f3f4f6',
+    background: '#E0F2F1',
     borderRadius: '8px',
     padding: '15px'
   },
   selfViewEmoji: {
     fontSize: '40px',
-    marginBottom: '5px'
+    marginBottom: '5px',
+    color: '#009688'
   },
   selfViewText: {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   quickTools: {
     width: '300px',
-    background: 'white',
-    borderLeft: '1px solid #e5e7eb',
+    background: '#FFFFFF',
+    borderLeft: '1px solid #4DB6AC',
     display: 'flex',
     flexDirection: 'column'
   },
   quickToolsHeader: {
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #4DB6AC'
   },
   quickToolsTitle: {
     margin: 0,
     fontSize: '16px',
     fontWeight: '600',
-    color: '#111827'
+    color: '#124441'
   },
   toolButtons: {
     padding: '20px',
@@ -1191,8 +1194,8 @@ const styles = {
     gap: '10px'
   },
   toolButton: {
-    background: 'white',
-    border: '1px solid #d1d5db',
+    background: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     padding: '12px 16px',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -1200,16 +1203,16 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     fontSize: '14px',
-    color: '#374151',
+    color: '#124441',
     transition: 'all 0.2s',
     ':hover': {
-      background: '#f9fafb',
-      borderColor: '#9ca3af'
+      background: '#E0F2F1',
+      borderColor: '#009688'
     }
   },
   activeToolButton: {
-    background: '#f3f4f6',
-    border: '1px solid #7C2A62',
+    background: '#E0F2F1',
+    border: '1px solid #009688',
     padding: '12px 16px',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -1217,12 +1220,12 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     fontSize: '14px',
-    color: '#7C2A62',
+    color: '#009688',
     fontWeight: '500'
   },
   recordingButton: {
-    background: '#fef2f2',
-    border: '1px solid #ef4444',
+    background: '#FEF2F2',
+    border: '1px solid #EF4444',
     padding: '12px 16px',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -1230,11 +1233,11 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     fontSize: '14px',
-    color: '#ef4444',
+    color: '#EF4444',
     fontWeight: '500'
   },
   recordingDot: {
-    color: '#ef4444',
+    color: '#EF4444',
     fontSize: '12px',
     animation: 'pulse 1s infinite'
   },
@@ -1243,8 +1246,8 @@ const styles = {
   },
   callControls: {
     padding: '20px',
-    borderTop: '1px solid #e5e7eb',
-    borderBottom: '1px solid #e5e7eb',
+    borderTop: '1px solid #4DB6AC',
+    borderBottom: '1px solid #4DB6AC',
     display: 'flex',
     justifyContent: 'space-around'
   },
@@ -1257,12 +1260,12 @@ const styles = {
     alignItems: 'center',
     gap: '5px',
     fontSize: '12px',
-    color: '#4b5563',
+    color: '#4F6F6B',
     padding: '8px',
     borderRadius: '6px',
     transition: 'background 0.2s',
     ':hover': {
-      background: '#f3f4f6'
+      background: '#E0F2F1'
     }
   },
   controlIcon: {
@@ -1278,26 +1281,28 @@ const styles = {
     margin: '0 0 15px 0',
     fontSize: '14px',
     fontWeight: '600',
-    color: '#111827'
+    color: '#124441'
   },
   notesTextarea: {
     flex: 1,
-    border: '1px solid #d1d5db',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     padding: '12px',
     fontSize: '14px',
     fontFamily: 'inherit',
     resize: 'none',
     marginBottom: '15px',
+    color: '#124441',
+    backgroundColor: '#FFFFFF',
     ':focus': {
       outline: 'none',
-      borderColor: '#7C2A62',
-      boxShadow: '0 0 0 3px rgba(124, 42, 98, 0.1)'
+      borderColor: '#009688',
+      boxShadow: '0 0 0 3px rgba(0, 150, 136, 0.1)'
     }
   },
   saveNotesButton: {
-    background: '#7C2A62',
-    color: 'white',
+    background: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '10px',
     borderRadius: '8px',
@@ -1305,18 +1310,19 @@ const styles = {
     fontWeight: '500',
     fontSize: '14px',
     transition: 'background 0.2s',
+    border: '1px solid #4DB6AC',
     ':hover': {
-      background: '#6a2355'
+      background: '#00897B'
     }
   },
   videoFooter: {
-    background: '#f9fafb',
+    background: '#E0F2F1',
     padding: '12px 25px',
-    borderTop: '1px solid #e5e7eb',
+    borderTop: '1px solid #4DB6AC',
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '14px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   appointmentInfo: {
     display: 'flex',
@@ -1338,9 +1344,10 @@ const styles = {
     }
   },
 
-  // Existing styles (keep all the previous styles)
+  // Main Content and Layout Styles
   mainContent: {
-    padding: '20px'
+    padding: '20px',
+    backgroundColor: '#E0F2F1'
   },
   header: {
     marginBottom: '30px'
@@ -1349,10 +1356,10 @@ const styles = {
     fontSize: '24px',
     fontWeight: 'bold',
     marginBottom: '5px',
-    color: '#333'
+    color: '#124441'
   },
   subtitle: {
-    color: '#666',
+    color: '#4F6F6B',
     marginBottom: '20px'
   },
   tabs: {
@@ -1362,14 +1369,16 @@ const styles = {
   },
   tab: {
     padding: '10px 20px',
-    background: '#f5f5f5',
-    border: 'none',
+    background: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     borderRadius: '5px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    color: '#124441'
   },
   activeTab: {
-    background: '#7C2A62',
-    color: 'white'
+    background: '#009688',
+    color: '#FFFFFF',
+    borderColor: '#009688'
   },
   filterTabs: {
     display: 'flex',
@@ -1378,14 +1387,16 @@ const styles = {
   },
   filterTab: {
     padding: '8px 16px',
-    background: '#f5f5f5',
-    border: 'none',
+    background: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     borderRadius: '5px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    color: '#124441'
   },
   activeFilterTab: {
-    background: '#7C2A62',
-    color: 'white'
+    background: '#009688',
+    color: '#FFFFFF',
+    borderColor: '#009688'
   },
   appointmentsContainer: {
     display: 'flex',
@@ -1393,10 +1404,11 @@ const styles = {
     gap: '15px'
   },
   appointmentCard: {
-    background: 'white',
+    background: '#FFFFFF',
     padding: '20px',
     borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+    border: '1px solid #4DB6AC'
   },
   appointmentHeader: {
     display: 'flex',
@@ -1412,12 +1424,13 @@ const styles = {
   profileIcon: {
     width: '40px',
     height: '40px',
-    background: '#F7D9EB',
+    background: '#E0F2F1',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '18px'
+    fontSize: '18px',
+    color: '#009688'
   },
   patientInfo: {
     flex: 1
@@ -1429,32 +1442,35 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    color: '#124441'
   },
   trimesterBadge: {
-    background: '#E8F4FD',
-    color: '#1E40AF',
+    background: '#E0F2F1',
+    color: '#009688',
     padding: '2px 8px',
     borderRadius: '12px',
     fontSize: '12px',
-    fontWeight: '500'
+    fontWeight: '500',
+    border: '1px solid #4DB6AC'
   },
   firstConsultationBadge: {
-    background: '#F7D9EB',
-    color: '#7C2A62',
+    background: '#E0F2F1',
+    color: '#009688',
     padding: '2px 8px',
     borderRadius: '12px',
     fontSize: '12px',
-    fontWeight: '500'
+    fontWeight: '500',
+    border: '1px solid #4DB6AC'
   },
   appointmentMeta: {
     fontSize: '14px',
-    color: '#666',
+    color: '#4F6F6B',
     marginBottom: '5px'
   },
   freeBadge: {
     background: '#10B981',
-    color: 'white',
+    color: '#FFFFFF',
     padding: '2px 6px',
     borderRadius: '4px',
     fontSize: '12px',
@@ -1462,26 +1478,28 @@ const styles = {
   },
   consultationType: {
     fontSize: '13px',
-    color: '#7C2A62',
+    color: '#009688',
     fontWeight: '500'
   },
   appointmentTime: {
     textAlign: 'right',
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px'
+    gap: '5px',
+    color: '#124441'
   },
   hospitalRequired: {
     fontSize: '11px',
-    color: '#DC2626',
+    color: '#EF4444',
     backgroundColor: '#FEF2F2',
     padding: '2px 6px',
-    borderRadius: '4px'
+    borderRadius: '4px',
+    border: '1px solid #EF4444'
   },
   appointmentDetails: {
     marginBottom: '15px',
     fontSize: '14px',
-    color: '#666'
+    color: '#4F6F6B'
   },
   appointmentActions: {
     display: 'flex',
@@ -1494,13 +1512,14 @@ const styles = {
     background: '#FEF2F2',
     borderRadius: '5px',
     fontSize: '14px',
-    color: '#666'
+    color: '#4F6F6B',
+    border: '1px solid #EF4444'
   },
   primaryButton: {
     padding: '8px 16px',
-    background: '#7C2A62',
-    color: 'white',
-    border: 'none',
+    background: '#009688',
+    color: '#FFFFFF',
+    border: '1px solid #009688',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px',
@@ -1508,9 +1527,9 @@ const styles = {
   },
   hospitalButton: {
     padding: '8px 16px',
-    background: '#F7D9EB',
-    color: '#7C2A62',
-    border: '1px solid #7C2A62',
+    background: '#E0F2F1',
+    color: '#009688',
+    border: '1px solid #009688',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px',
@@ -1519,8 +1538,8 @@ const styles = {
   secondaryButton: {
     padding: '8px 16px',
     background: 'transparent',
-    color: '#7C2A62',
-    border: '1px solid #7C2A62',
+    color: '#009688',
+    border: '1px solid #009688',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px'
@@ -1528,8 +1547,8 @@ const styles = {
   successButton: {
     padding: '8px 16px',
     background: '#10B981',
-    color: 'white',
-    border: 'none',
+    color: '#FFFFFF',
+    border: '1px solid #10B981',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px'
@@ -1537,8 +1556,8 @@ const styles = {
   dangerButton: {
     padding: '8px 16px',
     background: '#EF4444',
-    color: 'white',
-    border: 'none',
+    color: '#FFFFFF',
+    border: '1px solid #EF4444',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px'
@@ -1554,10 +1573,11 @@ const styles = {
     gap: '20px'
   },
   patientCard: {
-    background: 'white',
+    background: '#FFFFFF',
     padding: '20px',
     borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+    border: '1px solid #4DB6AC'
   },
   patientHeader: {
     display: 'flex',
@@ -1568,12 +1588,13 @@ const styles = {
   profileIconLarge: {
     width: '50px',
     height: '50px',
-    background: '#F7D9EB',
+    background: '#E0F2F1',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '20px'
+    fontSize: '20px',
+    color: '#009688'
   },
   patientBasicInfo: {
     flex: 1
@@ -1581,41 +1602,46 @@ const styles = {
   patientName: {
     fontSize: '16px',
     fontWeight: '600',
-    marginBottom: '5px'
+    marginBottom: '5px',
+    color: '#124441'
   },
   patientContact: {
     fontSize: '14px',
-    color: '#666',
+    color: '#4F6F6B',
     marginBottom: '2px'
   },
   patientEmail: {
     fontSize: '13px',
-    color: '#999'
+    color: '#4F6F6B'
   },
   pregnancyDetails: {
-    background: '#f8fafc',
+    background: '#E0F2F1',
     padding: '15px',
     borderRadius: '5px',
-    marginBottom: '15px'
+    marginBottom: '15px',
+    border: '1px solid #4DB6AC'
   },
   detailRow: {
     display: 'flex',
     justifyContent: 'space-between',
     marginBottom: '5px',
-    fontSize: '14px'
+    fontSize: '14px',
+    color: '#124441'
   },
   reportsSummary: {
     marginBottom: '15px',
     padding: '10px',
-    background: '#E8F4FD',
+    background: '#E0F2F1',
     borderRadius: '5px',
     fontSize: '14px',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    border: '1px solid #4DB6AC',
+    color: '#124441'
   },
   reportCount: {
-    color: '#1E40AF',
+    color: '#009688',
     fontWeight: '500'
   },
   patientActions: {
@@ -1636,13 +1662,14 @@ const styles = {
     gap: '20px'
   },
   packageCardLarge: {
-    background: 'white',
+    background: '#FFFFFF',
     padding: '20px',
     borderRadius: '8px',
     boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px'
+    gap: '15px',
+    border: '1px solid #4DB6AC'
   },
   packageCardHeader: {
     display: 'flex',
@@ -1652,19 +1679,19 @@ const styles = {
   packageNameLarge: {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#333',
+    color: '#124441',
     margin: 0
   },
   packagePriceLarge: {
     fontSize: '20px',
     fontWeight: 'bold',
-    color: '#7C2A62'
+    color: '#009688'
   },
   packageDurationLarge: {
     display: 'flex',
     gap: '10px',
     fontSize: '14px',
-    color: '#666'
+    color: '#4F6F6B'
   },
   packageFeaturesList: {
     flex: 1,
@@ -1677,10 +1704,10 @@ const styles = {
     alignItems: 'flex-start',
     gap: '8px',
     fontSize: '14px',
-    color: '#555'
+    color: '#124441'
   },
   featureIcon: {
-    color: '#10B981',
+    color: '#009688',
     flexShrink: 0
   },
   packageActions: {
@@ -1689,18 +1716,19 @@ const styles = {
   explainButton: {
     padding: '8px 16px',
     background: 'transparent',
-    color: '#7C2A62',
-    border: '1px solid #7C2A62',
+    color: '#009688',
+    border: '1px solid #009688',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px',
     width: '100%'
   },
   packageGuidelines: {
-    background: '#F7D9EB',
+    background: '#E0F2F1',
     padding: '20px',
     borderRadius: '8px',
-    marginTop: '20px'
+    marginTop: '20px',
+    border: '1px solid #4DB6AC'
   },
   guidelinesList: {
     listStyle: 'none',
@@ -1708,7 +1736,8 @@ const styles = {
     margin: 0,
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px'
+    gap: '8px',
+    color: '#124441'
   },
   modalOverlay: {
     position: 'fixed',
@@ -1716,7 +1745,7 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'rgba(0,0,0,0.5)',
+    background: 'rgba(18, 68, 65, 0.5)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1724,16 +1753,17 @@ const styles = {
     padding: '20px'
   },
   modal: {
-    background: 'white',
+    background: '#FFFFFF',
     borderRadius: '8px',
     maxWidth: '500px',
     width: '100%',
     maxHeight: '80vh',
-    overflow: 'auto'
+    overflow: 'auto',
+    border: '2px solid #4DB6AC'
   },
   modalHeader: {
     padding: '20px',
-    borderBottom: '1px solid #eee',
+    borderBottom: '1px solid #4DB6AC',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
@@ -1743,7 +1773,10 @@ const styles = {
     border: 'none',
     fontSize: '20px',
     cursor: 'pointer',
-    color: '#666'
+    color: '#4F6F6B',
+    backgroundColor: '#E0F2F1',
+    padding: '8px',
+    borderRadius: '4px'
   },
   modalContent: {
     padding: '20px'
@@ -1752,8 +1785,10 @@ const styles = {
     fontSize: '14px',
     marginBottom: '20px',
     padding: '10px',
-    background: '#f8fafc',
-    borderRadius: '5px'
+    background: '#E0F2F1',
+    borderRadius: '5px',
+    color: '#124441',
+    border: '1px solid #4DB6AC'
   },
   packagesList: {
     display: 'flex',
@@ -1762,12 +1797,13 @@ const styles = {
     marginBottom: '20px'
   },
   packageCard: {
-    border: '1px solid #eee',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     padding: '15px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px'
+    gap: '10px',
+    backgroundColor: '#FFFFFF'
   },
   packageInfo: {
     display: 'flex',
@@ -1777,17 +1813,18 @@ const styles = {
   packageName: {
     fontSize: '16px',
     fontWeight: '600',
-    margin: 0
+    margin: 0,
+    color: '#124441'
   },
   packagePrice: {
     fontSize: '16px',
     fontWeight: 'bold',
-    color: '#7C2A62',
+    color: '#009688',
     margin: 0
   },
   packageDuration: {
     fontSize: '12px',
-    color: '#666',
+    color: '#4F6F6B',
     marginTop: '5px'
   },
   packageFeatures: {
@@ -1795,7 +1832,7 @@ const styles = {
     flexDirection: 'column',
     gap: '5px',
     fontSize: '13px',
-    color: '#555'
+    color: '#124441'
   },
   feature: {
     display: 'flex',
@@ -1804,27 +1841,28 @@ const styles = {
   },
   moreFeatures: {
     fontSize: '12px',
-    color: '#999',
+    color: '#4F6F6B',
     fontStyle: 'italic'
   },
   selectButton: {
     padding: '8px 16px',
-    background: '#7C2A62',
-    color: 'white',
-    border: 'none',
+    background: '#009688',
+    color: '#FFFFFF',
+    border: '1px solid #009688',
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '14px',
     width: '100%'
   },
   currentPackageButton: {
-    background: '#10B981'
+    background: '#10B981',
+    borderColor: '#10B981'
   },
   packageNotes: {
     fontSize: '13px',
-    color: '#666',
+    color: '#4F6F6B',
     paddingTop: '15px',
-    borderTop: '1px solid #eee'
+    borderTop: '1px solid #4DB6AC'
   },
   uploadSection: {
     marginBottom: '20px'
@@ -1833,12 +1871,14 @@ const styles = {
     width: '100%',
     padding: '10px',
     marginBottom: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '5px'
+    border: '1px solid #4DB6AC',
+    borderRadius: '5px',
+    color: '#124441',
+    backgroundColor: '#FFFFFF'
   },
   fileNote: {
     fontSize: '12px',
-    color: '#666',
+    color: '#4F6F6B',
     marginTop: '5px'
   },
   reportsList: {
@@ -1849,10 +1889,10 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '12px',
-    border: '1px solid #eee',
+    border: '1px solid #4DB6AC',
     borderRadius: '5px',
     marginBottom: '10px',
-    background: '#f9fafb'
+    background: '#E0F2F1'
   },
   reportInfo: {
     display: 'flex',
@@ -1862,18 +1902,18 @@ const styles = {
   },
   reportIcon: {
     fontSize: '20px',
-    color: '#7C2A62'
+    color: '#009688'
   },
   reportDate: {
     fontSize: '12px',
-    color: '#666',
+    color: '#4F6F6B',
     marginTop: '2px'
   },
   viewButton: {
     padding: '6px 12px',
-    background: '#7C2A62',
-    color: 'white',
-    border: 'none',
+    background: '#009688',
+    color: '#FFFFFF',
+    border: '1px solid #009688',
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '12px',
@@ -1882,19 +1922,20 @@ const styles = {
   noReports: {
     textAlign: 'center',
     padding: '30px 20px',
-    color: '#666',
-    background: '#f9fafb',
+    color: '#4F6F6B',
+    background: '#E0F2F1',
     borderRadius: '8px',
-    border: '1px dashed #ddd'
+    border: '1px dashed #4DB6AC'
   },
   noReportsIcon: {
     fontSize: '40px',
     marginBottom: '10px',
-    opacity: 0.5
+    opacity: 0.5,
+    color: '#009688'
   },
   noReportsText: {
     fontSize: '13px',
-    color: '#999',
+    color: '#4F6F6B',
     marginTop: '5px'
   },
   notificationsContainer: {
@@ -1909,16 +1950,17 @@ const styles = {
   notification: {
     padding: '12px 20px',
     borderRadius: '5px',
-    color: 'white',
+    color: '#FFFFFF',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
   },
   emptyState: {
     textAlign: 'center',
     padding: '40px',
-    color: '#666',
-    background: 'white',
+    color: '#4F6F6B',
+    background: '#FFFFFF',
     borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+    border: '1px solid #4DB6AC'
   }
 };
 

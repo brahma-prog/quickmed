@@ -269,7 +269,7 @@ const ChatbotModal = ({ setShowChatbotModal, isMobile }) => {
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background-color: #9CA3AF;
+        background-color: #4F6F6B;
         animation: typing 1.4s infinite ease-in-out;
       }
       .typing-dots span:nth-child(1) { 
@@ -1152,14 +1152,14 @@ const modalStyles = {
     padding: '20px'
   },
   modal: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     maxHeight: '90vh',
     overflow: 'auto',
     boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)'
   },
   confirmModal: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     textAlign: 'center'
   },
@@ -1168,11 +1168,11 @@ const modalStyles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   },
   confirmHeader: {
     padding: '32px 24px 16px',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   },
   confirmIcon: {
     fontSize: '48px',
@@ -1181,7 +1181,7 @@ const modalStyles = {
   title: {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   },
   closeButton: {
@@ -1189,7 +1189,7 @@ const modalStyles = {
     border: 'none',
     fontSize: '20px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   content: {
     padding: '20px'
@@ -1209,13 +1209,13 @@ const modalStyles = {
     display: 'block',
     marginBottom: '6px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     fontSize: '14px'
   },
   input: {
     width: '100%',
     padding: '10px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px',
     boxSizing: 'border-box'
@@ -1234,18 +1234,18 @@ const modalStyles = {
     display: 'flex',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   },
   confirmActions: {
     display: 'flex',
     gap: '12px',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   },
   primaryButton: {
     padding: '12px 20px',
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
@@ -1256,8 +1256,8 @@ const modalStyles = {
   secondaryButton: {
     padding: '12px 20px',
     backgroundColor: 'transparent',
-    color: '#6b7280',
-    border: '2px solid #e5e7eb',
+    color: '#4F6F6B',
+    border: '2px solid #E0F2F1',
     borderRadius: '8px',
     fontSize: '14px',
     fontWeight: '600',
@@ -1267,7 +1267,7 @@ const modalStyles = {
   dangerButton: {
     padding: '12px 20px',
     backgroundColor: '#EF4444',
-    color: 'white',
+    color: '#FFFFFF',
     border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
@@ -1278,15 +1278,15 @@ const modalStyles = {
   smallButton: {
     padding: '6px 12px',
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '1px solid #7C2A62',
+    color: '#009688',
+    border: '1px solid #009688',
     borderRadius: '6px',
     fontSize: '12px',
     cursor: 'pointer',
     whiteSpace: 'nowrap'
   },
   buttonDisabled: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: '#4DB6AC',
     cursor: 'not-allowed'
   },
   notificationActions: {
@@ -1298,7 +1298,7 @@ const modalStyles = {
   emptyState: {
     textAlign: 'center',
     padding: '40px 20px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   emptyIcon: {
     fontSize: '48px',
@@ -1313,14 +1313,14 @@ const modalStyles = {
   notificationItem: {
     display: 'flex',
     padding: '16px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #E0F2F1',
     borderRadius: '8px',
     cursor: 'pointer',
     position: 'relative'
   },
   unreadNotification: {
-    backgroundColor: '#F7D9EB',
-    borderColor: '#7C2A62'
+    backgroundColor: '#E0F2F1',
+    borderColor: '#009688'
   },
   notificationIcon: {
     fontSize: '20px',
@@ -1334,16 +1334,17 @@ const modalStyles = {
   notificationTitle: {
     fontSize: '14px',
     fontWeight: '600',
-    margin: '0 0 4px 0'
+    margin: '0 0 4px 0',
+    color: '#124441'
   },
   notificationMessage: {
     fontSize: '13px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: '0 0 8px 0'
   },
   notificationTime: {
     fontSize: '11px',
-    color: '#9CA3AF'
+    color: '#4DB6AC'
   },
   priorityIndicator: {
     display: 'inline-block',
@@ -1384,7 +1385,7 @@ const modalStyles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb',
+    borderBottom: '1px solid #E0F2F1',
     flexWrap: 'wrap',
     gap: '10px'
   },
@@ -1401,11 +1402,12 @@ const modalStyles = {
   chatPatientName: {
     fontSize: '16px',
     fontWeight: '600',
-    margin: '0 0 4px 0'
+    margin: '0 0 4px 0',
+    color: '#124441'
   },
   chatPatientDetails: {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   chatActions: {
@@ -1434,11 +1436,11 @@ const modalStyles = {
     borderRadius: '16px'
   },
   messageLeftContent: {
-    backgroundColor: '#f3f4f6'
+    backgroundColor: '#E0F2F1'
   },
   messageRightContent: {
-    backgroundColor: '#7C2A62',
-    color: 'white'
+    backgroundColor: '#009688',
+    color: '#FFFFFF'
   },
   messageText: {
     margin: '0 0 4px 0',
@@ -1451,7 +1453,7 @@ const modalStyles = {
   messageInput: {
     display: 'flex',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb'
+    borderTop: '1px solid #E0F2F1'
   },
   patientInfo: {
     display: 'flex',
@@ -1462,7 +1464,7 @@ const modalStyles = {
   profileIcon: {
     width: '50px',
     height: '50px',
-    backgroundColor: '#F7D9EB',
+    backgroundColor: '#E0F2F1',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -1473,18 +1475,20 @@ const modalStyles = {
   patientName: {
     fontSize: '18px',
     fontWeight: '600',
-    margin: '0 0 4px 0'
+    margin: '0 0 4px 0',
+    color: '#124441'
   },
   patientAge: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   details: {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    color: '#124441'
   },
   // Chatbot specific styles
   chatbotHeader: {
@@ -1497,7 +1501,7 @@ const modalStyles = {
   },
   chatbotSubtitle: {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   chatbotContent: {
@@ -1523,16 +1527,16 @@ const modalStyles = {
     alignSelf: 'flex-end'
   },
   botMessageBubble: {
-    backgroundColor: '#f3f4f6'
+    backgroundColor: '#E0F2F1'
   },
   userMessageBubble: {
-    backgroundColor: '#7C2A62',
-    color: 'white'
+    backgroundColor: '#009688',
+    color: '#FFFFFF'
   },
   chatbotInput: {
     display: 'flex',
     padding: '20px',
-    borderTop: '1px solid #e5e7eb',
+    borderTop: '1px solid #E0F2F1',
     gap: '12px'
   },
   typingIndicator: {
@@ -1540,7 +1544,7 @@ const modalStyles = {
     alignItems: 'center',
     gap: '8px',
     padding: '12px 16px',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#E0F2F1',
     borderRadius: '16px',
     alignSelf: 'flex-start'
   },
@@ -1550,13 +1554,13 @@ const modalStyles = {
   },
   typingText: {
     fontSize: '12px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   editButton: {
     padding: '6px 12px',
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '1px solid #7C2A62',
+    color: '#009688',
+    border: '1px solid #009688',
     borderRadius: '6px',
     fontSize: '12px',
     cursor: 'pointer'
@@ -1572,7 +1576,7 @@ const modalStyles = {
     gap: '16px',
     marginBottom: '24px',
     padding: '16px',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#E0F2F1',
     borderRadius: '8px'
   },
   profileAvatar: {
@@ -1585,11 +1589,11 @@ const modalStyles = {
     fontSize: '18px',
     fontWeight: '600',
     margin: '0 0 4px 0',
-    color: '#1f2937'
+    color: '#124441'
   },
   profileSpecialization: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   profileDetails: {
@@ -1602,16 +1606,16 @@ const modalStyles = {
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: '8px 0',
-    borderBottom: '1px solid #e5e7eb'
+    borderBottom: '1px solid #E0F2F1'
   },
   detailLabel: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontWeight: '500'
   },
   detailValue: {
     fontSize: '14px',
-    color: '#1f2937',
+    color: '#124441',
     fontWeight: '600',
     textAlign: 'right',
     maxWidth: '60%'
@@ -1623,7 +1627,7 @@ const modalStyles = {
     gap: '20px',
     marginBottom: '24px',
     padding: '16px',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#E0F2F1',
     borderRadius: '8px'
   },
   profileIconLarge: {
@@ -1644,7 +1648,7 @@ const modalStyles = {
   sectionTitle: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 12px 0'
   },
   conditionsList: {
@@ -1653,8 +1657,8 @@ const modalStyles = {
     gap: '8px'
   },
   conditionTag: {
-    backgroundColor: '#F7D9EB',
-    color: '#7C2A62',
+    backgroundColor: '#E0F2F1',
+    color: '#009688',
     padding: '6px 12px',
     borderRadius: '16px',
     fontSize: '12px',
@@ -1669,7 +1673,7 @@ const modalStyles = {
     gap: '12px'
   },
   historyItem: {
-    border: '1px solid #e5e7eb',
+    border: '1px solid #E0F2F1',
     borderRadius: '8px',
     padding: '16px'
   },
@@ -1683,11 +1687,11 @@ const modalStyles = {
   },
   historyDate: {
     fontSize: '14px',
-    color: '#1f2937'
+    color: '#124441'
   },
   historyStatus: {
     backgroundColor: '#10B981',
-    color: 'white',
+    color: '#FFFFFF',
     padding: '4px 8px',
     borderRadius: '12px',
     fontSize: '11px',
@@ -1695,7 +1699,7 @@ const modalStyles = {
   },
   historyDetails: {
     fontSize: '14px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   historyDiagnosis: {
     margin: '0 0 4px 0'

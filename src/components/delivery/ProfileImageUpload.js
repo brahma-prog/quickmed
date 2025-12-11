@@ -12,22 +12,30 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
       maxWidth: '500px',
       maxHeight: '90vh',
       overflow: 'auto',
-      boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
+      boxShadow: '0 20px 25px -5px rgba(0,150,136,0.2)',
+      border: '1px solid #4DB6AC'
     },
     profileImageHeader: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '24px',
-      borderBottom: '1px solid #e5e7eb',
-      backgroundColor: '#f8fafc'
+      borderBottom: '1px solid #4DB6AC',
+      backgroundColor: '#E0F2F1'
+    },
+    headerText: {
+      margin: 0,
+      fontSize: '18px',
+      fontWeight: '600',
+      color: '#124441'
     },
     closeButton: {
       backgroundColor: 'transparent',
       border: 'none',
       fontSize: '20px',
       cursor: 'pointer',
-      color: '#6b7280'
+      color: '#4F6F6B',
+      transition: 'color 0.2s ease'
     },
     profileImageContent: {
       padding: '24px'
@@ -42,8 +50,10 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
       height: '150px',
       borderRadius: '50%',
       overflow: 'hidden',
-      border: '4px solid #7C2A62',
-      position: 'relative'
+      border: '4px solid #009688',
+      position: 'relative',
+      boxShadow: '0 4px 12px rgba(0,150,136,0.2)',
+      transition: 'transform 0.3s ease'
     },
     previewImage: {
       width: '100%',
@@ -53,20 +63,22 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
     placeholderImage: {
       width: '100%',
       height: '100%',
-      backgroundColor: '#F7D9EB',
+      backgroundColor: '#E0F2F1',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '48px'
+      fontSize: '48px',
+      color: '#4DB6AC'
     },
     imageActions: {
       display: 'flex',
       gap: '12px',
       justifyContent: 'center',
-      marginBottom: '20px'
+      marginBottom: '20px',
+      flexWrap: 'wrap'
     },
     primaryButton: {
-      backgroundColor: '#7C2A62',
+      backgroundColor: '#009688',
       color: 'white',
       border: 'none',
       padding: '10px 16px',
@@ -76,12 +88,13 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
       cursor: 'pointer',
       display: 'flex',
       alignItems: 'center',
-      gap: '6px'
+      gap: '6px',
+      transition: 'all 0.3s ease'
     },
     dangerButton: {
-      backgroundColor: '#EF4444',
-      color: 'white',
-      border: 'none',
+      backgroundColor: 'transparent',
+      color: '#f44336',
+      border: '1px solid #f44336',
       padding: '10px 16px',
       borderRadius: '6px',
       fontSize: '14px',
@@ -89,31 +102,39 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
       cursor: 'pointer',
       display: 'flex',
       alignItems: 'center',
-      gap: '6px'
+      gap: '6px',
+      transition: 'all 0.3s ease'
     },
     imageTips: {
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1',
       padding: '16px',
       borderRadius: '8px',
-      border: '1px solid #e5e7eb'
+      border: '1px solid #4DB6AC',
+      marginTop: '16px'
+    },
+    tipTitle: {
+      margin: '0 0 8px 0',
+      fontSize: '14px',
+      fontWeight: '600',
+      color: '#124441'
     },
     tipText: {
       margin: '4px 0',
       fontSize: '12px',
-      color: '#6b7280'
+      color: '#4F6F6B'
     },
     profileImageFooter: {
       padding: '16px 24px',
-      borderTop: '1px solid #e5e7eb',
+      borderTop: '1px solid #4DB6AC',
       display: 'flex',
       justifyContent: 'flex-end',
       gap: '12px',
-      backgroundColor: '#f8fafc'
+      backgroundColor: '#E0F2F1'
     },
     secondaryButton: {
       backgroundColor: 'transparent',
-      color: '#7C2A62',
-      border: '1px solid #7C2A62',
+      color: '#009688',
+      border: '1px solid #009688',
       padding: '9px 15px',
       borderRadius: '6px',
       fontSize: '14px',
@@ -125,7 +146,7 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
       gap: '6px'
     },
     successButton: {
-      backgroundColor: '#10B981',
+      backgroundColor: '#009688',
       color: 'white',
       border: 'none',
       padding: '10px 16px',
@@ -135,7 +156,8 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
       cursor: 'pointer',
       display: 'flex',
       alignItems: 'center',
-      gap: '6px'
+      gap: '6px',
+      transition: 'all 0.3s ease'
     }
   };
 
@@ -174,13 +196,24 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
   return (
     <div style={styles.profileImageModal}>
       <div style={styles.profileImageHeader}>
-        <h3>Update Profile Image</h3>
-        <button style={styles.closeButton} onClick={onCancel}>✕</button>
+        <h3 style={styles.headerText}>Update Profile Image</h3>
+        <button 
+          style={styles.closeButton} 
+          onClick={onCancel}
+          onMouseEnter={(e) => e.target.style.color = '#124441'}
+          onMouseLeave={(e) => e.target.style.color = '#4F6F6B'}
+        >
+          ✕
+        </button>
       </div>
       
       <div style={styles.profileImageContent}>
         <div style={styles.imagePreviewContainer}>
-          <div style={styles.imagePreview}>
+          <div 
+            style={styles.imagePreview}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
             {previewUrl ? (
               <img src={previewUrl} alt="Profile preview" style={styles.previewImage} />
             ) : (
@@ -200,6 +233,14 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
           <button
             style={styles.primaryButton}
             onClick={() => fileInputRef.current?.click()}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#00796B';
+              e.target.style.boxShadow = '0 4px 8px rgba(0,150,136,0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#009688';
+              e.target.style.boxShadow = 'none';
+            }}
           >
             📁 Choose Image
           </button>
@@ -207,6 +248,16 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
             <button
               style={styles.dangerButton}
               onClick={handleRemove}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#f44336';
+                e.target.style.color = 'white';
+                e.target.style.boxShadow = '0 4px 8px rgba(244,67,54,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.color = '#f44336';
+                e.target.style.boxShadow = 'none';
+              }}
             >
               🗑️ Remove
             </button>
@@ -214,17 +265,45 @@ const ProfileImageUpload = ({ currentImage, onImageChange, onCancel }) => {
         </div>
 
         <div style={styles.imageTips}>
+          <h4 style={styles.tipTitle}>Image Requirements</h4>
           <p style={styles.tipText}>• Maximum file size: 5MB</p>
           <p style={styles.tipText}>• Supported formats: JPG, PNG, WebP</p>
           <p style={styles.tipText}>• Recommended size: 500x500 pixels</p>
+          <p style={styles.tipText}>• Square images work best</p>
         </div>
       </div>
 
       <div style={styles.profileImageFooter}>
-        <button style={styles.secondaryButton} onClick={onCancel}>
+        <button 
+          style={styles.secondaryButton} 
+          onClick={onCancel}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#009688';
+            e.target.style.color = 'white';
+            e.target.style.boxShadow = '0 4px 8px rgba(0,150,136,0.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.color = '#009688';
+            e.target.style.boxShadow = 'none';
+          }}
+        >
           Cancel
         </button>
-        <button style={styles.successButton} onClick={handleSave}>
+        <button 
+          style={styles.successButton} 
+          onClick={handleSave}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#00796B';
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 12px rgba(0,150,136,0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#009688';
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = 'none';
+          }}
+        >
           Save Changes
         </button>
       </div>

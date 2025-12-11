@@ -426,38 +426,82 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
     return { isValid: true, message: '' };
   };
 
-  // Password strength checker
+  // Enhanced Password strength checker with stronger requirements
   const checkPasswordStrength = (password) => {
     let score = 0;
+    const requirements = {
+      length: false,
+      uppercase: false,
+      lowercase: false,
+      number: false,
+      special: false,
+      noCommon: true
+    };
     
-    // Check length
-    if (password.length >= 8) score += 1;
-    if (password.length >= 12) score += 1;
+    // Check length (minimum 12 characters for strong password)
+    if (password.length >= 8) {
+      score += 0.5;
+      if (password.length >= 12) {
+        score += 1;
+        requirements.length = true;
+      }
+    }
     
     // Check for uppercase letters
-    if (/[A-Z]/.test(password)) score += 1;
+    if (/[A-Z]/.test(password)) {
+      score += 1;
+      requirements.uppercase = true;
+    }
     
     // Check for lowercase letters
-    if (/[a-z]/.test(password)) score += 1;
+    if (/[a-z]/.test(password)) {
+      score += 1;
+      requirements.lowercase = true;
+    }
     
     // Check for numbers
-    if (/[0-9]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) {
+      score += 1;
+      requirements.number = true;
+    }
     
     // Check for special characters
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      score += 1;
+      requirements.special = true;
+    }
     
-    // Determine strength level
+    // Check for common passwords
+    const commonPasswords = [
+      'password', '12345678', 'qwerty123', 'admin123', 'welcome123',
+      'letmein', 'monkey', 'dragon', 'baseball', 'football',
+      'password123', 'admin', '123456789', '1234567890'
+    ];
+    
+    if (commonPasswords.includes(password.toLowerCase())) {
+      score = 0;
+      requirements.noCommon = false;
+    }
+    
+    // Check for sequential characters
+    if (/(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|012|123|234|345|456|567|678|789|890)/i.test(password)) {
+      score -= 1;
+    }
+    
+    // Determine strength level with stricter criteria
     let message, color;
-    if (score >= 5) {
+    if (score >= 4.5 && requirements.length && requirements.uppercase && 
+        requirements.lowercase && requirements.number && requirements.special && requirements.noCommon) {
       message = 'Very Strong';
       color = '#4CAF50'; // Green
-    } else if (score >= 4) {
+    } else if (score >= 3.5 && requirements.length && requirements.uppercase && 
+               requirements.lowercase && requirements.number) {
       message = 'Strong';
       color = '#8BC34A'; // Light Green
-    } else if (score >= 3) {
+    } else if (score >= 2.5 && requirements.length) {
       message = 'Good';
       color = '#FFC107'; // Yellow
-    } else if (score >= 2) {
+    } else if (score >= 1.5) {
       message = 'Fair';
       color = '#FF9800'; // Orange
     } else {
@@ -466,11 +510,12 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
     }
     
     if (password.length === 0) {
-      message = 'Very Weak';
+      message = 'Enter a password';
       score = 0;
+      color = '#9e9e9e';
     }
     
-    return { score, message, color };
+    return { score, message, color, requirements };
   };
 
   // Real-time email validation
@@ -484,6 +529,51 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
     
     if (!isValid) {
       return { isValid: false, message: 'Please enter a valid email address' };
+    }
+    
+    return { isValid: true, message: '' };
+  };
+
+  // Enhanced password validation
+  const validatePassword = (password) => {
+    if (!password) {
+      return { isValid: false, message: 'Password is required' };
+    }
+    
+    if (password.length < 12) {
+      return { isValid: false, message: 'Password must be at least 12 characters long' };
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+    }
+    
+    if (!/[0-9]/.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one number' };
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return { isValid: false, message: 'Password must contain at least one special character' };
+    }
+    
+    // Check for common passwords
+    const commonPasswords = [
+      'password', '12345678', 'qwerty123', 'admin123', 'welcome123',
+      'letmein', 'monkey', 'dragon', 'baseball', 'football',
+      'password123', 'admin', '123456789', '1234567890'
+    ];
+    
+    if (commonPasswords.includes(password.toLowerCase())) {
+      return { isValid: false, message: 'This password is too common. Please choose a stronger password' };
+    }
+    
+    // Check for sequential characters
+    if (/(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|012|123|234|345|456|567|678|789|890)/i.test(password)) {
+      return { isValid: false, message: 'Avoid sequential characters in your password' };
     }
     
     return { isValid: true, message: '' };
@@ -588,13 +678,10 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
       Object.assign(newErrors, duplicateErrors);
     }
     
-    // Password validation with strength check
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (passwordStrength.score < 2) {
-      newErrors.password = 'Password is too weak. Please use a stronger password';
+    // Enhanced password validation
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      newErrors.password = passwordValidation.message;
     }
     
     // Confirm password validation
@@ -708,6 +795,38 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
         setErrors(prev => ({ ...prev, phone: '' }));
       }
     }
+    // Password - real-time strength check
+    else if (name === 'password') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+      
+      if (value === formData.confirmPassword && errors.confirmPassword) {
+        setErrors(prev => ({ ...prev, confirmPassword: '' }));
+      }
+      
+      const strength = checkPasswordStrength(value);
+      setPasswordStrength(strength);
+      
+      // Clear error for this field
+      if (errors.password) {
+        setErrors(prev => ({ ...prev, password: '' }));
+      }
+    }
+    // Confirm password - real-time matching check
+    else if (name === 'confirmPassword') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+      
+      if (value && value !== formData.password) {
+        setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+      } else if (errors.confirmPassword) {
+        setErrors(prev => ({ ...prev, confirmPassword: '' }));
+      }
+    }
     // Emergency contact - same validation as phone with duplicate check
     else if (name === 'emergencyContact') {
       let digits = value.replace(/\D/g, '');
@@ -767,38 +886,6 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
         } else {
           setErrors(prev => ({ ...prev, dateOfBirth: '' }));
         }
-      }
-    }
-    // Password - real-time strength check
-    else if (name === 'password') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-      
-      if (value === formData.confirmPassword && errors.confirmPassword) {
-        setErrors(prev => ({ ...prev, confirmPassword: '' }));
-      }
-      
-      const strength = checkPasswordStrength(value);
-      setPasswordStrength(strength);
-      
-      // Clear error for this field
-      if (errors.password) {
-        setErrors(prev => ({ ...prev, password: '' }));
-      }
-    }
-    // Confirm password - real-time matching check
-    else if (name === 'confirmPassword') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-      
-      if (value && value !== formData.password) {
-        setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
-      } else if (errors.confirmPassword) {
-        setErrors(prev => ({ ...prev, confirmPassword: '' }));
       }
     }
     // Vendor specific fields
@@ -1110,14 +1197,9 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
       const step2Errors = {};
       let hasErrors = false;
       
-      if (!formData.password) {
-        step2Errors.password = 'Password is required';
-        hasErrors = true;
-      } else if (formData.password.length < 8) {
-        step2Errors.password = 'Password must be at least 8 characters';
-        hasErrors = true;
-      } else if (passwordStrength.score < 2) {
-        step2Errors.password = 'Password is too weak. Please use a stronger password';
+      const passwordValidation = validatePassword(formData.password);
+      if (!passwordValidation.isValid) {
+        step2Errors.password = passwordValidation.message;
         hasErrors = true;
       }
       
@@ -1179,9 +1261,10 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
   // Password strength indicator component
   const PasswordStrengthIndicator = () => {
     const segments = [];
+    const totalSegments = 6;
     
-    for (let i = 0; i < 6; i++) {
-      const isActive = i <= passwordStrength.score;
+    for (let i = 0; i < totalSegments; i++) {
+      const isActive = i <= Math.floor(passwordStrength.score);
       segments.push(
         <div 
           key={i}
@@ -1212,6 +1295,50 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
           }}
         >
           {passwordStrength.message}
+        </div>
+      </div>
+    );
+  };
+
+  // Password requirements checklist
+  const PasswordRequirements = () => {
+    const requirements = passwordStrength.requirements || {};
+    
+    const requirementChecks = [
+      { key: 'length', label: 'At least 12 characters long', met: requirements.length },
+      { key: 'uppercase', label: 'Contains uppercase letter (A-Z)', met: requirements.uppercase },
+      { key: 'lowercase', label: 'Contains lowercase letter (a-z)', met: requirements.lowercase },
+      { key: 'number', label: 'Contains number (0-9)', met: requirements.number },
+      { key: 'special', label: 'Contains special character (!@#$%^&*)', met: requirements.special },
+      { key: 'noCommon', label: 'Not a common password', met: requirements.noCommon }
+    ];
+    
+    return (
+      <div className="password-requirements">
+        <div className="requirements-title" style={{ fontSize: '13px', fontWeight: 600, color: '#124441', marginBottom: '8px' }}>
+          Password Requirements:
+        </div>
+        <div className="requirements-list" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {requirementChecks.map((req, index) => (
+            <div 
+              key={index} 
+              className="requirement-item"
+              style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '12px',
+                color: req.met ? '#4CAF50' : '#9e9e9e'
+              }}
+            >
+              <span style={{ fontSize: '14px' }}>
+                {req.met ? '✓' : '○'}
+              </span>
+              <span style={{ textDecoration: req.met ? 'none' : 'line-through', opacity: req.met ? 1 : 0.7 }}>
+                {req.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -1463,6 +1590,7 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
         return (
           <div className="step-content">
             <h3 className="step-title">Account Security</h3>
+            
             <div className="input-group">
               <label>Password *</label>
               <div className="password-input-wrapper">
@@ -1471,7 +1599,7 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Create a strong password (min. 8 characters)"
+                  placeholder="Create a strong password (min. 12 characters)"
                   disabled={isLoading}
                   className={errors.password ? 'error' : ''}
                 />
@@ -1489,22 +1617,16 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
               
               <PasswordStrengthIndicator />
               
-              <div className="password-hints">
-                <span className={formData.password.length >= 8 ? 'valid' : ''}>
-                  ✓ At least 8 characters
-                </span>
-                <span className={/[A-Z]/.test(formData.password) ? 'valid' : ''}>
-                  {/[A-Z]/.test(formData.password) ? '✓' : '•'} Uppercase letter
-                </span>
-                <span className={/[a-z]/.test(formData.password) ? 'valid' : ''}>
-                  {/[a-z]/.test(formData.password) ? '✓' : '•'} Lowercase letter
-                </span>
-                <span className={/[0-9]/.test(formData.password) ? 'valid' : ''}>
-                  {/[0-9]/.test(formData.password) ? '✓' : '•'} Number
-                </span>
-                <span className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) ? 'valid' : ''}>
-                  {/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password) ? '✓' : '•'} Special character
-                </span>
+              <PasswordRequirements />
+              
+              <div className="password-guidelines" style={{ marginTop: '15px', padding: '10px', backgroundColor: '#F5F5F5', borderRadius: '6px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#124441', marginBottom: '5px' }}>Password Guidelines:</div>
+                <ul style={{ margin: '0', paddingLeft: '20px', fontSize: '11px', color: '#4F6F6B' }}>
+                  <li>Use a mix of letters, numbers, and special characters</li>
+                  <li>Avoid common words or personal information</li>
+                  <li>Don't use sequential characters (123, abc)</li>
+                  <li>Consider using a passphrase</li>
+                </ul>
               </div>
             </div>
             
@@ -1516,7 +1638,7 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  placeholder="Confirm your password"
+                  placeholder="Re-enter your password for confirmation"
                   disabled={isLoading}
                   className={errors.confirmPassword ? 'error' : ''}
                 />
@@ -1531,9 +1653,16 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
                 </button>
               </div>
               {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              
               {formData.confirmPassword && formData.password === formData.confirmPassword && (
                 <div className="success-message">
                   ✓ Passwords match
+                </div>
+              )}
+              
+              {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <div className="error-message" style={{ marginTop: '5px', padding: '4px 8px', fontSize: '12px' }}>
+                  ❌ Passwords do not match
                 </div>
               )}
             </div>
@@ -2213,26 +2342,6 @@ const BaseSignup = ({ userType, userDetails, onSignupSuccess }) => {
           font-size: 12px;
           margin-top: 4px;
           font-style: italic;
-        }
-
-        .password-hints {
-          margin-top: 8px;
-          font-size: 12px;
-          color: #4F6F6B;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .password-hints span {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .password-hints .valid {
-          color: #4CAF50;
-          font-weight: 500;
         }
 
         .terms-section {

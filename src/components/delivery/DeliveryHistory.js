@@ -38,7 +38,7 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     mainContent: {
       padding: '30px',
       minHeight: '100vh',
-      backgroundColor: '#f8f9fa'
+      backgroundColor: '#E0F2F1' // softbg
     },
     header: {
       display: 'flex',
@@ -49,12 +49,12 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     greeting: {
       fontSize: '28px',
       fontWeight: '700',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: '0 0 8px 0'
     },
     subtitle: {
       fontSize: '16px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: 0
     },
     taskHeaderActions: {
@@ -69,16 +69,18 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     },
     searchInput: {
       padding: '8px 12px 8px 35px',
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC', // mint
       borderRadius: '8px',
       fontSize: '14px',
       width: '250px',
-      outline: 'none'
+      outline: 'none',
+      backgroundColor: '#FFFFFF', // white
+      color: '#124441' // darktext
     },
     searchIcon: {
       position: 'absolute',
       left: '10px',
-      color: '#6b7280'
+      color: '#4DB6AC' // mint
     },
     taskFilters: {
       display: 'flex',
@@ -86,18 +88,19 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     },
     filterButton: {
       padding: '8px 16px',
-      backgroundColor: 'white',
-      border: '1px solid #e5e7eb',
+      backgroundColor: '#FFFFFF', // white
+      border: '1px solid #4DB6AC', // mint
       borderRadius: '6px',
       cursor: 'pointer',
       fontSize: '14px',
       fontWeight: '500',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      color: '#4F6F6B' // softtext
     },
     filterButtonActive: {
-      backgroundColor: '#7C2A62',
-      color: 'white',
-      borderColor: '#7C2A62'
+      backgroundColor: '#009688', // primary
+      color: '#FFFFFF', // white
+      borderColor: '#009688' // primary
     },
     tasksContainer: {
       display: 'flex',
@@ -105,11 +108,11 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
       gap: '16px'
     },
     detailedTaskCard: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '20px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      border: '1px solid #e5e7eb',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      border: '1px solid #4DB6AC', // mint
       transition: 'all 0.3s ease'
     },
     taskHeader: {
@@ -130,7 +133,7 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     orderId: {
       fontSize: '18px',
       fontWeight: '600',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: 0
     },
     ratingDisplay: {
@@ -140,16 +143,16 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     },
     ratingText: {
       fontSize: '12px',
-      color: '#6b7280'
+      color: '#4F6F6B' // softtext
     },
     customerInfo: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: '4px 0 0 0'
     },
     deliveryDate: {
       fontSize: '12px',
-      color: '#9ca3af',
+      color: '#4DB6AC', // mint
       margin: '4px 0 0 0'
     },
     taskStatus: {
@@ -159,7 +162,7 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
       gap: '8px'
     },
     statusBadge: {
-      color: 'white',
+      color: '#FFFFFF', // white
       padding: '4px 8px',
       borderRadius: '12px',
       fontSize: '12px',
@@ -168,7 +171,7 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     amountBadge: {
       fontSize: '16px',
       fontWeight: '600',
-      color: '#7C2A62'
+      color: '#009688' // primary
     },
     taskDetails: {
       marginTop: '16px'
@@ -183,12 +186,12 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     },
     detailLabel: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       fontWeight: '500'
     },
     detailText: {
       fontSize: '14px',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: '4px 0 0 0'
     },
     detailSection: {
@@ -196,30 +199,32 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
     },
     feedbackText: {
       fontSize: '14px',
-      color: '#1f2937',
+      color: '#124441', // darktext
       fontStyle: 'italic',
       margin: '4px 0 0 0'
     },
     noTasks: {
       textAlign: 'center',
       padding: '60px 20px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       borderRadius: '12px',
-      border: '2px dashed #e5e7eb'
+      border: '2px dashed #4DB6AC', // mint
+      color: '#124441' // darktext
     },
     noTasksIcon: {
       fontSize: '48px',
-      marginBottom: '16px'
+      marginBottom: '16px',
+      color: '#009688' // primary
     },
     noTasksText: {
       fontSize: '18px',
       fontWeight: '600',
-      color: '#374151',
+      color: '#124441', // darktext
       margin: '0 0 8px 0'
     },
     noTasksSubtext: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: 0
     },
     statsSummary: {
@@ -229,22 +234,22 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
       marginBottom: '24px'
     },
     statCard: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '20px',
       borderRadius: '12px',
       boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC', // mint
       textAlign: 'center'
     },
     statNumber: {
       fontSize: '24px',
       fontWeight: '700',
-      color: '#7C2A62',
+      color: '#009688', // primary
       margin: '0 0 4px 0'
     },
     statLabel: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: 0,
       fontWeight: '500'
     }
@@ -311,7 +316,7 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={styles.searchInput}
             />
-            <span style={styles.searchIcon}></span>
+            <span style={styles.searchIcon}>🔍</span>
           </div>
           <div style={styles.taskFilters}>
             <button
@@ -412,14 +417,14 @@ const DeliveryHistory = ({ deliveryData, completedOrders = [] }) => {
                 <div style={styles.taskStatus}>
                   <span style={{
                     ...styles.statusBadge,
-                    backgroundColor: '#10B981'
+                    backgroundColor: '#009688' // primary
                   }}>
                     Delivered
                   </span>
                   <div style={styles.amountBadge}>
                     {formatIndianCurrency(task.amount)}
                     {task.tip > 0 && (
-                      <div style={{ fontSize: '12px', color: '#10B981', marginTop: '2px' }}>
+                      <div style={{ fontSize: '12px', color: '#4DB6AC', marginTop: '2px' }}>
                         +{formatIndianCurrency(task.tip)} tip
                       </div>
                     )}

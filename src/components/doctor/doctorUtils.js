@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-// Complete Mock Data
+// Complete Mock Data with Pregnancy Care and Baby Care
 export const dashboardData = {
   appointments: {
     today: 8,
@@ -21,6 +21,17 @@ export const dashboardData = {
     today: 1,
     week: 5,
     month: 18
+  },
+  pregnancyStats: {
+    activePatients: 15,
+    upcomingAppointments: 8,
+    homeVisits: 3,
+    trimesterBreakdown: { first: 4, second: 7, third: 4 }
+  },
+  babyCareStats: {
+    activeBabies: 12,
+    upcomingAppointments: 6,
+    plansBreakdown: { basic: 6, premium: 4, comprehensive: 2 }
   },
   recentConsultations: [
     {
@@ -47,14 +58,15 @@ export const dashboardData = {
     },
     {
       id: 3,
-      patientName: 'Emily Rodriguez',
+      patientName: 'Mrs. Sharma (Baby Rohan)',
       time: '2:00 PM',
       date: '2024-01-15',
-      issue: 'Initial consultation for chronic pain',
-      age: 38,
+      issue: 'Baby feeding consultation',
+      age: '3 months',
       status: 'completed',
-      prescription: 'Pain Management',
-      notes: 'Referred to physiotherapy'
+      prescription: 'Feeding schedule adjustment',
+      notes: 'Breastfeeding going well',
+      type: 'baby'
     },
     {
       id: 4,
@@ -83,27 +95,16 @@ export const dashboardData = {
     },
     {
       id: 6,
-      patientName: 'David Miller',
+      patientName: 'Mr. Verma (Baby Aryan)',
       time: '11:00 AM',
       date: '2024-01-16',
-      issue: 'Cardiac follow-up consultation',
-      age: 68,
+      issue: 'Baby vaccination follow-up',
+      age: '6 months',
       duration: '45 mins',
-      type: 'Specialist',
+      type: 'Baby Care',
       priority: 'high',
-      status: 'scheduled'
-    },
-    {
-      id: 7,
-      patientName: 'Priya Sharma',
-      time: '2:30 PM',
-      date: '2024-01-16',
-      issue: 'Pregnancy checkup',
-      age: 29,
-      duration: '30 mins',
-      type: 'Routine',
-      priority: 'normal',
-      status: 'scheduled'
+      status: 'scheduled',
+      plan: 'comprehensive'
     }
   ],
   rescheduledAppointments: [
@@ -148,6 +149,170 @@ export const dashboardData = {
       requestedDate: '2024-01-15'
     }
   ],
+  
+  // Pregnancy Care Specific Data
+  pregnancyAppointments: {
+    pending: [
+      {
+        id: 1001,
+        patientName: 'Priya Sharma',
+        time: '10:00 AM',
+        date: '2024-01-16',
+        age: 29,
+        issue: 'Pregnancy checkup - First consultation',
+        duration: '60 mins',
+        type: 'Pregnancy Care',
+        status: 'pending',
+        requestedDate: '2024-01-15',
+        trimester: '1st',
+        weeks: 12,
+        isFirstConsultation: true,
+        consultationType: 'offline',
+        priority: 'high',
+        fee: 'Free',
+        location: 'Hospital',
+        notes: 'First consultation - Explain 9-month plan and packages'
+      },
+      {
+        id: 1002,
+        patientName: 'Meera Nair',
+        time: '11:30 AM',
+        date: '2024-01-16',
+        age: 31,
+        issue: 'Pregnancy follow-up - 2nd trimester',
+        duration: '45 mins',
+        type: 'Pregnancy Care',
+        status: 'pending',
+        requestedDate: '2024-01-15',
+        trimester: '2nd',
+        weeks: 24,
+        isFirstConsultation: false,
+        consultationType: 'online',
+        priority: 'normal',
+        fee: '₹800',
+        location: 'Online',
+        notes: 'Follow-up after glucose test'
+      }
+    ],
+    upcoming: [
+      {
+        id: 1003,
+        patientName: 'Swati Menon',
+        time: '2:00 PM',
+        date: '2024-01-17',
+        age: 27,
+        issue: 'Regular pregnancy checkup',
+        duration: '45 mins',
+        type: 'Pregnancy Care',
+        status: 'scheduled',
+        trimester: '3rd',
+        weeks: 32,
+        isFirstConsultation: false,
+        consultationType: 'home_visit',
+        priority: 'normal',
+        fee: '₹1500',
+        location: 'Home Visit',
+        notes: 'Home visit for detailed medical reports',
+        reports: ['ultrasound', 'blood_test', 'urine_analysis']
+      },
+      {
+        id: 1004,
+        patientName: 'Anjali Desai',
+        time: '3:30 PM',
+        date: '2024-01-17',
+        age: 30,
+        issue: 'Pregnancy nutrition consultation',
+        duration: '30 mins',
+        type: 'Pregnancy Care',
+        status: 'scheduled',
+        trimester: '2nd',
+        weeks: 20,
+        isFirstConsultation: false,
+        consultationType: 'online',
+        priority: 'normal',
+        fee: '₹600',
+        location: 'Online',
+        notes: 'Nutrition guidance for 2nd trimester'
+      }
+    ],
+    cancelled: [
+      {
+        id: 1006,
+        patientName: 'Neha Kapoor',
+        time: '11:00 AM',
+        date: '2024-01-15',
+        age: 32,
+        issue: 'Pregnancy checkup',
+        duration: '45 mins',
+        type: 'Pregnancy Care',
+        status: 'cancelled',
+        trimester: '2nd',
+        weeks: 18,
+        cancelledDate: '2024-01-14',
+        reason: 'Patient not feeling well',
+        consultationType: 'home_visit'
+      }
+    ]
+  },
+
+  // Baby Care Specific Data
+  babyCareAppointments: {
+    pending: [
+      {
+        id: 2001,
+        parentName: 'Mrs. Gupta',
+        babyName: 'Baby Arnav',
+        babyAge: '2 months',
+        time: '10:00 AM',
+        date: '2024-01-16',
+        issue: 'First baby care consultation',
+        feedingType: 'Formula',
+        consultationType: 'online',
+        plan: 'basic',
+        caregiverHours: '8 hours',
+        priority: 'normal',
+        fee: '₹500',
+        status: 'pending'
+      }
+    ],
+    upcoming: [
+      {
+        id: 2002,
+        parentName: 'Mr. Verma',
+        babyName: 'Baby Aryan',
+        babyAge: '6 months',
+        time: '2:00 PM',
+        date: '2024-01-17',
+        issue: 'Vaccination follow-up',
+        feedingType: 'Formula',
+        consultationType: 'offline',
+        plan: 'comprehensive',
+        caregiverHours: '24 hours',
+        priority: 'high',
+        fee: '₹1000',
+        status: 'scheduled',
+        caregiverNotes: 'Needs sleep schedule guidance'
+      },
+      {
+        id: 2003,
+        parentName: 'Mrs. Sharma',
+        babyName: 'Baby Rohan',
+        babyAge: '3 months',
+        time: '11:00 AM',
+        date: '2024-01-18',
+        issue: 'Feeding consultation',
+        feedingType: 'Breastfeeding',
+        consultationType: 'online',
+        plan: 'premium',
+        caregiverHours: '12 hours',
+        priority: 'normal',
+        fee: '₹800',
+        status: 'scheduled'
+      }
+    ],
+    cancelled: []
+  },
+
   patients: [
     {
       id: 1,
@@ -160,6 +325,7 @@ export const dashboardData = {
       bloodGroup: 'A+',
       emergencyContact: '+91 98765 43211',
       age: 45,
+      patientType: 'general',
       medicalHistory: [
         { date: '2024-01-15', diagnosis: 'Regular checkup', prescription: 'Medication A, Medication B' },
         { date: '2023-12-10', diagnosis: 'Diabetes follow-up', prescription: 'Insulin adjustment' }
@@ -176,41 +342,157 @@ export const dashboardData = {
       bloodGroup: 'B+',
       emergencyContact: '+91 98765 43213',
       age: 62,
+      patientType: 'general',
       medicalHistory: [
         { date: '2024-01-15', diagnosis: 'BP follow-up', prescription: 'Blood Pressure Meds' }
       ]
     },
+    // Pregnancy Patients
     {
-      id: 3,
-      name: 'Emily Rodriguez',
+      id: 5,
+      name: 'Priya Sharma',
       lastVisit: '2024-01-15',
-      totalVisits: 3,
-      conditions: ['Chronic Back Pain'],
-      phone: '+91 98765 43214',
-      email: 'emily.r@email.com',
+      totalVisits: 1,
+      conditions: ['Pregnancy - 1st Trimester', 'Normal Pregnancy'],
+      phone: '+91 98765 43218',
+      email: 'priya.s@email.com',
       bloodGroup: 'O+',
-      emergencyContact: '+91 98765 43215',
-      age: 38,
+      emergencyContact: '+91 98765 43219 (Husband)',
+      age: 29,
+      patientType: 'pregnancy',
+      pregnancyDetails: {
+        trimester: '1st',
+        weeks: 12,
+        edd: '2024-07-20',
+        package: 'Basic Pregnancy Care',
+        isFirstConsultationFree: true,
+        consultationType: 'offline',
+        reports: [],
+        packageIncludes: ['Monthly checkups', 'Basic tests', 'Delivery assistance'],
+        nextAppointment: '2024-02-15',
+        doctorVisits: 1
+      },
       medicalHistory: [
-        { date: '2024-01-15', diagnosis: 'Chronic pain consultation', prescription: 'Pain Management' }
+        { 
+          date: '2024-01-15', 
+          diagnosis: 'First pregnancy consultation', 
+          prescription: 'Folic Acid, Prenatal Vitamins',
+          type: 'pregnancy',
+          consultationMode: 'offline',
+          notes: 'Explained 9-month plan. Selected Basic package.'
+        }
       ]
     },
     {
-      id: 4,
-      name: 'Robert Williams',
-      lastVisit: '2024-01-15',
-      totalVisits: 5,
-      conditions: ['Diabetes'],
-      phone: '+91 98765 43216',
-      email: 'robert.w@email.com',
-      bloodGroup: 'AB+',
-      emergencyContact: '+91 98765 43217',
-      age: 55,
+      id: 6,
+      name: 'Meera Nair',
+      lastVisit: '2023-12-20',
+      totalVisits: 3,
+      conditions: ['Pregnancy - 2nd Trimester', 'Gestational Diabetes'],
+      phone: '+91 98765 43220',
+      email: 'meera.n@email.com',
+      bloodGroup: 'B+',
+      emergencyContact: '+91 98765 43221 (Mother)',
+      age: 31,
+      patientType: 'pregnancy',
+      pregnancyDetails: {
+        trimester: '2nd',
+        weeks: 24,
+        edd: '2024-05-15',
+        package: 'Premium Pregnancy Care',
+        isFirstConsultationFree: false,
+        consultationType: 'online',
+        reports: ['ultrasound_20w', 'glucose_test', 'blood_report', 'urine_analysis'],
+        packageIncludes: ['Weekly checkups', 'All tests included', 'Home visits', 'Nutrition counseling'],
+        nextAppointment: '2024-01-30',
+        doctorVisits: 3
+      },
       medicalHistory: [
-        { date: '2024-01-15', diagnosis: 'Diabetes review', prescription: 'Insulin, Diet Plan' }
+        { 
+          date: '2023-12-20', 
+          diagnosis: 'Pregnancy follow-up with gestational diabetes', 
+          prescription: 'Diet control, Regular monitoring',
+          type: 'pregnancy',
+          consultationMode: 'online',
+          notes: 'Glucose levels controlled with diet. Next visit for detailed reports.'
+        }
+      ]
+    },
+    // Baby Care Patients
+    {
+      id: 7,
+      name: 'Baby Rohan',
+      lastVisit: '2024-01-10',
+      totalVisits: 3,
+      conditions: ['Newborn Care', 'Regular Checkup'],
+      phone: '+91 98765 43222',
+      email: 'sharma.family@email.com',
+      bloodGroup: 'AB+',
+      emergencyContact: '+91 98765 43223 (Mother)',
+      age: '3 months',
+      patientType: 'baby',
+      babyCareDetails: {
+        package: 'premium',
+        age: '3 months',
+        weight: '6.2',
+        feedingType: 'Breastfeeding',
+        parentName: 'Mrs. Sharma',
+        parentPhone: '+91 98765 43222',
+        nextVaccination: 'Next month',
+        vaccinationDue: true,
+        reports: ['birth_certificate.pdf', 'vaccination_card.pdf', 'growth_chart.pdf'],
+        caregiverHours: '12 hours/day',
+        planFeatures: ['Enhanced hygiene', 'Play & developmental support', 'Daily reports']
+      },
+      medicalHistory: [
+        { 
+          date: '2024-01-10', 
+          diagnosis: 'Regular baby checkup', 
+          prescription: 'Vitamin D drops',
+          type: 'baby',
+          consultationMode: 'online',
+          notes: 'Growth normal. Feeding schedule established.'
+        }
+      ]
+    },
+    {
+      id: 8,
+      name: 'Baby Aryan',
+      lastVisit: '2024-01-08',
+      totalVisits: 5,
+      conditions: ['Vaccination Due', 'Growth Monitoring'],
+      phone: '+91 98765 43224',
+      email: 'verma.family@email.com',
+      bloodGroup: 'B+',
+      emergencyContact: '+91 98765 43225 (Father)',
+      age: '6 months',
+      patientType: 'baby',
+      babyCareDetails: {
+        package: 'comprehensive',
+        age: '6 months',
+        weight: '8.5',
+        feedingType: 'Formula',
+        parentName: 'Mr. Verma',
+        parentPhone: '+91 98765 43224',
+        nextVaccination: 'This week',
+        vaccinationDue: true,
+        reports: ['growth_chart.pdf', 'medical_history.pdf', 'vaccination_record.pdf'],
+        caregiverHours: '24×7',
+        planFeatures: ['24×7 caregiver', 'Pediatrician access', 'Premium supplies']
+      },
+      medicalHistory: [
+        { 
+          date: '2024-01-08', 
+          diagnosis: 'Vaccination follow-up', 
+          prescription: 'Regular vaccination schedule',
+          type: 'baby',
+          consultationMode: 'offline',
+          notes: 'Ready for next vaccination. Weight gain good.'
+        }
       ]
     }
   ],
+  
   earningsHistory: {
     daily: [
       { date: '2024-01-15', amount: 2400, consultations: 6 },
@@ -228,13 +510,132 @@ export const dashboardData = {
       { month: 'December 2023', amount: 61200, consultations: 153 },
       { month: 'November 2023', amount: 52400, consultations: 131 }
     ]
-  }
+  },
+  
+  pregnancyPackages: [
+    {
+      id: 1,
+      name: 'Basic Pregnancy Care',
+      price: '₹25,000',
+      duration: '9 months',
+      features: [
+        'Monthly checkups',
+        'Basic tests (Blood, Urine)',
+        '2 Ultrasounds',
+        'Hospital delivery',
+        'Postnatal checkup'
+      ],
+      patients: 8
+    },
+    {
+      id: 2,
+      name: 'Premium Pregnancy Care',
+      price: '₹50,000',
+      duration: '9 months',
+      features: [
+        'Fortnightly checkups',
+        'All tests included',
+        '4 Ultrasounds',
+        'Home visits (3 times)',
+        'Nutrition counseling',
+        'Delivery & postnatal care'
+      ],
+      patients: 5
+    },
+    {
+      id: 3,
+      name: 'Comprehensive Pregnancy Care',
+      price: '₹75,000',
+      duration: '9 months',
+      features: [
+        'Weekly checkups',
+        'All tests & advanced scans',
+        'Unlimited home visits',
+        'Personalized nutrition plan',
+        'Delivery preparation classes',
+        'Complete postnatal care'
+      ],
+      patients: 2
+    }
+  ],
+
+  babyCarePlans: [
+    {
+      id: 'basic',
+      name: 'Basic Plan',
+      price: '₹8,999/month',
+      duration: 'Monthly subscription',
+      patients: '45 babies enrolled',
+      icon: '👶',
+      color: '#3B82F6',
+      features: [
+        'Supplies & hygiene essentials delivery',
+        'Diapers, wipes, skincare monthly',
+        'Basic feeding & diaper assistance',
+        'Light caregiving (up to 8 hours/day)',
+        'Basic hygiene & nursery maintenance',
+        'Monthly check-in advice line',
+        'Parent support chat'
+      ],
+      idealFor: 'Newborns & early months',
+      coverage: '8 hours/day caregiver support'
+    },
+    {
+      id: 'premium',
+      name: 'Premium Plan',
+      price: '₹14,999/month',
+      duration: 'Monthly subscription',
+      patients: '28 babies enrolled',
+      icon: '🌟',
+      color: '#8B5CF6',
+      features: [
+        'Everything in Basic Plan',
+        'Extended caregiver (12 hours/day)',
+        'Enhanced hygiene & regular bathing',
+        'Nursery cleaning & management',
+        'Play & developmental support',
+        'Sleep & routine establishment',
+        'Daily/weekly progress reports',
+        'Age-appropriate toys & activities',
+        'Feeding schedule management'
+      ],
+      idealFor: 'Working parents, busy households',
+      coverage: '12 hours/day day+night support'
+    },
+    {
+      id: 'comprehensive',
+      name: 'Comprehensive Plan',
+      price: '₹24,999/month',
+      duration: 'Monthly subscription',
+      patients: '15 babies enrolled',
+      icon: '👑',
+      color: '#10B981',
+      features: [
+        'Everything in Premium Plan',
+        '24×7 live-in caregiver/nanny',
+        'Health monitoring & vaccination reminders',
+        'Pediatrician consultation access',
+        'Lactation & nutrition guidance',
+        'Sleep-training & parenting coaching',
+        'Postnatal & mother support',
+        'Premium organic supplies',
+        'Monthly baby-kit box',
+        'Replacement guarantee',
+        'Long-term contract options'
+      ],
+      idealFor: 'Both parents working, full support needed',
+      coverage: '24×7 round-the-clock care'
+    }
+  ]
 };
 
+// Update navigation to include Pregnancy Care and Baby Care
 export const navigationItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'appointments', label: 'Appointments', icon: '📅' },
-  { id: 'patients', label: 'Patients', icon: '👥' },
+  { id: 'pregnancyCare', label: 'Pregnancy Care', icon: '🤰' },
+  { id: 'babyCare', label: 'Baby Care', icon: '👶' },
+  { id: 'patients', label: 'All Patients', icon: '👥' },
   { id: 'earnings', label: 'Earnings', icon: '💰' },
   { id: 'timeslots', label: 'Time Slots', icon: '⏰' }
 ];
@@ -247,7 +648,6 @@ export const useWindowSize = () => {
   });
 
   useEffect(() => {
-    // Only run in browser environment
     if (typeof window === 'undefined') return;
 
     const handleResize = () => {
@@ -258,8 +658,6 @@ export const useWindowSize = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    
-    // Call handler right away so state gets updated with initial window size
     handleResize();
     
     return () => window.removeEventListener('resize', handleResize);
@@ -284,6 +682,8 @@ export const useDoctorState = (user) => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [timeslots, setTimeslots] = useState([]);
+  const [pregnancyFilter, setPregnancyFilter] = useState('upcoming');
+  const [babyCareFilter, setBabyCareFilter] = useState('upcoming'); // New state for baby care filter
 
   const windowSize = useWindowSize();
 
@@ -298,9 +698,9 @@ export const useDoctorState = (user) => {
     fullName: user?.fullName || 'Dr. John Doe',
     email: user?.email || 'doctor@example.com',
     phone: user?.phone || '+91 98765 43210',
-    specialization: user?.specialization || 'General Physician',
-    licenseNumber: user?.licenseNumber || 'MED-2024-12345',
-    experience: user?.experience || '12 years',
+    specialization: user?.specialization || 'Gynecologist & Pediatrician',
+    licenseNumber: user?.licenseNumber || 'GYN-PED-2024-12345',
+    experience: user?.experience || '15 years',
     hospital: user?.hospital || 'City General Hospital',
     address: user?.address || 'Medical Complex, Sector 15, Noida',
     city: user?.city || 'Noida',
@@ -312,29 +712,32 @@ export const useDoctorState = (user) => {
     {
       id: 1,
       type: 'appointment',
-      title: 'New Appointment Request',
-      message: 'Rahul Verma requested an appointment for general health checkup',
+      title: 'New Pregnancy Appointment Request',
+      message: 'Priya Sharma requested first pregnancy consultation',
       time: '10 minutes ago',
       read: false,
-      priority: 'high'
+      priority: 'high',
+      category: 'pregnancy'
     },
     {
       id: 2,
-      type: 'message',
-      title: 'New Message from Patient',
-      message: 'Sarah Johnson sent a message about prescription follow-up',
-      time: '25 minutes ago',
-      read: false,
-      priority: 'medium'
+      type: 'reminder',
+      title: 'Baby Care Home Visit',
+      message: 'Baby Aryan vaccination follow-up tomorrow at 2 PM',
+      time: '1 hour ago',
+      read: true,
+      priority: 'medium',
+      category: 'baby'
     },
     {
       id: 3,
-      type: 'reminder',
-      title: 'Upcoming Appointment',
-      message: 'You have an appointment with Lisa Thompson in 30 minutes',
-      time: '1 hour ago',
-      read: true,
-      priority: 'high'
+      type: 'message',
+      title: 'New Message from Parent',
+      message: 'Mrs. Sharma sent baby feeding update',
+      time: '2 hours ago',
+      read: false,
+      priority: 'medium',
+      category: 'baby'
     }
   ]);
 
@@ -360,38 +763,42 @@ export const useDoctorState = (user) => {
 
     // Initialize messages
     const initialMessages = {
-      'Sarah Johnson': [
+      'Priya Sharma': [
         {
           id: 1,
           from: 'patient',
-          message: 'Hello Doctor, I wanted to follow up on my prescription.',
+          message: 'Hello Doctor, I uploaded my reports in File Locker.',
           timestamp: '2024-01-15T14:30:00',
-          read: true
+          read: true,
+          category: 'pregnancy'
         },
         {
           id: 2,
           from: 'doctor',
-          message: 'Hello Sarah, your prescription has been updated. You can collect it from the pharmacy.',
+          message: 'I reviewed your reports. Everything looks normal for 12 weeks.',
           timestamp: '2024-01-15T14:35:00',
-          read: true
+          read: true,
+          category: 'pregnancy'
         }
       ],
-      'Michael Chen': [
+      'Mrs. Sharma': [
         {
           id: 1,
-          from: 'patient',
-          message: 'Dr. John, my blood pressure readings have been normal this week.',
+          from: 'parent',
+          message: 'Doctor, Baby Rohan is feeding well. Should I continue same schedule?',
           timestamp: '2024-01-15T10:15:00',
-          read: true
+          read: true,
+          category: 'baby'
         }
       ],
-      'Emily Rodriguez': [
+      'Mr. Verma': [
         {
           id: 1,
-          from: 'patient',
-          message: 'When should I schedule my next physiotherapy session?',
+          from: 'parent',
+          message: 'Baby Aryan has slight fever after vaccination. What should I do?',
           timestamp: '2024-01-14T16:20:00',
-          read: false
+          read: false,
+          category: 'baby'
         }
       ]
     };
@@ -440,7 +847,11 @@ export const useDoctorState = (user) => {
     setIsSidebarOpen,
     windowSize,
     timeslots,
-    setTimeslots
+    setTimeslots,
+    pregnancyFilter,
+    setPregnancyFilter,
+    babyCareFilter,
+    setBabyCareFilter // New state for baby care
   };
 };
 
@@ -468,7 +879,9 @@ export const useDoctorActions = (state) => {
     windowSize,
     setActivePage,
     timeslots,
-    setTimeslots
+    setTimeslots,
+    setPregnancyFilter,
+    setBabyCareFilter
   } = state;
 
   const getUnreadMessagesCount = () => {
@@ -477,7 +890,7 @@ export const useDoctorActions = (state) => {
       Object.values(patientMessages).forEach(messages => {
         if (Array.isArray(messages)) {
           messages.forEach(msg => {
-            if (msg.from === 'patient' && !msg.read) {
+            if ((msg.from === 'patient' || msg.from === 'parent') && !msg.read) {
               count++;
             }
           });
@@ -496,7 +909,6 @@ export const useDoctorActions = (state) => {
     setSelectedPatient(patient);
     setShowMessagesModal(true);
     
-    // Auto-close sidebar on mobile when opening messages
     if (windowSize && windowSize.width <= 768) {
       setIsSidebarOpen(false);
     }
@@ -532,6 +944,150 @@ export const useDoctorActions = (state) => {
     }));
   };
 
+  // Pregnancy-specific actions
+  const handleApprovePregnancyAppointment = (appointmentId) => {
+    const appointment = dashboardData.pregnancyAppointments.pending.find(
+      apt => apt.id === appointmentId
+    );
+    
+    if (appointment) {
+      // For first consultation, ensure it's offline
+      if (appointment.isFirstConsultation && appointment.consultationType !== 'offline') {
+        alert('First pregnancy consultation must be offline at hospital.');
+        return;
+      }
+      
+      // Move to upcoming appointments
+      const updatedAppointment = {
+        ...appointment,
+        status: 'scheduled'
+      };
+      
+      // Show success message
+      showNotification(
+        'Pregnancy Appointment Approved',
+        `Approved ${appointment.isFirstConsultation ? 'first' : ''} consultation with ${appointment.patientName}`
+      );
+      
+      return updatedAppointment;
+    }
+    return null;
+  };
+
+  // Baby Care specific actions
+  const handleApproveBabyCareAppointment = (appointmentId) => {
+    const appointment = dashboardData.babyCareAppointments.pending.find(
+      apt => apt.id === appointmentId
+    );
+    
+    if (appointment) {
+      const updatedAppointment = {
+        ...appointment,
+        status: 'scheduled'
+      };
+      
+      showNotification(
+        'Baby Care Appointment Approved',
+        `Approved consultation for ${appointment.babyName}`
+      );
+      
+      return updatedAppointment;
+    }
+    return null;
+  };
+
+  const handleUpdateBabyCarePlan = (babyName, planId) => {
+    showNotification(
+      'Baby Care Plan Updated',
+      `Updated ${babyName}'s care plan to ${planId}`
+    );
+    
+    return true;
+  };
+
+  const handleScheduleHomeVisit = (patientName, date, time) => {
+    const homeVisitAppointment = {
+      id: Date.now(),
+      patientName,
+      date,
+      time,
+      issue: 'Home visit for detailed medical reports',
+      type: patientName.includes('Baby') ? 'Baby Care' : 'Pregnancy Care',
+      consultationType: 'home_visit',
+      status: 'scheduled',
+      priority: 'normal'
+    };
+    
+    showNotification(
+      'Home Visit Scheduled',
+      `Scheduled home visit for ${patientName} on ${date} at ${time}`
+    );
+    
+    return homeVisitAppointment;
+  };
+
+  const handleUploadReportToLocker = (patientName, reportType, file) => {
+    showNotification(
+      'Report Uploaded',
+      `${reportType} report uploaded to ${patientName}'s File Locker`
+    );
+    
+    return true;
+  };
+
+  const handleViewPregnancyReports = (patientName) => {
+    const patient = dashboardData.patients.find(p => p.name === patientName && p.patientType === 'pregnancy');
+    
+    if (patient && patient.pregnancyDetails && patient.pregnancyDetails.reports) {
+      const reports = patient.pregnancyDetails.reports;
+      
+      const reportsWindow = window.open('', '_blank');
+      if (reportsWindow) {
+        reportsWindow.document.write(`
+          <html>
+            <head>
+              <title>Pregnancy Reports - ${patientName}</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { border-bottom: 2px solid #009688; padding-bottom: 10px; margin-bottom: 20px; }
+                .report-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+                .report-type { font-weight: bold; color: #009688; }
+                .upload-date { color: #4F6F6B; font-size: 12px; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1>Pregnancy Reports - ${patientName}</h1>
+                <p><strong>Trimester:</strong> ${patient.pregnancyDetails.trimester} | <strong>Weeks:</strong> ${patient.pregnancyDetails.weeks}</p>
+              </div>
+              <h2>Medical Reports in File Locker</h2>
+              ${reports.map((report, index) => `
+                <div class="report-item">
+                  <p class="report-type">${report.replace(/_/g, ' ').toUpperCase()}</p>
+                  <p class="upload-date">Uploaded: ${new Date().toLocaleDateString()}</p>
+                  <button onclick="alert('Viewing ${report} report')">View Report</button>
+                  <button onclick="alert('Downloading ${report} report')">Download</button>
+                </div>
+              `).join('')}
+            </body>
+          </html>
+        `);
+        reportsWindow.document.close();
+      }
+    } else {
+      alert('No reports found in File Locker for this patient.');
+    }
+  };
+
+  const handleUpdatePregnancyPackage = (patientName, packageName) => {
+    showNotification(
+      'Package Updated',
+      `Updated ${patientName}'s pregnancy package to ${packageName}`
+    );
+    
+    return true;
+  };
+
   const handleStartConsultation = (appointmentId) => {
     const appointment = appointments.upcoming.find(apt => apt.id === appointmentId);
     if (appointment) {
@@ -540,12 +1096,10 @@ export const useDoctorActions = (state) => {
         upcoming: prev.upcoming.filter(apt => apt.id !== appointmentId)
       }));
       
-      // Show mobile-friendly notification
       if (windowSize && windowSize.width <= 768) {
         showNotification('Consultation Started', `Started consultation with ${appointment.patientName}`);
       }
       
-      // Return the appointment for the current consultation state
       return appointment;
     }
     return null;
@@ -554,7 +1108,6 @@ export const useDoctorActions = (state) => {
   const handleCancelAppointment = (appointmentId) => {
     const appointment = appointments.upcoming.find(apt => apt.id === appointmentId);
     if (appointment) {
-      // Mobile-friendly confirmation
       const confirmMessage = `Are you sure you want to cancel the appointment with ${appointment.patientName}?`;
       if (window.confirm(confirmMessage)) {
         const cancelledAppointment = {
@@ -570,7 +1123,6 @@ export const useDoctorActions = (state) => {
           cancelled: [...prev.cancelled, cancelledAppointment]
         }));
 
-        // Mobile notification
         if (windowSize && windowSize.width <= 768) {
           showNotification('Appointment Cancelled', `Cancelled appointment with ${appointment.patientName}`);
         }
@@ -587,7 +1139,6 @@ export const useDoctorActions = (state) => {
         upcoming: [...prev.upcoming, { ...appointment, status: 'scheduled' }]
       }));
 
-      // Mobile notification
       if (windowSize && windowSize.width <= 768) {
         showNotification('Appointment Approved', `Approved appointment with ${appointment.patientName}`);
       }
@@ -597,7 +1148,6 @@ export const useDoctorActions = (state) => {
   const handleRejectAppointment = (appointmentId) => {
     const appointment = appointments.pending.find(apt => apt.id === appointmentId);
     if (appointment) {
-      // Mobile-friendly confirmation
       const confirmMessage = `Are you sure you want to reject the appointment request from ${appointment.patientName}?`;
       if (window.confirm(confirmMessage)) {
         setAppointments(prev => ({
@@ -605,7 +1155,6 @@ export const useDoctorActions = (state) => {
           pending: prev.pending.filter(apt => apt.id !== appointmentId)
         }));
 
-        // Mobile notification
         if (windowSize && windowSize.width <= 768) {
           showNotification('Appointment Rejected', `Rejected appointment with ${appointment.patientName}`);
         }
@@ -622,7 +1171,6 @@ export const useDoctorActions = (state) => {
         [patientName]: notes
       }));
 
-      // Mobile notification
       if (windowSize && windowSize.width <= 768) {
         showNotification('Notes Added', `Added notes for ${patientName}`);
       }
@@ -632,12 +1180,9 @@ export const useDoctorActions = (state) => {
   const handleViewFullHistory = (patientName) => {
     const patient = dashboardData.patients.find(p => p.name === patientName);
     if (patient) {
-      // Use windowSize safely with fallback
       const isMobileView = windowSize ? windowSize.width <= 768 : window.innerWidth <= 768;
       
-      // Mobile-friendly history view
       if (isMobileView) {
-        // For mobile, open in same window with responsive design
         const historyHTML = `
           <html>
             <head>
@@ -648,10 +1193,10 @@ export const useDoctorActions = (state) => {
                   font-family: Arial, sans-serif; 
                   margin: 15px; 
                   line-height: 1.4;
-                  color: #333;
+                  color: #124441;
                 }
                 .header { 
-                  border-bottom: 2px solid #7C2A62; 
+                  border-bottom: 2px solid #009688; 
                   padding-bottom: 10px; 
                   margin-bottom: 20px; 
                 }
@@ -660,19 +1205,19 @@ export const useDoctorActions = (state) => {
                   padding: 12px; 
                   margin-bottom: 10px; 
                   border-radius: 8px;
-                  background: #f9f9f9;
+                  background: #E0F2F1;
                 }
                 .diagnosis { 
                   font-weight: bold; 
-                  color: #7C2A62; 
+                  color: #009688; 
                   margin: 5px 0;
                 }
                 .prescription { 
-                  color: #2d5016; 
+                  color: #4F6F6B; 
                   margin: 5px 0;
                 }
                 .back-button {
-                  background: #7C2A62;
+                  background: #009688;
                   color: white;
                   border: none;
                   padding: 10px 15px;
@@ -692,6 +1237,13 @@ export const useDoctorActions = (state) => {
                 <h1>Medical History - ${patientName}</h1>
                 <p><strong>Age:</strong> ${patient.age} | <strong>Blood Group:</strong> ${patient.bloodGroup}</p>
                 <p><strong>Conditions:</strong> ${patient.conditions.join(', ')}</p>
+                ${patient.patientType === 'pregnancy' ? `
+                  <p><strong>Pregnancy:</strong> ${patient.pregnancyDetails.trimester} Trimester (${patient.pregnancyDetails.weeks} weeks)</p>
+                  <p><strong>EDD:</strong> ${patient.pregnancyDetails.edd}</p>
+                ` : patient.patientType === 'baby' ? `
+                  <p><strong>Baby Care Plan:</strong> ${patient.babyCareDetails?.package || 'N/A'}</p>
+                  <p><strong>Feeding Type:</strong> ${patient.babyCareDetails?.feedingType || 'N/A'}</p>
+                ` : ''}
               </div>
               <h2>Medical Records</h2>
               ${patient.medicalHistory.map(record => `
@@ -699,6 +1251,7 @@ export const useDoctorActions = (state) => {
                   <p><strong>Date:</strong> ${record.date}</p>
                   <p class="diagnosis">Diagnosis: ${record.diagnosis}</p>
                   <p class="prescription">Prescription: ${record.prescription}</p>
+                  ${record.notes ? `<p><strong>Notes:</strong> ${record.notes}</p>` : ''}
                 </div>
               `).join('')}
             </body>
@@ -711,7 +1264,6 @@ export const useDoctorActions = (state) => {
           historyWindow.document.close();
         }
       } else {
-        // For desktop, use the original design
         const historyWindow = window.open('', '_blank');
         if (historyWindow) {
           historyWindow.document.write(`
@@ -719,11 +1271,11 @@ export const useDoctorActions = (state) => {
               <head>
                 <title>Medical History - ${patientName}</title>
                 <style>
-                  body { font-family: Arial, sans-serif; margin: 20px; }
-                  .header { border-bottom: 2px solid #7C2A62; padding-bottom: 10px; margin-bottom: 20px; }
-                  .history-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-                  .diagnosis { font-weight: bold; color: #7C2A62; }
-                  .prescription { color: #2d5016; }
+                  body { font-family: Arial, sans-serif; margin: 20px; color: #124441; }
+                  .header { border-bottom: 2px solid #009688; padding-bottom: 10px; margin-bottom: 20px; }
+                  .history-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; background: #E0F2F1; }
+                  .diagnosis { font-weight: bold; color: #009688; }
+                  .prescription { color: #4F6F6B; }
                 </style>
               </head>
               <body>
@@ -731,6 +1283,13 @@ export const useDoctorActions = (state) => {
                   <h1>Medical History - ${patientName}</h1>
                   <p><strong>Age:</strong> ${patient.age} | <strong>Blood Group:</strong> ${patient.bloodGroup}</p>
                   <p><strong>Conditions:</strong> ${patient.conditions.join(', ')}</p>
+                  ${patient.patientType === 'pregnancy' ? `
+                    <p><strong>Pregnancy:</strong> ${patient.pregnancyDetails.trimester} Trimester (${patient.pregnancyDetails.weeks} weeks)</p>
+                    <p><strong>EDD:</strong> ${patient.pregnancyDetails.edd}</p>
+                  ` : patient.patientType === 'baby' ? `
+                    <p><strong>Baby Care Plan:</strong> ${patient.babyCareDetails?.package || 'N/A'}</p>
+                    <p><strong>Feeding Type:</strong> ${patient.babyCareDetails?.feedingType || 'N/A'}</p>
+                  ` : ''}
                 </div>
                 <h2>Medical Records</h2>
                 ${patient.medicalHistory.map(record => `
@@ -755,7 +1314,6 @@ export const useDoctorActions = (state) => {
       setShowProfileModal(false);
       setFormErrors({});
       
-      // Mobile notification
       if (windowSize && windowSize.width <= 768) {
         showNotification('Profile Updated', 'Your profile has been updated successfully');
       }
@@ -777,7 +1335,6 @@ export const useDoctorActions = (state) => {
       prev.map(notification => ({ ...notification, read: true }))
     );
     
-    // Mobile notification
     if (windowSize && windowSize.width <= 768) {
       showNotification('Notifications', 'All notifications marked as read');
     }
@@ -786,14 +1343,12 @@ export const useDoctorActions = (state) => {
   const handleClearAllNotifications = () => {
     setNotifications([]);
     
-    // Mobile notification
     if (windowSize && windowSize.width <= 768) {
       showNotification('Notifications', 'All notifications cleared');
     }
   };
 
   const showNotification = (title, message) => {
-    // Use browser notification API if available, otherwise fallback to alert
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, { body: message });
     } else if ('Notification' in window && Notification.permission !== 'denied') {
@@ -801,12 +1356,10 @@ export const useDoctorActions = (state) => {
         if (permission === 'granted') {
           new Notification(title, { body: message });
         } else {
-          // Fallback to alert for mobile
           alert(`${title}: ${message}`);
         }
       });
     } else {
-      // Fallback for browsers that don't support notifications
       alert(`${title}: ${message}`);
     }
   };
@@ -841,7 +1394,7 @@ export const useDoctorActions = (state) => {
     );
   };
 
-  // Complete form validation
+  // Form validation
   const validateForm = (formData) => {
     const errors = {};
 
@@ -861,7 +1414,7 @@ export const useDoctorActions = (state) => {
     };
 
     const validatePincode = (pincode) => {
-      if (!pincode) return true; // Optional field
+      if (!pincode) return true;
       const pincodeRegex = /^[1-9][0-9]{5}$/;
       return pincodeRegex.test(pincode);
     };
@@ -929,6 +1482,17 @@ export const useDoctorActions = (state) => {
     addTimeslot,
     updateTimeslot,
     deleteTimeslot,
-    toggleTimeslotAvailability
+    toggleTimeslotAvailability,
+    // Pregnancy-specific actions
+    handleApprovePregnancyAppointment,
+    handleScheduleHomeVisit,
+    handleUploadReportToLocker,
+    handleViewPregnancyReports,
+    handleUpdatePregnancyPackage,
+    setPregnancyFilter,
+    // Baby Care specific actions
+    handleApproveBabyCareAppointment,
+    handleUpdateBabyCarePlan,
+    setBabyCareFilter
   };
 };

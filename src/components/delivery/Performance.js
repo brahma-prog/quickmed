@@ -69,7 +69,7 @@ const Performance = () => {
     mainContent: {
       padding: '30px',
       minHeight: '100vh',
-      backgroundColor: '#f8fafc'
+      backgroundColor: '#E0F2F1' // softbg
     },
     header: {
       display: 'flex',
@@ -80,21 +80,21 @@ const Performance = () => {
     greeting: {
       fontSize: '28px',
       fontWeight: '700',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: '0 0 8px 0'
     },
     subtitle: {
       fontSize: '16px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: 0
     },
     performanceFilters: {
       display: 'flex',
       gap: '8px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '4px',
       borderRadius: '8px',
-      border: '1px solid #e5e7eb'
+      border: '1px solid #4DB6AC' // mint
     },
     performanceFilterButton: {
       padding: '8px 16px',
@@ -104,11 +104,12 @@ const Performance = () => {
       cursor: 'pointer',
       fontSize: '14px',
       fontWeight: '500',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      color: '#4F6F6B' // softtext
     },
     performanceFilterButtonActive: {
-      backgroundColor: '#7C2A62',
-      color: 'white'
+      backgroundColor: '#009688', // primary
+      color: '#FFFFFF' // white
     },
     performanceGrid: {
       display: 'grid',
@@ -117,14 +118,14 @@ const Performance = () => {
       marginBottom: '30px'
     },
     performanceCard: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '20px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      border: '1px solid #e5e7eb'
+      border: '1px solid #4DB6AC' // mint
     },
     performanceIcon: {
       fontSize: '32px',
@@ -133,8 +134,9 @@ const Performance = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#F7D9EB',
-      borderRadius: '12px'
+      backgroundColor: '#E0F2F1', // softbg
+      borderRadius: '12px',
+      color: '#009688' // primary
     },
     performanceContent: {
       flex: 1
@@ -142,26 +144,27 @@ const Performance = () => {
     performanceValue: {
       fontSize: '24px',
       fontWeight: '700',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: '0 0 4px 0'
     },
     performanceLabel: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: 0,
       textTransform: 'capitalize'
     },
     chartContainer: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      marginBottom: '24px'
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      marginBottom: '24px',
+      border: '1px solid #4DB6AC' // mint
     },
     sectionTitle: {
       fontSize: '20px',
       fontWeight: '600',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: '0 0 16px 0'
     },
     performanceChart: {
@@ -170,7 +173,7 @@ const Performance = () => {
       gap: '20px',
       height: '200px',
       padding: '20px',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1', // softbg
       borderRadius: '8px',
       marginBottom: '20px'
     },
@@ -189,21 +192,21 @@ const Performance = () => {
     },
     deliveryBar: {
       width: '20px',
-      backgroundColor: '#7C2A62',
+      backgroundColor: '#009688', // primary
       borderRadius: '4px 4px 0 0',
       minHeight: '4px',
       transition: 'height 0.5s ease'
     },
     ratingBar: {
       width: '20px',
-      backgroundColor: '#10B981',
+      backgroundColor: '#4DB6AC', // mint
       borderRadius: '4px 4px 0 0',
       minHeight: '4px',
       transition: 'height 0.5s ease'
     },
     weekLabel: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       fontWeight: '500'
     },
     chartLegend: {
@@ -216,7 +219,7 @@ const Performance = () => {
       alignItems: 'center',
       gap: '6px',
       fontSize: '12px',
-      color: '#6b7280'
+      color: '#4F6F6B' // softtext
     },
     legendColor: {
       width: '12px',
@@ -234,16 +237,18 @@ const Performance = () => {
       marginBottom: '30px'
     },
     realTimeChartContainer: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      border: '1px solid #4DB6AC' // mint
     },
     realTimeStatsContainer: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      border: '1px solid #4DB6AC' // mint
     },
     realTimeHeader: {
       display: 'flex',
@@ -254,7 +259,7 @@ const Performance = () => {
     realTimeTitle: {
       fontSize: '18px',
       fontWeight: '600',
-      color: '#1f2937',
+      color: '#124441', // darktext
       margin: 0
     },
     realTimeIndicator: {
@@ -262,12 +267,12 @@ const Performance = () => {
       alignItems: 'center',
       gap: '8px',
       fontSize: '12px',
-      color: '#10B981'
+      color: '#4DB6AC' // mint
     },
     pulseDot: {
       width: '8px',
       height: '8px',
-      backgroundColor: '#10B981',
+      backgroundColor: '#4DB6AC', // mint
       borderRadius: '50%',
       animation: 'pulse 1.5s infinite'
     },
@@ -277,7 +282,7 @@ const Performance = () => {
       gap: '12px',
       height: '180px',
       padding: '20px',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1', // softbg
       borderRadius: '8px'
     },
     timeBar: {
@@ -297,7 +302,7 @@ const Performance = () => {
     },
     realTimeDeliveryBar: {
       width: '16px',
-      backgroundColor: '#7C2A62',
+      backgroundColor: '#009688', // primary
       borderRadius: '3px 3px 0 0',
       minHeight: '4px',
       transition: 'all 0.5s ease',
@@ -305,7 +310,7 @@ const Performance = () => {
     },
     realTimeRatingBar: {
       width: '16px',
-      backgroundColor: '#10B981',
+      backgroundColor: '#4DB6AC', // mint
       borderRadius: '3px 3px 0 0',
       minHeight: '4px',
       transition: 'all 0.5s ease',
@@ -313,7 +318,7 @@ const Performance = () => {
     },
     barLabel: {
       fontSize: '10px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       fontWeight: '500',
       marginTop: '4px'
     },
@@ -324,19 +329,19 @@ const Performance = () => {
     },
     statCard: {
       padding: '16px',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1', // softbg
       borderRadius: '8px',
-      border: '1px solid #e5e7eb'
+      border: '1px solid #4DB6AC' // mint
     },
     statValue: {
       fontSize: '24px',
       fontWeight: '700',
-      color: '#7C2A62',
+      color: '#009688', // primary
       margin: '0 0 4px 0'
     },
     statLabel: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       margin: 0,
       textTransform: 'uppercase',
       fontWeight: '600'
@@ -347,7 +352,7 @@ const Performance = () => {
       alignItems: 'center',
       height: '120px',
       fontSize: '14px',
-      color: '#6b7280'
+      color: '#4F6F6B' // softtext
     }
   };
 
@@ -506,11 +511,11 @@ const Performance = () => {
         </div>
         <div style={styles.chartLegend}>
           <div style={styles.legendItem}>
-            <div style={{ ...styles.legendColor, backgroundColor: '#7C2A62' }}></div>
+            <div style={{ ...styles.legendColor, backgroundColor: '#009688' }}></div>
             <span>Deliveries</span>
           </div>
           <div style={styles.legendItem}>
-            <div style={{ ...styles.legendColor, backgroundColor: '#10B981' }}></div>
+            <div style={{ ...styles.legendColor, backgroundColor: '#4DB6AC' }}></div>
             <span>Rating</span>
           </div>
         </div>
@@ -560,11 +565,11 @@ const Performance = () => {
                 </div>
                 <div style={styles.chartLegend}>
                   <div style={styles.legendItem}>
-                    <div style={{ ...styles.legendColor, backgroundColor: '#7C2A62' }}></div>
+                    <div style={{ ...styles.legendColor, backgroundColor: '#009688' }}></div>
                     <span>Deliveries</span>
                   </div>
                   <div style={styles.legendItem}>
-                    <div style={{ ...styles.legendColor, backgroundColor: '#10B981' }}></div>
+                    <div style={{ ...styles.legendColor, backgroundColor: '#4DB6AC' }}></div>
                     <span>Rating</span>
                   </div>
                 </div>

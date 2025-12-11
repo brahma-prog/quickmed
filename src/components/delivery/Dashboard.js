@@ -97,8 +97,8 @@ const Dashboard = ({
     mainContent: {
       padding: '30px',
       minHeight: '100vh',
-      backgroundColor: isOnline ? '#f8f9fa' : '#000000',
-      background: isOnline ? '#f8f9fa' : 'linear-gradient(135deg, #000000 0%, #1a0f1a 50%, #000000 100%)',
+      backgroundColor: isOnline ? '#E0F2F1' : '#000000',
+      background: isOnline ? '#E0F2F1' : 'linear-gradient(135deg, #000000 0%, #0F2C2A 50%, #000000 100%)',
       transition: 'all 0.5s ease'
     },
     header: {
@@ -120,11 +120,11 @@ const Dashboard = ({
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
       padding: '8px 12px',
       borderRadius: '8px',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB40',
-      color: isOnline ? '#374151' : '#F7D9EB',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC40',
+      color: isOnline ? '#124441' : '#E0F2F1',
       transition: 'all 0.3s ease'
     },
     statusDot: {
@@ -136,12 +136,12 @@ const Dashboard = ({
     statusText: {
       fontSize: '14px',
       fontWeight: '500',
-      color: isOnline ? '#374151' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       transition: 'color 0.3s ease'
     },
     statusToggle: {
-      backgroundColor: isOnline ? '#EF4444' : '#F7D9EB',
-      color: isOnline ? 'white' : '#7C2A62',
+      backgroundColor: isOnline ? '#009688' : '#E0F2F1',
+      color: isOnline ? '#FFFFFF' : '#124441',
       border: 'none',
       padding: '6px 12px',
       borderRadius: '6px',
@@ -151,8 +151,8 @@ const Dashboard = ({
       transition: 'all 0.3s ease'
     },
     aiChatButton: {
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       border: 'none',
       borderRadius: '50%',
       padding: '16px',
@@ -170,25 +170,25 @@ const Dashboard = ({
       bottom: '20px',
       right: '20px',
       zIndex: 1000,
-      boxShadow: '0 4px 12px rgba(124, 42, 98, 0.3)'
+      boxShadow: '0 4px 12px rgba(0, 150, 136, 0.3)'
     },
     notificationButton: {
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB40',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC40',
       borderRadius: '8px',
       padding: '8px 12px',
       cursor: 'pointer',
       fontSize: '16px',
       position: 'relative',
       transition: 'all 0.3s ease',
-      color: isOnline ? '#374151' : '#F7D9EB'
+      color: isOnline ? '#124441' : '#E0F2F1'
     },
     notificationBadge: {
       position: 'absolute',
       top: '-4px',
       right: '-4px',
-      backgroundColor: '#EF4444',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       borderRadius: '50%',
       width: '16px',
       height: '16px',
@@ -201,19 +201,19 @@ const Dashboard = ({
     greeting: {
       fontSize: '28px',
       fontWeight: '700',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 8px 0',
       transition: 'color 0.3s ease'
     },
     subtitle: {
       fontSize: '16px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       margin: 0,
       transition: 'color 0.3s ease'
     },
     dateDisplay: {
       fontSize: '14px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       fontWeight: '500',
       transition: 'color 0.3s ease'
     },
@@ -224,22 +224,22 @@ const Dashboard = ({
       marginBottom: '30px'
     },
     statCard: {
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
       padding: '20px',
       borderRadius: '12px',
-      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(247, 217, 235, 0.1)',
+      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(224, 242, 241, 0.1)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      border: isOnline ? '2px solid transparent' : '1px solid #F7D9EB20',
+      border: isOnline ? '2px solid transparent' : '1px solid #4DB6AC20',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
       minHeight: '120px'
     },
     statCardActive: {
-      borderColor: '#7C2A62',
-      boxShadow: '0 4px 12px rgba(124, 42, 98, 0.2)',
+      borderColor: '#009688',
+      boxShadow: '0 4px 12px rgba(0, 150, 136, 0.2)',
       transform: 'translateY(-2px)'
     },
     statIcon: {
@@ -251,8 +251,8 @@ const Dashboard = ({
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: '12px',
-      backgroundColor: isOnline ? '#F7D9EB' : '#F7D9EB20',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      backgroundColor: isOnline ? '#E0F2F1' : '#4DB6AC20',
+      color: isOnline ? '#124441' : '#E0F2F1',
       transition: 'all 0.3s ease'
     },
     statContent: {
@@ -261,13 +261,13 @@ const Dashboard = ({
     statNumber: {
       fontSize: '24px',
       fontWeight: '700',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 4px 0',
       transition: 'color 0.3s ease'
     },
     statLabel: {
       fontSize: '12px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       margin: 0,
       fontWeight: '500',
       transition: 'color 0.3s ease'
@@ -278,11 +278,11 @@ const Dashboard = ({
       gap: '30px'
     },
     section: {
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
       borderRadius: '12px',
       padding: '24px',
-      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(247, 217, 235, 0.1)',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB20',
+      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(224, 242, 241, 0.1)',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       transition: 'all 0.3s ease'
     },
     sidebarSection: {
@@ -299,13 +299,13 @@ const Dashboard = ({
     sectionTitle: {
       fontSize: '20px',
       fontWeight: '600',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: 0,
       transition: 'color 0.3s ease'
     },
     viewAll: {
       fontSize: '14px',
-      color: '#7C2A62',
+      color: '#009688',
       fontWeight: '500',
       cursor: 'pointer'
     },
@@ -316,10 +316,10 @@ const Dashboard = ({
     },
     taskCard: {
       padding: '20px',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB20',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       borderRadius: '10px',
       transition: 'all 0.3s ease',
-      backgroundColor: isOnline ? 'white' : '#1a0f1a'
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A'
     },
     taskHeader: {
       display: 'flex',
@@ -333,13 +333,13 @@ const Dashboard = ({
     orderId: {
       fontSize: '16px',
       fontWeight: '600',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 4px 0',
       transition: 'color 0.3s ease'
     },
     customerName: {
       fontSize: '14px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       margin: 0,
       transition: 'color 0.3s ease'
     },
@@ -350,7 +350,7 @@ const Dashboard = ({
       gap: '4px'
     },
     statusBadge: {
-      color: 'white',
+      color: '#FFFFFF',
       padding: '4px 8px',
       borderRadius: '12px',
       fontSize: '12px',
@@ -370,14 +370,14 @@ const Dashboard = ({
     },
     locationLabel: {
       fontSize: '12px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       fontWeight: '500',
       minWidth: '80px',
       transition: 'color 0.3s ease'
     },
     locationText: {
       fontSize: '14px',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       flex: 1,
       transition: 'color 0.3s ease'
     },
@@ -389,12 +389,12 @@ const Dashboard = ({
     },
     contactButton: {
       backgroundColor: 'transparent',
-      border: isOnline ? '1px solid #d1d5db' : '1px solid #F7D9EB40',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC40',
       padding: '4px 8px',
       borderRadius: '4px',
       fontSize: '12px',
       cursor: 'pointer',
-      color: isOnline ? '#374151' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       display: 'flex',
       alignItems: 'center',
       gap: '4px',
@@ -407,7 +407,7 @@ const Dashboard = ({
     },
     metaItem: {
       fontSize: '12px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       fontWeight: '500',
       transition: 'color 0.3s ease'
     },
@@ -417,8 +417,8 @@ const Dashboard = ({
       flexWrap: 'wrap'
     },
     primaryButton: {
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -432,8 +432,8 @@ const Dashboard = ({
     },
     secondaryButton: {
       backgroundColor: 'transparent',
-      color: '#7C2A62',
-      border: '1px solid #7C2A62',
+      color: '#009688',
+      border: '1px solid #009688',
       padding: '9px 15px',
       borderRadius: '6px',
       fontSize: '14px',
@@ -446,7 +446,7 @@ const Dashboard = ({
     },
     successButton: {
       backgroundColor: '#10B981',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -459,7 +459,7 @@ const Dashboard = ({
     },
     dangerButton: {
       backgroundColor: '#EF4444',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -472,7 +472,7 @@ const Dashboard = ({
     },
     acceptButton: {
       backgroundColor: '#3B82F6',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -485,7 +485,7 @@ const Dashboard = ({
     },
     directionButton: {
       backgroundColor: '#8B5CF6',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -497,11 +497,11 @@ const Dashboard = ({
       gap: '6px'
     },
     incentivesSection: {
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
       borderRadius: '12px',
       padding: '24px',
-      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(247, 217, 235, 0.1)',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB20',
+      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(224, 242, 241, 0.1)',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       marginBottom: '20px',
       transition: 'all 0.3s ease'
     },
@@ -514,7 +514,7 @@ const Dashboard = ({
     incentivesTitle: {
       fontSize: '20px',
       fontWeight: '600',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: 0,
       transition: 'color 0.3s ease'
     },
@@ -524,28 +524,28 @@ const Dashboard = ({
       gap: '16px'
     },
     incentiveCard: {
-      backgroundColor: isOnline ? '#F0F7FF' : '#1a0f1a',
+      backgroundColor: isOnline ? '#E0F2F1' : '#0F2C2A',
       padding: '16px',
       borderRadius: '8px',
-      border: isOnline ? '1px solid #E1E8F0' : '1px solid #F7D9EB20',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       transition: 'all 0.3s ease'
     },
     incentiveAmount: {
       fontSize: '24px',
       fontWeight: '700',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 4px 0',
       transition: 'color 0.3s ease'
     },
     incentiveLabel: {
       fontSize: '14px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       margin: 0,
       transition: 'color 0.3s ease'
     },
     bonusBadge: {
       backgroundColor: '#10B981',
-      color: 'white',
+      color: '#FFFFFF',
       padding: '4px 8px',
       borderRadius: '12px',
       fontSize: '12px',
@@ -555,52 +555,52 @@ const Dashboard = ({
     },
     specialIncentivesSection: {
       background: isOnline 
-        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-        : 'linear-gradient(135deg, #1a0f1a 0%, #2d1a2d 50%, #1a0f1a 100%)',
+        ? 'linear-gradient(135deg, #009688 0%, #00796B 100%)' 
+        : 'linear-gradient(135deg, #0F2C2A 0%, #124441 50%, #0F2C2A 100%)',
       borderRadius: '12px',
       padding: '24px',
       marginBottom: '20px',
-      color: 'white',
-      border: isOnline ? 'none' : '1px solid #F7D9EB40',
-      boxShadow: isOnline ? 'none' : '0 4px 20px rgba(247, 217, 235, 0.1)',
+      color: '#FFFFFF',
+      border: isOnline ? 'none' : '1px solid #4DB6AC40',
+      boxShadow: isOnline ? 'none' : '0 4px 20px rgba(224, 242, 241, 0.1)',
       transition: 'all 0.3s ease'
     },
     specialIncentiveCard: {
-      backgroundColor: isOnline ? 'rgba(255, 255, 255, 0.1)' : 'rgba(247, 217, 235, 0.1)',
+      backgroundColor: isOnline ? 'rgba(255, 255, 255, 0.1)' : 'rgba(224, 242, 241, 0.1)',
       padding: '16px',
       borderRadius: '8px',
       marginBottom: '12px',
       backdropFilter: 'blur(10px)',
-      border: isOnline ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(247, 217, 235, 0.3)',
+      border: isOnline ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(224, 242, 241, 0.3)',
       transition: 'all 0.3s ease'
     },
     specialIncentiveTitle: {
       fontSize: '16px',
       fontWeight: '600',
       margin: '0 0 8px 0',
-      color: 'white'
+      color: '#FFFFFF'
     },
     specialIncentiveDesc: {
       fontSize: '12px',
       margin: 0,
       opacity: 0.9,
-      color: 'white'
+      color: '#FFFFFF'
     },
     targetAchievedMessage: {
-      backgroundColor: '#F7D9EB',
-      color: '#7C2A62',
+      backgroundColor: '#E0F2F1',
+      color: '#124441',
       padding: '16px',
       borderRadius: '8px',
       textAlign: 'center',
       marginBottom: '20px',
       fontWeight: '600',
-      border: '1px solid #F7D9EB',
-      boxShadow: '0 4px 15px rgba(247, 217, 235, 0.3)'
+      border: '1px solid #4DB6AC',
+      boxShadow: '0 4px 15px rgba(0, 150, 136, 0.3)'
     },
     progressBar: {
       width: '100%',
       height: '8px',
-      backgroundColor: isOnline ? '#E5E7EB' : '#2a1a2a',
+      backgroundColor: isOnline ? '#E0F2F1' : '#124441',
       borderRadius: '4px',
       overflow: 'hidden',
       marginTop: '8px',
@@ -617,9 +617,9 @@ const Dashboard = ({
       alignItems: 'center',
       marginBottom: '20px',
       padding: '16px',
-      backgroundColor: isOnline ? '#F8FAFC' : '#1a0f1a',
+      backgroundColor: isOnline ? '#E0F2F1' : '#0F2C2A',
       borderRadius: '8px',
-      border: isOnline ? '1px solid #E2E8F0' : '1px solid #F7D9EB20',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       transition: 'all 0.3s ease'
     },
     progressStep: {
@@ -633,35 +633,35 @@ const Dashboard = ({
       width: '12px',
       height: '12px',
       borderRadius: '50%',
-      backgroundColor: isOnline ? '#CBD5E1' : '#2a1a2a',
+      backgroundColor: isOnline ? '#4DB6AC' : '#124441',
       position: 'relative',
       transition: 'background-color 0.3s ease'
     },
     progressDotActive: {
-      backgroundColor: '#7C2A62'
+      backgroundColor: '#009688'
     },
     progressDotCompleted: {
       backgroundColor: '#10B981'
     },
     progressLabel: {
       fontSize: '12px',
-      color: isOnline ? '#64748B' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       textAlign: 'center',
       transition: 'color 0.3s ease'
     },
     progressLabelActive: {
-      color: '#7C2A62',
+      color: '#009688',
       fontWeight: '600'
     },
     progressLine: {
       flex: 1,
       height: '2px',
-      backgroundColor: isOnline ? '#CBD5E1' : '#2a1a2a',
+      backgroundColor: isOnline ? '#4DB6AC' : '#124441',
       margin: '0 8px',
       transition: 'background-color 0.3s ease'
     },
     progressLineActive: {
-      backgroundColor: '#7C2A62'
+      backgroundColor: '#009688'
     },
     progressLineCompleted: {
       backgroundColor: '#10B981'
@@ -681,8 +681,8 @@ const Dashboard = ({
       transition: 'color 0.3s ease'
     },
     goOnlineLargeButton: {
-      backgroundColor: '#F7D9EB',
-      color: '#7C2A62',
+      backgroundColor: '#E0F2F1',
+      color: '#124441',
       border: 'none',
       padding: '16px 32px',
       borderRadius: '12px',
@@ -694,39 +694,39 @@ const Dashboard = ({
       alignItems: 'center',
       gap: '8px',
       margin: '20px auto',
-      boxShadow: '0 4px 20px rgba(247, 217, 235, 0.3)'
+      boxShadow: '0 4px 20px rgba(0, 150, 136, 0.3)'
     },
     deliveryHistorySection: {
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
       borderRadius: '12px',
       padding: '24px',
-      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(247, 217, 235, 0.1)',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB20',
+      boxShadow: isOnline ? '0 2px 4px rgba(0,0,0,0.05)' : '0 4px 15px rgba(224, 242, 241, 0.1)',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       marginBottom: '20px',
       transition: 'all 0.3s ease'
     },
     historyItem: {
       padding: '16px',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB20',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       borderRadius: '8px',
       marginBottom: '12px',
-      backgroundColor: isOnline ? '#f8f9fa' : '#1a0f1a',
+      backgroundColor: isOnline ? '#E0F2F1' : '#0F2C2A',
       transition: 'all 0.3s ease'
     },
     historyOrderId: {
       fontSize: '14px',
       fontWeight: '600',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 4px 0'
     },
     historyDetails: {
       fontSize: '12px',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
       margin: '0 0 4px 0'
     },
     historyTime: {
       fontSize: '11px',
-      color: isOnline ? '#9ca3af' : '#F7D9EB80',
+      color: isOnline ? '#9ca3af' : '#E0F2F180',
       margin: 0
     },
     // New Styles for Proof Modal
@@ -744,21 +744,21 @@ const Dashboard = ({
       padding: '20px'
     },
     proofModalContent: {
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
       borderRadius: '12px',
       padding: '30px',
       maxWidth: '500px',
       width: '100%',
       maxHeight: '90vh',
       overflowY: 'auto',
-      border: isOnline ? '1px solid #e5e7eb' : '1px solid #F7D9EB20',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC20',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
       transition: 'all 0.3s ease'
     },
     proofModalTitle: {
       fontSize: '22px',
       fontWeight: '700',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 20px 0',
       textAlign: 'center'
     },
@@ -768,7 +768,7 @@ const Dashboard = ({
     proofLabel: {
       fontSize: '16px',
       fontWeight: '600',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      color: isOnline ? '#124441' : '#E0F2F1',
       margin: '0 0 12px 0',
       display: 'flex',
       alignItems: 'center',
@@ -778,16 +778,16 @@ const Dashboard = ({
       width: '100%',
       padding: '12px',
       borderRadius: '8px',
-      border: isOnline ? '1px solid #d1d5db' : '1px solid #F7D9EB40',
-      backgroundColor: isOnline ? 'white' : '#1a0f1a',
-      color: isOnline ? '#1f2937' : '#F7D9EB',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC40',
+      backgroundColor: isOnline ? '#FFFFFF' : '#0F2C2A',
+      color: isOnline ? '#124441' : '#E0F2F1',
       fontSize: '16px',
       marginBottom: '15px',
       transition: 'all 0.3s ease'
     },
     proofImageUpload: {
       border: '2px dashed',
-      borderColor: isOnline ? '#d1d5db' : '#F7D9EB40',
+      borderColor: isOnline ? '#4DB6AC' : '#4DB6AC40',
       borderRadius: '8px',
       padding: '30px 20px',
       textAlign: 'center',
@@ -800,12 +800,12 @@ const Dashboard = ({
       maxHeight: '200px',
       borderRadius: '8px',
       marginBottom: '15px',
-      border: '1px solid #d1d5db'
+      border: '1px solid #4DB6AC'
     },
     signatureCanvas: {
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC',
       borderRadius: '8px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       width: '100%',
       height: '150px',
       cursor: 'crosshair',
@@ -818,7 +818,7 @@ const Dashboard = ({
     },
     proofSubmitButton: {
       backgroundColor: '#10B981',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '14px 20px',
       borderRadius: '8px',
@@ -834,8 +834,8 @@ const Dashboard = ({
     },
     proofCancelButton: {
       backgroundColor: 'transparent',
-      color: isOnline ? '#6b7280' : '#F7D9EBB0',
-      border: isOnline ? '1px solid #d1d5db' : '1px solid #F7D9EB40',
+      color: isOnline ? '#4F6F6B' : '#E0F2F1B0',
+      border: isOnline ? '1px solid #4DB6AC' : '1px solid #4DB6AC40',
       padding: '14px 20px',
       borderRadius: '8px',
       fontSize: '16px',
@@ -846,7 +846,7 @@ const Dashboard = ({
     },
     customerDirectionButton: {
       backgroundColor: '#8B5CF6',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '8px 12px',
       borderRadius: '6px',
@@ -861,7 +861,7 @@ const Dashboard = ({
     },
     cancelOrderButton: {
       backgroundColor: '#EF4444',
-      color: 'white',
+      color: '#FFFFFF',
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -988,7 +988,7 @@ const Dashboard = ({
     if (signatureCanvasRef.current && showProofModal) {
       const canvas = signatureCanvasRef.current;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }, [showProofModal]);
@@ -1006,7 +1006,7 @@ const Dashboard = ({
       case 'High': return '#EF4444';
       case 'Medium': return '#F59E0B';
       case 'Low': return '#10B981';
-      default: return '#6B7280';
+      default: return '#4F6F6B';
     }
   };
 
@@ -1019,7 +1019,7 @@ const Dashboard = ({
       case 'delivery_reached': return '#F59E0B';
       case 'delivery_completed': return '#10B981';
       case 'cancelled': return '#EF4444';
-      default: return '#6B7280';
+      default: return '#4F6F6B';
     }
   };
 
@@ -1143,7 +1143,7 @@ const Dashboard = ({
       e.clientX - rect.left,
       e.clientY - rect.top
     );
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = '#124441';
     ctx.lineWidth = 2;
     ctx.stroke();
   };
@@ -1157,7 +1157,7 @@ const Dashboard = ({
   const handleClearSignature = () => {
     const canvas = signatureCanvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setProofSignature(null);
   };
@@ -1321,10 +1321,10 @@ const Dashboard = ({
               ) : (
                 <>
                   <div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div>
-                  <p style={{ color: isOnline ? '#6b7280' : '#F7D9EBB0', margin: 0 }}>
+                  <p style={{ color: isOnline ? '#4F6F6B' : '#E0F2F1B0', margin: 0 }}>
                     Click to take/upload photo
                   </p>
-                  <p style={{ fontSize: '12px', color: isOnline ? '#9ca3af' : '#F7D9EB80', margin: '5px 0 0 0' }}>
+                  <p style={{ fontSize: '12px', color: isOnline ? '#9ca3af' : '#E0F2F180', margin: '5px 0 0 0' }}>
                     Show delivered items with customer/house number
                   </p>
                 </>
@@ -1413,7 +1413,7 @@ const Dashboard = ({
             <div style={styles.onlineStatus}>
               <span style={{
                 ...styles.statusDot,
-                backgroundColor: '#F7D9EB'
+                backgroundColor: '#E0F2F1'
               }}></span>
               <span style={styles.statusText}>Offline</span>
               {!incentives.dailyTargetAchieved && (
@@ -1444,7 +1444,7 @@ const Dashboard = ({
         
         {/* Special Incentives Section */}
         <div style={styles.specialIncentivesSection}>
-          <h2 style={{...styles.sectionTitle, color: '#F7D9EB', marginBottom: '20px'}}>
+          <h2 style={{...styles.sectionTitle, color: '#E0F2F1', marginBottom: '20px'}}>
             Special Incentives & Offers
           </h2>
           
@@ -1590,7 +1590,7 @@ const Dashboard = ({
           }}
           onClick={() => handleStatClick('totalToday')}
         >
-          <div style={{ ...styles.statIcon, backgroundColor: '#F7D9EB' }}>📦</div>
+          <div style={{ ...styles.statIcon, backgroundColor: '#E0F2F1' }}>📦</div>
           <div style={styles.statContent}>
             <h3 style={styles.statNumber}>{completedOrders.length + acceptedOrders.length}</h3>
             <p style={styles.statLabel}>Total Deliveries Today</p>
@@ -1604,7 +1604,7 @@ const Dashboard = ({
           }}
           onClick={() => handleStatClick('pending')}
         >
-          <div style={{ ...styles.statIcon, backgroundColor: '#E8F4FD' }}>⏳</div>
+          <div style={{ ...styles.statIcon, backgroundColor: '#E0F2F1' }}>⏳</div>
           <div style={styles.statContent}>
             <h3 style={styles.statNumber}>{availableOrders.length}</h3>
             <p style={styles.statLabel}>Pending Acceptance</p>
@@ -1618,7 +1618,7 @@ const Dashboard = ({
           }}
           onClick={() => handleStatClick('inProgress')}
         >
-          <div style={{ ...styles.statIcon, backgroundColor: '#E8F4FD' }}>🚚</div>
+          <div style={{ ...styles.statIcon, backgroundColor: '#E0F2F1' }}>🚚</div>
           <div style={styles.statContent}>
             <h3 style={styles.statNumber}>{acceptedOrders.filter(o => o.status !== 'assigned').length}</h3>
             <p style={styles.statLabel}>In Progress</p>
@@ -1632,7 +1632,7 @@ const Dashboard = ({
           }}
           onClick={() => handleStatClick('completed')}
         >
-          <div style={{ ...styles.statIcon, backgroundColor: '#F0F7E8' }}>✅</div>
+          <div style={{ ...styles.statIcon, backgroundColor: '#E0F2F1' }}>✅</div>
           <div style={styles.statContent}>
             <h3 style={styles.statNumber}>{completedOrders.length}</h3>
             <p style={styles.statLabel}>Delivered</p>
@@ -1646,7 +1646,7 @@ const Dashboard = ({
           }}
           onClick={() => handleStatClick('todayEarnings')}
         >
-          <div style={{ ...styles.statIcon, backgroundColor: '#FFF7ED' }}>💰</div>
+          <div style={{ ...styles.statIcon, backgroundColor: '#E0F2F1' }}>💰</div>
           <div style={styles.statContent}>
             <h3 style={styles.statNumber}>{formatIndianCurrency(incentives.today)}</h3>
             <p style={styles.statLabel}>Today's Earnings</p>
@@ -1660,7 +1660,7 @@ const Dashboard = ({
           }}
           onClick={() => handleStatClick('cancelled')}
         >
-          <div style={{ ...styles.statIcon, backgroundColor: '#FEE2E2' }}>❌</div>
+          <div style={{ ...styles.statIcon, backgroundColor: '#E0F2F1' }}>❌</div>
           <div style={styles.statContent}>
             <h3 style={styles.statNumber}>0</h3>
             <p style={styles.statLabel}>Cancelled Orders</p>

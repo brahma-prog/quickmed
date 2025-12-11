@@ -10,7 +10,7 @@ const Earnings = ({ deliveryData }) => {
     mainContent: {
       padding: '30px',
       minHeight: '100vh',
-      backgroundColor: '#f8fafc'
+      backgroundColor: '#E0F2F1'
     },
     header: {
       display: 'flex',
@@ -21,12 +21,12 @@ const Earnings = ({ deliveryData }) => {
     greeting: {
       fontSize: '28px',
       fontWeight: '700',
-      color: '#1f2937',
+      color: '#124441',
       margin: '0 0 8px 0'
     },
     subtitle: {
       fontSize: '16px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       margin: 0
     },
     earningFilters: {
@@ -35,7 +35,7 @@ const Earnings = ({ deliveryData }) => {
       backgroundColor: 'white',
       padding: '4px',
       borderRadius: '8px',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC',
       alignItems: 'center'
     },
     earningFilter: {
@@ -49,10 +49,11 @@ const Earnings = ({ deliveryData }) => {
       transition: 'all 0.3s ease',
       display: 'flex',
       alignItems: 'center',
-      gap: '6px'
+      gap: '6px',
+      color: '#124441'
     },
     earningFilterActive: {
-      backgroundColor: '#7C2A62',
+      backgroundColor: '#009688',
       color: 'white'
     },
     monthDropdown: {
@@ -60,18 +61,20 @@ const Earnings = ({ deliveryData }) => {
     },
     monthSelect: {
       padding: '8px 12px',
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC',
       borderRadius: '6px',
       fontSize: '14px',
       backgroundColor: 'white',
-      minWidth: '150px'
+      minWidth: '150px',
+      color: '#124441'
     },
     earningsSummary: {
       backgroundColor: 'white',
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      marginBottom: '24px'
+      boxShadow: '0 2px 8px rgba(0,150,136,0.1)',
+      marginBottom: '24px',
+      border: '1px solid #E0F2F1'
     },
     earningStats: {
       display: 'grid',
@@ -81,18 +84,19 @@ const Earnings = ({ deliveryData }) => {
     earningStat: {
       textAlign: 'center',
       padding: '16px',
-      backgroundColor: '#f8fafc',
-      borderRadius: '8px'
+      backgroundColor: '#E0F2F1',
+      borderRadius: '8px',
+      border: '1px solid #4DB6AC'
     },
     earningAmount: {
       fontSize: '24px',
       fontWeight: '700',
-      color: '#7C2A62',
+      color: '#009688',
       margin: '0 0 8px 0'
     },
     earningLabel: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       margin: '0 0 12px 0',
       fontWeight: '500'
     },
@@ -101,21 +105,21 @@ const Earnings = ({ deliveryData }) => {
       flexDirection: 'column',
       gap: '4px',
       paddingTop: '12px',
-      borderTop: '1px solid #e5e7eb'
+      borderTop: '1px solid #4DB6AC'
     },
     metricValue: {
       fontSize: '16px',
       fontWeight: '600',
-      color: '#1f2937'
+      color: '#124441'
     },
     metricLabel: {
       fontSize: '12px',
-      color: '#6b7280'
+      color: '#4F6F6B'
     },
     sectionTitle: {
       fontSize: '20px',
       fontWeight: '600',
-      color: '#1f2937',
+      color: '#124441',
       margin: '0 0 16px 0'
     },
     sectionHeader: {
@@ -126,24 +130,26 @@ const Earnings = ({ deliveryData }) => {
     },
     viewAll: {
       fontSize: '14px',
-      color: '#7C2A62',
+      color: '#009688',
       fontWeight: '500',
       cursor: 'pointer',
       padding: '8px 16px',
-      border: '1px solid #7C2A62',
+      border: '1px solid #009688',
       borderRadius: '6px',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      backgroundColor: 'white'
     },
     viewAllHover: {
-      backgroundColor: '#7C2A62',
+      backgroundColor: '#009688',
       color: 'white'
     },
     earningsHistory: {
       backgroundColor: 'white',
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      marginBottom: '24px'
+      boxShadow: '0 2px 8px rgba(0,150,136,0.1)',
+      marginBottom: '24px',
+      border: '1px solid #E0F2F1'
     },
     earningsList: {
       display: 'flex',
@@ -155,23 +161,25 @@ const Earnings = ({ deliveryData }) => {
       justifyContent: 'space-between',
       alignItems: 'flex-start',
       padding: '16px',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC',
       borderRadius: '8px',
       transition: 'all 0.3s ease',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      backgroundColor: 'white'
     },
     earningItemHover: {
-      backgroundColor: '#f8fafc',
-      borderColor: '#7C2A62'
+      backgroundColor: '#E0F2F1',
+      borderColor: '#009688'
     },
     earningDate: {
       flex: 1
     },
     earningDateText: {
       fontSize: '14px',
-      color: '#1f2937',
+      color: '#124441',
       marginBottom: '8px',
-      display: 'block'
+      display: 'block',
+      fontWeight: '600'
     },
     earningMeta: {
       display: 'flex',
@@ -181,15 +189,16 @@ const Earnings = ({ deliveryData }) => {
     metaBadge: {
       fontSize: '11px',
       padding: '4px 8px',
-      backgroundColor: '#f3f4f6',
-      color: '#6b7280',
+      backgroundColor: '#E0F2F1',
+      color: '#4F6F6B',
       borderRadius: '12px',
-      fontWeight: '500'
+      fontWeight: '500',
+      border: '1px solid #4DB6AC'
     },
     earningAmountItem: {
       fontSize: '16px',
       fontWeight: '600',
-      color: '#7C2A62'
+      color: '#009688'
     },
     loadingSpinner: {
       display: 'flex',
@@ -200,15 +209,15 @@ const Earnings = ({ deliveryData }) => {
     spinner: {
       width: '40px',
       height: '40px',
-      border: '4px solid #f3f4f6',
-      borderTop: '4px solid #7C2A62',
+      border: '4px solid #E0F2F1',
+      borderTop: '4px solid #009688',
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     },
     noData: {
       textAlign: 'center',
       padding: '40px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       fontSize: '16px'
     },
     pagination: {
@@ -221,20 +230,28 @@ const Earnings = ({ deliveryData }) => {
     },
     paginationButton: {
       padding: '8px 16px',
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC',
       backgroundColor: 'white',
       borderRadius: '6px',
       cursor: 'pointer',
       fontSize: '14px',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      color: '#124441'
+    },
+    paginationButtonHover: {
+      backgroundColor: '#009688',
+      color: 'white',
+      borderColor: '#009688'
     },
     paginationButtonDisabled: {
       opacity: 0.5,
-      cursor: 'not-allowed'
+      cursor: 'not-allowed',
+      backgroundColor: '#E0F2F1',
+      color: '#4F6F6B'
     },
     paginationInfo: {
       fontSize: '14px',
-      color: '#6b7280'
+      color: '#4F6F6B'
     }
   };
 
@@ -398,6 +415,16 @@ const Earnings = ({ deliveryData }) => {
               ...(earningFilter === 'today' ? styles.earningFilterActive : {})
             }}
             onClick={() => setEarningFilter('today')}
+            onMouseEnter={(e) => {
+              if (earningFilter !== 'today') {
+                e.currentTarget.style.backgroundColor = '#E0F2F1';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (earningFilter !== 'today') {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
           >
             Today
           </button>
@@ -407,6 +434,16 @@ const Earnings = ({ deliveryData }) => {
               ...(earningFilter === 'week' ? styles.earningFilterActive : {})
             }}
             onClick={() => setEarningFilter('week')}
+            onMouseEnter={(e) => {
+              if (earningFilter !== 'week') {
+                e.currentTarget.style.backgroundColor = '#E0F2F1';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (earningFilter !== 'week') {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
           >
             This Week
           </button>
@@ -514,6 +551,14 @@ const Earnings = ({ deliveryData }) => {
           <span 
             style={styles.viewAll}
             onClick={handleViewAllClick}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#009688';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.color = '#009688';
+            }}
           >
             {showAllMonths ? 'Show Less' : 'View All'}
           </span>
@@ -532,12 +577,12 @@ const Earnings = ({ deliveryData }) => {
                     key={index} 
                     style={styles.earningItem}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8fafc';
-                      e.currentTarget.style.borderColor = '#7C2A62';
+                      e.currentTarget.style.backgroundColor = '#E0F2F1';
+                      e.currentTarget.style.borderColor = '#009688';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'white';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.borderColor = '#4DB6AC';
                     }}
                   >
                     <div style={styles.earningDate}>
@@ -576,6 +621,20 @@ const Earnings = ({ deliveryData }) => {
                   }}
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
+                  onMouseEnter={(e) => {
+                    if (currentPage !== 1) {
+                      e.currentTarget.style.backgroundColor = '#009688';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.borderColor = '#009688';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage !== 1) {
+                      e.currentTarget.style.backgroundColor = 'white';
+                      e.currentTarget.style.color = '#124441';
+                      e.currentTarget.style.borderColor = '#4DB6AC';
+                    }
+                  }}
                 >
                   Previous
                 </button>
@@ -589,6 +648,20 @@ const Earnings = ({ deliveryData }) => {
                   }}
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
+                  onMouseEnter={(e) => {
+                    if (currentPage !== totalPages) {
+                      e.currentTarget.style.backgroundColor = '#009688';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.borderColor = '#009688';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage !== totalPages) {
+                      e.currentTarget.style.backgroundColor = 'white';
+                      e.currentTarget.style.color = '#124441';
+                      e.currentTarget.style.borderColor = '#4DB6AC';
+                    }
+                  }}
                 >
                   Next
                 </button>

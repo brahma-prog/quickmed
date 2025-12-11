@@ -30,7 +30,7 @@ const DoctorSidebar = ({
         <div style={styles.sidebarHeader}>
           <div style={styles.logoContainer}>
             <img 
-              src="/Quickmed img.png" 
+              src="/Quickmed_logo.png" 
               alt="QuickMed Logo" 
               style={styles.logoImage}
               onError={(e) => {
@@ -107,8 +107,8 @@ const DoctorSidebar = ({
 
 const styles = {
   sidebar: {
-    backgroundColor: '#F7D9EB',
-    color: '#333333',
+    backgroundColor: '#E0F2F1',
+    color: '#124441',
     display: 'flex',
     flexDirection: 'column',
     position: 'fixed',
@@ -118,7 +118,8 @@ const styles = {
     zIndex: 1000,
     transition: 'transform 0.3s ease',
     overflow: 'hidden',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    borderRight: '1px solid rgba(18, 68, 65, 0.1)'
   },
   overlay: {
     position: 'fixed',
@@ -131,7 +132,7 @@ const styles = {
   },
   sidebarHeader: {
     padding: '24px 20px 16px',
-    borderBottom: '1px solid rgba(0,0,0,0.1)',
+    borderBottom: '1px solid rgba(18, 68, 65, 0.1)',
     position: 'relative',
     flexShrink: 0
   },
@@ -144,7 +145,8 @@ const styles = {
     width: '40px',
     height: '40px',
     borderRadius: '8px',
-    objectFit: 'cover'
+    objectFit: 'cover',
+    border: '1px solid rgba(18, 68, 65, 0.1)'
   },
   logoFallback: {
     fontSize: '24px',
@@ -153,7 +155,7 @@ const styles = {
     display: 'none',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: '#4DB6AC',
     borderRadius: '8px'
   },
   logoTextContainer: {
@@ -164,15 +166,15 @@ const styles = {
     fontSize: '22px',
     fontWeight: '700',
     margin: '0 0 4px 0',
-    color: '#333333',
+    color: '#009688',
     letterSpacing: '0.5px'
   },
   doctorTitle: {
     fontSize: '12px',
     opacity: 0.8,
     margin: 0,
-    fontWeight: '400',
-    color: '#333333'
+    fontWeight: '500',
+    color: '#4F6F6B'
   },
   closeButton: {
     position: 'absolute',
@@ -180,21 +182,22 @@ const styles = {
     right: '20px',
     background: 'none',
     border: 'none',
-    color: '#333333',
+    color: '#124441',
     fontSize: '20px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    opacity: 0.7
   },
   profileSection: {
     padding: '16px 20px',
-    borderBottom: '1px solid rgba(0,0,0,0.1)',
+    borderBottom: '1px solid rgba(18, 68, 65, 0.1)',
     flexShrink: 0,
-    backgroundColor: 'rgba(0,0,0,0.05)'
+    backgroundColor: '#FFFFFF'
   },
   profileButton: {
     width: '100%',
     padding: '0',
     backgroundColor: 'transparent',
-    color: '#333333',
+    color: '#124441',
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -208,7 +211,7 @@ const styles = {
     padding: '12px',
     borderRadius: '6px',
     transition: 'background-color 0.3s ease',
-    backgroundColor: 'rgba(0,0,0,0.05)'
+    backgroundColor: '#F5F9F9'
   },
   userAvatar: {
     fontSize: '32px',
@@ -218,9 +221,9 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: '#4DB6AC',
     borderRadius: '10px',
-    border: '2px solid rgba(0,0,0,0.2)'
+    border: '2px solid #009688'
   },
   userDetails: {
     flex: 1,
@@ -233,7 +236,7 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    color: '#333333'
+    color: '#124441'
   },
   userSpecialization: {
     margin: 0,
@@ -242,7 +245,7 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    color: '#333333'
+    color: '#4F6F6B'
   },
   navigation: {
     flex: 1,
@@ -257,17 +260,17 @@ const styles = {
     padding: '14px 20px',
     backgroundColor: 'transparent',
     border: 'none',
-    color: '#333333',
+    color: '#4F6F6B',
     fontSize: '14px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    opacity: 0.8,
     position: 'relative'
   },
   navButtonActive: {
-    backgroundColor: 'rgba(0,0,0,0.08)',
-    opacity: 1,
-    fontWeight: '600'
+    backgroundColor: '#FFFFFF',
+    color: '#009688',
+    fontWeight: '600',
+    borderLeft: '4px solid #009688'
   },
   navIcon: {
     fontSize: '18px',
@@ -282,8 +285,8 @@ const styles = {
   },
   bottomSection: {
     flexShrink: 0,
-    borderTop: '1px solid rgba(0,0,0,0.1)',
-    backgroundColor: 'rgba(0,0,0,0.05)'
+    borderTop: '1px solid rgba(18, 68, 65, 0.1)',
+    backgroundColor: '#FFFFFF'
   },
   sidebarFooter: {
     padding: '16px 20px'
@@ -291,8 +294,8 @@ const styles = {
   logoutButton: {
     width: '100%',
     padding: '10px 16px',
-    backgroundColor: 'rgba(0,0,0,0.08)',
-    color: '#333333',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',

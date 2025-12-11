@@ -1,4 +1,4 @@
-// App.js - Complete Consolidated Version
+// App.js - Complete Consolidated Version with DeliverySignup Integration
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
@@ -17,9 +17,8 @@ import DeliveryLogin from './components/DeliveryLogin';
 import DoctorLogin from './components/DoctorLogin';
 import UserSignup from './components/UserSignup';
 import VendorSignup from './components/VendorSignup';
-import DeliverySignup from './components/DeliverySignup';
+import DeliverySignup from './components/DeliverySignup'; // Import DeliverySignup
 import DoctorSignup from './components/DoctorSignup';
-
 
 // Import Dashboard Components
 import DoctorDashboard from './components/doctor/DoctorDashboard';
@@ -362,6 +361,33 @@ const AppWrapper = () => {
     handleSignupSuccess(userData);
   }, [handleSignupSuccess]);
 
+  // Handle delivery signup success
+  const handleDeliverySignupSuccess = useCallback((user) => {
+    console.log('Delivery signup successful:', user);
+    // Transform delivery signup data to match user object structure
+    const userData = {
+      ...user,
+      userType: 'delivery',
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      isActive: true,
+      deliveriesCompleted: 0,
+      rating: 0,
+      earnings: 0
+    };
+    handleSignupSuccess(userData);
+  }, [handleSignupSuccess]);
+
+  // Handle switch to login (for DeliverySignup component)
+  const handleSwitchToLogin = useCallback(() => {
+    navigate('/login/delivery');
+  }, [navigate]);
+
+  // Handle switch to role selection (for DeliverySignup component)
+  const handleSwitchToRoleSelection = useCallback(() => {
+    navigate('/login');
+  }, [navigate]);
+
   return (
     <div className="App">
       <main>
@@ -453,7 +479,11 @@ const AppWrapper = () => {
             path="/signup/delivery" 
             element={
               <PublicRoute>
-                <DeliverySignup onSignupSuccess={handleSignupSuccess} />
+                <DeliverySignup 
+                  onSwitchToLogin={handleSwitchToLogin}
+                  onSwitchToRoleSelection={handleSwitchToRoleSelection}
+                  onSignupSuccess={handleDeliverySignupSuccess}
+                />
               </PublicRoute>
             } 
           />

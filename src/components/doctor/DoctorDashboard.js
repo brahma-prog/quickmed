@@ -5,6 +5,7 @@ import DoctorHeader from './DoctorHeader';
 import DashboardContent from './DashboardContent';
 import AppointmentsContent from './AppointmentsContent';
 import PregnancyCareContent from './PregnancyCareContent';
+import BabyCareContent from './BabyCareContent';
 import PatientsContent from './PatientsContent';
 import EarningsContent from './EarningsContent';
 import MessagesContent from './MessagesContent';
@@ -24,7 +25,6 @@ const DoctorAppointmentDetail = () => {
     <div>
       <h2>Appointment Details</h2>
       <p>Viewing appointment: {appointmentId}</p>
-      {/* Add appointment detail view here */}
     </div>
   );
 };
@@ -35,7 +35,6 @@ const DoctorPatientDetail = () => {
     <div>
       <h2>Patient Profile</h2>
       <p>Viewing patient: {patientId}</p>
-      {/* Add patient detail view here */}
     </div>
   );
 };
@@ -46,7 +45,6 @@ const DoctorMessagesDetail = () => {
     <div>
       <h2>Conversation</h2>
       <p>Viewing conversation: {conversationId}</p>
-      {/* Add conversation detail view here */}
     </div>
   );
 };
@@ -57,7 +55,16 @@ const DoctorPregnancyDetail = () => {
     <div>
       <h2>Pregnancy Care Details</h2>
       <p>Viewing pregnancy case: {pregnancyId}</p>
-      {/* Add pregnancy care detail view here */}
+    </div>
+  );
+};
+
+const DoctorBabyDetail = () => {
+  const { babyId } = useParams();
+  return (
+    <div>
+      <h2>Baby Care Details</h2>
+      <p>Viewing baby case: {babyId}</p>
     </div>
   );
 };
@@ -68,7 +75,6 @@ const DoctorEarningDetail = () => {
     <div>
       <h2>Earnings Details</h2>
       <p>Viewing earnings for: {period}</p>
-      {/* Add earning detail view here */}
     </div>
   );
 };
@@ -79,7 +85,6 @@ const DoctorTimeslotDetail = () => {
     <div>
       <h2>Timeslot Management</h2>
       <p>Managing timeslot: {timeslotId}</p>
-      {/* Add timeslot detail view here */}
     </div>
   );
 };
@@ -112,7 +117,8 @@ const DoctorDashboard = ({ user, onLogout }) => {
     formErrors,
     windowSize,
     timeslots,
-    pregnancyFilter
+    pregnancyFilter,
+    babyCareFilter
   } = state;
 
   // Get actions
@@ -138,7 +144,8 @@ const DoctorDashboard = ({ user, onLogout }) => {
     setSelectedPatient: state.setSelectedPatient,
     setIsSidebarOpen: state.setIsSidebarOpen,
     setTimeslots: state.setTimeslots,
-    setPregnancyFilter: state.setPregnancyFilter
+    setPregnancyFilter: state.setPregnancyFilter,
+    setBabyCareFilter: state.setBabyCareFilter
   });
 
   const {
@@ -167,7 +174,9 @@ const DoctorDashboard = ({ user, onLogout }) => {
     handleScheduleHomeVisit,
     handleUploadReportToLocker,
     handleViewPregnancyReports,
-    handleUpdatePregnancyPackage
+    handleUpdatePregnancyPackage,
+    handleApproveBabyCareAppointment,
+    handleUpdateBabyCarePlan
   } = actions;
 
   // Update activePage based on route
@@ -175,6 +184,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
     const path = location.pathname;
     if (path.includes('/appointments')) state.setActivePage('appointments');
     else if (path.includes('/pregnancy-care')) state.setActivePage('pregnancyCare');
+    else if (path.includes('/baby-care')) state.setActivePage('babyCare');
     else if (path.includes('/patients')) state.setActivePage('patients');
     else if (path.includes('/earnings')) state.setActivePage('earnings');
     else if (path.includes('/messages')) state.setActivePage('messages');
@@ -208,7 +218,14 @@ const DoctorDashboard = ({ user, onLogout }) => {
       handleScheduleHomeVisit,
       handleUploadReportToLocker,
       handleViewPregnancyReports,
-      handleUpdatePregnancyPackage
+      handleUpdatePregnancyPackage,
+      setPregnancyFilter: state.setPregnancyFilter
+    };
+
+    const babyCareActions = {
+      handleApproveBabyCareAppointment,
+      handleUpdateBabyCarePlan,
+      setBabyCareFilter: state.setBabyCareFilter
     };
 
     return {
@@ -223,7 +240,8 @@ const DoctorDashboard = ({ user, onLogout }) => {
         patientMessages,
         userProfile,
         timeslots,
-        pregnancyFilter
+        pregnancyFilter,
+        babyCareFilter
       },
       actions: {
         setActivePage: state.setActivePage,
@@ -234,10 +252,10 @@ const DoctorDashboard = ({ user, onLogout }) => {
         setConsultationDetails: state.setConsultationDetails,
         getUnreadMessagesCount,
         getUnreadNotificationsCount,
-        setPregnancyFilter: state.setPregnancyFilter,
         ...commonActions,
         ...timeslotActions,
-        ...pregnancyActions
+        ...pregnancyActions,
+        ...babyCareActions
       }
     };
   };
@@ -258,6 +276,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
               dashboard: '/doctor/dashboard',
               appointments: '/doctor/dashboard/appointments',
               pregnancyCare: '/doctor/dashboard/pregnancy-care',
+              babyCare: '/doctor/dashboard/baby-care',
               patients: '/doctor/dashboard/patients',
               earnings: '/doctor/dashboard/earnings',
               messages: '/doctor/dashboard/messages',
@@ -302,6 +321,10 @@ const DoctorDashboard = ({ user, onLogout }) => {
           {/* Pregnancy Care */}
           <Route path="/pregnancy-care" element={<PregnancyCareContent {...getCommonContentProps()} />} />
           <Route path="/pregnancy-care/:pregnancyId" element={<DoctorPregnancyDetail />} />
+          
+          {/* Baby Care */}
+          <Route path="/baby-care" element={<BabyCareContent {...getCommonContentProps()} />} />
+          <Route path="/baby-care/:babyId" element={<DoctorBabyDetail />} />
           
           {/* Patients */}
           <Route path="/patients" element={<PatientsContent {...getCommonContentProps()} />} />
@@ -380,7 +403,7 @@ const styles = {
   container: {
     display: 'flex',
     minHeight: '100vh',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#E0F2F1',
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     position: 'relative'
   },
@@ -392,7 +415,7 @@ const styles = {
     position: 'fixed',
     bottom: '30px',
     right: '30px',
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     color: 'white',
     border: 'none',
     borderRadius: '50%',
@@ -404,7 +427,7 @@ const styles = {
     justifyContent: 'center',
     fontSize: '24px',
     cursor: 'pointer',
-    boxShadow: '0 4px 20px rgba(124, 42, 98, 0.3)',
+    boxShadow: '0 4px 20px rgba(0, 150, 136, 0.3)',
     zIndex: 100,
     transition: 'all 0.3s ease',
     animation: 'pulse 2s infinite',
@@ -417,7 +440,7 @@ const styles = {
   chatbotTooltip: {
     position: 'absolute',
     top: '-35px',
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     color: 'white',
     padding: '6px 12px',
     borderRadius: '20px',
@@ -437,15 +460,15 @@ style.textContent = `
   @keyframes pulse {
     0% {
       transform: scale(1);
-      box-shadow: 0 4px 20px rgba(124, 42, 98, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 150, 136, 0.3);
     }
     50% {
       transform: scale(1.05);
-      box-shadow: 0 6px 25px rgba(124, 42, 98, 0.4);
+      box-shadow: 0 6px 25px rgba(0, 150, 136, 0.4);
     }
     100% {
       transform: scale(1);
-      boxShadow: 0 4px 20px rgba(124, 42, 98, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 150, 136, 0.3);
     }
   }
 
@@ -456,7 +479,7 @@ style.textContent = `
 
   button:hover {
     transform: scale(1.1);
-    box-shadow: 0 8px 30px rgba(124, 42, 98, 0.5);
+    box-shadow: 0 8px 30px rgba(0, 150, 136, 0.5);
   }
 `;
 document.head.appendChild(style);

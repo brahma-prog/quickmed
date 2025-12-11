@@ -613,7 +613,7 @@ const DeliveryDashboard = ({ user, onLogout }) => {
     container: {
       display: 'flex',
       minHeight: '100vh',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       position: 'relative'
     },
@@ -628,7 +628,7 @@ const DeliveryDashboard = ({ user, onLogout }) => {
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '1rem',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       position: 'sticky',
       top: 0,
@@ -639,7 +639,7 @@ const DeliveryDashboard = ({ user, onLogout }) => {
       border: 'none',
       fontSize: '1.5rem',
       cursor: 'pointer',
-      color: '#333'
+      color: '#124441'
     },
     mobileSidebar: {
       position: 'fixed',
@@ -647,7 +647,7 @@ const DeliveryDashboard = ({ user, onLogout }) => {
       left: isMobileMenuOpen ? '0' : '-280px',
       width: '280px',
       height: '100vh',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
       zIndex: 1000,
       transition: 'left 0.3s ease'
@@ -723,16 +723,19 @@ const DeliveryDashboard = ({ user, onLogout }) => {
           >
             ☰
           </button>
-          <h3 style={{ margin: 0, color: '#333', fontSize: '1.1rem' }}>Delivery Dashboard</h3>
+          <h3 style={{ margin: 0, color: '#124441', fontSize: '1.1rem' }}>Delivery Dashboard</h3>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <button 
               onClick={toggleNotifications}
               style={{ 
                 background: 'none', 
-                border: 'none', 
+                border: '1px solid #4DB6AC',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
                 position: 'relative', 
                 cursor: 'pointer',
-                fontSize: '1.2rem'
+                fontSize: '1.2rem',
+                padding: '8px'
               }}
             >
               🔔
@@ -741,8 +744,8 @@ const DeliveryDashboard = ({ user, onLogout }) => {
                   position: 'absolute',
                   top: '-5px',
                   right: '-5px',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
+                  backgroundColor: '#009688',
+                  color: '#FFFFFF',
                   borderRadius: '50%',
                   width: '18px',
                   height: '18px',
@@ -837,8 +840,8 @@ const DeliveryDashboard = ({ user, onLogout }) => {
               width: '60px',
               height: '60px',
               borderRadius: '50%',
-              backgroundColor: '#3b82f6',
-              color: 'white',
+              backgroundColor: '#009688',
+              color: '#FFFFFF',
               border: 'none',
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
               fontSize: '24px',
@@ -857,8 +860,8 @@ const DeliveryDashboard = ({ user, onLogout }) => {
               width: '60px',
               height: '60px',
               borderRadius: '50%',
-              backgroundColor: isOnline ? '#10b981' : '#ef4444',
-              color: 'white',
+              backgroundColor: isOnline ? '#009688' : '#4F6F6B',
+              color: '#FFFFFF',
               border: 'none',
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
               fontSize: '24px',

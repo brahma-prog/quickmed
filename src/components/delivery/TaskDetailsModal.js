@@ -30,40 +30,39 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
       zIndex: 1000,
     },
     modal: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       borderRadius: '12px',
       padding: '24px',
       maxWidth: '500px',
       width: '90%',
       maxHeight: '80vh',
       overflow: 'auto',
-      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+      border: '1px solid #4DB6AC', // mint border
     },
     header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: '20px',
-      borderBottom: '1px solid #e5e7eb',
+      borderBottom: '1px solid #E0F2F1', // softbg border
       paddingBottom: '16px',
     },
     title: {
       fontSize: '20px',
       fontWeight: '600',
       margin: 0,
-      color: '#1f2937',
+      color: '#124441', // darktext
     },
     closeButton: {
       backgroundColor: 'transparent',
       border: 'none',
       fontSize: '24px',
       cursor: 'pointer',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       padding: '4px',
       borderRadius: '4px',
-      ':hover': {
-        backgroundColor: '#f3f4f6',
-      }
+      transition: 'background-color 0.3s ease',
     },
     content: {
       display: 'flex',
@@ -77,7 +76,7 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
       fontSize: '16px',
       fontWeight: '600',
       margin: '0 0 12px 0',
-      color: '#374151',
+      color: '#124441', // darktext
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
@@ -89,20 +88,20 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
     },
     medicineItem: {
       padding: '8px 12px',
-      backgroundColor: '#f8f9fa',
+      backgroundColor: '#E0F2F1', // softbg
       borderRadius: '6px',
       marginBottom: '8px',
       fontSize: '14px',
-      color: '#374151',
-      borderLeft: '3px solid #7C2A62',
+      color: '#124441', // darktext
+      borderLeft: '3px solid #009688', // primary
     },
     noData: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       fontStyle: 'italic',
       textAlign: 'center',
       padding: '20px',
-      backgroundColor: '#f9fafb',
+      backgroundColor: '#F8FAFC',
       borderRadius: '6px',
     },
     infoGrid: {
@@ -118,12 +117,12 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
     },
     infoLabel: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#4F6F6B', // softtext
       fontWeight: '500',
     },
     infoValue: {
       fontSize: '14px',
-      color: '#374151',
+      color: '#124441', // darktext
       fontWeight: '500',
     },
     priorityBadge: {
@@ -143,10 +142,10 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
       color: 'white',
     },
     instructions: {
-      backgroundColor: '#f0fdf4',
+      backgroundColor: '#F0FDF4',
       padding: '12px',
       borderRadius: '6px',
-      border: '1px solid #bbf7d0',
+      border: '1px solid #4DB6AC', // mint
       fontSize: '14px',
       color: '#065f46',
       lineHeight: '1.4',
@@ -157,11 +156,11 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
       justifyContent: 'flex-end',
       marginTop: '20px',
       paddingTop: '16px',
-      borderTop: '1px solid #e5e7eb',
+      borderTop: '1px solid #E0F2F1', // softbg
     },
     primaryButton: {
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688', // primary
+      color: '#FFFFFF', // white
       border: 'none',
       padding: '10px 16px',
       borderRadius: '6px',
@@ -172,8 +171,8 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
     },
     secondaryButton: {
       backgroundColor: 'transparent',
-      color: '#7C2A62',
-      border: '1px solid #7C2A62',
+      color: '#009688', // primary
+      border: '1px solid #009688', // primary
       padding: '9px 15px',
       borderRadius: '6px',
       fontSize: '14px',
@@ -188,20 +187,20 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
       case 'High': return '#EF4444';
       case 'Medium': return '#F59E0B';
       case 'Low': return '#10B981';
-      default: return '#6B7280';
+      default: return '#4DB6AC'; // mint as default
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return '#F59E0B';
-      case 'assigned': return '#3B82F6';
-      case 'pickup_reached': return '#8B5CF6';
-      case 'pickup_completed': return '#7C2A62';
-      case 'delivery_reached': return '#F59E0B';
-      case 'delivery_completed': return '#10B981';
-      case 'cancelled': return '#EF4444';
-      default: return '#6B7280';
+      case 'pending': return '#F59E0B'; // yellow
+      case 'assigned': return '#3B82F6'; // blue
+      case 'pickup_reached': return '#8B5CF6'; // purple
+      case 'pickup_completed': return '#009688'; // primary
+      case 'delivery_reached': return '#F59E0B'; // yellow
+      case 'delivery_completed': return '#4DB6AC'; // mint
+      case 'cancelled': return '#EF4444'; // red
+      default: return '#4F6F6B'; // softtext
     }
   };
 
@@ -217,7 +216,7 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
           <button 
             style={modalStyles.closeButton} 
             onClick={onClose}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#f3f4f6'}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#E0F2F1'}
             onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
           >
             ×
@@ -258,7 +257,7 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
               <span style={modalStyles.infoValue}>
                 {formatIndianCurrency(amount)}
                 {tip > 0 && (
-                  <span style={{color: '#10B981', marginLeft: '8px'}}>
+                  <span style={{color: '#4DB6AC', marginLeft: '8px', fontWeight: '500'}}>
                     + {formatIndianCurrency(tip)} tip
                   </span>
                 )}
@@ -331,6 +330,14 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
             <button 
               style={modalStyles.secondaryButton}
               onClick={onClose}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#E0F2F1';
+                e.currentTarget.style.color = '#009688';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#009688';
+              }}
             >
               Close
             </button>
@@ -338,6 +345,8 @@ const TaskDetailsModal = ({ task, onClose, onAccept, onStatusUpdate }) => {
               <button 
                 style={modalStyles.primaryButton}
                 onClick={() => onAccept(safeTask)}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4DB6AC'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#009688'}
               >
                 Accept Delivery
               </button>

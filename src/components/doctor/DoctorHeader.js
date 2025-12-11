@@ -30,7 +30,7 @@ const DoctorHeader = ({
 
   const getPageSubtitle = () => {
     const subtitles = {
-      dashboard: 'Overview of your practice',
+      dashboard: ' Clinical Dashboard',
       appointments: '', // Removed subtitle
       patients: '', // Removed subtitle
       earnings: '', // Removed subtitle
@@ -110,7 +110,7 @@ const styles = {
     cursor: 'pointer',
     padding: '5px',
     borderRadius: '5px',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
   },
   headerActions: {
@@ -121,7 +121,7 @@ const styles = {
   },
   notificationBell: {
     position: 'relative',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     border: 'none',
     borderRadius: '50%',
     width: '44px',
@@ -139,7 +139,7 @@ const styles = {
     top: '-2px',
     right: '-2px',
     backgroundColor: '#EF4444',
-    color: 'white',
+    color: '#FFFFFF',
     borderRadius: '50%',
     width: '18px',
     height: '18px',
@@ -152,17 +152,17 @@ const styles = {
   greeting: {
     fontSize: 'clamp(20px, 4vw, 28px)',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0'
   },
   subtitle: {
     fontSize: 'clamp(14px, 2vw, 16px)',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   dateDisplay: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     fontWeight: '500'
   }
 };

@@ -139,26 +139,53 @@ const AppointmentsView = ({
     )
   };
 
+  // Normalize appointment status to match filter categories
+  const normalizeAppointmentStatus = (appointment) => {
+    const status = (appointment.status || 'pending').toLowerCase();
+    
+    // Map various status names to filter categories
+    if (status === 'confirmed' || status === 'scheduled' || status === 'booked' || status === 'active') {
+      return 'confirmed';
+    } else if (status === 'pending' || status === 'waiting' || status === 'awaiting' || status === 'upcoming') {
+      return 'pending';
+    } else if (status === 'completed' || status === 'finished' || status === 'done' || status === 'attended') {
+      return 'completed';
+    } else if (status === 'cancelled' || status === 'canceled' || status === 'rejected' || status === 'declined') {
+      return 'cancelled';
+    }
+    return 'pending';
+  };
+
   // Validate appointments data
   useEffect(() => {
-    const validatedAppointments = appointments.map(appt => ({
-      id: appt.id || `appt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      doctorName: appt.doctorName || 'Dr. Unknown',
-      doctorSpecialty: appt.doctorSpecialty || appt.doctor?.specialty || 'General',
-      date: appt.date || appt.appointmentDateTime?.split('T')[0] || new Date().toISOString().split('T')[0],
-      time: appt.time || appt.appointmentDateTime?.split('T')[1]?.substring(0, 5) || '10:00',
-      status: appt.status || 'pending',
-      type: appt.type || 'clinic',
-      consultationType: appt.consultationType || appt.type || 'clinic',
-      fee: appt.fee || appt.payment?.amount || '500',
-      category: appt.category || 'General',
-      hospital: appt.hospital || 'QuickMed Clinic',
-      priority: appt.priority || 'L2',
-      payment: appt.payment || null,
-      createdAt: appt.createdAt || new Date().toISOString(),
-      doctorId: appt.doctorId,
-      ...appt
-    }));
+    const validatedAppointments = appointments.map(appt => {
+      const normalizedStatus = normalizeAppointmentStatus(appt);
+      const originalStatus = (appt.status || 'pending').toLowerCase();
+      
+      return {
+        id: appt.id || `appt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        doctorName: appt.doctorName || appt.doctor?.name || 'Dr. Unknown',
+        doctorSpecialty: appt.doctorSpecialty || appt.doctor?.specialty || 'General',
+        date: appt.date || appt.appointmentDateTime?.split('T')[0] || new Date().toISOString().split('T')[0],
+        time: appt.time || appt.appointmentDateTime?.split('T')[1]?.substring(0, 5) || '10:00',
+        status: originalStatus,
+        normalizedStatus: normalizedStatus,
+        type: appt.type || 'clinic',
+        consultationType: appt.consultationType || appt.type || 'clinic',
+        fee: appt.fee || appt.payment?.amount || '500',
+        category: appt.category || 'General',
+        hospital: appt.hospital || appt.clinic?.name || 'QuickMed Clinic',
+        priority: appt.priority || 'L2',
+        payment: appt.payment || null,
+        createdAt: appt.createdAt || appt.bookingDate || new Date().toISOString(),
+        doctorId: appt.doctorId,
+        ...appt,
+        clinic: appt.clinic || {
+          name: appt.hospital || 'QuickMed Clinic',
+          address: appt.address || '123 Health Street, Medical District'
+        }
+      };
+    });
     
     if (JSON.stringify(validatedAppointments) !== JSON.stringify(appointments)) {
       setValidatedAppointments(validatedAppointments);
@@ -203,11 +230,20 @@ const AppointmentsView = ({
     
     switch(type.toLowerCase()) {
       case 'video':
+      case 'video consultation':
+      case 'telemedicine':
         return 'Video Consultation';
       case 'home':
+      case 'home visit':
+      case 'home consultation':
         return 'Home Consultation';
       case 'clinic':
+      case 'in-person':
+      case 'clinic appointment':
         return 'Clinic Appointment';
+      case 'phone':
+      case 'phone consultation':
+        return 'Phone Consultation';
       default:
         return type.charAt(0).toUpperCase() + type.slice(1) + ' Appointment';
     }
@@ -217,6 +253,7 @@ const AppointmentsView = ({
     const consultationType = getConsultationType({ type });
     if (consultationType.includes('Video')) return <Icons.Video />;
     if (consultationType.includes('Home')) return <Icons.Home />;
+    if (consultationType.includes('Phone')) return <Icons.Phone />;
     return <Icons.Clinic />;
   };
 
@@ -225,15 +262,16 @@ const AppointmentsView = ({
     
     if (appointmentFilter !== 'all') {
       filtered = validatedAppointments.filter(appt => {
-        const status = appt.status ? appt.status.toLowerCase() : 'pending';
-        const filter = appointmentFilter.toLowerCase();
+        const normalizedStatus = appt.normalizedStatus || normalizeAppointmentStatus(appt);
         
-        if (filter === 'confirmed') {
-          return status === 'confirmed' || status === 'scheduled';
-        } else if (filter === 'pending') {
-          return status === 'pending';
-        } else if (filter === 'completed') {
-          return status === 'completed';
+        if (appointmentFilter === 'confirmed') {
+          return normalizedStatus === 'confirmed';
+        } else if (appointmentFilter === 'pending') {
+          return normalizedStatus === 'pending';
+        } else if (appointmentFilter === 'completed') {
+          return normalizedStatus === 'completed';
+        } else if (appointmentFilter === 'cancelled') {
+          return normalizedStatus === 'cancelled';
         }
         return true;
       });
@@ -247,14 +285,16 @@ const AppointmentsView = ({
           (appt.doctorSpecialty && appt.doctorSpecialty.toLowerCase().includes(searchLower)) ||
           (appt.id && appt.id.toLowerCase().includes(searchLower)) ||
           (appt.hospital && appt.hospital.toLowerCase().includes(searchLower)) ||
-          getConsultationType(appt).toLowerCase().includes(searchLower)
+          (appt.clinic?.name && appt.clinic.name.toLowerCase().includes(searchLower)) ||
+          getConsultationType(appt).toLowerCase().includes(searchLower) ||
+          (appt.status && appt.status.toLowerCase().includes(searchLower))
         );
       });
     }
     
     return filtered.sort((a, b) => {
-      const dateA = new Date(a.date || a.appointmentDateTime || 0);
-      const dateB = new Date(b.date || b.appointmentDateTime || 0);
+      const dateA = new Date(a.date || a.appointmentDateTime || a.createdAt || 0);
+      const dateB = new Date(b.date || b.appointmentDateTime || b.createdAt || 0);
       return dateB - dateA;
     });
   };
@@ -309,22 +349,41 @@ const AppointmentsView = ({
   };
 
   const getStatusColor = (status) => {
+    const statusLower = status.toLowerCase();
     const statusStyles = {
       confirmed: { background: '#E8F5E8', color: '#2E7D32', border: '1px solid #C8E6C9', icon: <Icons.CheckCircle /> },
       scheduled: { background: '#E8F5E8', color: '#2E7D32', border: '1px solid #C8E6C9', icon: <Icons.CheckCircle /> },
+      booked: { background: '#E8F5E8', color: '#2E7D32', border: '1px solid #C8E6C9', icon: <Icons.CheckCircle /> },
+      active: { background: '#E8F5E8', color: '#2E7D32', border: '1px solid #C8E6C9', icon: <Icons.CheckCircle /> },
       pending: { background: '#FFF3E0', color: '#EF6C00', border: '1px solid #FFE0B2', icon: <Icons.Clock /> },
-      completed: { background: '#F5F5F5', color: '#424242', border: '1px solid #E0E0E0', icon: <Icons.CheckCircle /> }
+      waiting: { background: '#FFF3E0', color: '#EF6C00', border: '1px solid #FFE0B2', icon: <Icons.Clock /> },
+      upcoming: { background: '#FFF3E0', color: '#EF6C00', border: '1px solid #FFE0B2', icon: <Icons.Clock /> },
+      completed: { background: '#F5F5F5', color: '#424242', border: '1px solid #E0E0E0', icon: <Icons.CheckCircle /> },
+      finished: { background: '#F5F5F5', color: '#424242', border: '1px solid #E0E0E0', icon: <Icons.CheckCircle /> },
+      attended: { background: '#F5F5F5', color: '#424242', border: '1px solid #E0E0E0', icon: <Icons.CheckCircle /> },
+      cancelled: { background: '#FFEBEE', color: '#D32F2F', border: '1px solid #FFCDD2', icon: <Icons.Cross /> },
+      canceled: { background: '#FFEBEE', color: '#D32F2F', border: '1px solid #FFCDD2', icon: <Icons.Cross /> },
+      rejected: { background: '#FFEBEE', color: '#D32F2F', border: '1px solid #FFCDD2', icon: <Icons.Cross /> },
+      declined: { background: '#FFEBEE', color: '#D32F2F', border: '1px solid #FFCDD2', icon: <Icons.Cross /> }
     };
-    return statusStyles[status?.toLowerCase()] || statusStyles.pending;
+    
+    return statusStyles[statusLower] || statusStyles.pending;
   };
 
   const getPaymentStatusColor = (status) => {
+    const statusLower = status.toLowerCase();
     const paymentStyles = {
       completed: { background: '#E8F5E8', color: '#2E7D32', icon: <Icons.CheckCircle /> },
+      paid: { background: '#E8F5E8', color: '#2E7D32', icon: <Icons.CheckCircle /> },
+      success: { background: '#E8F5E8', color: '#2E7D32', icon: <Icons.CheckCircle /> },
       pending: { background: '#FFF3E0', color: '#EF6C00', icon: <Icons.Clock /> },
-      failed: { background: '#FFEBEE', color: '#D32F2F', icon: <Icons.Cross /> }
+      waiting: { background: '#FFF3E0', color: '#EF6C00', icon: <Icons.Clock /> },
+      processing: { background: '#FFF3E0', color: '#EF6C00', icon: <Icons.Clock /> },
+      failed: { background: '#FFEBEE', color: '#D32F2F', icon: <Icons.Cross /> },
+      cancelled: { background: '#FFEBEE', color: '#D32F2F', icon: <Icons.Cross /> },
+      refunded: { background: '#E3F2FD', color: '#1976D2', icon: <Icons.Info /> }
     };
-    return paymentStyles[status] || paymentStyles.pending;
+    return paymentStyles[statusLower] || paymentStyles.pending;
   };
 
   const getPriorityBadge = (priority) => {
@@ -346,9 +405,29 @@ const AppointmentsView = ({
         color: '#059669', 
         label: 'Low Priority',
         icon: <Icons.PriorityLow />
+      },
+      'high': { 
+        background: '#FEE2E2', 
+        color: '#DC2626', 
+        label: 'High Priority',
+        icon: <Icons.PriorityHigh />
+      },
+      'medium': { 
+        background: '#FEF3C7', 
+        color: '#D97706', 
+        label: 'Medium Priority',
+        icon: <Icons.PriorityMedium />
+      },
+      'low': { 
+        background: '#D1FAE5', 
+        color: '#059669', 
+        label: 'Low Priority',
+        icon: <Icons.PriorityLow />
       }
     };
-    const style = priorityStyles[priority] || priorityStyles['L2'];
+    
+    const priorityUpper = priority ? priority.toUpperCase() : 'L2';
+    const style = priorityStyles[priorityUpper] || priorityStyles[priority?.toLowerCase()] || priorityStyles['L2'];
     
     return (
       <span style={{
@@ -369,7 +448,7 @@ const AppointmentsView = ({
     );
   };
 
-  // Doctor Information Database (unchanged)
+  // Doctor Information Database
   const doctorDatabase = {
     "Dr. Ananya Sharma": {
       specialty: "Pediatrics", 
@@ -381,22 +460,79 @@ const AppointmentsView = ({
       clinic: "Apollo Children's Hospital", 
       address: "123 Health Street, Medical District, Hyderabad"
     },
-    // ... rest of doctorDatabase remains unchanged
+    "Dr. Vikram Patel": {
+      specialty: "Cardiology", 
+      experience: "15+ years", 
+      education: "MBBS, MD, DM - Cardiology",
+      languages: "English, Hindi, Gujarati", 
+      rating: "4.8/5", 
+      about: "Expert in interventional cardiology and heart failure management.",
+      clinic: "Medanta Heart Institute", 
+      address: "456 Cardiac Road, Gurugram"
+    },
+    "Dr. Priya Nair": {
+      specialty: "Dermatology", 
+      experience: "10+ years", 
+      education: "MBBS, MD - Dermatology",
+      languages: "English, Hindi, Malayalam", 
+      rating: "4.7/5", 
+      about: "Specialized in cosmetic dermatology and skin cancer treatments.",
+      clinic: "Skin & Hair Clinic", 
+      address: "789 Beauty Lane, Mumbai"
+    },
+    "Dr. Rohan Desai": {
+      specialty: "Orthopedics", 
+      experience: "18+ years", 
+      education: "MBBS, MS - Orthopedics",
+      languages: "English, Hindi, Marathi", 
+      rating: "4.9/5", 
+      about: "Expert in joint replacements and sports injuries.",
+      clinic: "Bone & Joint Center", 
+      address: "321 Fitness Street, Pune"
+    }
   };
 
-  // Appointment Details Component
-  const AppointmentDetails = ({ appointment, onBack }) => {
-    const doctorInfo = doctorDatabase[appointment.doctorName] || {
-      specialty: appointment.doctorSpecialty || "Medical Specialist",
-      experience: appointment.doctorExperience || "Experienced professional",
+  const getDoctorInfo = (doctorName) => {
+    return doctorDatabase[doctorName] || {
+      specialty: "Medical Specialist",
+      experience: "10+ years", 
       education: "Medical degree",
       languages: "English",
       rating: "4.5/5",
       about: "Qualified medical professional providing excellent care.",
-      clinic: appointment.hospital || "QuickMed Clinic",
+      clinic: "QuickMed Clinic",
       address: "123 Health Street, Medical District"
     };
+  };
 
+  // Format status for display
+  const formatStatusDisplay = (status) => {
+    if (!status) return 'Pending';
+    const statusLower = status.toLowerCase();
+    
+    const statusMap = {
+      'confirmed': 'Confirmed',
+      'scheduled': 'Scheduled',
+      'booked': 'Booked',
+      'active': 'Active',
+      'pending': 'Pending',
+      'waiting': 'Waiting',
+      'upcoming': 'Upcoming',
+      'completed': 'Completed',
+      'finished': 'Completed',
+      'attended': 'Attended',
+      'cancelled': 'Cancelled',
+      'canceled': 'Cancelled',
+      'rejected': 'Rejected',
+      'declined': 'Declined'
+    };
+    
+    return statusMap[statusLower] || status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  // Appointment Details Component
+  const AppointmentDetails = ({ appointment, onBack }) => {
+    const doctorInfo = getDoctorInfo(appointment.doctorName);
     const statusStyle = getStatusColor(appointment.status);
     const paymentStyle = appointment.payment ? getPaymentStatusColor(appointment.payment.status) : null;
     const consultationType = getConsultationType(appointment);
@@ -422,7 +558,7 @@ const AppointmentsView = ({
                   <div style={styles.statusContainer}>
                     <span style={{ ...styles.statusBadge, ...statusStyle }}>
                       <span style={styles.statusIcon}>{statusStyle.icon}</span>
-                      {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1) || 'Pending'}
+                      {formatStatusDisplay(appointment.status)}
                     </span>
                     <span style={styles.idBadge}>
                       <Icons.Info /> ID: {appointment.id}
@@ -430,7 +566,8 @@ const AppointmentsView = ({
                     {appointment.priority && getPriorityBadge(appointment.priority)}
                     <span style={{
                       backgroundColor: consultationType.includes('Video') ? '#00796B' : 
-                                     consultationType.includes('Home') ? '#4DB6AC' : '#009688',
+                                     consultationType.includes('Home') ? '#4DB6AC' : 
+                                     consultationType.includes('Phone') ? '#2196F3' : '#009688',
                       color: 'white',
                       padding: '0.2rem 0.5rem',
                       borderRadius: '10px',
@@ -482,7 +619,7 @@ const AppointmentsView = ({
                   },
                   { 
                     label: 'Hospital/Clinic', 
-                    value: appointment.hospital || doctorInfo.clinic,
+                    value: appointment.hospital || appointment.clinic?.name || doctorInfo.clinic,
                     icon: <Icons.Location />
                   }
                 ].map((item, idx) => (
@@ -509,7 +646,7 @@ const AppointmentsView = ({
                         color: paymentStyle.color
                       }}>
                         <span style={styles.paymentIcon}>{paymentStyle.icon}</span>
-                        {appointment.payment.status.charAt(0).toUpperCase() + appointment.payment.status.slice(1)}
+                        {formatStatusDisplay(appointment.payment.status)}
                       </span>
                     </div>
                     <div style={styles.paymentDetailRow}>
@@ -553,12 +690,17 @@ const AppointmentsView = ({
                     ? 'Home Consultation: Doctor will contact you for address confirmation. Please be available at the scheduled time.' 
                     : consultationType === 'Video Consultation'
                     ? 'Video Consultation: A video call link will be sent to your email 15 minutes before the appointment. Please ensure stable internet connection.'
+                    : consultationType === 'Phone Consultation'
+                    ? 'Phone Consultation: Doctor will call you at the scheduled time. Please ensure your phone is available.'
                     : 'Clinic Appointment: Please arrive 15 minutes before your scheduled time. Bring your ID and any previous medical records.'}
                 </p>
-                {appointment.hospital && consultationType !== 'Home Consultation' && (
+                {(appointment.hospital || appointment.clinic?.name) && 
+                 !consultationType.includes('Home') && 
+                 !consultationType.includes('Video') && 
+                 !consultationType.includes('Phone') && (
                   <p style={styles.notesText}>
                     <span style={styles.noteIcon}><Icons.Location /></span>
-                    <strong>Location:</strong> {appointment.hospital}
+                    <strong>Location:</strong> {appointment.hospital || appointment.clinic?.name}
                   </p>
                 )}
                 {appointment.createdAt && (
@@ -600,13 +742,13 @@ const AppointmentsView = ({
               </div>
             </div>
 
-            {/* Clinic Information */}
-            {consultationType !== 'Home Consultation' && consultationType !== 'Video Consultation' && (
+            {/* Clinic Information for in-person appointments */}
+            {consultationType === 'Clinic Appointment' && (
               <div style={styles.card}>
                 <h3 style={styles.sectionTitle}>Clinic Information</h3>
                 {[
-                  { label: 'Clinic Name', value: doctorInfo.clinic, icon: <Icons.Clinic /> },
-                  { label: 'Address', value: doctorInfo.address, multiline: true, icon: <Icons.Location /> },
+                  { label: 'Clinic Name', value: appointment.hospital || appointment.clinic?.name || doctorInfo.clinic, icon: <Icons.Clinic /> },
+                  { label: 'Address', value: appointment.clinic?.address || appointment.address || doctorInfo.address, multiline: true, icon: <Icons.Location /> },
                   { label: 'Contact', value: '1-800-QUICK-MED\ninfo@quickmed.com', multiline: true, icon: <Icons.Phone /> }
                 ].map((item, idx) => (
                   <div key={idx} style={styles.clinicItem}>
@@ -646,10 +788,31 @@ const AppointmentsView = ({
               <div style={styles.card}>
                 <h3 style={styles.sectionTitle}>Home Consultation Details</h3>
                 {[
-                  { label: 'Service Area', value: `Within 10km radius of ${doctorInfo.clinic}`, icon: <Icons.Location /> },
+                  { label: 'Service Area', value: `Within 10km radius of ${appointment.hospital || appointment.clinic?.name || doctorInfo.clinic}`, icon: <Icons.Location /> },
                   { label: 'Doctor Arrival', value: 'Doctor will arrive within the scheduled time window', icon: <Icons.Clock /> },
                   { label: 'Preparation', value: '• Have medical reports ready\n• Ensure well-lit consultation area\n• Keep emergency contacts handy', multiline: true, icon: <Icons.Info /> },
                   { label: 'Support', value: '1-800-QUICK-HOME\nhome-support@quickmed.com', multiline: true, icon: <Icons.Phone /> }
+                ].map((item, idx) => (
+                  <div key={idx} style={styles.clinicItem}>
+                    <div style={styles.clinicHeader}>
+                      <span style={styles.clinicIcon}>{item.icon}</span>
+                      <strong style={styles.clinicLabel}>{item.label}:</strong>
+                    </div>
+                    <p style={item.multiline ? styles.clinicTextMultiline : styles.clinicText}>{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Phone Consultation Information */}
+            {consultationType === 'Phone Consultation' && (
+              <div style={styles.card}>
+                <h3 style={styles.sectionTitle}>Phone Consultation Details</h3>
+                {[
+                  { label: 'Call From', value: 'Doctor will call from a private number', icon: <Icons.Phone /> },
+                  { label: 'Timing', value: 'Doctor will call at the scheduled appointment time', icon: <Icons.Clock /> },
+                  { label: 'Preparation', value: '• Keep your phone available\n• Find a quiet place for the call\n• Have your medical history ready', multiline: true, icon: <Icons.Info /> },
+                  { label: 'Support', value: '1-800-QUICK-PHONE\nphone-support@quickmed.com', multiline: true, icon: <Icons.Phone /> }
                 ].map((item, idx) => (
                   <div key={idx} style={styles.clinicItem}>
                     <div style={styles.clinicHeader}>
@@ -671,6 +834,15 @@ const AppointmentsView = ({
   if (showDetails && selectedAppointment) {
     return <AppointmentDetails appointment={selectedAppointment} onBack={handleBackToList} />;
   }
+
+  // Filter buttons configuration
+  const filterButtons = [
+    { key: 'all', label: 'All Appointments' },
+    { key: 'confirmed', label: 'Confirmed' },
+    { key: 'pending', label: 'Pending Payment' },
+    { key: 'completed', label: 'Completed' },
+    { key: 'cancelled', label: 'Cancelled' }
+  ];
 
   return (
     <div style={styles.mainContainer}>
@@ -709,21 +881,19 @@ const AppointmentsView = ({
         </div>
 
         <div style={styles.filterContainer}>
-          {['all', 'confirmed', 'pending', 'completed'].map((filter) => (
+          {filterButtons.map(({ key, label }) => (
             <button
-              key={filter}
-              onClick={() => setAppointmentFilter(filter)}
+              key={key}
+              onClick={() => setAppointmentFilter(key)}
               style={{
                 ...styles.filterButton,
-                backgroundColor: appointmentFilter === filter ? '#009688' : 'white',
-                color: appointmentFilter === filter ? 'white' : '#124441',
-                border: `1px solid ${appointmentFilter === filter ? '#009688' : '#4DB6AC'}`
+                backgroundColor: appointmentFilter === key ? '#009688' : 'white',
+                color: appointmentFilter === key ? 'white' : '#124441',
+                border: `1px solid ${appointmentFilter === key ? '#009688' : '#4DB6AC'}`
               }}
               type="button"
             >
-              {filter === 'all' ? 'All Appointments' : 
-               filter === 'confirmed' ? 'Confirmed' :
-               filter === 'pending' ? 'Pending Payment' : 'Completed'}
+              {label}
             </button>
           ))}
         </div>
@@ -767,14 +937,15 @@ const AppointmentsView = ({
                       <div style={styles.statusContainer}>
                         <span style={{ ...styles.statusBadge, ...statusStyle }}>
                           <span style={styles.statusIconSmall}>{statusStyle.icon}</span>
-                          {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1) || 'Pending'}
+                          {formatStatusDisplay(appointment.status)}
                         </span>
                         <span style={styles.idText}>
                           <Icons.Info /> ID: {appointment.id}
                         </span>
                         <span style={{
                           backgroundColor: consultationType.includes('Video') ? '#00796B' : 
-                                         consultationType.includes('Home') ? '#4DB6AC' : '#009688',
+                                         consultationType.includes('Home') ? '#4DB6AC' : 
+                                         consultationType.includes('Phone') ? '#2196F3' : '#009688',
                           color: 'white',
                           padding: '0.2rem 0.5rem',
                           borderRadius: '10px',
@@ -789,10 +960,10 @@ const AppointmentsView = ({
                         </span>
                         {appointment.priority && (
                           <span style={{
-                            backgroundColor: appointment.priority === 'L1' ? '#FEE2E2' : 
-                                         appointment.priority === 'L2' ? '#FEF3C7' : '#D1FAE5',
-                            color: appointment.priority === 'L1' ? '#DC2626' : 
-                                 appointment.priority === 'L2' ? '#D97706' : '#059669',
+                            backgroundColor: appointment.priority === 'L1' || appointment.priority === 'high' ? '#FEE2E2' : 
+                                         appointment.priority === 'L2' || appointment.priority === 'medium' ? '#FEF3C7' : '#D1FAE5',
+                            color: appointment.priority === 'L1' || appointment.priority === 'high' ? '#DC2626' : 
+                                 appointment.priority === 'L2' || appointment.priority === 'medium' ? '#D97706' : '#059669',
                             padding: '0.2rem 0.5rem',
                             borderRadius: '10px',
                             fontSize: '0.7rem',
@@ -801,10 +972,10 @@ const AppointmentsView = ({
                             alignItems: 'center',
                             gap: '0.2rem'
                           }}>
-                            {appointment.priority === 'L1' ? <Icons.PriorityHigh /> : 
-                             appointment.priority === 'L2' ? <Icons.PriorityMedium /> : <Icons.PriorityLow />} 
-                            {appointment.priority === 'L1' ? ' High' : 
-                             appointment.priority === 'L2' ? ' Medium' : ' Low'}
+                            {appointment.priority === 'L1' || appointment.priority === 'high' ? <Icons.PriorityHigh /> : 
+                             appointment.priority === 'L2' || appointment.priority === 'medium' ? <Icons.PriorityMedium /> : <Icons.PriorityLow />} 
+                            {appointment.priority === 'L1' || appointment.priority === 'high' ? ' High' : 
+                             appointment.priority === 'L2' || appointment.priority === 'medium' ? ' Medium' : ' Low'}
                           </span>
                         )}
                         {appointment.payment && (
@@ -814,7 +985,7 @@ const AppointmentsView = ({
                             color: paymentStyle.color
                           }}>
                             <span style={styles.paymentIconSmall}>{paymentStyle.icon}</span>
-                            {appointment.payment.status.charAt(0).toUpperCase() + appointment.payment.status.slice(1)}
+                            {formatStatusDisplay(appointment.payment.status)}
                           </span>
                         )}
                       </div>
@@ -846,7 +1017,9 @@ const AppointmentsView = ({
                           ? 'Home consultation at your location'
                           : consultationType === 'Video Consultation'
                           ? 'Video call consultation'
-                          : 'Clinic appointment at ' + (appointment.hospital || 'QuickMed Clinic')}
+                          : consultationType === 'Phone Consultation'
+                          ? 'Phone consultation'
+                          : 'Clinic appointment at ' + (appointment.hospital || appointment.clinic?.name || 'QuickMed Clinic')}
                       </p>
                       {appointment.payment && (
                         <div style={styles.paymentSummary}>
@@ -1027,7 +1200,6 @@ const styles = {
     fontSize: '0.9rem',
     fontWeight: '600',
     transition: 'all 0.3s ease',
-    textTransform: 'capitalize',
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',

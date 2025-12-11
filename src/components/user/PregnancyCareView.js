@@ -122,7 +122,7 @@ const Icon = ({ name, size = 20, color = '#7C2A62', style = {} }) => {
     ),
     ai: (
       <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={style}>
-        <path d="M21 11.5c0 .36-.04.71-.1 1.05.36.23.7.51 1 .82.15.15.28.32.39.5.23.35.4.74.51 1.16.11.42.15.86.15 1.32 0 1.15-.29 2.19-.78 3.05-.49.86-1.17 1.54-1.97 2.03-.8.49-1.74.73-2.72.73-.57 0-1.11-.09-1.62-.27-.51-.18-.97-.44-1.37-.78-.4-.34-.73-.75-1-1.22-.27-.47-.47-.99-.6-1.56-.13-.57-.2-1.17-.2-1.79 0-1.15.29-2.19.78-3.05.49-.86 1.17-1.54 1.97-2.03.8-.49 1.74-.73 2.72-.73.1 0 .19.01.29.01.31-.47.67-.88 1.07-1.24.4-.36.84-.66 1.32-.91.48-.25.99-.44 1.54-.57.55-.13 1.12-.2 1.71-.2 1.15 0 2.19.29 3.05.78.86.49 1.54 1.17 2.03 1.97.49.8.73 1.74.73 2.72 0 .57-.09 1.11-.27 1.62-.18.51-.44.97-.78 1.37-.34.4-.75.73-1.22 1-.47.27-.99.47-1.56.6-.57.13-1.17.2-1.79.2-.1 0-.19-.01-.29-.01-.31.47-.67.88-1.07 1.24-.4.36-.84.66-1.32.91-.48.25-.99.44-1.54.57-.55.13-1.12.2-1.71.2-1.15 0-2.19-.29-3.05-.78-.86-.49-1.54-1.17-2.03-1.97-.49-.8-.73-1.74-.73-2.72 0-.57.09-1.11.27-1.62.18-.51.44-.97.78-1.37.34-.4.75-.73 1.22-1 .47-.27.99-.47 1.56-.6.57-.13 1.17-.2 1.79-.2h.29c.06-.34.1-.69.1-1.05 0-1.15-.29-2.19-.78-3.05-.49-.86-1.17-1.54-1.97-2.03-.8-.49-1.74-.73-2.72-.73-.57 0-1.11.09-1.62.27-.51.18-.97.44-1.37.78-.4.34-.73.75-1 1.22-.27.47-.47.99-.6 1.56-.13.57-.2 1.17-.2 1.79 0 1.15.29 2.19.78 3.05.49.86 1.17 1.54 1.97 2.03.8.49 1.74.73 2.72.73.1 0 .19-.01.29-.01.31.47.67.88 1.07 1.24.4.36.84.66 1.32.91.48.25.99.44 1.54.57.55.13 1.12.2 1.71.2 1.15 0 2.19-.29 3.05-.78.86-.49 1.54-1.17 2.03-1.97.49-.8.73-1.74.73-2.72 0-.57-.09-1.11-.27-1.62-.18-.51-.44-.97-.78-1.37-.34-.4-.75-.73-1.22-1-.47-.27-.99-.47-1.56-.6-.57-.13-1.17-.2-1.79-.2h-.29c-.06-.34-.1-.69-.1-1.05z"/>
+        <path d="M21 11.5c0 .36-.04.71-.1 1.05.36.23.7.51 1 .82.15.15.28.32.39.5.23.35.4.74.51 1.16.11.42.15.86.15 1.32 0 1.15-.29 2.19-.78 3.05-.49.86-1.17 1.54-1.97 2.03-.80.49-1.74.73-2.72.73-.57 0-1.11-.09-1.62-.27-.51-.18-.97-.44-1.37-.78-.4-.34-.73-.75-1-1.22-.27-.47-.47-.99-.6-1.56-.13-.57-.2-1.17-.2-1.79 0-1.15.29-2.19.78-3.05.49-.86 1.17-1.54 1.97-2.03.8-.49 1.74-.73 2.72-.73.1 0 .19.01.29.01.31-.47.67-.88 1.07-1.24.4-.36.84-.66 1.32-.91.48-.25.99-.44 1.54-.57.55-.13 1.12-.2 1.71-.2 1.15 0 2.19.29 3.05.78.86.49 1.54 1.17 2.03 1.97.49.8.73 1.74.73 2.72 0 .57-.09 1.11-.27 1.62-.18.51-.44.97-.78 1.37-.34.4-.75.73-1.22 1-.47.27-.99.47-1.56.6-.57.13-1.17.2-1.79.2-.1 0-.19-.01-.29-.01-.31.47-.67.88-1.07 1.24-.4.36-.84.66-1.32.91-.48.25-.99.44-1.54.57-.55.13-1.12.2-1.71.2-1.15 0-2.19-.29-3.05-.78-.86-.49-1.54-1.17-2.03-1.97-.49-.8-.73-1.74-.73-2.72 0-.57.09-1.11.27-1.62.18-.51.44-.97.78-1.37.34-.4.75-.73 1.22-1 .47-.27.99-.47 1.56-.6.57-.13 1.17-.2 1.79-.2h.29c.06-.34.1-.69.1-1.05 0-1.15-.29-2.19-.78-3.05-.49-.86-1.17-1.54-1.97-2.03-.8-.49-1.74-.73-2.72-.73-.57 0-1.11.09-1.62.27-.51.18-.97.44-1.37.78-.4.34-.73.75-1 1.22-.27.47-.47.99-.6 1.56-.13.57-.2 1.17-.2 1.79 0 1.15.29 2.19.78 3.05.49.86 1.17 1.54 1.97 2.03.8.49 1.74.73 2.72.73.1 0 .19-.01.29-.01.31.47.67.88 1.07 1.24.4.36.84.66 1.32.91.48.25.99.44 1.54.57.55.13 1.12.2 1.71.2 1.15 0 2.19-.29 3.05-.78.86-.49 1.54-1.17 2.03-1.97.49-.8.73-1.74.73-2.72 0-.57-.09-1.11-.27-1.62-.18-.51-.44-.97-.78-1.37-.34-.4-.75-.73-1.22-1-.47-.27-.99-.47-1.56-.6-.57-.13-1.17-.2-1.79-.2h-.29c-.06-.34-.1-.69-.1-1.05z"/>
       </svg>
     ),
     progress: (
@@ -226,6 +226,16 @@ const Icon = ({ name, size = 20, color = '#7C2A62', style = {} }) => {
         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
       </svg>
     ),
+    mail: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={style}>
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+      </svg>
+    ),
+    copy: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={style}>
+        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+      </svg>
+    ),
     default: (
       <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={style}>
         <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
@@ -297,7 +307,7 @@ const PREGNANCY_CARE_PACKAGES = [
   }
 ];
 
-// 9-Month Pregnancy Diet Plans
+// 9-Month Pregnancy Diet Plans - COMPLETE AND FIXED
 const PREGNANCY_DIET_PLANS = {
   1: {
     month: 1,
@@ -339,7 +349,13 @@ const PREGNANCY_DIET_PLANS = {
       snack: 'Cottage cheese with pineapple chunks',
       dinner: 'Baked salmon with sweet potato and broccoli',
       bedtime: 'Chamomile tea'
-    }
+    },
+    tips: [
+      'Include protein in every meal',
+      'Focus on calcium-rich foods',
+      'Limit caffeine to 200mg per day',
+      'Get moderate exercise'
+    ]
   },
   3: {
     month: 3,
@@ -349,7 +365,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Walnuts', 'Eggs', 'Lean beef', 'Dairy products'],
       avoid: ['Raw sprouts', 'Undercooked eggs', 'High-sodium foods']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Scrambled eggs with spinach',
+      snack: 'Walnuts and dried apricots',
+      lunch: 'Lean beef stir-fry with vegetables',
+      snack: 'Greek yogurt with honey',
+      dinner: 'Baked chicken with quinoa',
+      bedtime: 'Herbal tea'
+    },
+    tips: [
+      'Include omega-3 rich foods daily',
+      'Eat iodine-rich foods for thyroid health',
+      'Cook eggs thoroughly',
+      'Stay active with light exercises'
+    ]
   },
   4: {
     month: 4,
@@ -359,7 +389,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Dairy', 'Leafy greens', 'Fish', 'Nuts and seeds'],
       avoid: ['Alcohol', 'Excess caffeine', 'Processed foods']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Greek yogurt with granola and berries',
+      snack: 'Cheese cubes with whole grain crackers',
+      lunch: 'Spinach salad with salmon',
+      snack: 'Almonds and raisins',
+      dinner: 'Grilled fish with roasted vegetables',
+      bedtime: 'Warm milk'
+    },
+    tips: [
+      'Get sunlight for Vitamin D',
+      'Include dairy products daily',
+      'Eat magnesium-rich foods',
+      'Stay hydrated'
+    ]
   },
   5: {
     month: 5,
@@ -369,7 +413,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Lean meats', 'Citrus fruits', 'Legumes', 'Whole grains'],
       avoid: ['Raw shellfish', 'Soft cheeses', 'Deli meats']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Fortified cereal with milk and orange juice',
+      snack: 'Orange slices',
+      lunch: 'Lentil curry with brown rice',
+      snack: 'Hard-boiled egg',
+      dinner: 'Lean steak with steamed broccoli',
+      bedtime: 'Chamomile tea'
+    },
+    tips: [
+      'Pair iron-rich foods with Vitamin C',
+      'Eat lean protein at every meal',
+      'Cook meats thoroughly',
+      'Monitor weight gain'
+    ]
   },
   6: {
     month: 6,
@@ -379,7 +437,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Avocado', 'Nuts', 'Olive oil', 'Fatty fish'],
       avoid: ['Trans fats', 'Fried foods', 'Sugary drinks']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Avocado toast with eggs',
+      snack: 'Mixed nuts',
+      lunch: 'Tuna salad sandwich',
+      snack: 'Apple with almond butter',
+      dinner: 'Salmon with asparagus',
+      bedtime: 'Herbal infusion'
+    },
+    tips: [
+      'Include healthy fats in meals',
+      'Eat omega-3 rich fish twice a week',
+      'Choose whole foods over processed',
+      'Stay active with walking'
+    ]
   },
   7: {
     month: 7,
@@ -389,7 +461,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Bell peppers', 'Carrots', 'Berries', 'Garlic'],
       avoid: ['Raw honey', 'Unpasteurized juices', 'High-mercury fish']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Berry smoothie with spinach',
+      snack: 'Carrot sticks with hummus',
+      lunch: 'Chicken vegetable soup',
+      snack: 'Strawberries with yogurt',
+      dinner: 'Turkey meatballs with tomato sauce',
+      bedtime: 'Ginger tea'
+    },
+    tips: [
+      'Eat colorful vegetables daily',
+      'Include immune-boosting foods',
+      'Cook vegetables lightly',
+      'Stay hydrated with water'
+    ]
   },
   8: {
     month: 8,
@@ -399,7 +485,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Whole grains', 'Legumes', 'Dairy', 'Leafy greens'],
       avoid: ['Large meals', 'Spicy foods', 'Gas-producing foods']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Oatmeal with dates and nuts',
+      snack: 'Prunes and yogurt',
+      lunch: 'Bean burrito with whole wheat tortilla',
+      snack: 'Cottage cheese with fruit',
+      dinner: 'Chicken and vegetable stir-fry with brown rice',
+      bedtime: 'Warm milk with turmeric'
+    },
+    tips: [
+      'Eat small, frequent meals',
+      'Include fiber to prevent constipation',
+      'Focus on complex carbohydrates',
+      'Rest when needed'
+    ]
   },
   9: {
     month: 9,
@@ -409,7 +509,21 @@ const PREGNANCY_DIET_PLANS = {
     foods: {
       recommended: ['Leafy greens', 'Lean meats', 'Whole grains', 'Dates'],
       avoid: ['Heavy meals', 'New foods', 'Excess sugar']
-    }
+    },
+    sampleDay: {
+      breakfast: 'Date and nut energy balls',
+      snack: 'Banana with peanut butter',
+      lunch: 'Lean beef stew with vegetables',
+      snack: 'Greek yogurt with honey',
+      dinner: 'Baked fish with quinoa and spinach',
+      bedtime: 'Raspberry leaf tea'
+    },
+    tips: [
+      'Eat dates daily for labor preparation',
+      'Focus on iron-rich foods',
+      'Stay hydrated',
+      'Prepare easy-to-digest meals'
+    ]
   }
 };
 
@@ -436,12 +550,17 @@ const PregnancyCareView = ({
   const [pregnancyData, setPregnancyData] = useState(INITIAL_PREGNANCY_DATA);
   const [medicalReports, setMedicalReports] = useState([]);
   const [uploadingFile, setUploadingFile] = useState(false);
+  
+  // Fixed vitals state with all possible vital types
   const [vitals, setVitals] = useState({
     bloodPressure: { value: '120/80', date: '2024-01-20', trend: 'stable' },
     weight: { value: '65 kg', date: '2024-01-20', trend: '+0.5kg/week' },
     bloodSugar: { value: '95 mg/dL', date: '2024-01-20', trend: 'normal' },
     temperature: { value: '36.8°C', date: '2024-01-20', trend: 'normal' },
+    heartRate: { value: '', date: '', trend: '' },
+    fetalHeartRate: { value: '', date: '', trend: '' }
   });
+  
   const [showAddVitalModal, setShowAddVitalModal] = useState(false);
   const [newVital, setNewVital] = useState({ type: '', value: '', date: '', notes: '' });
   const fileInputRef = useRef(null);
@@ -466,6 +585,16 @@ const PregnancyCareView = ({
   const [regeneratingPlan, setRegeneratingPlan] = useState(false);
   const [showRegenerationModal, setShowRegenerationModal] = useState(false);
   const [regenerationProgress, setRegenerationProgress] = useState(0);
+
+  // NEW: Payment modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPackageForPayment, setSelectedPackageForPayment] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  // NEW: Share with Doctor modal state
+  const [showShareDoctorModal, setShowShareDoctorModal] = useState(false);
+  const [shareDoctorData, setShareDoctorData] = useState(null);
 
   const realTimeDietData = [
     { time: 'Breakfast (8:00 AM)', meals: ['Oatmeal with berries and almonds (300 cal)'], recommendation: 'High in protein and fiber', nutrients: 'Protein: 25g, Fiber: 8g' },
@@ -676,6 +805,29 @@ const PregnancyCareView = ({
     addNotification('Subscription Plans', 'Please select a pregnancy care package to access premium features', 'info');
   };
 
+  // Handle share with doctor link
+  const handleShareWithDoctorLink = (packageData = null) => {
+    const shareData = {
+      title: packageData ? `Pregnancy Care Package - ${packageData.title}` : 'Pregnancy Health Records',
+      text: packageData 
+        ? `I'm interested in the ${packageData.title} package for my pregnancy care. Please review and share your recommendations.`
+        : 'Please review my pregnancy health records and vitals for your expert opinion.',
+      type: packageData ? 'package' : 'records',
+      data: packageData || {
+        vitals: Object.entries(vitals).filter(([key, val]) => val.value && val.value.trim() !== ''),
+        reports: medicalReports.length,
+        currentWeek: pregnancyData.currentWeek
+      },
+      timestamp: new Date().toLocaleString(),
+      // Generate a unique share link
+      shareLink: `${window.location.origin}/doctor-share/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      accessCode: Math.random().toString(36).substr(2, 8).toUpperCase()
+    };
+
+    setShareDoctorData(shareData);
+    setShowShareDoctorModal(true);
+  };
+
   // Regenerate AI diet plan - UPDATED FUNCTION
   const handleRegenerateAIPlan = () => {
     // Optional: Show a demo mode message for non-premium users
@@ -703,7 +855,7 @@ const PregnancyCareView = ({
       });
     }, 500);
 
-    // Get current month's focus
+    // Get current month's focus - SAFE ACCESS
     const monthPlan = PREGNANCY_DIET_PLANS[currentMonth] || PREGNANCY_DIET_PLANS[1];
     
     // Simulate AI processing delay
@@ -735,8 +887,8 @@ const PregnancyCareView = ({
           aiGenerated: true,
           timestamp: new Date().toLocaleTimeString(),
           month: currentMonth,
-          focus: monthPlan.focus,
-          calories: monthPlan.dailyCalories + Math.floor(Math.random() * 100) - 50 // Random variation
+          focus: monthPlan?.focus || 'Nutrition & Health',
+          calories: (monthPlan?.dailyCalories || 2200) + Math.floor(Math.random() * 100) - 50 // Random variation
         };
       });
 
@@ -794,8 +946,10 @@ const PregnancyCareView = ({
       9: 'Vitamin K for labor preparation'
     };
 
-    const baseRec = recommendations[timeOfDay][mealIndex % recommendations[timeOfDay].length];
-    return `${baseRec}. ${specificRecs[month] || 'Tailored for your pregnancy stage.'}`;
+    const baseRec = recommendations[timeOfDay]?.[mealIndex % (recommendations[timeOfDay]?.length || 3)] || 'Balanced nutrition for pregnancy';
+    const specificRec = specificRecs[month] || 'Tailored for your pregnancy stage.';
+    
+    return `${baseRec}. ${specificRec}`;
   };
 
   // Generate nutrient information
@@ -812,7 +966,7 @@ const PregnancyCareView = ({
       9: { protein: '20-25g', fiber: '8-10g', vitaminK: '100% DV', carbs: '45g' }
     };
 
-    const profile = nutrientProfiles[month] || nutrientProfiles[1];
+    const profile = nutrientProfiles[month] || nutrientProfiles[1] || {};
     const nutrients = Object.entries(profile).map(([key, value]) => 
       `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`
     ).join(', ');
@@ -826,7 +980,7 @@ const PregnancyCareView = ({
       title: `Pregnancy Diet Plan - Month ${currentMonth}`,
       text: `Check out my AI-optimized pregnancy diet plan for Month ${currentMonth}: ${PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Pregnancy Nutrition'}`,
       month: currentMonth,
-      focus: PREGNANCY_DIET_PLANS[currentMonth]?.focus,
+      focus: PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Nutrition & Health',
       plan: aiDietPlan.slice(0, 3), // Share first 3 meals as preview
       timestamp: new Date().toLocaleString(),
       url: window.location.href
@@ -865,63 +1019,6 @@ const PregnancyCareView = ({
     }
   };
 
-  // Handle specific share option
-  const handleShareOption = (option) => {
-    if (!shareOptions?.data) return;
-
-    switch(option) {
-      case 'Copy Link':
-        navigator.clipboard.writeText(shareOptions.data.url)
-          .then(() => {
-            addNotification('Link Copied', 'Diet plan link copied to clipboard', 'success');
-          })
-          .catch(err => {
-            console.error('Failed to copy:', err);
-            addNotification('Share Error', 'Failed to copy link', 'alert');
-          });
-        break;
-        
-      case 'Send Email':
-        const emailSubject = encodeURIComponent(shareOptions.data.title);
-        const emailBody = encodeURIComponent(
-          `${shareOptions.data.text}\n\n` +
-          `Sample Meals:\n${shareOptions.data.plan.map(meal => `• ${meal.time}: ${meal.meals[0]}`).join('\n')}\n\n` +
-          `Generated: ${shareOptions.data.timestamp}\n\n` +
-          `View full plan: ${shareOptions.data.url}`
-        );
-        window.open(`mailto:?subject=${emailSubject}&body=${emailBody}`, '_blank');
-        addNotification('Email Opened', 'Email client opened with diet plan details', 'info');
-        break;
-        
-      case 'Download PDF':
-        // Simulate PDF download
-        const link = document.createElement('a');
-        link.href = '#';
-        link.download = `Pregnancy-Diet-Plan-Month-${currentMonth}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        addNotification(
-          'PDF Downloaded',
-          `Diet plan PDF for Month ${currentMonth} downloaded successfully`,
-          'download'
-        );
-        break;
-        
-      case 'Share with Doctor':
-        // Simulate sharing with doctor
-        addNotification(
-          'Shared with Doctor',
-          'Diet plan shared with your doctor for review',
-          'share'
-        );
-        break;
-    }
-    
-    setShowShareModal(false);
-  };
-
   // Initialize user data
   useEffect(() => {
     setMedicalReports([
@@ -950,15 +1047,21 @@ const PregnancyCareView = ({
     generateMonthlyDietPlan();
   }, []);
 
-  // Generate monthly diet plan
+  // Generate monthly diet plan - FIXED FUNCTION
   const generateMonthlyDietPlan = () => {
+    // Use safe access with defaults
     const monthPlan = PREGNANCY_DIET_PLANS[currentMonth] || PREGNANCY_DIET_PLANS[1];
+    
+    // Ensure all properties exist with defaults
+    const focus = monthPlan?.focus || 'Nutrition & Health';
+    const dailyCalories = monthPlan?.dailyCalories || 2200;
+    
     const updatedPlan = realTimeDietData.map(meal => ({
       ...meal,
       meals: meal.meals.map(m => `${m} [Month ${currentMonth} Optimized]`),
       month: currentMonth,
-      focus: monthPlan.focus,
-      calories: monthPlan.dailyCalories
+      focus: focus,
+      calories: dailyCalories
     }));
     
     setAiDietPlan(updatedPlan);
@@ -966,7 +1069,7 @@ const PregnancyCareView = ({
     if (hasPremiumAccess()) {
       addNotification(
         'Diet Plan Updated',
-        `Your ${monthPlan.focus} diet plan for Month ${currentMonth} is ready!`,
+        `Your ${focus} diet plan for Month ${currentMonth} is ready!`,
         'health'
       );
     }
@@ -981,17 +1084,38 @@ const PregnancyCareView = ({
     }
   };
 
+  // NEW: Handle payment modal open
+  const handlePaymentModalOpen = (packageItem) => {
+    setSelectedPackageForPayment(packageItem);
+    setShowPaymentModal(true);
+  };
+
+  // NEW: Handle payment submission
+  const handlePaymentSubmit = async () => {
+    if (!selectedPackageForPayment) return;
+    
+    setPaymentProcessing(true);
+    
+    // Simulate payment processing
+    setTimeout(() => {
+      setPaymentProcessing(false);
+      setShowPaymentModal(false);
+      
+      // Show success message
+      addNotification(
+        'Payment Successful',
+        `Your ${selectedPackageForPayment.title} package has been activated!`,
+        'success'
+      );
+      
+      // Reset selected package
+      setSelectedPackageForPayment(null);
+    }, 2000);
+  };
+
   // Handle subscription selection in PregnancyCareView
   const handleSubscribeInPregnancy = (plan) => {
-    if (handleSubscribe) {
-      handleSubscribe(plan);
-    } else {
-      // Fallback to local state if parent function not provided
-      setSelectedSubscription(plan);
-      if (setShowSubscriptionModal) {
-        setShowSubscriptionModal(true);
-      }
-    }
+    handlePaymentModalOpen(plan);
   };
 
   // Handle package upgrade in PregnancyCareView
@@ -1009,21 +1133,7 @@ const PregnancyCareView = ({
       return;
     }
     
-    if (handleUpgradeSubscription) {
-      handleUpgradeSubscription({
-        planType: 'pregnancyCare',
-        subscription: activePregnancyPackage,
-        newPackage: newPackage
-      });
-    } else {
-      // Fallback to local state
-      setSelectedUpgradePlan({
-        planType: 'pregnancyCare',
-        subscription: activePregnancyPackage,
-        newPackage: newPackage
-      });
-      setShowUpgradeModal(true);
-    }
+    handlePaymentModalOpen(newPackage);
   };
 
   // Mark medicine as taken
@@ -1145,7 +1255,7 @@ const PregnancyCareView = ({
     }
   };
 
-  // Vital functions
+  // Vital functions - FIXED
   const addVitalRecord = () => {
     // Validate required fields
     if (!newVital.type || !newVital.value || !newVital.date) {
@@ -1175,14 +1285,35 @@ const PregnancyCareView = ({
       return;
     }
 
-    const key = newVital.type.toLowerCase().replace(/\s+/g, '');
+    // FIXED: Create consistent key names that match initial state
+    const getVitalKey = (type) => {
+      const keyMap = {
+        'Blood Pressure': 'bloodPressure',
+        'Weight': 'weight',
+        'Blood Sugar': 'bloodSugar',
+        'Temperature': 'temperature',
+        'Heart Rate': 'heartRate',
+        'Fetal Heart Rate': 'fetalHeartRate'
+      };
+      return keyMap[type] || type.toLowerCase().replace(/\s+/g, '');
+    };
+
+    const key = getVitalKey(newVital.type);
+    
+    // Check if this vital type already exists
+    if (vitals[key] && vitals[key].value && !window.confirm(`A ${newVital.type} record already exists. Do you want to update it?`)) {
+      return;
+    }
+
     setVitals(prev => ({
       ...prev,
       [key]: {
         value: newVital.value.trim(),
         date: newVital.date,
         trend: calculateTrend(newVital.type, newVital.value, prev[key]?.value),
-        notes: newVital.notes || ''
+        notes: newVital.notes || '',
+        // Add timestamp to differentiate entries
+        timestamp: new Date().toISOString()
       }
     }));
 
@@ -1192,30 +1323,48 @@ const PregnancyCareView = ({
     addNotification('Vital Recorded', `${newVital.type} recorded successfully`, 'health');
   };
 
+  // Fixed calculateTrend function
   const calculateTrend = (type, newValue, oldValue) => {
-    if (!oldValue) return 'new';
+    if (!oldValue || oldValue === '') return 'new';
     
-    if (type === 'Blood Pressure') {
-      const [newSys, newDia] = newValue.split('/').map(Number);
-      const [oldSys, oldDia] = oldValue.split('/').map(Number);
-      if (newSys > oldSys + 10 || newDia > oldDia + 10) return 'increasing';
-      if (newSys < oldSys - 10 || newDia < oldDia - 10) return 'decreasing';
+    try {
+      if (type === 'Blood Pressure') {
+        const [newSys, newDia] = newValue.split('/').map(Number);
+        const [oldSys, oldDia] = oldValue.split('/').map(Number);
+        if (isNaN(newSys) || isNaN(newDia) || isNaN(oldSys) || isNaN(oldDia)) return 'stable';
+        if (newSys > oldSys + 10 || newDia > oldDia + 10) return 'increasing';
+        if (newSys < oldSys - 10 || newDia < oldDia - 10) return 'decreasing';
+        return 'stable';
+      }
+      
+      if (type === 'Weight') {
+        const newWeight = parseFloat(newValue);
+        const oldWeight = parseFloat(oldValue);
+        if (isNaN(newWeight) || isNaN(oldWeight)) return 'stable';
+        if (newWeight > oldWeight + 1) return 'increasing';
+        if (newWeight < oldWeight - 1) return 'decreasing';
+        return 'stable';
+      }
+      
+      // For other numeric vitals
+      if (type === 'Heart Rate' || type === 'Fetal Heart Rate' || type === 'Blood Sugar' || type === 'Temperature') {
+        const newNum = parseFloat(newValue);
+        const oldNum = parseFloat(oldValue);
+        if (isNaN(newNum) || isNaN(oldNum)) return 'stable';
+        const diff = newNum - oldNum;
+        if (Math.abs(diff) < 0.1) return 'stable';
+        return diff > 0 ? 'increasing' : 'decreasing';
+      }
+      
+      return 'stable';
+    } catch (error) {
+      console.error('Error calculating trend:', error);
       return 'stable';
     }
-    
-    if (type === 'Weight') {
-      const newWeight = parseFloat(newValue);
-      const oldWeight = parseFloat(oldValue);
-      if (newWeight > oldWeight + 1) return 'increasing';
-      if (newWeight < oldWeight - 1) return 'decreasing';
-      return 'stable';
-    }
-    
-    return 'stable';
   };
 
   const openShareVitalsModal = () => {
-    setSelectedVitalsToShare(Object.keys(vitals));
+    setSelectedVitalsToShare(Object.keys(vitals).filter(key => vitals[key].value && vitals[key].value.trim() !== ''));
     setShowShareVitalsModal(true);
   };
 
@@ -1256,13 +1405,15 @@ const PregnancyCareView = ({
     </button>
   );
 
-  // Pregnancy Care Packages Section
+  // Pregnancy Care Packages Section - UPDATED with side-by-side layout
   const PregnancyPackagesSection = () => (
     <div className="subscription-plans-section">
-      <h3><Icon name="package" size={24} /> Pregnancy Care Packages</h3>
-      <p>Choose the perfect care package for your pregnancy journey</p>
+      <div className="section-header">
+        <h3><Icon name="package" size={24} /> Pregnancy Care Packages</h3>
+        <p>Choose the perfect care package for your pregnancy journey</p>
+      </div>
       
-      <div className="subscription-cards-grid">
+      <div className="packages-container">
         {PREGNANCY_CARE_PACKAGES.map(pkg => {
           const isActive = activePregnancyPackage?.planId === pkg.id;
           const canUpgrade = activePregnancyPackage && 
@@ -1271,14 +1422,17 @@ const PregnancyCareView = ({
           return (
             <div
               key={pkg.id}
-              className={`subscription-card ${isActive ? 'active' : ''} ${pkg.popular ? 'popular' : ''}`}
+              className={`package-card ${pkg.popular ? 'popular' : ''} ${isActive ? 'active' : ''}`}
             >
               {pkg.popular && <div className="popular-badge">MOST POPULAR</div>}
               
-              <div className="subscription-header">
+              <div className="package-header">
                 <h4>{pkg.title}</h4>
-                <div className="subscription-price">
-                  <span className="price"><Icon name="rupee" size={28} />{pkg.price.toLocaleString()}</span>
+                <div className="package-price">
+                  <span className="price">
+                    <Icon name="rupee" size={28} />
+                    {pkg.price.toLocaleString()}
+                  </span>
                   <span className="duration">{pkg.duration}</span>
                 </div>
                 <div className="patients-enrolled">
@@ -1286,7 +1440,7 @@ const PregnancyCareView = ({
                 </div>
               </div>
               
-              <div className="subscription-features">
+              <div className="package-features">
                 <ul>
                   {pkg.features.map((feature, index) => (
                     <li key={index}>
@@ -1302,7 +1456,14 @@ const PregnancyCareView = ({
                   className="details-button"
                   onClick={() => showPackageDetails(pkg)}
                 >
-                  <Icon name="info" size={16} /> Explain Package
+                  <Icon name="info" size={16} /> Package Details
+                </button>
+                
+                <button 
+                  className="share-button"
+                  onClick={() => handleShareWithDoctorLink(pkg)}
+                >
+                  <Icon name="share" size={16} /> Share with Doctor
                 </button>
                 
                 {isActive ? (
@@ -1334,6 +1495,16 @@ const PregnancyCareView = ({
       </div>
     </div>
   );
+
+  // Add useEffect to handle month changes safely
+  useEffect(() => {
+    // Ensure current month is valid (1-9)
+    if (currentMonth < 1) setCurrentMonth(1);
+    if (currentMonth > 9) setCurrentMonth(9);
+    
+    // Generate diet plan when month changes
+    generateMonthlyDietPlan();
+  }, [currentMonth]);
 
   return (
     <div className="pregnancy-container">
@@ -1465,25 +1636,38 @@ const PregnancyCareView = ({
                       <button className="secondary-button" onClick={() => setShowAddVitalModal(true)}>
                         <Icon name="edit" size={16} /> Add Vital
                       </button>
-                      <button className="button" onClick={openShareVitalsModal}>
+                      <button className="button" onClick={() => handleShareWithDoctorLink()}>
                         <Icon name="share" size={16} /> Share with Doctor
                       </button>
                     </div>
                   </div>
                   
                   <div className="grid">
-                    {Object.entries(vitals).map(([key, data]) => (
-                      <div key={key} className="vital-card">
-                        <Icon name={key === 'bloodPressure' ? 'activity' : key === 'weight' ? 'scale' : 'thermometer'} size={28} />
-                        <div className="vital-info">
-                          <h4>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h4>
-                          <p>{data.value}</p>
-                          <div className="vital-details">
-                            <span>Trend: {data.trend}</span>
-                            <span>Last: {data.date}</span>
+                    {Object.entries(vitals)
+                      .filter(([key, data]) => data.value && data.value.trim() !== '') // Only show vitals with values
+                      .map(([key, data]) => (
+                        <div key={key} className="vital-card">
+                          <Icon name={
+                            key === 'bloodPressure' ? 'activity' : 
+                            key === 'weight' ? 'scale' : 
+                            key === 'temperature' ? 'thermometer' :
+                            key === 'heartRate' ? 'heart' :
+                            key === 'fetalHeartRate' ? 'baby' :
+                            'activity'
+                          } size={28} />
+                          <div className="vital-info">
+                            <h4>{key === 'bloodPressure' ? 'Blood Pressure' : 
+                                 key === 'bloodSugar' ? 'Blood Sugar' : 
+                                 key === 'heartRate' ? 'Heart Rate' : 
+                                 key === 'fetalHeartRate' ? 'Fetal Heart Rate' :
+                                 key.charAt(0).toUpperCase() + key.slice(1)}</h4>
+                            <p>{data.value}</p>
+                            <div className="vital-details">
+                              <span>Trend: {data.trend || 'new'}</span>
+                              <span>Last: {data.date}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
                     ))}
                   </div>
                 </div>
@@ -1522,7 +1706,7 @@ const PregnancyCareView = ({
                           <div className="file-icon"><Icon name={report.type === 'ultrasound' ? 'ultrasound' : 'file'} size={24} /></div>
                           <div className="file-actions">
                             <button className="icon-btn" onClick={() => downloadReport(report)} title="Download"><Icon name="download" size={18} /></button>
-                            <button className="icon-btn" title="Share with Doctor"><Icon name="share" size={18} /></button>
+                            <button className="icon-btn" onClick={() => handleShareWithDoctorLink()} title="Share with Doctor"><Icon name="share" size={18} /></button>
                             <button className="icon-btn" onClick={() => deleteReport(report.id)} title="Delete"><Icon name="trash" size={18} /></button>
                           </div>
                         </div>
@@ -1548,50 +1732,79 @@ const PregnancyCareView = ({
                   <div className="diet-header">
                     <div>
                       <h3>Real-Time AI Diet Plan</h3>
-                      <p>Month {currentMonth} of Pregnancy: {PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Early Nutrition'}</p>
+                      <p className="month-display">Month {currentMonth} Focus</p>
                     </div>
                     <div className="diet-controls">
-                      <div className="month-navigation">
-                        <button onClick={() => navigateMonth(-1)} disabled={currentMonth <= 1}>
+                      <div className="month-navigation-stable">
+                        <button 
+                          className="month-nav-btn" 
+                          onClick={() => navigateMonth(-1)} 
+                          disabled={currentMonth <= 1}
+                        >
                           <Icon name="arrowLeft" size={16} /> Prev
                         </button>
-                        <span className="current-month">Month {currentMonth}</span>
-                        <button onClick={() => navigateMonth(1)} disabled={currentMonth >= 9}>
+                        <div className="current-month-display">
+                          <div className="month-text">CURRENT MONTH</div>
+                          <div className="month-number">Month {currentMonth}</div>
+                          <div className="month-focus">
+                            {PREGNANCY_DIET_PLANS[currentMonth]?.focus?.split('&')[0]?.trim() || 'Nutrition & Health'}
+                          </div>
+                        </div>
+                        <button 
+                          className="month-nav-btn" 
+                          onClick={() => navigateMonth(1)} 
+                          disabled={currentMonth >= 9}
+                        >
                           Next <Icon name="arrowRight" size={16} />
                         </button>
                       </div>
-                      <button 
-                        className="secondary-button" 
-                        onClick={handleRegenerateAIPlan}
-                        disabled={regeneratingPlan}
-                      >
-                        {regeneratingPlan ? (
-                          <>
-                            <span className="spinner" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid #f3f3f3', borderTop: '2px solid #3498db', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
-                            Regenerating...
-                          </>
-                        ) : (
-                          <>
-                            <Icon name="refresh" size={16} /> Regenerate AI Plan
-                          </>
-                        )}
-                      </button>
-                      <button 
-                        className="button" 
-                        onClick={handleSharePlan}
-                      >
-                        <Icon name="share" size={16} /> Share
-                      </button>
+                      
+                      <div className="diet-action-buttons">
+                        <button 
+                          className="secondary-button" 
+                          onClick={handleRegenerateAIPlan}
+                          disabled={regeneratingPlan}
+                        >
+                          {regeneratingPlan ? (
+                            <>
+                              <span className="spinner" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid #f3f3f3', borderTop: '2px solid #3498db', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                              Regenerating...
+                            </>
+                          ) : (
+                            <>
+                              <Icon name="refresh" size={16} /> Regenerate AI Plan
+                            </>
+                          )}
+                        </button>
+                        <button 
+                          className="button" 
+                          onClick={handleSharePlan}
+                        >
+                          <Icon name="share" size={16} /> Share
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Month-specific diet information */}
-                  <div className="diet-plan-month">
-                    <h4><Icon name="calendar" size={20} /> Month {currentMonth} Focus</h4>
-                    <p><strong>{PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Early Nutrition'}</strong></p>
-                    <div className="flex-between mt-15">
-                      <span>Daily Calories: {PREGNANCY_DIET_PLANS[currentMonth]?.dailyCalories || 2200}</span>
-                      <span>Key Nutrients: {PREGNANCY_DIET_PLANS[currentMonth]?.keyNutrients?.join(', ') || 'Folic Acid, Iron'}</span>
+                  {/* Month-specific stats - FIXED with safe access */}
+                  <div className="month-stats-grid">
+                    <div className="month-stat">
+                      <div className="stat-label">Daily Calories</div>
+                      <div className="stat-value">
+                        {PREGNANCY_DIET_PLANS[currentMonth]?.dailyCalories || 2200}
+                      </div>
+                    </div>
+                    <div className="month-stat">
+                      <div className="stat-label">Key Nutrients</div>
+                      <div className="stat-value-nutrients">
+                        {PREGNANCY_DIET_PLANS[currentMonth]?.keyNutrients?.slice(0, 3).join(', ') || 'Folic Acid, Iron'}
+                      </div>
+                    </div>
+                    <div className="month-stat">
+                      <div className="stat-label">Recommended Foods</div>
+                      <div className="stat-value-foods">
+                        {PREGNANCY_DIET_PLANS[currentMonth]?.foods?.recommended?.slice(0, 3).join(', ') || 'Leafy greens, Citrus fruits'}
+                      </div>
                     </div>
                   </div>
 
@@ -1627,12 +1840,12 @@ const PregnancyCareView = ({
                     ))}
                   </div>
                   
-                  {/* Premium tips for current month */}
+                  {/* Premium tips for current month - FIXED with safe access */}
                   {hasPremiumAccess() && PREGNANCY_DIET_PLANS[currentMonth]?.tips && (
                     <div className="card mt-30">
                       <h4><Icon name="ai" size={20} /> Premium Tips for Month {currentMonth}</h4>
                       <ul style={{ paddingLeft: '20px' }}>
-                        {PREGNANCY_DIET_PLANS[currentMonth].tips.map((tip, idx) => (
+                        {(PREGNANCY_DIET_PLANS[currentMonth].tips || []).map((tip, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{tip}</li>
                         ))}
                       </ul>
@@ -1913,18 +2126,26 @@ const PregnancyCareView = ({
             <div className="modal-body">
               <p>Select which vitals you want to share:</p>
               <div className="vital-selection">
-                {Object.entries(vitals).map(([key, data]) => (
-                  <label key={key} className="vital-checkbox">
-                    <input 
-                      type="checkbox" 
-                      checked={selectedVitalsToShare.includes(key)} 
-                      onChange={(e) => {
-                        if (e.target.checked) setSelectedVitalsToShare([...selectedVitalsToShare, key]);
-                        else setSelectedVitalsToShare(selectedVitalsToShare.filter(k => k !== key));
-                      }} 
-                    />
-                    <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: {data.value}</span>
-                  </label>
+                {Object.entries(vitals)
+                  .filter(([key, data]) => data.value && data.value.trim() !== '')
+                  .map(([key, data]) => (
+                    <label key={key} className="vital-checkbox">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedVitalsToShare.includes(key)} 
+                        onChange={(e) => {
+                          if (e.target.checked) setSelectedVitalsToShare([...selectedVitalsToShare, key]);
+                          else setSelectedVitalsToShare(selectedVitalsToShare.filter(k => k !== key));
+                        }} 
+                      />
+                      <span>
+                        {key === 'bloodPressure' ? 'Blood Pressure' : 
+                         key === 'bloodSugar' ? 'Blood Sugar' : 
+                         key === 'heartRate' ? 'Heart Rate' : 
+                         key === 'fetalHeartRate' ? 'Fetal Heart Rate' :
+                         key.charAt(0).toUpperCase() + key.slice(1)}: {data.value}
+                      </span>
+                    </label>
                 ))}
               </div>
             </div>
@@ -2094,7 +2315,6 @@ const PregnancyCareView = ({
                     alert('Please select a sharing option');
                     return;
                   }
-                  handleShareOption(selectedShareOption);
                 }}
                 disabled={!selectedShareOption}
               >
@@ -2106,6 +2326,133 @@ const PregnancyCareView = ({
                   setShowShareModal(false);
                   setSelectedShareOption('');
                 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && selectedPackageForPayment && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header-stable">
+              <h3><Icon name="package" size={24} /> Complete Payment</h3>
+              <CloseButton onClick={() => {
+                setShowPaymentModal(false);
+                setSelectedPackageForPayment(null);
+              }} />
+            </div>
+            
+            <div className="modal-body">
+              <div className="payment-summary">
+                <div className="payment-package-info">
+                  <h4>{selectedPackageForPayment.title}</h4>
+                  <div className="payment-price">
+                    <Icon name="rupee" size={28} color="#7C2A62" />
+                    <span className="price">{selectedPackageForPayment.price.toLocaleString()}</span>
+                    <span className="duration">for {selectedPackageForPayment.duration}</span>
+                  </div>
+                  <div className="payment-features">
+                    <p><strong>Includes:</strong> {selectedPackageForPayment.features.slice(0, 3).join(', ')}...</p>
+                  </div>
+                </div>
+                
+                <div className="payment-methods">
+                  <h4>Select Payment Method</h4>
+                  <div className="payment-options">
+                    <label className={`payment-option ${paymentMethod === 'card' ? 'selected' : ''}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="card" 
+                        checked={paymentMethod === 'card'} 
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      />
+                      <div className="payment-option-content">
+                        <Icon name="shield" size={24} />
+                        <div>
+                          <span className="payment-option-title">Credit/Debit Card</span>
+                          <span className="payment-option-desc">Pay securely with your card</span>
+                        </div>
+                      </div>
+                    </label>
+                    
+                    <label className={`payment-option ${paymentMethod === 'upi' ? 'selected' : ''}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="upi" 
+                        checked={paymentMethod === 'upi'} 
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      />
+                      <div className="payment-option-content">
+                        <Icon name="user" size={24} />
+                        <div>
+                          <span className="payment-option-title">UPI</span>
+                          <span className="payment-option-desc">Google Pay, PhonePe, Paytm</span>
+                        </div>
+                      </div>
+                    </label>
+                    
+                    <label className={`payment-option ${paymentMethod === 'netbanking' ? 'selected' : ''}`}>
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="netbanking" 
+                        checked={paymentMethod === 'netbanking'} 
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      />
+                      <div className="payment-option-content">
+                        <div className="payment-icon">🏦</div>
+                        <div>
+                          <span className="payment-option-title">Net Banking</span>
+                          <span className="payment-option-desc">All major banks supported</span>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="payment-security">
+                  <div className="security-badge">
+                    <Icon name="lock" size={16} color="#4CAF50" />
+                    <span>Secure SSL Encrypted Payment</span>
+                  </div>
+                  <div className="security-badge">
+                    <Icon name="shield" size={16} color="#4CAF50" />
+                    <span>Your data is protected</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer gap-10">
+              <button 
+                className="button" 
+                onClick={handlePaymentSubmit}
+                disabled={paymentProcessing}
+              >
+                {paymentProcessing ? (
+                  <>
+                    <span className="spinner" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid #f3f3f3', borderTop: '2px solid #3498db', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                    Processing Payment...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="check" size={18} /> Pay ₹{selectedPackageForPayment.price.toLocaleString()}
+                  </>
+                )}
+              </button>
+              <button 
+                className="secondary-button" 
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setSelectedPackageForPayment(null);
+                }}
+                disabled={paymentProcessing}
               >
                 Cancel
               </button>
@@ -2252,6 +2599,151 @@ const PregnancyCareView = ({
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share with Doctor Link Modal */}
+      {showShareDoctorModal && shareDoctorData && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '600px' }}>
+            <div className="modal-header-stable">
+              <h3><Icon name="share" size={24} /> Share with Doctor</h3>
+              <CloseButton onClick={() => {
+                setShowShareDoctorModal(false);
+                setShareDoctorData(null);
+              }} />
+            </div>
+            
+            <div className="modal-body">
+              <div className="share-link-container">
+                <div className="share-link-header">
+                  <Icon name="doctor" size={32} color="#7C2A62" />
+                  <div>
+                    <h4>Secure Share Link Generated</h4>
+                    <p>Share this link with your doctor for review</p>
+                  </div>
+                </div>
+                
+                <div className="share-link-card">
+                  <div className="link-display">
+                    <input 
+                      type="text" 
+                      value={shareDoctorData.shareLink}
+                      readOnly
+                      className="link-input"
+                      onClick={(e) => e.target.select()}
+                    />
+                    <button 
+                      className="copy-button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(shareDoctorData.shareLink);
+                        addNotification('Link Copied', 'Share link copied to clipboard', 'success');
+                      }}
+                    >
+                      <Icon name="copy" size={18} /> Copy
+                    </button>
+                  </div>
+                  
+                  <div className="share-details">
+                    <div className="detail-item">
+                      <Icon name="lock" size={16} color="#4CAF50" />
+                      <span>Secure Access Code: <strong>{shareDoctorData.accessCode}</strong></span>
+                    </div>
+                    <div className="detail-item">
+                      <Icon name="calendar" size={16} color="#666" />
+                      <span>Expires in 7 days</span>
+                    </div>
+                    <div className="detail-item">
+                      <Icon name="eye" size={16} color="#666" />
+                      <span>Doctor-only access • Encrypted</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {shareDoctorData.type === 'package' ? (
+                  <div className="package-share-preview">
+                    <h5>Package Details:</h5>
+                    <div className="preview-card">
+                      <h4>{shareDoctorData.data.title}</h4>
+                      <p>{shareDoctorData.data.description}</p>
+                      <div className="preview-features">
+                        <strong>Features:</strong>
+                        <ul>
+                          {shareDoctorData.data.features.slice(0, 3).map((feature, idx) => (
+                            <li key={idx}>{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="records-share-summary">
+                    <h5>What you're sharing:</h5>
+                    <div className="summary-grid">
+                      <div className="summary-item">
+                        <Icon name="activity" size={20} />
+                        <span>{shareDoctorData.data.vitals.length} Health Vitals</span>
+                      </div>
+                      <div className="summary-item">
+                        <Icon name="file" size={20} />
+                        <span>{shareDoctorData.data.reports} Medical Reports</span>
+                      </div>
+                      <div className="summary-item">
+                        <Icon name="calendar" size={20} />
+                        <span>Week {shareDoctorData.data.currentWeek} of Pregnancy</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="share-options-buttons">
+                  <button 
+                    className="button"
+                    onClick={() => {
+                      const emailSubject = encodeURIComponent(shareDoctorData.title);
+                      const emailBody = encodeURIComponent(
+                        `Dear Doctor,\n\n` +
+                        `${shareDoctorData.text}\n\n` +
+                        `Please review using this secure link:\n${shareDoctorData.shareLink}\n\n` +
+                        `Access Code: ${shareDoctorData.accessCode}\n\n` +
+                        `Best regards,\n${user?.fullName || 'Patient'}`
+                      );
+                      window.open(`mailto:?subject=${emailSubject}&body=${emailBody}`, '_blank');
+                    }}
+                  >
+                    <Icon name="mail" size={18} /> Send via Email
+                  </button>
+                  
+                  <button 
+                    className="secondary-button"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: shareDoctorData.title,
+                          text: `${shareDoctorData.text}\n\nAccess Code: ${shareDoctorData.accessCode}`,
+                          url: shareDoctorData.shareLink
+                        });
+                      }
+                    }}
+                  >
+                    <Icon name="share" size={18} /> Share via App
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                className="secondary-button"
+                onClick={() => {
+                  setShowShareDoctorModal(false);
+                  setShareDoctorData(null);
+                }}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

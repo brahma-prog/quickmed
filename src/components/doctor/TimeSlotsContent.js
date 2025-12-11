@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 const TimeSlotsContent = ({ state, actions }) => {
@@ -156,9 +155,9 @@ const TimeSlotsContent = ({ state, actions }) => {
     return (
       <div style={{
         ...styles.timeSlotItem,
-        backgroundColor: isDisabled ? '#f3f4f6' : 
+        backgroundColor: isDisabled ? '#E0F2F1' : 
                         slot.isAvailable ? '#f0fdf4' : '#fef2f2',
-        borderColor: isDisabled ? '#d1d5db' : 
+        borderColor: isDisabled ? '#E0F2F1' : 
                      slot.isAvailable ? '#bbf7d0' : '#fecaca'
       }}>
         <div style={styles.slotInfo}>
@@ -424,18 +423,18 @@ const styles = {
   title: {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0'
   },
   subtitle: {
     fontSize: '16px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   viewToggle: {
     display: 'flex',
     gap: '10px',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#E0F2F1',
     padding: '4px',
     borderRadius: '8px'
   },
@@ -444,14 +443,14 @@ const styles = {
     border: 'none',
     borderRadius: '6px',
     backgroundColor: 'transparent',
-    color: '#6b7280',
+    color: '#4F6F6B',
     cursor: 'pointer',
     fontWeight: '500',
     fontSize: '14px'
   },
   activeViewButton: {
-    backgroundColor: '#7C2A62',
-    color: 'white'
+    backgroundColor: '#009688',
+    color: '#FFFFFF'
   },
   statsBar: {
     display: 'grid',
@@ -460,7 +459,7 @@ const styles = {
     marginBottom: '30px'
   },
   statCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '20px',
     borderRadius: '12px',
     textAlign: 'center',
@@ -470,15 +469,15 @@ const styles = {
     display: 'block',
     fontSize: '32px',
     fontWeight: '700',
-    color: '#7C2A62',
+    color: '#009688',
     marginBottom: '5px'
   },
   statText: {
     fontSize: '14px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   addSlotCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '24px',
     borderRadius: '12px',
     marginBottom: '30px',
@@ -487,7 +486,7 @@ const styles = {
   sectionTitle: {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 20px 0'
   },
   addForm: {
@@ -504,27 +503,27 @@ const styles = {
     display: 'block',
     fontSize: '14px',
     fontWeight: '500',
-    color: '#374151',
+    color: '#124441',
     marginBottom: '8px'
   },
   input: {
     width: '100%',
     padding: '10px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px'
   },
   select: {
     width: '100%',
     padding: '10px 12px',
-    border: '1px solid #d1d5db',
+    border: '1px solid #E0F2F1',
     borderRadius: '6px',
     fontSize: '14px',
-    backgroundColor: 'white'
+    backgroundColor: '#FFFFFF'
   },
   addButton: {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '10px 24px',
     borderRadius: '6px',
@@ -543,7 +542,7 @@ const styles = {
     gap: '20px'
   },
   dayCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '20px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
@@ -562,12 +561,12 @@ const styles = {
   dayTitle: {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 4px 0'
   },
   dayDate: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0
   },
   dayStats: {
@@ -581,11 +580,11 @@ const styles = {
     display: 'block',
     fontSize: '20px',
     fontWeight: '600',
-    color: '#7C2A62'
+    color: '#009688'
   },
   statLabel: {
     fontSize: '12px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   quickActions: {
     display: 'flex',
@@ -594,9 +593,9 @@ const styles = {
     flexWrap: 'wrap'
   },
   smallButton: {
-    backgroundColor: '#f3f4f6',
-    color: '#374151',
-    border: '1px solid #d1d5db',
+    backgroundColor: '#E0F2F1',
+    color: '#124441',
+    border: '1px solid #E0F2F1',
     padding: '6px 12px',
     borderRadius: '6px',
     fontSize: '12px',
@@ -633,11 +632,11 @@ const styles = {
   slotTime: {
     fontSize: '14px',
     fontWeight: '500',
-    color: '#1f2937'
+    color: '#124441'
   },
   duration: {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     marginLeft: '8px'
   },
   slotStatus: {
@@ -684,7 +683,7 @@ const styles = {
   },
   bookedText: {
     fontSize: '12px',
-    color: '#9ca3af',
+    color: '#4F6F6B',
     fontStyle: 'italic'
   },
   listView: {
@@ -696,7 +695,7 @@ const styles = {
     gap: '20px'
   },
   dateSection: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '20px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
@@ -704,10 +703,10 @@ const styles = {
   dateHeader: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 15px 0',
     paddingBottom: '10px',
-    borderBottom: '2px solid #f3f4f6'
+    borderBottom: '2px solid #E0F2F1'
   },
   dateSlots: {
     display: 'grid',
@@ -715,22 +714,22 @@ const styles = {
     gap: '10px'
   },
   tipsCard: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#E0F2F1',
     padding: '20px',
     borderRadius: '12px',
-    border: '1px solid #bae6fd'
+    border: '1px solid #E0F2F1'
   },
   tipsTitle: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#0369a1',
+    color: '#009688',
     margin: '0 0 10px 0'
   },
   tipsList: {
     margin: 0,
     paddingLeft: '20px',
     fontSize: '14px',
-    color: '#0c4a6e',
+    color: '#124441',
     lineHeight: '1.6'
   }
 };

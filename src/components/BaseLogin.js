@@ -40,13 +40,6 @@ const BaseLogin = ({ userType, userDetails, onLoginSuccess, isLinkedAccount = fa
     darktext: '#124441',
     softtext: '#4F6F6B'
   };
-
-  // Delivery Partner Demo Credentials
-  const deliveryDemoCredentials = {
-    email: 'delivery@quickmed.com',
-    password: 'password123'
-  };
-
   // User-specific content based on userType
   const userTypeContent = {
     user: {
@@ -506,16 +499,6 @@ const BaseLogin = ({ userType, userDetails, onLoginSuccess, isLinkedAccount = fa
     setFormErrors({});
   };
 
-  // Pre-fill delivery partner credentials
-  const prefillDeliveryCredentials = () => {
-    if (userType === 'delivery') {
-      setEmail(deliveryDemoCredentials.email);
-      setPassword(deliveryDemoCredentials.password);
-      showToastMessage('Demo credentials pre-filled for testing', 'info');
-    }
-  };
-
-  // Custom Icons based on user type
   const UserTypeIcon = () => {
     const iconProps = {
       width: "100",
@@ -832,24 +815,6 @@ const BaseLogin = ({ userType, userDetails, onLoginSuccess, isLinkedAccount = fa
                   Forgot Password?
                 </span>
               </div>
-
-              {userType === 'delivery' && (
-                <div className="demo-credentials">
-                  <button
-                    type="button"
-                    onClick={prefillDeliveryCredentials}
-                    disabled={isLoading}
-                    className="demo-btn"
-                    style={{ 
-                      borderColor: colors.primary,
-                      color: colors.primary
-                    }}
-                  >
-                    Use Demo Credentials
-                  </button>
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={isLoading}

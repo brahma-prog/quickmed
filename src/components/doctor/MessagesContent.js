@@ -127,13 +127,13 @@ const styles = {
   greeting: {
     fontSize: 'clamp(20px, 4vw, 28px)',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0',
     textAlign: 'left'
   },
   subtitle: {
     fontSize: 'clamp(14px, 2vw, 16px)',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0,
     textAlign: 'left'
   },
@@ -147,7 +147,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '16px 24px',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     minWidth: '140px'
@@ -155,12 +155,12 @@ const styles = {
   messageStatNumber: {
     fontSize: '24px',
     fontWeight: '700',
-    color: '#7C2A62',
+    color: '#009688',
     marginBottom: '4px'
   },
   messageStatLabel: {
     fontSize: '14px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   messagesOverview: {
     marginTop: '20px',
@@ -172,11 +172,11 @@ const styles = {
     textAlign: 'left'
   },
   conversationCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: '20px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #E0F2F1',
     textAlign: 'left'
   },
   conversationCardHeader: {
@@ -200,13 +200,13 @@ const styles = {
   conversationCardName: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 4px 0',
     textAlign: 'left'
   },
   conversationCardLastMessage: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0,
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -216,7 +216,7 @@ const styles = {
   },
   conversationCardTime: {
     fontSize: '12px',
-    color: '#9CA3AF',
+    color: '#4F6F6B',
     flexShrink: 0
   },
   conversationCardActions: {
@@ -226,8 +226,8 @@ const styles = {
     flexWrap: 'wrap'
   },
   primaryButton: {
-    backgroundColor: '#7C2A62',
-    color: 'white',
+    backgroundColor: '#009688',
+    color: '#FFFFFF',
     border: 'none',
     padding: '10px 14px',
     borderRadius: '8px',
@@ -239,8 +239,8 @@ const styles = {
   },
   viewHistoryButton: {
     backgroundColor: 'transparent',
-    color: '#7C2A62',
-    border: '2px solid #7C2A62',
+    color: '#009688',
+    border: '2px solid #009688',
     padding: '8px 14px',
     borderRadius: '8px',
     fontSize: '13px',

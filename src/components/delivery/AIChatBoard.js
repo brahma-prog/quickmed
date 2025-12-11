@@ -27,7 +27,7 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
       zIndex: 1003
     },
     chatContainer: {
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       borderRadius: '12px',
       width: '90%',
       maxWidth: '400px',
@@ -43,8 +43,8 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '20px',
-      backgroundColor: '#7C2A62',
-      color: 'white'
+      backgroundColor: '#009688',
+      color: '#FFFFFF'
     },
     chatHeaderInfo: {
       display: 'flex',
@@ -70,7 +70,7 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
     chatCloseButton: {
       backgroundColor: 'transparent',
       border: 'none',
-      color: 'white',
+      color: '#FFFFFF',
       fontSize: '20px',
       cursor: 'pointer',
       padding: '4px'
@@ -82,7 +82,7 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
       display: 'flex',
       flexDirection: 'column',
       gap: '12px',
-      backgroundColor: '#f8fafc'
+      backgroundColor: '#E0F2F1'
     },
     message: {
       maxWidth: '80%',
@@ -93,15 +93,15 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
     },
     userMessage: {
       alignSelf: 'flex-end',
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       borderBottomRightRadius: '4px'
     },
     aiMessage: {
       alignSelf: 'flex-start',
-      backgroundColor: 'white',
-      color: '#1f2937',
-      border: '1px solid #e5e7eb',
+      backgroundColor: '#FFFFFF',
+      color: '#124441',
+      border: '1px solid #4DB6AC',
       borderBottomLeftRadius: '4px'
     },
     messageContent: {
@@ -122,9 +122,9 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
       alignItems: 'center',
       gap: '8px',
       padding: '12px 16px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       borderRadius: '18px',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC',
       alignSelf: 'flex-start',
       maxWidth: '150px'
     },
@@ -134,12 +134,12 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
     },
     typingText: {
       fontSize: '12px',
-      color: '#6b7280'
+      color: '#4F6F6B'
     },
     chatInputContainer: {
       padding: '16px',
-      borderTop: '1px solid #e5e7eb',
-      backgroundColor: 'white'
+      borderTop: '1px solid #4DB6AC',
+      backgroundColor: '#FFFFFF'
     },
     chatInputWrapper: {
       display: 'flex',
@@ -149,14 +149,15 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
     chatInput: {
       flex: 1,
       padding: '12px 16px',
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC',
       borderRadius: '24px',
       fontSize: '14px',
-      outline: 'none'
+      outline: 'none',
+      color: '#124441'
     },
     sendButton: {
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       border: 'none',
       borderRadius: '50%',
       width: '40px',
@@ -175,12 +176,12 @@ const AIChatBoard = ({ isOpen, onClose, user }) => {
     },
     suggestionLabel: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       marginRight: '4px'
     },
     suggestionButton: {
-      backgroundColor: '#f3f4f6',
-      color: '#374151',
+      backgroundColor: '#E0F2F1',
+      color: '#124441',
       border: 'none',
       borderRadius: '12px',
       padding: '4px 8px',

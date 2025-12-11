@@ -1,24 +1,26 @@
-// LabTestsView.js
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+// LabTestsView.js - Complete Version with Razorpay Integration
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 
-const LabTestsView = ({ setActiveView, addNotification }) => {
+const LabTestsView = ({ setActiveView, addNotification, profile }) => {
   const [activeTab, setActiveTab] = useState('book');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [cart, setCart] = useState([]);
   const [selectedFamilyMember, setSelectedFamilyMember] = useState('self');
   const [selectedLab, setSelectedLab] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [bookingStep, setBookingStep] = useState(1);
   const [currentBooking, setCurrentBooking] = useState(null);
   const [liveTracking, setLiveTracking] = useState(false);
-  const [phlebotomistLocation, setPhlebotomistLocation] = useState({ lat: 12.9716, lng: 77.5946 });
-  const [phlebotomistStatus, setPhlebotomistStatus] = useState('assigned');
   const [estimatedArrival, setEstimatedArrival] = useState(15);
   const [reportProgress, setReportProgress] = useState(0);
   const [downloadingReport, setDownloadingReport] = useState(null);
+  const [selectedTests, setSelectedTests] = useState([]);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [showPhoneConfirm, setShowPhoneConfirm] = useState(false);
+  const [tempPhone, setTempPhone] = useState(profile?.phone || '');
+  const [checkoutData, setCheckoutData] = useState(null);
   
-  // Use refs to persist values without causing re-renders
   const searchInputRef = useRef(null);
   
   const [bookingHistory, setBookingHistory] = useState([
@@ -31,7 +33,6 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       status: 'Completed',
       results: 'Available',
       amount: 1200,
-      reportUrl: '#',
       familyMember: 'Self',
       phlebotomist: 'Dr. Ramesh Kumar',
       trackingId: 'TRK001',
@@ -99,7 +100,208 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     }
   ]);
 
-  // Static data - no need to memoize if it doesn't change
+  // SVG Icons
+  const Icons = {
+    Book: () => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        <line x1="8" y1="6" x2="16" y2="6"/>
+        <line x1="8" y1="10" x2="16" y2="10"/>
+        <line x1="8" y1="14" x2="12" y2="14"/>
+      </svg>
+    ),
+    History: () => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    ),
+    Labs: () => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    ),
+    Search: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    ),
+    Blood: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+        <path d="M8 12h8"/>
+      </svg>
+    ),
+    Hormone: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12" y2="16"/>
+      </svg>
+    ),
+    Organ: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF9800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+        <path d="M8 12h8"/>
+      </svg>
+    ),
+    Metabolic: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9C27B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v20"/>
+        <path d="M2 12h20"/>
+        <circle cx="12" cy="12" r="4"/>
+      </svg>
+    ),
+    Vitamin: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00BCD4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    ),
+    Cardiac: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F44336" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    ),
+    Routine: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#607D8B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    ),
+    AllTests: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#009688" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    ),
+    Popular: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    ),
+    Time: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    ),
+    Fasting: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+    Add: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+    ),
+    Check: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    ),
+    User: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    ),
+    Hospital: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    ),
+    Calendar: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    ),
+    Payment: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+        <line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+    ),
+    Track: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    ),
+    Download: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    ),
+    View: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    ),
+    Location: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    ),
+    Star: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    ),
+    Clock: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    ),
+    Phone: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    ),
+    Map: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+        <line x1="8" y1="2" x2="8" y2="18"/>
+        <line x1="16" y1="6" x2="16" y2="22"/>
+      </svg>
+    ),
+    Progress: () => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+    ),
+    Back: () => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+    )
+  };
+
+  // Static data
   const familyMembers = [
     { id: 'self', name: 'Self', relation: 'Self', age: 28 },
     { id: 'father', name: 'Rajesh Kumar', relation: 'Father', age: 58 },
@@ -216,14 +418,14 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   ];
 
   const categories = [
-    { id: 'all', name: 'All Tests', icon: '🧪', count: 8 },
-    { id: 'blood', name: 'Blood Tests', icon: '💉', count: 4 },
-    { id: 'hormone', name: 'Hormone Tests', icon: '⚖️', count: 1 },
-    { id: 'organ', name: 'Organ Function', icon: '🫀', count: 2 },
-    { id: 'metabolic', name: 'Metabolic', icon: '🔬', count: 1 },
-    { id: 'vitamin', name: 'Vitamin Tests', icon: '💊', count: 1 },
-    { id: 'cardiac', name: 'Cardiac', icon: '❤️', count: 1 },
-    { id: 'routine', name: 'Routine', icon: '📋', count: 1 }
+    { id: 'all', name: 'All Tests', icon: 'AllTests', color: '#009688', count: 8 },
+    { id: 'blood', name: 'Blood Tests', icon: 'Blood', color: '#FF6B6B', count: 4 },
+    { id: 'hormone', name: 'Hormone Tests', icon: 'Hormone', color: '#4CAF50', count: 1 },
+    { id: 'organ', name: 'Organ Function', icon: 'Organ', color: '#FF9800', count: 2 },
+    { id: 'metabolic', name: 'Metabolic', icon: 'Metabolic', color: '#9C27B0', count: 1 },
+    { id: 'vitamin', name: 'Vitamin Tests', icon: 'Vitamin', color: '#00BCD4', count: 1 },
+    { id: 'cardiac', name: 'Cardiac', icon: 'Cardiac', color: '#F44336', count: 1 },
+    { id: 'routine', name: 'Routine', icon: 'Routine', color: '#607D8B', count: 1 }
   ];
 
   const labs = [
@@ -284,6 +486,256 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     { id: 7, time: '04:00 PM - 05:00 PM', available: true },
     { id: 8, time: '06:00 PM - 07:00 PM', available: true }
   ];
+
+  // Get selected family member data
+  const selectedFamilyMemberData = useMemo(() => {
+    return familyMembers.find(m => m.id === selectedFamilyMember);
+  }, [selectedFamilyMember]);
+
+  // Calculate total price
+  const totalPrice = useMemo(() => {
+    const testsTotal = selectedTests.reduce((total, item) => total + item.price, 0);
+    const homeCollectionFee = selectedLab?.homeCollectionFee || 0;
+    return testsTotal + homeCollectionFee;
+  }, [selectedTests, selectedLab]);
+
+  // Filter tests
+  const filteredTests = useMemo(() => {
+    return labTests.filter(test => {
+      const matchesSearch = test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           test.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || test.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
+  // Initialize Razorpay
+  useEffect(() => {
+    const initializeRazorpay = async () => {
+      const isLoaded = await loadRazorpayScript();
+      setRazorpayLoaded(isLoaded);
+      if (!isLoaded) {
+        console.error('Failed to load Razorpay script');
+      }
+    };
+    initializeRazorpay();
+  }, []);
+
+  // Load Razorpay script
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
+  // Phone Confirmation Modal Component
+  const PhoneConfirmationModal = () => {
+    if (!showPhoneConfirm) return null;
+
+    const handlePhoneConfirmClick = () => {
+      if (tempPhone.length !== 10) {
+        alert('Please enter a valid 10-digit mobile number');
+        return;
+      }
+      
+      // Close the modal
+      setShowPhoneConfirm(false);
+      
+      // Proceed with payment using confirmed phone number
+      if (checkoutData) {
+        proceedWithPayment(checkoutData, tempPhone);
+      }
+      
+      // Reset state
+      setCheckoutData(null);
+      setTempPhone(profile?.phone || '');
+    };
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10000,
+        padding: 'max(20px, 2vw)'
+      }}>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '15px',
+          padding: 'max(30px, 3vw) max(25px, 2.5vw)',
+          maxWidth: 'min(500px, 90vw)',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          <h3 style={{ 
+            fontSize: 'clamp(1.2rem, 3vw, 1.4rem)', 
+            fontWeight: 'bold', 
+            color: '#009688', 
+            marginBottom: 'max(15px, 1.5vw)',
+            textAlign: 'center'
+          }}>
+            Edit contact details
+          </h3>
+          
+          <p style={{ 
+            fontSize: 'clamp(0.9rem, 2vw, 1rem)', 
+            color: '#4F6F6B', 
+            marginBottom: 'max(25px, 2.5vw)',
+            lineHeight: '1.5',
+            textAlign: 'center'
+          }}>
+            Enter mobile number to continue
+          </p>
+          
+          <div style={{ marginBottom: 'max(25px, 2.5vw)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              border: `1px solid ${tempPhone.length === 10 ? '#4CAF50' : '#4DB6AC'}`,
+              borderRadius: '8px',
+              padding: 'max(12px, 1.2vw) max(15px, 1.5vw)',
+              backgroundColor: '#f9f9f9',
+              marginBottom: 'max(10px, 1vw)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginRight: '10px',
+                paddingRight: '10px',
+                borderRight: '1px solid #4DB6AC'
+              }}>
+                <span style={{ 
+                  fontSize: 'clamp(1rem, 2vw, 1.1rem)', 
+                  color: '#124441',
+                  marginRight: '8px'
+                }}>+91</span>
+                <span style={{ 
+                  fontSize: 'clamp(0.9rem, 1.5vw, 1rem)', 
+                  color: '#4F6F6B' 
+                }}>▼</span>
+              </div>
+              <input
+                type="tel"
+                value={tempPhone}
+                onChange={(e) => setTempPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="6300604470"
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  backgroundColor: 'transparent',
+                  fontSize: 'clamp(1rem, 2vw, 1.1rem)',
+                  color: '#124441',
+                  minWidth: '0'
+                }}
+                maxLength={10}
+                autoFocus
+              />
+            </div>
+            
+            <div style={{ 
+              fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', 
+              color: '#4F6F6B',
+              marginTop: 'max(5px, 0.5vw)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>{tempPhone.length}/10 digits</span>
+              {tempPhone.length === 10 && (
+                <span style={{ color: '#4CAF50', fontWeight: 'bold' }}>✓ Valid number</span>
+              )}
+            </div>
+          </div>
+          
+          <div style={{ 
+            display: 'flex', 
+            gap: 'max(15px, 1.5vw)', 
+            justifyContent: 'center'
+          }}>
+            <button
+              onClick={() => {
+                setShowPhoneConfirm(false);
+                setCheckoutData(null);
+                setTempPhone('');
+                setPaymentLoading(false);
+              }}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#4F6F6B',
+                border: '1px solid #4DB6AC',
+                padding: 'max(12px, 1.2vw) max(24px, 2.4vw)',
+                borderRadius: '25px',
+                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                cursor: 'pointer',
+                flex: 1,
+                transition: 'all 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#E0F2F1';
+                e.target.style.borderColor = '#009688';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.borderColor = '#4DB6AC';
+              }}
+            >
+              Cancel
+            </button>
+            
+            <button
+              onClick={handlePhoneConfirmClick}
+              disabled={tempPhone.length !== 10}
+              style={{
+                backgroundColor: tempPhone.length === 10 ? '#009688' : '#ccc',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: 'max(12px, 1.2vw) max(24px, 2.4vw)',
+                borderRadius: '25px',
+                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                fontWeight: 'bold',
+                cursor: tempPhone.length === 10 ? 'pointer' : 'not-allowed',
+                flex: 1,
+                transition: 'background-color 0.3s ease',
+                minWidth: '120px'
+              }}
+              onMouseEnter={(e) => {
+                if (tempPhone.length === 10) {
+                  e.target.style.backgroundColor = '#00897B';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (tempPhone.length === 10) {
+                  e.target.style.backgroundColor = '#009688';
+                }
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Generate dummy PDF report
   const generateReportPDF = (booking) => {
@@ -414,7 +866,6 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       // Simulate download progress
       for (let i = 0; i <= 100; i += 10) {
         await new Promise(resolve => setTimeout(resolve, 100));
-        // Update progress in UI
       }
       
       // Generate PDF content
@@ -440,27 +891,160 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     }
   }, [bookingHistory, addNotification]);
 
-  // Filter tests - memoize to prevent recalculation on every render
-  const filteredTests = useMemo(() => {
-    return labTests.filter(test => {
-      const matchesSearch = test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           test.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || test.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+  // Show phone confirmation modal
+  const showPhoneConfirmation = (checkoutData) => {
+    setCheckoutData(checkoutData);
+    setTempPhone(profile?.phone || '');
+    setShowPhoneConfirm(true);
+  };
+
+  // Proceed with payment after phone confirmation
+  const proceedWithPayment = async (checkoutData, phoneNumber) => {
+    setPaymentLoading(true);
+
+    try {
+      const options = {
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        amount: checkoutData.amount * 100,
+        currency: 'INR',
+        name: 'QuickMed Lab Services',
+        description: `Lab Tests for ${selectedFamilyMemberData?.name || 'Self'}`,
+        handler: (response) => handlePaymentSuccess(response, checkoutData),
+        prefill: {
+          name: selectedFamilyMemberData?.name || 'Patient',
+          email: profile?.email || 'patient@example.com',
+          contact: phoneNumber  // Use confirmed phone number
+        },
+        theme: { color: '#009688' },
+        modal: {
+          ondismiss: () => {
+            setPaymentLoading(false);
+            addNotification('Payment Cancelled', 'Your payment was cancelled.', 'alert');
+          }
+        }
+      };
+
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.open();
+      return true;
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      setPaymentLoading(false);
+      addNotification('Payment Error', 'Failed to initiate payment. Please try again.', 'error');
+      return false;
+    }
+  };
+
+  // Main payment function with phone confirmation
+  const processPayment = useCallback(async () => {
+    if (selectedTests.length === 0) {
+      alert('Please select tests to book first');
+      return;
+    }
+
+    if (!razorpayLoaded) {
+      addNotification('Payment Error', 'Payment service is loading. Please try again.', 'error');
+      return;
+    }
+
+    // Prepare checkout data
+    const checkoutData = {
+      amount: totalPrice,
+      tests: selectedTests,
+      patient: selectedFamilyMemberData?.name || 'Self',
+      lab: selectedLab?.name,
+      timeSlot: selectedTimeSlot?.time
+    };
+
+    // Show phone confirmation first
+    showPhoneConfirmation(checkoutData);
+  }, [selectedTests, totalPrice, selectedFamilyMemberData, selectedLab, selectedTimeSlot, razorpayLoaded, addNotification]);
+
+  // Handle payment success
+  const handlePaymentSuccess = async (paymentResponse, checkoutData) => {
+    try {
+      // Verify payment (simulated)
+      await verifyPayment(paymentResponse);
+      
+      // Create booking
+      const newBooking = {
+        id: `LAB${Date.now()}`,
+        tests: selectedTests.map(item => item.name),
+        lab: selectedLab?.name || 'Home Collection',
+        date: new Date().toISOString().split('T')[0],
+        time: selectedTimeSlot?.time || 'Morning Slot',
+        status: 'Phlebotomist Assigned',
+        results: 'Pending',
+        amount: totalPrice,
+        familyMember: selectedFamilyMemberData?.name || 'Self',
+        phlebotomist: 'Dr. Ramesh Kumar',
+        phone: '+91 98765 43210',
+        trackingId: `TRK${Date.now()}`,
+        estimatedArrival: '15 minutes',
+        homeCollectionFee: selectedLab?.homeCollectionFee || 0,
+        paymentId: paymentResponse.razorpay_payment_id,
+        orderId: paymentResponse.razorpay_order_id,
+        signature: paymentResponse.razorpay_signature,
+        paymentStatus: 'Completed',
+        paymentDate: new Date().toISOString()
+      };
+      
+      // Update state
+      setCurrentBooking(newBooking);
+      setBookingHistory(prev => [newBooking, ...prev]);
+      setSelectedTests([]);
+      setSelectedLab(null);
+      setSelectedTimeSlot(null);
+      setBookingStep(6);
+      setPaymentLoading(false);
+      
+      addNotification(
+        'Payment Successful',
+        `Your lab tests have been booked successfully! Order ID: ${newBooking.id}`,
+        'success'
+      );
+
+      // Send booking details to Razorpay dashboard (simulated)
+      console.log('Payment details sent to Razorpay dashboard:', {
+        payment_id: paymentResponse.razorpay_payment_id,
+        order_id: paymentResponse.razorpay_order_id,
+        amount: totalPrice,
+        currency: 'INR',
+        customer: selectedFamilyMemberData?.name || 'Self',
+        tests: selectedTests.map(t => t.name),
+        lab: selectedLab?.name,
+        time_slot: selectedTimeSlot?.time,
+        status: 'captured'
+      });
+
+      // Simulate phlebotomist assignment
+      setTimeout(() => {
+        setCurrentBooking(prev => ({ ...prev, status: 'On the Way' }));
+        addNotification('Phlebotomist En Route', 'Your phlebotomist is on the way', 'lab');
+      }, 3000);
+
+      setTimeout(() => {
+        setCurrentBooking(prev => ({ ...prev, status: 'Sample Collected' }));
+        addNotification('Sample Collected', 'Blood sample has been collected', 'lab');
+      }, 60000);
+
+      return true;
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      setPaymentLoading(false);
+      addNotification('Payment Failed', 'Payment verification failed. Please contact support.', 'error');
+      return false;
+    }
+  };
+
+  // Verify payment (simulated)
+  const verifyPayment = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true });
+      }, 2000);
     });
-  }, [searchQuery, selectedCategory]);
-
-  // Calculate total price
-  const totalPrice = useMemo(() => {
-    const testsTotal = cart.reduce((total, item) => total + item.price, 0);
-    const homeCollectionFee = selectedLab?.homeCollectionFee || 0;
-    return testsTotal + homeCollectionFee;
-  }, [cart, selectedLab]);
-
-  // Get selected family member data
-  const selectedFamilyMemberData = useMemo(() => {
-    return familyMembers.find(m => m.id === selectedFamilyMember);
-  }, [selectedFamilyMember]);
+  };
 
   // Event handlers
   const handleSearchChange = useCallback((e) => {
@@ -476,27 +1060,23 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     if (tab === 'book') setBookingStep(1);
   }, []);
 
-  const addToCart = useCallback((test) => {
-    setCart(prev => {
+  const handleTestSelection = useCallback((test) => {
+    setSelectedTests(prev => {
       const existing = prev.find(item => item.id === test.id);
-      if (existing) return prev;
-      return [...prev, { ...test, quantity: 1 }];
+      if (existing) {
+        return prev.filter(item => item.id !== test.id);
+      } else {
+        return [...prev, test];
+      }
     });
-    addNotification('Test Added', `${test.name} added to cart`, 'lab');
-  }, [addNotification]);
-
-  const removeFromCart = useCallback((testId) => {
-    setCart(prev => prev.filter(item => item.id !== testId));
-  }, []);
-
-  const handleAddToCart = useCallback((test, e) => {
-    e.stopPropagation();
-    if (cart.some(item => item.id === test.id)) {
-      removeFromCart(test.id);
-    } else {
-      addToCart(test);
-    }
-  }, [cart, addToCart, removeFromCart]);
+    
+    const isSelected = selectedTests.some(item => item.id === test.id);
+    addNotification(
+      isSelected ? 'Test Removed' : 'Test Selected',
+      `${test.name} ${isSelected ? 'removed from selection' : 'added for booking'}`,
+      'lab'
+    );
+  }, [selectedTests, addNotification]);
 
   const handleFamilyMemberClick = useCallback((memberId) => {
     setSelectedFamilyMember(memberId);
@@ -513,12 +1093,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   }, []);
 
   const proceedToFamilySelection = useCallback(() => {
-    if (cart.length === 0) {
-      alert('Please add tests to cart first');
+    if (selectedTests.length === 0) {
+      alert('Please select tests to book first');
       return;
     }
     setBookingStep(2);
-  }, [cart]);
+  }, [selectedTests]);
 
   const proceedToLabSelection = useCallback(() => {
     setBookingStep(3);
@@ -540,58 +1120,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     setBookingStep(5);
   }, [selectedTimeSlot]);
 
-  const simulatePayment = useCallback(() => {
-    const newBooking = {
-      id: `LAB${Date.now()}`,
-      tests: cart.map(item => item.name),
-      lab: selectedLab.name,
-      date: new Date().toISOString().split('T')[0],
-      time: selectedTimeSlot.time,
-      status: 'Phlebotomist Assigned',
-      results: 'Pending',
-      amount: totalPrice,
-      familyMember: selectedFamilyMemberData?.name || 'Self',
-      phlebotomist: 'Dr. Ramesh Kumar',
-      phone: '+91 98765 43210',
-      trackingId: `TRK${Date.now()}`,
-      estimatedArrival: '15 minutes',
-      homeCollectionFee: selectedLab.homeCollectionFee
-    };
-
-    setCurrentBooking(newBooking);
-    setBookingHistory(prev => [newBooking, ...prev]);
-    setCart([]);
-    setSelectedLab(null);
-    setSelectedTimeSlot(null);
-    setBookingStep(6);
-    
-    setTimeout(() => {
-      setCurrentBooking(prev => ({ ...prev, status: 'On the Way' }));
-      setPhlebotomistStatus('on_the_way');
-      addNotification('Phlebotomist En Route', 'Your phlebotomist is on the way', 'lab');
-    }, 3000);
-
-    setTimeout(() => {
-      setCurrentBooking(prev => ({ ...prev, status: 'Sample Collected' }));
-      setPhlebotomistStatus('sample_collected');
-      addNotification('Sample Collected', 'Blood sample has been collected', 'lab');
-    }, 60000);
-
-    addNotification('Payment Successful', 'Your lab tests have been booked', 'lab');
-  }, [cart, selectedLab, selectedTimeSlot, totalPrice, selectedFamilyMemberData, addNotification]);
-
-  const startLiveTracking = useCallback(() => {
-    setLiveTracking(true);
-    addNotification('Live Tracking Started', 'You can now track phlebotomist location', 'lab');
-  }, [addNotification]);
-
   const viewReportDetails = useCallback((booking) => {
     setCurrentBooking(booking);
     setActiveTab('book');
     setBookingStep(6);
   }, [setActiveTab]);
 
-  // View report details in modal
   const viewFullReport = useCallback((booking) => {
     if (!booking.reportData) {
       alert('Report data not available yet');
@@ -604,13 +1138,29 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     reportWindow.document.close();
   }, []);
 
+  const startLiveTracking = useCallback(() => {
+    setLiveTracking(true);
+    addNotification('Live Tracking Started', 'You can now track phlebotomist location', 'lab');
+  }, [addNotification]);
+
+  // Format numbers with commas for Indian numbering system
+  const formatIndianNumber = (number) => {
+    return new Intl.NumberFormat('en-IN').format(number);
+  };
+
+  // Render category icon
+  const renderCategoryIcon = (iconName) => {
+    const IconComponent = Icons[iconName];
+    return IconComponent ? <IconComponent /> : null;
+  };
+
   // Styles
   const styles = {
     container: {
       padding: '20px',
       maxWidth: '1200px',
       margin: '0 auto',
-      marginTop: '140px',
+      marginTop: '120px',
       minHeight: 'calc(100vh - 120px)',
       width: '100%',
       boxSizing: 'border-box',
@@ -621,7 +1171,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: '2rem',
-      marginTop: '50px',
+      marginTop: '40px',
       flexWrap: 'wrap',
       gap: '1rem'
     },
@@ -660,10 +1210,9 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       fontWeight: '500',
       transition: 'all 0.3s ease',
       whiteSpace: 'nowrap',
-      '@media (max-width: 768px)': {
-        padding: '10px 15px',
-        fontSize: '0.85rem'
-      }
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
     },
     activeTab: {
       backgroundColor: '#009688',
@@ -677,25 +1226,29 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
       marginBottom: '25px',
       border: '1px solid #4DB6AC',
-      transition: 'all 0.3s ease',
-      '@media (max-width: 768px)': {
-        padding: '15px'
-      }
+      transition: 'all 0.3s ease'
     },
     searchBox: {
       width: '100%',
-      padding: '15px 25px',
+      padding: '15px 25px 15px 50px',
       borderRadius: '12px',
       border: '1px solid #4DB6AC',
       fontSize: '1rem',
       marginBottom: '20px',
       backgroundColor: '#FFFFFF',
       color: '#124441',
-      boxSizing: 'border-box',
-      '@media (max-width: 768px)': {
-        padding: '12px 15px',
-        fontSize: '0.9rem'
-      }
+      boxSizing: 'border-box'
+    },
+    searchContainer: {
+      position: 'relative',
+      marginBottom: '20px'
+    },
+    searchIcon: {
+      position: 'absolute',
+      left: '20px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      color: '#4F6F6B'
     },
     categories: {
       display: 'flex',
@@ -725,11 +1278,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       color: '#4F6F6B',
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
-      '@media (max-width: 768px)': {
-        padding: '8px 15px',
-        fontSize: '0.8rem'
-      }
+      gap: '8px'
     },
     activeCategory: {
       backgroundColor: '#009688',
@@ -739,14 +1288,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     testsGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-      gap: '25px',
-      '@media (max-width: 768px)': {
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '15px'
-      },
-      '@media (max-width: 480px)': {
-        gridTemplateColumns: '1fr'
-      }
+      gap: '25px'
     },
     testCard: {
       backgroundColor: '#FFFFFF',
@@ -756,38 +1298,26 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       border: '1px solid #4DB6AC',
       transition: 'all 0.3s ease',
       position: 'relative',
-      cursor: 'pointer',
-      '@media (max-width: 768px)': {
-        padding: '15px'
-      }
+      cursor: 'pointer'
     },
     testImage: {
       width: '100%',
       height: '150px',
       borderRadius: '10px',
       objectFit: 'cover',
-      marginBottom: '15px',
-      '@media (max-width: 768px)': {
-        height: '120px'
-      }
+      marginBottom: '15px'
     },
     testName: {
       fontSize: '1.1rem',
       fontWeight: 'bold',
       color: '#124441',
-      marginBottom: '10px',
-      '@media (max-width: 768px)': {
-        fontSize: '1rem'
-      }
+      marginBottom: '10px'
     },
     testDescription: {
       fontSize: '0.9rem',
       color: '#4F6F6B',
       marginBottom: '15px',
-      lineHeight: '1.5',
-      '@media (max-width: 768px)': {
-        fontSize: '0.85rem'
-      }
+      lineHeight: '1.5'
     },
     testDetails: {
       display: 'flex',
@@ -800,10 +1330,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     testPrice: {
       fontSize: '1.3rem',
       fontWeight: 'bold',
-      color: '#009688',
-      '@media (max-width: 768px)': {
-        fontSize: '1.1rem'
-      }
+      color: '#009688'
     },
     testInfo: {
       fontSize: '0.85rem',
@@ -824,10 +1351,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       transition: 'all 0.3s ease',
       width: '100%',
       boxSizing: 'border-box',
-      '@media (max-width: 768px)': {
-        padding: '10px 20px',
-        fontSize: '0.9rem'
-      }
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px'
     },
     secondaryButton: {
       backgroundColor: '#FFFFFF',
@@ -841,26 +1368,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       transition: 'all 0.3s ease',
       width: '100%',
       boxSizing: 'border-box',
-      '@media (max-width: 768px)': {
-        padding: '10px 20px',
-        fontSize: '0.9rem'
-      }
-    },
-    cartBadge: {
-      position: 'absolute',
-      top: '-8px',
-      right: '-8px',
-      backgroundColor: '#FF6B6B',
-      color: '#FFFFFF',
-      borderRadius: '50%',
-      width: '24px',
-      height: '24px',
-      fontSize: '0.8rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontWeight: 'bold',
-      zIndex: 1
+      gap: '8px'
     },
     bookingCard: {
       backgroundColor: '#FFFFFF',
@@ -869,10 +1380,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       marginBottom: '15px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
       border: '1px solid #4DB6AC',
-      transition: 'all 0.3s ease',
-      '@media (max-width: 768px)': {
-        padding: '15px'
-      }
+      transition: 'all 0.3s ease'
     },
     sectionTitle: {
       fontSize: '1.3rem',
@@ -881,10 +1389,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       marginBottom: '20px',
       display: 'flex',
       alignItems: 'center',
-      gap: '10px',
-      '@media (max-width: 768px)': {
-        fontSize: '1.1rem'
-      }
+      gap: '10px'
     },
     headerActions: {
       display: 'flex',
@@ -892,9 +1397,6 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       alignItems: 'center',
       flexWrap: 'wrap',
       justifyContent: 'flex-end'
-    },
-    cartButtonContainer: {
-      position: 'relative'
     },
     stepIndicator: {
       display: 'flex',
@@ -904,24 +1406,14 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       padding: '20px',
       backgroundColor: '#FFFFFF',
       borderRadius: '12px',
-      border: '1px solid #4DB6AC',
-      '@media (max-width: 768px)': {
-        flexDirection: 'column',
-        gap: '15px',
-        padding: '15px'
-      }
+      border: '1px solid #4DB6AC'
     },
     step: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       flex: 1,
-      position: 'relative',
-      '@media (max-width: 768px)': {
-        width: '100%',
-        flexDirection: 'row',
-        gap: '10px'
-      }
+      position: 'relative'
     },
     stepNumber: {
       width: '35px',
@@ -934,11 +1426,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       justifyContent: 'center',
       fontWeight: 'bold',
       marginBottom: '10px',
-      border: '2px solid #4DB6AC',
-      '@media (max-width: 768px)': {
-        marginBottom: '0',
-        minWidth: '35px'
-      }
+      border: '2px solid #4DB6AC'
     },
     activeStep: {
       backgroundColor: '#009688',
@@ -949,11 +1437,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       fontSize: '0.85rem',
       color: '#4F6F6B',
       textAlign: 'center',
-      whiteSpace: 'nowrap',
-      '@media (max-width: 768px)': {
-        textAlign: 'left',
-        flex: 1
-      }
+      whiteSpace: 'nowrap'
     },
     activeStepName: {
       color: '#009688',
@@ -966,10 +1450,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       width: '100%',
       height: '2px',
       backgroundColor: '#4DB6AC',
-      zIndex: -1,
-      '@media (max-width: 768px)': {
-        display: 'none'
-      }
+      zIndex: -1
     },
     familyMemberCard: {
       padding: '20px',
@@ -977,10 +1458,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       borderRadius: '12px',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
-      backgroundColor: '#FFFFFF',
-      '@media (max-width: 768px)': {
-        padding: '15px'
-      }
+      backgroundColor: '#FFFFFF'
     },
     selectedFamilyMember: {
       borderColor: '#009688',
@@ -993,10 +1471,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       marginBottom: '15px',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
-      backgroundColor: '#FFFFFF',
-      '@media (max-width: 768px)': {
-        padding: '15px'
-      }
+      backgroundColor: '#FFFFFF'
     },
     selectedLab: {
       borderColor: '#009688',
@@ -1012,12 +1487,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       backgroundColor: '#FFFFFF',
       color: '#124441',
       minWidth: '150px',
-      textAlign: 'center',
-      '@media (max-width: 768px)': {
-        minWidth: '130px',
-        padding: '10px',
-        fontSize: '0.9rem'
-      }
+      textAlign: 'center'
     },
     selectedTimeSlot: {
       backgroundColor: '#009688',
@@ -1039,9 +1509,9 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       border: '1px solid #4DB6AC',
       position: 'relative',
       overflow: 'hidden',
-      '@media (max-width: 768px)': {
-        height: '200px'
-      }
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     },
     progressBar: {
       width: '100%',
@@ -1060,20 +1530,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     statusTimeline: {
       padding: '20px',
       borderLeft: '2px solid #4DB6AC',
-      marginLeft: '10px',
-      '@media (max-width: 768px)': {
-        padding: '15px',
-        marginLeft: '5px'
-      }
+      marginLeft: '10px'
     },
     statusItem: {
       position: 'relative',
       paddingLeft: '25px',
-      marginBottom: '25px',
-      '@media (max-width: 768px)': {
-        paddingLeft: '20px',
-        marginBottom: '20px'
-      }
+      marginBottom: '25px'
     },
     statusDot: {
       position: 'absolute',
@@ -1083,12 +1545,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       height: '20px',
       borderRadius: '50%',
       backgroundColor: '#FFFFFF',
-      border: '2px solid #4DB6AC',
-      '@media (max-width: 768px)': {
-        width: '16px',
-        height: '16px',
-        left: '-9px'
-      }
+      border: '2px solid #4DB6AC'
     },
     activeStatusDot: {
       backgroundColor: '#009688',
@@ -1097,20 +1554,67 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     completedStatusDot: {
       backgroundColor: '#4CAF50',
       borderColor: '#4CAF50'
+    },
+    backButton: {
+      padding: '0.5rem 1rem',
+      backgroundColor: 'transparent',
+      color: '#009688',
+      border: '1px solid #009688',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+      marginRight: '1rem',
+      transition: 'all 0.3s ease',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '5px'
+    },
+    selectionBadge: {
+      position: 'absolute',
+      top: '25px',
+      right: '25px',
+      backgroundColor: '#4CAF50',
+      color: '#FFFFFF',
+      padding: '3px 12px',
+      borderRadius: '12px',
+      fontSize: '0.75rem',
+      fontWeight: 'bold',
+      zIndex: 1,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '5px'
+    },
+    popularBadge: {
+      position: 'absolute',
+      top: '25px',
+      right: '25px',
+      backgroundColor: '#FF6B6B',
+      color: '#FFFFFF',
+      padding: '3px 12px',
+      borderRadius: '12px',
+      fontSize: '0.75rem',
+      fontWeight: 'bold',
+      zIndex: 1,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '5px'
     }
   };
 
-  // Render search input separately with a stable key
+  // Render search input
   const renderSearchInput = () => (
-    <input
-      key="search-input"
-      type="text"
-      placeholder="🔍 Search for lab tests (e.g., CBC, Thyroid, Vitamin D)..."
-      style={styles.searchBox}
-      value={searchQuery}
-      onChange={handleSearchChange}
-      ref={searchInputRef}
-    />
+    <div style={styles.searchContainer}>
+      <Icons.Search />
+      <input
+        key="search-input"
+        type="text"
+        placeholder="Search for lab tests (e.g., CBC, Thyroid, Vitamin D)..."
+        style={styles.searchBox}
+        value={searchQuery}
+        onChange={handleSearchChange}
+        ref={searchInputRef}
+      />
+    </div>
   );
 
   // Render categories
@@ -1121,80 +1625,108 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           key={category.id}
           style={{
             ...styles.category,
-            ...(selectedCategory === category.id ? styles.activeCategory : {})
+            ...(selectedCategory === category.id ? styles.activeCategory : {}),
+            borderColor: category.color
           }}
           onClick={() => handleCategoryClick(category.id)}
         >
-          {category.icon} {category.name} ({category.count})
+          <span style={{ color: selectedCategory === category.id ? '#FFFFFF' : category.color }}>
+            {renderCategoryIcon(category.icon)}
+          </span>
+          {category.name} ({category.count})
         </button>
       ))}
     </div>
   );
 
   // Render test card
-  const renderTestCard = (test) => (
-    <div 
-      key={test.id}
-      style={styles.testCard}
-      onClick={() => addNotification('Test Details', `${test.name} - ${test.description}`, 'lab')}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 150, 136, 0.15)';
-        e.currentTarget.style.transform = 'translateY(-5px)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = '0 3px 15px rgba(0,0,0,0.05)';
-        e.currentTarget.style.transform = 'translateY(0)';
-      }}
-    >
-      <img src={test.image} alt={test.name} style={styles.testImage} />
-      {test.popular && (
-        <div style={{
-          position: 'absolute',
-          top: '25px',
-          right: '25px',
-          backgroundColor: '#FF6B6B',
-          color: '#FFFFFF',
-          padding: '3px 12px',
-          borderRadius: '12px',
-          fontSize: '0.75rem',
-          fontWeight: 'bold',
-          zIndex: 1
-        }}>
-          Popular
-        </div>
-      )}
-      <div style={styles.testName}>{test.name}</div>
-      <div style={styles.testDescription}>{test.description}</div>
-      <div style={styles.testDetails}>
-        <div>
-          <div style={styles.testPrice}>₹{test.price}</div>
-          <div style={styles.testInfo}>⏱️ Report: {test.reportTime}</div>
-        </div>
-        <div>
-          <div style={styles.testInfo}>🍽️ {test.fasting}</div>
-          <div style={{...styles.testInfo, fontSize: '0.8rem', color: '#009688'}}>
-            {test.recommendedFor[0]}
-          </div>
-        </div>
-      </div>
-      <button 
-        style={{
-          ...styles.button,
-          backgroundColor: cart.some(item => item.id === test.id) ? '#4DB6AC' : '#009688',
-          marginTop: '10px'
-        }}
-        onClick={(e) => handleAddToCart(test, e)}
+  const renderTestCard = (test) => {
+    const isSelected = selectedTests.some(item => item.id === test.id);
+    const IconComponent = Icons[test.category.charAt(0).toUpperCase() + test.category.slice(1)] || Icons.AllTests;
+    
+    return (
+      <div 
+        key={test.id}
+        style={styles.testCard}
+        onClick={() => handleTestSelection(test)}
         onMouseEnter={(e) => {
-          e.target.style.backgroundColor = cart.some(item => item.id === test.id) ? '#4F6F6B' : '#4DB6AC';
+          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 150, 136, 0.15)';
+          e.currentTarget.style.transform = 'translateY(-5px)';
         }}
         onMouseLeave={(e) => {
-          e.target.style.backgroundColor = cart.some(item => item.id === test.id) ? '#4DB6AC' : '#009688';
+          e.currentTarget.style.boxShadow = '0 3px 15px rgba(0,0,0,0.05)';
+          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        {cart.some(item => item.id === test.id) ? '✓ Added to Cart' : 'Add to Cart'}
-      </button>
-    </div>
-  );
+        <img src={test.image} alt={test.name} style={styles.testImage} />
+        
+        {isSelected ? (
+          <div style={styles.selectionBadge}>
+            <Icons.Check />
+            Selected
+          </div>
+        ) : test.popular ? (
+          <div style={styles.popularBadge}>
+            <Icons.Popular />
+            Popular
+          </div>
+        ) : null}
+        
+        <div style={styles.testName}>
+          <IconComponent />
+          {test.name}
+        </div>
+        <div style={styles.testDescription}>{test.description}</div>
+        <div style={styles.testDetails}>
+          <div>
+            <div style={styles.testPrice}>₹{formatIndianNumber(test.price)}</div>
+            <div style={styles.testInfo}>
+              <Icons.Time />
+              Report: {test.reportTime}
+            </div>
+          </div>
+          <div>
+            <div style={styles.testInfo}>
+              <Icons.Fasting />
+              {test.fasting}
+            </div>
+            <div style={{...styles.testInfo, fontSize: '0.8rem', color: '#009688'}}>
+              {test.recommendedFor[0]}
+            </div>
+          </div>
+        </div>
+        <button 
+          style={{
+            ...styles.button,
+            backgroundColor: isSelected ? '#4CAF50' : '#009688',
+            marginTop: '10px'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleTestSelection(test);
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = isSelected ? '#45a049' : '#4DB6AC';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = isSelected ? '#4CAF50' : '#009688';
+          }}
+        >
+          {isSelected ? (
+            <>
+              <Icons.Check />
+              Selected
+            </>
+          ) : (
+            <>
+              <Icons.Add />
+              Select Test
+            </>
+          )}
+        </button>
+      </div>
+    );
+  };
 
   // Step 1: Test Selection
   const renderStep1 = () => (
@@ -1208,17 +1740,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
         {filteredTests.map(test => renderTestCard(test))}
       </div>
 
-      {cart.length > 0 && (
+      {selectedTests.length > 0 && (
         <div style={{
           position: 'fixed',
           bottom: '20px',
           right: '20px',
-          zIndex: 1000,
-          '@media (max-width: 768px)': {
-            bottom: '10px',
-            right: '10px',
-            left: '10px'
-          }
+          zIndex: 1000
         }}>
           <button
             style={{
@@ -1226,16 +1753,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
               padding: '15px 30px',
               fontSize: '1rem',
               borderRadius: '25px',
-              boxShadow: '0 4px 15px rgba(0, 150, 136, 0.3)',
-              '@media (max-width: 768px)': {
-                padding: '12px 20px',
-                fontSize: '0.9rem',
-                width: 'auto'
-              }
+              boxShadow: '0 4px 15px rgba(0, 150, 136, 0.3)'
             }}
             onClick={proceedToFamilySelection}
           >
-            Proceed to Booking ({cart.length} tests) →
+            <Icons.User />
+            Book {selectedTests.length} Test{selectedTests.length > 1 ? 's' : ''} →
           </button>
         </div>
       )}
@@ -1245,7 +1768,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Step 2: Family Member Selection
   const renderStep2 = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>👨‍👩‍👧‍👦 Select Family Member</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.User />
+        Select Family Member
+      </h3>
       <p style={{ color: '#4F6F6B', marginBottom: '20px' }}>
         Select who these tests are for. You can book tests for yourself or family members.
       </p>
@@ -1277,13 +1803,15 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           style={styles.secondaryButton}
           onClick={() => setBookingStep(1)}
         >
-          ← Back
+          <Icons.Back />
+          Back
         </button>
         <button 
           style={styles.button}
           onClick={proceedToLabSelection}
         >
-          Next: Select Lab →
+          Next: Select Lab
+          <Icons.Hospital />
         </button>
       </div>
     </div>
@@ -1292,7 +1820,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Step 3: Lab Selection
   const renderStep3 = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>🏥 Select Laboratory</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.Hospital />
+        Select Laboratory
+      </h3>
       <p style={{ color: '#4F6F6B', marginBottom: '20px' }}>
         Choose a lab for sample collection. Home service available for all labs.
       </p>
@@ -1305,36 +1836,38 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           }}
           onClick={() => handleLabClick(lab)}
         >
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', '@media (max-width: 768px)': { flexDirection: 'column', gap: '10px' } }}>
-            <img src={lab.image} alt={lab.name} style={{ width: '100px', height: '80px', borderRadius: '8px', '@media (max-width: 768px)': { width: '100%', height: '150px', objectFit: 'cover' } }} />
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+            <img src={lab.image} alt={lab.name} style={{ width: '100px', height: '80px', borderRadius: '8px' }} />
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', '@media (max-width: 768px)': { flexDirection: 'column', gap: '10px' } }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontWeight: 'bold', color: '#124441', fontSize: '1.1rem' }}>
                     {lab.name}
                   </div>
-                  <div style={{ color: '#4F6F6B', fontSize: '0.9rem', marginTop: '5px' }}>
-                    📍 {lab.address}
+                  <div style={{ color: '#4F6F6B', fontSize: '0.9rem', marginTop: '5px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Icons.Location />
+                    {lab.address}
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ color: '#FFA500' }}>★</span>
+                  <Icons.Star />
                   <span style={{ fontWeight: 'bold', color: '#124441' }}>{lab.rating}</span>
                   <span style={{ color: '#4F6F6B' }}>({lab.distance})</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '20px', marginTop: '15px', flexWrap: 'wrap', '@media (max-width: 768px)': { gap: '10px' } }}>
+              <div style={{ display: 'flex', gap: '20px', marginTop: '15px', flexWrap: 'wrap' }}>
                 <div style={styles.testInfo}>
                   🏠 Home Collection: ₹{lab.homeCollectionFee}
                 </div>
-                <div style={styles.testInfo}>
-                  ⏰ {lab.timing}
+                <div style={{...styles.testInfo, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Icons.Clock />
+                  {lab.timing}
                 </div>
                 <div style={styles.testInfo}>
                   👨‍⚕️ {lab.phlebotomists} phlebotomists
                 </div>
               </div>
-              <div style={{ marginTop: '10px', color: '#009688', fontSize: '0.85rem' }}>
+              <div style={{ marginTop: '10px', color: '#009688', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
                 🏆 {lab.accreditation}
               </div>
             </div>
@@ -1346,14 +1879,16 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           style={styles.secondaryButton}
           onClick={() => setBookingStep(2)}
         >
-          ← Back
+          <Icons.Back />
+          Back
         </button>
         <button 
           style={styles.button}
           onClick={proceedToTimeSlot}
           disabled={!selectedLab}
         >
-          Next: Select Time Slot →
+          Next: Select Time Slot
+          <Icons.Calendar />
         </button>
       </div>
     </div>
@@ -1362,7 +1897,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Step 4: Time Slot Selection
   const renderStep4 = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>⏰ Select Time Slot</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.Calendar />
+        Select Time Slot
+      </h3>
       <p style={{ color: '#4F6F6B', marginBottom: '20px' }}>
         Choose your preferred time for sample collection. Slots update in real-time.
       </p>
@@ -1394,8 +1932,8 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           Booking Summary
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-          <span style={{ color: '#4F6F6B' }}>Tests ({cart.length})</span>
-          <span style={{ fontWeight: 'bold' }}>₹{cart.reduce((sum, item) => sum + item.price, 0)}</span>
+          <span style={{ color: '#4F6F6B' }}>Tests ({selectedTests.length})</span>
+          <span style={{ fontWeight: 'bold' }}>₹{selectedTests.reduce((sum, item) => sum + item.price, 0)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
           <span style={{ color: '#4F6F6B' }}>Home Collection Fee</span>
@@ -1413,14 +1951,16 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           style={styles.secondaryButton}
           onClick={() => setBookingStep(3)}
         >
-          ← Back
+          <Icons.Back />
+          Back
         </button>
         <button 
           style={styles.button}
           onClick={proceedToPayment}
           disabled={!selectedTimeSlot}
         >
-          Proceed to Payment →
+          Proceed to Payment
+          <Icons.Payment />
         </button>
       </div>
     </div>
@@ -1429,7 +1969,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Step 5: Payment
   const renderStep5 = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>💳 Payment</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.Payment />
+        Payment
+      </h3>
       <div style={{ 
         backgroundColor: '#E0F2F1', 
         padding: '30px', 
@@ -1440,7 +1983,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
       }}>
         <div style={{ fontSize: '3rem', marginBottom: '20px' }}>💳</div>
         <div style={{ fontWeight: 'bold', color: '#124441', fontSize: '1.2rem', marginBottom: '10px' }}>
-          Total Amount: ₹{totalPrice}
+          Total Amount: ₹{formatIndianNumber(totalPrice)}
         </div>
         <div style={{ color: '#4F6F6B', marginBottom: '30px' }}>
           Secure payment powered by Razorpay
@@ -1462,7 +2005,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #E0F2F1' }}>
             <span style={{ color: '#4F6F6B' }}>Tests:</span>
-            <span style={{ fontWeight: '500' }}>{cart.map(t => t.name).join(', ')}</span>
+            <span style={{ fontWeight: '500' }}>{selectedTests.map(t => t.name).join(', ')}</span>
           </div>
         </div>
 
@@ -1472,21 +2015,35 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
             padding: '15px 40px',
             fontSize: '1.1rem',
             maxWidth: '300px',
-            '@media (max-width: 768px)': {
-              padding: '12px 30px',
-              fontSize: '1rem'
-            }
+            backgroundColor: paymentLoading ? '#4F6F6B' : '#009688'
           }}
-          onClick={simulatePayment}
+          onClick={processPayment}
+          disabled={paymentLoading}
         >
-          Pay ₹{totalPrice} Now
+          {paymentLoading ? (
+            <>
+              <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block', marginRight: '10px' }}>⟳</span>
+              Processing...
+            </>
+          ) : (
+            <>
+              <Icons.Payment />
+              Pay ₹{formatIndianNumber(totalPrice)} with Razorpay
+            </>
+          )}
         </button>
+        
+        <div style={{ marginTop: '20px', fontSize: '0.85rem', color: '#4F6F6B' }}>
+          🔒 100% Secure Payment | SSL Encrypted
+        </div>
       </div>
       <button 
         style={styles.secondaryButton}
         onClick={() => setBookingStep(4)}
+        disabled={paymentLoading}
       >
-        ← Back
+        <Icons.Back />
+        Back
       </button>
     </div>
   );
@@ -1494,7 +2051,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Step 6: Tracking
   const renderStep6 = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>🚚 Sample Collection Tracking</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.Track />
+        Sample Collection Tracking
+      </h3>
       <div style={{ 
         backgroundColor: '#4CAF50', 
         color: '#FFFFFF', 
@@ -1509,15 +2069,29 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '30px' }}>
         <div style={{ flex: 1, minWidth: '250px' }}>
-          <div style={styles.sectionTitle}>👨‍⚕️ Phlebotomist Details</div>
+          <div style={styles.sectionTitle}>
+            <Icons.User />
+            Phlebotomist Details
+          </div>
           <div style={{ backgroundColor: '#E0F2F1', padding: '20px', borderRadius: '8px' }}>
             <div style={{ fontWeight: 'bold', color: '#124441' }}>{currentBooking.phlebotomist}</div>
-            <div style={{ color: '#4F6F6B', marginTop: '5px' }}>📱 {currentBooking.phone}</div>
+            <div style={{ color: '#4F6F6B', marginTop: '5px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Icons.Phone />
+              {currentBooking.phone}
+            </div>
             <div style={{ color: '#4F6F6B', marginTop: '5px' }}>🆔 Tracking ID: {currentBooking.trackingId}</div>
+            {currentBooking.paymentId && (
+              <div style={{ color: '#4F6F6B', marginTop: '5px', fontSize: '0.9rem' }}>
+                Payment ID: {currentBooking.paymentId}
+              </div>
+            )}
           </div>
         </div>
         <div style={{ flex: 1, minWidth: '250px' }}>
-          <div style={styles.sectionTitle}>📋 Test Details</div>
+          <div style={styles.sectionTitle}>
+            <Icons.Hospital />
+            Test Details
+          </div>
           <div style={{ backgroundColor: '#E0F2F1', padding: '20px', borderRadius: '8px' }}>
             <div style={{ color: '#124441', fontWeight: '500' }}>For: {currentBooking.familyMember}</div>
             <div style={{ color: '#4F6F6B', marginTop: '10px' }}>
@@ -1529,13 +2103,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
         </div>
       </div>
 
-      <div style={styles.sectionTitle}>📍 Live Tracking</div>
+      <div style={styles.sectionTitle}>
+        <Icons.Map />
+        Live Tracking
+      </div>
       <div style={styles.trackingMap}>
         <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
           textAlign: 'center',
           color: '#124441'
         }}>
@@ -1548,10 +2121,14 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
         style={{ ...styles.button, marginBottom: '20px' }}
         onClick={startLiveTracking}
       >
+        <Icons.Track />
         {liveTracking ? 'Live Tracking Active' : 'Start Live Tracking'}
       </button>
 
-      <div style={styles.sectionTitle}>📊 Collection Status</div>
+      <div style={styles.sectionTitle}>
+        <Icons.Progress />
+        Collection Status
+      </div>
       <div style={styles.statusTimeline}>
         {['Phlebotomist Assigned', 'On the Way', 'Sample Collected', 'Sample at Lab', 'Testing', 'Report Ready'].map((status, idx) => {
           const isActive = idx === ['Phlebotomist Assigned', 'On the Way', 'Sample Collected', 'Sample at Lab', 'Testing', 'Report Ready']
@@ -1579,7 +2156,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
 
       {currentBooking.status === 'Sample Collected' && (
         <div style={{ marginTop: '30px' }}>
-          <div style={styles.sectionTitle}>🔬 Report Progress</div>
+          <div style={styles.sectionTitle}>
+            <Icons.Progress />
+            Report Progress
+          </div>
           <div style={styles.progressBar}>
             <div style={{ ...styles.progressFill, width: `${reportProgress}%` }}></div>
           </div>
@@ -1613,112 +2193,13 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
     }
   };
 
-  // Cart Tab
-  const renderCartTab = () => (
-    <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>🛒 Test Cart ({cart.length} tests)</h3>
-      {cart.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#4F6F6B' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '20px' }}>🧪</div>
-          <div style={{ color: '#124441', fontWeight: '500' }}>Your cart is empty</div>
-          <div style={{ fontSize: '0.9rem', marginTop: '10px' }}>Add tests from the Book section</div>
-          <button 
-            style={{ ...styles.button, marginTop: '20px', maxWidth: '200px' }}
-            onClick={() => handleTabClick('book')}
-          >
-            Browse Tests
-          </button>
-        </div>
-      ) : (
-        <div>
-          {cart.map(test => (
-            <div key={test.id} style={styles.bookingCard}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 'bold', color: '#124441', fontSize: '1.1rem' }}>{test.name}</div>
-                  <div style={{ fontSize: '0.9rem', color: '#4F6F6B', marginTop: '5px' }}>
-                    ⏱️ Report: {test.reportTime} • 🍽️ {test.fasting}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#009688', marginTop: '5px' }}>
-                    {test.recommendedFor[0]}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div style={{ fontWeight: 'bold', color: '#009688', fontSize: '1.2rem' }}>₹{test.price}</div>
-                  <button 
-                    onClick={() => removeFromCart(test.id)}
-                    style={{
-                      backgroundColor: '#FF6B6B',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      padding: '8px 15px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      fontWeight: '500'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#FF4757';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = '#FF6B6B';
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-          <div style={{ 
-            backgroundColor: '#E0F2F1', 
-            padding: '25px', 
-            borderRadius: '10px', 
-            marginTop: '25px',
-            border: '1px solid #4DB6AC'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-              <div>
-                <div style={{ fontWeight: 'bold', color: '#124441' }}>Tests Total ({cart.length})</div>
-                <div style={{ fontSize: '0.9rem', color: '#4F6F6B' }}>Home collection fee will be added later</div>
-              </div>
-              <div style={{ fontWeight: 'bold', color: '#124441', fontSize: '1.3rem' }}>
-                ₹{cart.reduce((sum, item) => sum + item.price, 0)}
-              </div>
-            </div>
-            <div style={{ borderTop: '1px solid #4DB6AC', paddingTop: '15px' }}>
-              <div style={{ fontSize: '0.9rem', color: '#4F6F6B', marginBottom: '10px' }}>
-                You'll select time slot and lab in next step
-              </div>
-              <button 
-                style={{ 
-                  ...styles.button, 
-                  marginTop: '10px', 
-                  fontSize: '1rem', 
-                  padding: '15px',
-                  backgroundColor: '#009688'
-                }}
-                onClick={proceedToFamilySelection}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#4DB6AC';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#009688';
-                }}
-              >
-                🧪 Proceed to Booking →
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  // History Tab with enhanced report download
+  // History Tab
   const renderHistoryTab = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>📋 Test History & Reports</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.History />
+        Test History & Reports
+      </h3>
       {bookingHistory.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#4F6F6B' }}>
           <div style={{ fontSize: '3rem', marginBottom: '20px' }}>📄</div>
@@ -1817,7 +2298,8 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
                           </>
                         ) : (
                           <>
-                            📄 Download PDF
+                            <Icons.Download />
+                            Download PDF
                           </>
                         )}
                       </button>
@@ -1831,14 +2313,18 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
                           cursor: 'pointer',
                           fontSize: '0.85rem',
                           fontWeight: '500',
-                          transition: 'all 0.3s ease'
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
                           viewFullReport(booking);
                         }}
                       >
-                        👁️ View Report
+                        <Icons.View />
+                        View Report
                       </button>
                     </>
                   ) : booking.reportProgress ? (
@@ -1859,14 +2345,18 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontSize: '0.85rem',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
                     viewReportDetails(booking);
                   }}
                 >
-                  View Details →
+                  View Details
+                  <Icons.View />
                 </button>
               </div>
             </div>
@@ -1879,7 +2369,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Labs Tab
   const renderLabsTab = () => (
     <div style={styles.contentCard}>
-      <h3 style={styles.sectionTitle}>🏥 Nearby Diagnostic Centers</h3>
+      <h3 style={styles.sectionTitle}>
+        <Icons.Labs />
+        Nearby Diagnostic Centers
+      </h3>
       <p style={{ color: '#4F6F6B', marginBottom: '20px' }}>
         Choose from NABL accredited labs with home collection service
       </p>
@@ -1904,17 +2397,19 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
             <img src={lab.image} alt={lab.name} style={styles.testImage} />
             <div style={styles.testName}>{lab.name}</div>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ color: '#FFA500', marginRight: '5px' }}>★</span>
-              <span style={{ color: '#124441', fontWeight: 'bold' }}>{lab.rating}</span>
-              <span style={{ marginLeft: '10px', color: '#4F6F6B', fontSize: '0.9rem' }}>
-                📍 {lab.distance} away
+              <Icons.Star />
+              <span style={{ color: '#124441', fontWeight: 'bold', marginLeft: '5px' }}>{lab.rating}</span>
+              <span style={{ marginLeft: '10px', color: '#4F6F6B', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Icons.Location />
+                {lab.distance} away
               </span>
             </div>
             <div style={{ fontSize: '0.9rem', color: '#4F6F6B', marginBottom: '10px' }}>
               🏠 {lab.sampleCollection}
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#4F6F6B', marginBottom: '10px' }}>
-              ⏰ {lab.timing}
+            <div style={{ fontSize: '0.9rem', color: '#4F6F6B', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Icons.Clock />
+              {lab.timing}
             </div>
             <div style={{ fontSize: '0.85rem', color: '#009688', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '5px' }}>
               🏆 {lab.accreditation.split(', ')[0]}
@@ -1928,6 +2423,7 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
                 setBookingStep(3);
               }}
             >
+              <Icons.Book />
               Book from this Lab
             </button>
           </div>
@@ -1964,33 +2460,12 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   // Back Button component
   const BackButton = ({ onClick, text = 'Back' }) => (
     <button 
-      style={{
-        padding: '0.5rem 1rem',
-        backgroundColor: 'transparent',
-        color: '#009688',
-        border: '1px solid #009688',
-        borderRadius: '6px',
-        cursor: 'pointer',
-        fontSize: '0.9rem',
-        marginRight: '1rem',
-        transition: 'all 0.3s ease',
-        '@media (max-width: 768px)': {
-          padding: '0.4rem 0.8rem',
-          fontSize: '0.85rem'
-        }
-      }}
+      style={styles.backButton}
       onClick={onClick}
       type="button"
-      onMouseEnter={(e) => {
-        e.target.style.backgroundColor = '#E0F2F1';
-        e.target.style.color = '#124441';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.backgroundColor = 'transparent';
-        e.target.style.color = '#009688';
-      }}
     >
-      ← {text}
+      <Icons.Back />
+      {text}
     </button>
   );
 
@@ -2005,6 +2480,10 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
   return (
     <>
       <style>{spinnerStyle}</style>
+      
+      {/* Phone Confirmation Modal */}
+      <PhoneConfirmationModal />
+      
       <div style={styles.container}>
         {/* Header Row with Back Button */}
         <div style={styles.headerRow}>
@@ -2016,34 +2495,20 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
           </div>
 
           <div style={styles.headerActions}>
-            <div style={styles.cartButtonContainer}>
+            {currentBooking && (
               <button 
                 style={{
                   ...styles.tab,
-                  backgroundColor: cart.length > 0 ? '#009688' : '#FFFFFF',
-                  color: cart.length > 0 ? '#FFFFFF' : '#4F6F6B',
-                  borderColor: '#4DB6AC',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
+                  backgroundColor: '#009688',
+                  color: '#FFFFFF'
                 }}
-                onClick={() => handleTabClick('cart')}
-              >
-                🛒 Cart
-                {cart.length > 0 && (
-                  <span style={styles.cartBadge}>{cart.length}</span>
-                )}
-              </button>
-            </div>
-            {currentBooking && (
-              <button 
-                style={styles.tab}
                 onClick={() => {
                   handleTabClick('book');
                   setBookingStep(6);
                 }}
               >
-                🚚 Track #{currentBooking.id}
+                <Icons.Track />
+                Track #{currentBooking.id}
               </button>
             )}
           </div>
@@ -2054,25 +2519,40 @@ const LabTestsView = ({ setActiveView, addNotification }) => {
 
         {/* Main Tabs */}
         <div style={styles.tabs}>
-          {['book', 'history', 'labs'].map(tab => (
-            <button
-              key={tab}
-              style={{
-                ...styles.tab,
-                ...(activeTab === tab ? styles.activeTab : {})
-              }}
-              onClick={() => handleTabClick(tab)}
-            >
-              {tab === 'book' && '🧪 Book Tests'}
-              {tab === 'history' && '📋 History & Reports'}
-              {tab === 'labs' && '🏥 Labs'}
-            </button>
-          ))}
+          <button
+            style={{
+              ...styles.tab,
+              ...(activeTab === 'book' ? styles.activeTab : {})
+            }}
+            onClick={() => handleTabClick('book')}
+          >
+            <Icons.Book />
+            Book Tests
+          </button>
+          <button
+            style={{
+              ...styles.tab,
+              ...(activeTab === 'history' ? styles.activeTab : {})
+            }}
+            onClick={() => handleTabClick('history')}
+          >
+            <Icons.History />
+            History & Reports
+          </button>
+          <button
+            style={{
+              ...styles.tab,
+              ...(activeTab === 'labs' ? styles.activeTab : {})
+            }}
+            onClick={() => handleTabClick('labs')}
+          >
+            <Icons.Labs />
+            Labs
+          </button>
         </div>
 
         {/* Tab Content */}
         {activeTab === 'book' && renderBookTestsTab()}
-        {activeTab === 'cart' && renderCartTab()}
         {activeTab === 'history' && renderHistoryTab()}
         {activeTab === 'labs' && renderLabsTab()}
       </div>

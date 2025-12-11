@@ -1,5 +1,5 @@
-// UserDashboard.js - Complete Integrated Version with Vehicle Dashboard
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import ProfileView from './ProfileView';
 import AppointmentsView from './AppointmentsView';
@@ -13,6 +13,7 @@ import FullNotificationsPage from './FullNotificationsPage';
 import Modals from './Modals';
 import Products from './Products';
 import AIChatbotWidget from './AIChatbotWidget';
+import VehicleDashboard from './VehicleDashboard';
 import { ProfileProvider, useProfile } from './ProfileContext';
 
 // Import the new views
@@ -21,10 +22,6 @@ import LabTestsView from './LabTestsView';
 import HealthRecordsView from './HealthRecordsView';
 import BloodBankView from './BloodBankView';
 import BabyCareView from './BabyCareView';
-import VehicleDashboard from './VehicleDashboard';
-
-// Add React Router imports
-import { useLocation, useNavigate } from 'react-router-dom';
 
 // Color Scheme Constants
 const COLORS = {
@@ -332,8 +329,8 @@ const SERVICES = [
     icon: '👶'
   },
   {
-    view: 'vehicle',
-    title: 'Vehicle ',
+    view: 'vehicle-dashboard',
+    title: 'Vehicle Dashboard',
     desc: 'View ambulance, cab, auto, and bike availability near your location in real-time.',
     icon: '🚗'
   }
@@ -573,8 +570,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
-  // New state for subscription modal
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  // New state for subscription modal - REMOVED showSubscriptionModal
   const [selectedSubscription, setSelectedSubscription] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedUpgradePlan, setSelectedUpgradePlan] = useState(null);
@@ -592,7 +588,6 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   const profilePhotoInputRef = useRef(null);
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
-  const subscriptionModalRef = useRef(null);
 
   const [healthRecords, setHealthRecords] = useState({
     conditions: [{ id: 1, condition: 'Hypertension', diagnosedDate: '2022-03-15', status: 'Controlled', severity: 'Mild', treatment: 'Medication & Lifestyle changes' }],
@@ -638,7 +633,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     } else if (activeView !== 'dashboard' && !location.pathname.endsWith(`/${activeView}`)) {
       navigate(`/user/${activeView}`, { replace: true });
     }
-  }, []);
+  }, [activeView, navigate, location.pathname]);
 
   // Save appointments to localStorage whenever they change
   useEffect(() => {
@@ -808,14 +803,14 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
 
   // ========== UPDATED PAYMENT FUNCTIONS ==========
 
-  // Subscription Payment with Phone Confirmation
+  // Subscription Payment with Phone Confirmation - DIRECT PAYMENT (NO POPUP)
   const initiateSubscriptionPayment = async (plan) => {
     if (!razorpayLoaded) {
       addNotification('Payment Error', 'Payment service is not available. Please try again.', 'error');
       return false;
     }
 
-    // Show phone confirmation modal instead of directly opening Razorpay
+    // Show phone confirmation modal instead of subscription info popup
     showPhoneConfirmation(plan, 'subscription');
     return true;
   };
@@ -900,8 +895,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
       
       setPaymentLoading(false);
       
-      // Close subscription modal if open
-      setShowSubscriptionModal(false);
+      // Clear selected subscription
       setSelectedSubscription(null);
       
       addNotification(
@@ -928,12 +922,11 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     });
   };
 
-  // Handle subscription from PregnancyCareView
+  // Handle subscription from PregnancyCareView - DIRECT TO PAYMENT
   const handleSubscribe = async (plan) => {
     setSelectedSubscription(plan);
-    setShowSubscriptionModal(true);
     
-    // Initiate payment with phone confirmation
+    // Initiate payment directly without showing subscription info popup
     const paymentInitiated = await initiateSubscriptionPayment(plan);
     
     if (!paymentInitiated) {
@@ -1481,19 +1474,11 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileDropdown(false);
       }
-      
-      // Close subscription modal when clicking outside
-      if (showSubscriptionModal && 
-          subscriptionModalRef.current && 
-          !subscriptionModalRef.current.contains(event.target)) {
-        setShowSubscriptionModal(false);
-        setSelectedSubscription(null);
-      }
     };
     
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showSubscriptionModal]);
+  }, []);
 
   useEffect(() => {
     if (showChatbot) setTimeout(() => chatInputRef.current?.focus(), 100);
@@ -1743,252 +1728,6 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
               }}
             >
               Continue
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Subscription Modal Component
-  const SubscriptionModal = () => {
-    if (!showSubscriptionModal || !selectedSubscription) return null;
-    
-    return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 10000,
-        padding: 'max(20px, 2vw)'
-      }}>
-        <div 
-          ref={subscriptionModalRef}
-          style={{
-            backgroundColor: COLORS.white,
-            borderRadius: '15px',
-            padding: 'max(30px, 3vw) max(25px, 2.5vw)',
-            maxWidth: 'min(600px, 90vw)',
-            width: '100%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            boxSizing: 'border-box',
-            position: 'relative'
-          }}
-        >
-          <button
-            onClick={() => {
-              setShowSubscriptionModal(false);
-              setSelectedSubscription(null);
-            }}
-            style={{
-              position: 'absolute',
-              top: '15px',
-              right: '15px',
-              backgroundColor: 'transparent',
-              border: 'none',
-              fontSize: 'clamp(1.2rem, 2vw, 1.5rem)',
-              color: '#666',
-              cursor: 'pointer',
-              padding: '5px',
-              borderRadius: '50%',
-              width: '30px',
-              height: '30px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#f5f5f5';
-              e.target.style.color = '#ff5252';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-              e.target.style.color = '#666';
-            }}
-          >
-            ×
-          </button>
-          
-          <h2 style={{ 
-            fontSize: 'clamp(1.3rem, 3vw, 1.5rem)', 
-            fontWeight: 'bold', 
-            color: COLORS.primary, 
-            marginBottom: 'max(20px, 2vw)', 
-            textAlign: 'center',
-            lineHeight: '1.3'
-          }}>
-            {selectedSubscription.title}
-          </h2>
-          
-          <div style={{ 
-            backgroundColor: COLORS.softbg, 
-            padding: 'max(20px, 2vw) max(15px, 1.5vw)', 
-            borderRadius: '10px', 
-            marginBottom: 'max(20px, 2vw)',
-            textAlign: 'center'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              marginBottom: 'max(15px, 1.5vw)',
-              flexWrap: 'wrap',
-              gap: '10px'
-            }}>
-              <div style={{ flex: 1 }}>
-                <span style={{ 
-                  fontSize: 'clamp(1.5rem, 3vw, 2rem)', 
-                  fontWeight: 'bold', 
-                  color: COLORS.primary 
-                }}>
-                  ₹{selectedSubscription.price}
-                </span>
-                <div style={{ 
-                  fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', 
-                  color: COLORS.softtext,
-                  marginTop: '5px'
-                }}>
-                  {selectedSubscription.duration}
-                </div>
-              </div>
-              
-              {selectedSubscription.patientsEnrolled && (
-                <div style={{
-                  backgroundColor: '#2196F3',
-                  color: COLORS.white,
-                  padding: 'max(6px, 0.6vw) max(12px, 1.2vw)',
-                  borderRadius: '12px',
-                  fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)',
-                  fontWeight: 'bold'
-                }}>
-                  {selectedSubscription.patientsEnrolled}
-                </div>
-              )}
-              
-              {selectedSubscription.popular && (
-                <div style={{
-                  backgroundColor: COLORS.primary,
-                  color: COLORS.white,
-                  padding: 'max(6px, 0.6vw) max(12px, 1.2vw)',
-                  borderRadius: '12px',
-                  fontSize: 'clamp(0.7rem, 1.5vw, 0.8rem)',
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap'
-                }}>
-                  MOST POPULAR
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div style={{ marginBottom: 'max(20px, 2vw)' }}>
-            <h4 style={{ 
-              fontSize: 'clamp(1rem, 2.5vw, 1.1rem)', 
-              fontWeight: 'bold', 
-              color: COLORS.darktext, 
-              marginBottom: 'max(15px, 1.5vw)',
-              textAlign: 'center'
-            }}>
-              Features Included:
-            </h4>
-            <div style={{ 
-              maxHeight: '200px', 
-              overflowY: 'auto',
-              padding: '0 10px'
-            }}>
-              {selectedSubscription.features.map((feature, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  alignItems: 'flex-start',
-                  marginBottom: 'max(10px, 1vw)',
-                  padding: 'max(8px, 0.8vw) max(10px, 1vw)',
-                  backgroundColor: index % 2 === 0 ? '#f9f9f9' : COLORS.white,
-                  borderRadius: '8px'
-                }}>
-                  <span style={{ 
-                    color: '#4CAF50', 
-                    marginRight: '10px', 
-                    fontSize: 'clamp(0.9rem, 1.5vw, 1rem)',
-                    minWidth: '20px'
-                  }}>✓</span>
-                  <span style={{ 
-                    fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)',
-                    lineHeight: '1.5',
-                    flex: 1
-                  }}>
-                    {feature}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div style={{ 
-            backgroundColor: '#e8f5e9', 
-            padding: 'max(15px, 1.5vw) max(10px, 1vw)', 
-            borderRadius: '10px', 
-            marginBottom: 'max(20px, 2vw)',
-            textAlign: 'center'
-          }}>
-            <h4 style={{ 
-              fontSize: 'clamp(0.9rem, 2vw, 1rem)', 
-              fontWeight: 'bold', 
-              color: '#2e7d32', 
-              marginBottom: 'max(8px, 0.8vw)'
-            }}>
-               What you'll get:
-            </h4>
-            <p style={{ 
-              fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', 
-              color: COLORS.softtext,
-              lineHeight: '1.5'
-            }}>
-              This plan provides comprehensive pregnancy care with professional medical support, 
-              regular checkups, and complete delivery and postnatal services.
-            </p>
-          </div>
-          
-          <div style={{ 
-            display: 'flex', 
-            gap: 'max(15px, 1.5vw)', 
-            justifyContent: 'center',
-            flexWrap: 'wrap'
-          }}>
-            <button
-              onClick={() => {
-                setShowSubscriptionModal(false);
-                setSelectedSubscription(null);
-              }}
-              style={{
-                backgroundColor: 'transparent',
-                color: COLORS.softtext,
-                border: `1px solid ${COLORS.mint}50`,
-                padding: 'max(12px, 1.2vw) max(24px, 2.4vw)',
-                borderRadius: '25px',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                cursor: 'pointer',
-                flex: '1 1 min(150px, 100%)',
-                minWidth: '120px',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = COLORS.softbg;
-                e.target.style.borderColor = COLORS.primary;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent';
-                e.target.style.borderColor = `${COLORS.mint}50`;
-              }}
-            >
-              Close
             </button>
           </div>
         </div>
@@ -2793,9 +2532,6 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
         {/* Phone Confirmation Modal - FIXED VERSION */}
         <PhoneConfirmationModal />
         
-        {/* Subscription Modal */}
-        <SubscriptionModal />
-        
         {/* Render the correct view based on activeView */}
         {activeView === 'dashboard' && <DashboardView />}
         {activeView === 'profile' && (
@@ -2909,8 +2645,8 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
             handleSubscribe={handleSubscribe}
             handleUpgradeSubscription={handleUpgradeSubscription}
             paymentLoading={paymentLoading}
-            showSubscriptionModal={showSubscriptionModal}
-            setShowSubscriptionModal={setShowSubscriptionModal}
+            showSubscriptionModal={false} // REMOVED: No subscription modal
+            setShowSubscriptionModal={() => {}} // REMOVED: No subscription modal
             selectedSubscription={selectedSubscription}
             setSelectedSubscription={setSelectedSubscription}
             showUpgradeModal={showUpgradeModal}

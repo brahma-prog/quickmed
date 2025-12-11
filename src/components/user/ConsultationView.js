@@ -395,15 +395,16 @@ const TimeSlotsModal = memo(({
   }, [bookedAppointments, convertTo24Hour]);
 
   const getAvailableTimeSlots = useCallback(() => {
+    if (!selectedDoctor || !selectedDoctor.availableSlots) return [];
     return selectedDoctor.availableSlots.filter(time => 
       isTimeSlotAvailable(selectedDoctor.id, selectedAppointmentDate, time, appointmentType)
     );
   }, [selectedDoctor, selectedAppointmentDate, appointmentType, isTimeSlotAvailable]);
 
-  const availableTimeSlots = selectedAppointmentDate ? getAvailableTimeSlots() : [];
-
   // Early return must be after all hooks
   if (!showTimeSlotsModal || !selectedDoctor) return null;
+
+  const availableTimeSlots = selectedAppointmentDate ? getAvailableTimeSlots() : [];
 
   const fee = appointmentType === 'home' 
     ? selectedDoctor.homeConsultFee 
@@ -616,8 +617,7 @@ const PaymentModal = memo(({
   onRetry,
   onDone
 }) => {
-  // Early return must be at the beginning, after all hooks if any
-  // This component doesn't use hooks, so early return is fine at the top
+  // Early return must be at the beginning
   if (!showPaymentModal || !selectedDoctor || !pendingAppointment) return null;
 
   // FIXED: Only show failed/cancelled messages when status is actually 'failed' or 'cancelled'
@@ -888,6 +888,52 @@ const ConsultationView = ({
       document.body.appendChild(script);
     });
   }, []);
+
+  // Search functionality
+  const filterDoctorsBySearch = useCallback((doctors) => {
+    if (!doctorSearchQuery.trim()) return doctors;
+    
+    const query = doctorSearchQuery.toLowerCase().trim();
+    
+    return doctors.filter(doctor => {
+      return (
+        doctor.name.toLowerCase().includes(query) ||
+        doctor.specialty.toLowerCase().includes(query) ||
+        doctor.hospital.toLowerCase().includes(query) ||
+        (doctor.description && doctor.description.toLowerCase().includes(query)) ||
+        (doctor.keywords && doctor.keywords.some(keyword => keyword.toLowerCase().includes(query)))
+      );
+    });
+  }, [doctorSearchQuery]);
+
+  // Filtered doctor lists
+  const pediatricDoctorsFiltered = useMemo(() => 
+    filterDoctorsBySearch(pediatricDoctors), 
+    [filterDoctorsBySearch]
+  );
+
+  const pregnancyDoctorsFiltered = useMemo(() => 
+    filterDoctorsBySearch(pregnancyDoctors), 
+    [filterDoctorsBySearch]
+  );
+
+  const generalDoctorsFiltered = useMemo(() => 
+    filterDoctorsBySearch(generalDoctors), 
+    [filterDoctorsBySearch]
+  );
+
+  // Check if any search results exist
+  const hasSearchResults = useMemo(() => {
+    if (!doctorSearchQuery.trim()) return false;
+    
+    const allDoctors = [
+      ...pediatricDoctorsFiltered,
+      ...pregnancyDoctorsFiltered,
+      ...generalDoctorsFiltered
+    ];
+    
+    return allDoctors.length > 0;
+  }, [doctorSearchQuery, pediatricDoctorsFiltered, pregnancyDoctorsFiltered, generalDoctorsFiltered]);
 
   // Helper Functions - memoized
   const getAppointmentDetails = useCallback((doctorId, type) => {
@@ -1256,7 +1302,23 @@ const ConsultationView = ({
 
       {/* Doctors List */}
       <div style={doctorsListStyle}>
-        {!showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && (
+        {/* Show search results header if searching */}
+        {doctorSearchQuery.trim() && (
+          <div style={searchResultsHeaderStyle}>
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
+              Search Results for "{doctorSearchQuery}"
+            </h3>
+            {!hasSearchResults && !showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && (
+              <div style={noResultsStyle}>
+                <p style={{ color: '#4F6F6B', marginBottom: '1rem' }}>
+                  No doctors found matching "{doctorSearchQuery}". Try a different search or browse categories below.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && !doctorSearchQuery.trim() && (
           <div style={categorySectionStyle}>
             <h3 style={{ color: '#124441', marginBottom: '1rem' }}>All Specialists</h3>
             <p style={{ color: '#4F6F6B', marginBottom: '1rem' }}>
@@ -1265,54 +1327,109 @@ const ConsultationView = ({
           </div>
         )}
 
-        {showPediatricDoctors && (
+        {/* Show pediatric doctors when category selected OR when searching */}
+        {(showPediatricDoctors || (doctorSearchQuery.trim() && pediatricDoctorsFiltered.length > 0)) && (
           <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>👶 Pediatric Specialists</h3>
-            {pediatricDoctors.map((doctor) => (
-              <DoctorCard 
-                key={doctor.id}
-                doctor={doctor}
-                getAppointmentDetails={getAppointmentDetails}
-                handleBookAppointmentClick={handleBookAppointmentClick}
-                handleBookHomeConsultationClick={handleBookHomeConsultationClick}
-                handleBookVideoConsultationClick={handleBookVideoConsultationClick}
-                handleStartVideoCallClick={handleStartVideoCallClick}
-              />
-            ))}
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
+              👶 Pediatric Specialists
+              {pediatricDoctorsFiltered.length > 0 && (
+                <span style={{ fontSize: '0.9rem', color: '#4F6F6B', marginLeft: '0.5rem', fontWeight: 'normal' }}>
+                  ({pediatricDoctorsFiltered.length} found)
+                </span>
+              )}
+            </h3>
+            
+            {pediatricDoctorsFiltered.length > 0 ? (
+              pediatricDoctorsFiltered.map((doctor) => (
+                <DoctorCard 
+                  key={doctor.id}
+                  doctor={doctor}
+                  getAppointmentDetails={getAppointmentDetails}
+                  handleBookAppointmentClick={handleBookAppointmentClick}
+                  handleBookHomeConsultationClick={handleBookHomeConsultationClick}
+                  handleBookVideoConsultationClick={handleBookVideoConsultationClick}
+                  handleStartVideoCallClick={handleStartVideoCallClick}
+                />
+              ))
+            ) : showPediatricDoctors ? (
+              <p style={{ color: '#4F6F6B', fontStyle: 'italic' }}>
+                No pediatric doctors found.
+              </p>
+            ) : null}
           </div>
         )}
 
-        {showPregnancyDoctors && (
+        {/* Show pregnancy doctors when category selected OR when searching */}
+        {(showPregnancyDoctors || (doctorSearchQuery.trim() && pregnancyDoctorsFiltered.length > 0)) && (
           <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>🤰 Pregnancy Specialists</h3>
-            {pregnancyDoctors.map((doctor) => (
-              <DoctorCard 
-                key={doctor.id}
-                doctor={doctor}
-                getAppointmentDetails={getAppointmentDetails}
-                handleBookAppointmentClick={handleBookAppointmentClick}
-                handleBookHomeConsultationClick={handleBookHomeConsultationClick}
-                handleBookVideoConsultationClick={handleBookVideoConsultationClick}
-                handleStartVideoCallClick={handleStartVideoCallClick}
-              />
-            ))}
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
+              🤰 Pregnancy Specialists
+              {pregnancyDoctorsFiltered.length > 0 && (
+                <span style={{ fontSize: '0.9rem', color: '#4F6F6B', marginLeft: '0.5rem', fontWeight: 'normal' }}>
+                  ({pregnancyDoctorsFiltered.length} found)
+                </span>
+              )}
+            </h3>
+            
+            {pregnancyDoctorsFiltered.length > 0 ? (
+              pregnancyDoctorsFiltered.map((doctor) => (
+                <DoctorCard 
+                  key={doctor.id}
+                  doctor={doctor}
+                  getAppointmentDetails={getAppointmentDetails}
+                  handleBookAppointmentClick={handleBookAppointmentClick}
+                  handleBookHomeConsultationClick={handleBookHomeConsultationClick}
+                  handleBookVideoConsultationClick={handleBookVideoConsultationClick}
+                  handleStartVideoCallClick={handleStartVideoCallClick}
+                />
+              ))
+            ) : showPregnancyDoctors ? (
+              <p style={{ color: '#4F6F6B', fontStyle: 'italic' }}>
+                No pregnancy doctors found.
+              </p>
+            ) : null}
           </div>
         )}
 
-        {showGeneralDoctors && (
+        {/* Show general doctors when category selected OR when searching */}
+        {(showGeneralDoctors || (doctorSearchQuery.trim() && generalDoctorsFiltered.length > 0)) && (
           <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>🏥 General Doctors</h3>
-            {generalDoctors.map((doctor) => (
-              <DoctorCard 
-                key={doctor.id}
-                doctor={doctor}
-                getAppointmentDetails={getAppointmentDetails}
-                handleBookAppointmentClick={handleBookAppointmentClick}
-                handleBookHomeConsultationClick={handleBookHomeConsultationClick}
-                handleBookVideoConsultationClick={handleBookVideoConsultationClick}
-                handleStartVideoCallClick={handleStartVideoCallClick}
-              />
-            ))}
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
+              🏥 General Doctors
+              {generalDoctorsFiltered.length > 0 && (
+                <span style={{ fontSize: '0.9rem', color: '#4F6F6B', marginLeft: '0.5rem', fontWeight: 'normal' }}>
+                  ({generalDoctorsFiltered.length} found)
+                </span>
+              )}
+            </h3>
+            
+            {generalDoctorsFiltered.length > 0 ? (
+              generalDoctorsFiltered.map((doctor) => (
+                <DoctorCard 
+                  key={doctor.id}
+                  doctor={doctor}
+                  getAppointmentDetails={getAppointmentDetails}
+                  handleBookAppointmentClick={handleBookAppointmentClick}
+                  handleBookHomeConsultationClick={handleBookHomeConsultationClick}
+                  handleBookVideoConsultationClick={handleBookVideoConsultationClick}
+                  handleStartVideoCallClick={handleStartVideoCallClick}
+                />
+              ))
+            ) : showGeneralDoctors ? (
+              <p style={{ color: '#4F6F6B', fontStyle: 'italic' }}>
+                No general doctors found.
+              </p>
+            ) : null}
+          </div>
+        )}
+
+        {/* Show all categories option when searching */}
+        {doctorSearchQuery.trim() && !showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && (
+          <div style={categorySectionStyle}>
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>Browse All Categories</h3>
+            <p style={{ color: '#4F6F6B', marginBottom: '1rem' }}>
+              Select a category above to view all doctors in that specialty
+            </p>
           </div>
         )}
       </div>
@@ -1464,6 +1581,24 @@ const categorySectionStyle = {
   borderRadius: '12px',
   boxShadow: '0 2px 8px rgba(18, 68, 65, 0.08)',
   border: '1px solid #E0F2F1'
+};
+
+// New styles for search functionality
+const searchResultsHeaderStyle = {
+  backgroundColor: '#E0F2F1',
+  padding: '1.5rem',
+  borderRadius: '12px',
+  marginBottom: '1rem',
+  border: '1px solid #B2DFDB'
+};
+
+const noResultsStyle = {
+  backgroundColor: '#FEE2E2',
+  padding: '1.5rem',
+  borderRadius: '12px',
+  textAlign: 'center',
+  border: '1px solid #FECACA',
+  marginBottom: '1rem'
 };
 
 // Doctor Card Styles

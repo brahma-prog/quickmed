@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, onToggleAIChat }) => {
@@ -7,19 +6,20 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
   const styles = {
     sidebar: {
       width: '280px',
-      backgroundColor: '#F7D9EB',
-      color: '#333333',
+      backgroundColor: '#FFFFFF', // white
+      color: '#124441', // darktext
       display: 'flex',
       flexDirection: 'column',
       position: 'fixed',
       height: '100vh',
       left: 0,
       top: 0,
-      overflowY: 'auto'
+      overflowY: 'auto',
+      borderRight: '1px solid #4DB6AC' // mint border
     },
     sidebarHeader: {
       padding: '24px 20px 16px',
-      borderBottom: '1px solid rgba(0,0,0,0.1)',
+      borderBottom: '1px solid #E0F2F1', // softbg border
       display: 'flex',
       alignItems: 'center',
       gap: '12px'
@@ -39,18 +39,18 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       width: '40px',
       height: '40px',
       borderRadius: '8px',
-      backgroundColor: 'rgba(0,0,0,0.1)',
+      backgroundColor: '#E0F2F1', // softbg
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: '20px',
-      border: '2px solid rgba(0,0,0,0.2)'
+      border: '2px solid #4DB6AC' // mint
     },
     logoText: {
       fontSize: '22px',
       fontWeight: '700',
       margin: '0 0 4px 0',
-      color: '#333333',
+      color: '#009688', // primary
       letterSpacing: '0.5px'
     },
     agentTitle: {
@@ -58,12 +58,12 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       opacity: 0.8,
       margin: 0,
       fontWeight: '400',
-      color: '#333333'
+      color: '#4F6F6B' // softtext
     },
     profileSection: {
       padding: '16px 20px',
-      borderBottom: '1px solid rgba(0,0,0,0.1)',
-      backgroundColor: 'rgba(0,0,0,0.05)'
+      borderBottom: '1px solid #E0F2F1', // softbg border
+      backgroundColor: '#F8FAFC'
     },
     profileInfo: {
       display: 'flex',
@@ -79,20 +79,21 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       height: '48px',
       borderRadius: '50%',
       objectFit: 'cover',
-      border: '2px solid rgba(0,0,0,0.2)',
+      border: '2px solid #4DB6AC', // mint border
       cursor: 'pointer'
     },
     sidebarAvatarPlaceholder: {
       width: '48px',
       height: '48px',
       borderRadius: '50%',
-      backgroundColor: 'rgba(0,0,0,0.1)',
+      backgroundColor: '#E0F2F1', // softbg
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: '20px',
-      border: '2px solid rgba(0,0,0,0.2)',
-      cursor: 'pointer'
+      border: '2px solid #4DB6AC', // mint
+      cursor: 'pointer',
+      color: '#009688' // primary
     },
     userDetails: {
       flex: 1
@@ -101,7 +102,7 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       margin: '0 0 4px 0',
       fontWeight: '600',
       fontSize: '14px',
-      color: '#333333'
+      color: '#124441' // darktext
     },
     onlineStatusSmall: {
       display: 'flex',
@@ -109,7 +110,7 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       gap: '6px',
       fontSize: '12px',
       opacity: 0.8,
-      color: '#333333'
+      color: '#4F6F6B' // softtext
     },
     statusDot: {
       width: '8px',
@@ -128,17 +129,18 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       padding: '14px 20px',
       backgroundColor: 'transparent',
       border: 'none',
-      color: '#333333',
+      color: '#4F6F6B', // softtext
       fontSize: '14px',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
       opacity: 0.8
     },
     navButtonActive: {
-      backgroundColor: 'rgba(0,0,0,0.08)',
+      backgroundColor: '#E0F2F1', // softbg
       opacity: 1,
-      // Removed the borderRight property to remove the line
-      fontWeight: '600'
+      color: '#009688', // primary
+      fontWeight: '600',
+      borderLeft: '4px solid #009688' // primary accent border
     },
     navIcon: {
       fontSize: '18px',
@@ -153,8 +155,8 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
     },
     sidebarFooter: {
       padding: '16px 20px',
-      borderTop: '1px solid rgba(0,0,0,0.1)',
-      backgroundColor: 'rgba(0,0,0,0.05)'
+      borderTop: '1px solid #E0F2F1', // softbg border
+      backgroundColor: '#F8FAFC'
     },
     sidebarActions: {
       display: 'flex',
@@ -164,14 +166,18 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
     logoutButton: {
       width: '100%',
       padding: '10px 16px',
-      backgroundColor: 'rgba(0,0,0,0.08)',
-      color: '#333333',
-      border: 'none',
+      backgroundColor: '#E0F2F1', // softbg
+      color: '#124441', // darktext
+      border: '1px solid #4DB6AC', // mint
       borderRadius: '8px',
       cursor: 'pointer',
       fontWeight: '500',
       fontSize: '14px',
       transition: 'background-color 0.3s ease'
+    },
+    logoutButtonHover: {
+      backgroundColor: '#4DB6AC', // mint
+      color: '#FFFFFF' // white
     },
     // Profile Popup Styles
     profilePopup: {
@@ -179,16 +185,17 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF', // white
       borderRadius: '12px',
       padding: '24px',
       width: '400px',
       maxWidth: '90vw',
       maxHeight: '80vh',
       overflowY: 'auto',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
       zIndex: 1000,
-      color: '#333'
+      color: '#124441', // darktext
+      border: '1px solid #4DB6AC' // mint
     },
     overlay: {
       position: 'fixed',
@@ -196,7 +203,7 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: 'rgba(0,0,0,0.3)',
       zIndex: 999
     },
     popupHeader: {
@@ -205,12 +212,12 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       justifyContent: 'space-between',
       marginBottom: '20px',
       paddingBottom: '16px',
-      borderBottom: '1px solid #e5e7eb'
+      borderBottom: '1px solid #E0F2F1' // softbg
     },
     popupTitle: {
       fontSize: '20px',
       fontWeight: '600',
-      color: '#7C2A62',
+      color: '#009688', // primary
       margin: 0
     },
     closeButton: {
@@ -218,7 +225,7 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       border: 'none',
       fontSize: '24px',
       cursor: 'pointer',
-      color: '#6B7280',
+      color: '#4F6F6B', // softtext
       padding: '4px'
     },
     profileDetails: {
@@ -230,16 +237,16 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '12px 0',
-      borderBottom: '1px solid #f3f4f6'
+      borderBottom: '1px solid #F8FAFC'
     },
     detailLabel: {
       fontWeight: '500',
-      color: '#6B7280',
+      color: '#4F6F6B', // softtext
       fontSize: '14px'
     },
     detailValue: {
       fontWeight: '400',
-      color: '#374151',
+      color: '#124441', // darktext
       fontSize: '14px',
       textAlign: 'right'
     },
@@ -255,8 +262,8 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
     fullProfileButton: {
       flex: 1,
       padding: '12px',
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688', // primary
+      color: '#FFFFFF', // white
       border: 'none',
       borderRadius: '8px',
       cursor: 'pointer',
@@ -267,22 +274,22 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
     // Scrollbar styles
     scrollbar: {
       scrollbarWidth: 'thin',
-      scrollbarColor: 'rgba(0,0,0,0.3) rgba(0,0,0,0.1)'
+      scrollbarColor: '#4DB6AC #E0F2F1' // mint and softbg
     },
     scrollbarWebkit: {
       '&::-webkit-scrollbar': {
         width: '6px'
       },
       '&::-webkit-scrollbar-track': {
-        background: 'rgba(0,0,0,0.1)',
+        background: '#E0F2F1', // softbg
         borderRadius: '3px'
       },
       '&::-webkit-scrollbar-thumb': {
-        background: 'rgba(0,0,0,0.3)',
+        background: '#4DB6AC', // mint
         borderRadius: '3px'
       },
       '&::-webkit-scrollbar-thumb:hover': {
-        background: 'rgba(0,0,0,0.5)'
+        background: '#009688' // primary
       }
     }
   };
@@ -324,8 +331,8 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
 
   // Logo configuration - replace with your actual logo URL
   const logoConfig = {
-    url: 'Quickmed img.png',
-    alt: 'QuickMed Logo'
+    url: 'QuickMed_logo.png',
+    alt: 'QuickMed'
   };
 
   const profileInfo = getProfileData();
@@ -346,7 +353,7 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
                 }}
               />
             ) : (
-              <div style={styles.logoPlaceholder}></div>
+              <div style={styles.logoPlaceholder}>🏥</div>
             )}
             <div>
               <h1 style={styles.logoText}>QUICKMED</h1>
@@ -374,7 +381,7 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
               <div style={styles.onlineStatusSmall}>
                 <span style={{
                   ...styles.statusDot,
-                  backgroundColor: isOnline ? '#10B981' : '#6B7280'
+                  backgroundColor: isOnline ? '#4DB6AC' : '#9CA3AF' // mint when online
                 }}></span>
                 <span>{isOnline ? 'Online' : 'Offline'}</span>
               </div>
@@ -392,6 +399,18 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
                 ...(activePage === item.id ? styles.navButtonActive : {})
               }}
               onClick={() => setActivePage(item.id)}
+              onMouseEnter={(e) => {
+                if (activePage !== item.id) {
+                  e.currentTarget.style.backgroundColor = '#F8FAFC';
+                  e.currentTarget.style.color = '#124441';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activePage !== item.id) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#4F6F6B';
+                }
+              }}
             >
               <span style={styles.navIcon}>{item.icon}</span>
               <span style={styles.navLabel}>{item.label}</span>
@@ -402,7 +421,18 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
         {/* Footer Actions */}
         <div style={styles.sidebarFooter}>
           <div style={styles.sidebarActions}>
-            <button style={styles.logoutButton} onClick={onLogout}>
+            <button 
+              style={styles.logoutButton} 
+              onClick={onLogout}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#4DB6AC';
+                e.currentTarget.style.color = '#FFFFFF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#E0F2F1';
+                e.currentTarget.style.color = '#124441';
+              }}
+            >
                Logout
             </button>
           </div>
@@ -455,7 +485,16 @@ const Sidebar = ({ activePage, setActivePage, profileData, isOnline, onLogout, o
             </div>
 
             <div style={styles.popupActions}>
-              <button style={styles.fullProfileButton} onClick={handleViewFullProfile}>
+              <button 
+                style={styles.fullProfileButton} 
+                onClick={handleViewFullProfile}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#4DB6AC';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#009688';
+                }}
+              >
                 View Full Profile
               </button>
             </div>

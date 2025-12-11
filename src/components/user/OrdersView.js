@@ -720,7 +720,7 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
       recent: () => { const d = new Date(); d.setDate(d.getDate() - 7); return d; },
       last30days: () => { const d = new Date(); d.setDate(d.getDate() - 30); return d; },
       last6months: () => { const d = new Date(); d.setMonth(d.getMonth() - 6); return d; },
-      last1year: () => { const d = new Date(); d.setFullYear(d.getFullYear() - 1); return d; }
+      last1year: () => { const d = new Date(); d.setFullYear(d.getYear() - 1); return d; }
     };
     if (dateRanges[dateFilter]) {
       const startDate = dateRanges[dateFilter]();
@@ -769,7 +769,7 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
     <>
       <div style={styles.container}>
         <div style={styles.header}>
-          <button style={styles.backButton} onClick={() => setActiveView('dashboard')}>← Dashboard</button>
+          <button style={styles.backButton} onClick={() => setActiveView('medicine')}>← Back to Medicines</button>
           <div style={{ flex: 1, textAlign: 'center' }}>
             <h2 style={styles.title}>Order History & Tracking</h2>
             <p style={styles.subtitle}>Track your medicine orders with real-time updates and 20-30 mins delivery</p>
@@ -830,6 +830,9 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
                 <div style={styles.emptyState}>
                   <div style={{ fontSize: '4rem', marginBottom: '1.5rem', opacity: 0.7 }}>📋</div>
                   <h4 style={{ color: '#009688', marginBottom: '1rem' }}>No Orders Found</h4>
+                  <p style={{ color: '#4F6F6B', marginBottom: '1.5rem' }}>
+                    You haven't placed any orders yet. Start shopping to see your order history here!
+                  </p>
                   <button style={styles.shopButton} onClick={() => setActiveView('medicine')}>🛒 Shop Medicines</button>
                 </div>
               ) : (

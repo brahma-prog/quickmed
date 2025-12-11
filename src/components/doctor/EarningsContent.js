@@ -269,7 +269,9 @@ const EarningsContent = ({ dashboardData, state, actions }) => {
 const styles = {
   mainContent: {
     padding: 'clamp(15px, 3vw, 30px)',
-    textAlign: 'left'
+    textAlign: 'left',
+    backgroundColor: '#E0F2F1',
+    minHeight: '100vh'
   },
   header: {
     display: 'flex',
@@ -287,13 +289,13 @@ const styles = {
   greeting: {
     fontSize: 'clamp(20px, 4vw, 28px)',
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0',
     textAlign: 'left'
   },
   subtitle: {
     fontSize: 'clamp(14px, 2vw, 16px)',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0,
     textAlign: 'left'
   },
@@ -303,7 +305,7 @@ const styles = {
     backgroundColor: 'white',
     padding: '4px',
     borderRadius: '8px',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC'
   },
   mobileFilter: {
     marginBottom: '20px'
@@ -311,9 +313,11 @@ const styles = {
   mobileFilterSelect: {
     width: '100%',
     padding: '12px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
-    fontSize: '16px'
+    fontSize: '16px',
+    backgroundColor: 'white',
+    color: '#124441'
   },
   earningFilter: {
     padding: '8px 16px',
@@ -322,10 +326,11 @@ const styles = {
     borderRadius: '6px',
     cursor: 'pointer',
     fontSize: '14px',
-    fontWeight: '500'
+    fontWeight: '500',
+    color: '#4F6F6B'
   },
   earningFilterActive: {
-    backgroundColor: '#7C2A62',
+    backgroundColor: '#009688',
     color: 'white'
   },
   earningsSummary: {
@@ -334,7 +339,8 @@ const styles = {
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     marginBottom: '24px',
-    textAlign: 'left'
+    textAlign: 'left',
+    border: '1px solid #4DB6AC'
   },
   earningStats: {
     display: 'grid',
@@ -346,13 +352,13 @@ const styles = {
   earningAmount: {
     fontSize: 'clamp(20px, 3vw, 24px)',
     fontWeight: '700',
-    color: '#7C2A62',
+    color: '#009688',
     margin: '0 0 8px 0',
     textAlign: 'left'
   },
   earningLabel: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: 0,
     textAlign: 'left'
   },
@@ -361,18 +367,19 @@ const styles = {
     padding: '24px',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    textAlign: 'left'
+    textAlign: 'left',
+    border: '1px solid #4DB6AC'
   },
   sectionTitle: {
     fontSize: 'clamp(18px, 2.5vw, 20px)',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 8px 0',
     textAlign: 'left'
   },
   sectionSubtitle: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#4F6F6B',
     margin: '0 0 20px 0',
     textAlign: 'left'
   },
@@ -387,13 +394,17 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '16px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     textAlign: 'left',
     flexWrap: 'wrap',
     gap: '10px',
     cursor: 'pointer',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.3s ease',
+    backgroundColor: '#E0F2F1'
+  },
+  earningItemHover: {
+    backgroundColor: '#B2DFDB'
   },
   earningDate: {
     display: 'flex',
@@ -406,23 +417,23 @@ const styles = {
   earningDateText: {
     textAlign: 'left',
     fontSize: '16px',
-    color: '#1f2937'
+    color: '#124441'
   },
   earningConsultations: {
     textAlign: 'left',
     fontSize: '14px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   clickHint: {
     textAlign: 'left',
     fontSize: '12px',
-    color: '#7C2A62',
+    color: '#009688',
     fontWeight: '500'
   },
   earningAmountItem: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#7C2A62',
+    color: '#009688',
     textAlign: 'right'
   },
   // Modal Styles
@@ -446,14 +457,15 @@ const styles = {
     width: '100%',
     maxHeight: '80vh',
     overflow: 'auto',
-    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+    border: '1px solid #4DB6AC'
   },
   modalHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    borderBottom: '1px solid #e5e7eb',
+    borderBottom: '1px solid #4DB6AC',
     position: 'sticky',
     top: 0,
     backgroundColor: 'white',
@@ -462,7 +474,7 @@ const styles = {
   modalTitle: {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: 0
   },
   closeButton: {
@@ -470,7 +482,19 @@ const styles = {
     border: 'none',
     fontSize: '20px',
     cursor: 'pointer',
-    color: '#6b7280'
+    color: '#4F6F6B',
+    padding: '0',
+    width: '30px',
+    height: '30px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '4px',
+    transition: 'all 0.3s ease'
+  },
+  closeButtonHover: {
+    backgroundColor: '#E0F2F1',
+    color: '#124441'
   },
   modalContent: {
     padding: '20px'
@@ -482,22 +506,22 @@ const styles = {
     marginBottom: '24px'
   },
   summaryCard: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#E0F2F1',
     padding: '16px',
     borderRadius: '8px',
     textAlign: 'center',
-    border: '1px solid #e5e7eb'
+    border: '1px solid #4DB6AC'
   },
   summaryAmount: {
     fontSize: '18px',
     fontWeight: '700',
-    color: '#7C2A62',
+    color: '#009688',
     display: 'block',
     marginBottom: '4px'
   },
   summaryLabel: {
     fontSize: '12px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   patientsList: {
     marginTop: '20px'
@@ -505,7 +529,7 @@ const styles = {
   listTitle: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#124441',
     margin: '0 0 16px 0'
   },
   patientEarningItem: {
@@ -513,9 +537,10 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '12px',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
-    marginBottom: '8px'
+    marginBottom: '8px',
+    backgroundColor: '#E0F2F1'
   },
   patientInfo: {
     display: 'flex',
@@ -525,7 +550,8 @@ const styles = {
   },
   patientAvatar: {
     fontSize: '20px',
-    flexShrink: 0
+    flexShrink: 0,
+    color: '#4F6F6B'
   },
   patientDetails: {
     display: 'flex',
@@ -534,20 +560,20 @@ const styles = {
   },
   patientName: {
     fontSize: '14px',
-    color: '#1f2937'
+    color: '#124441'
   },
   serviceType: {
     fontSize: '12px',
-    color: '#6b7280'
+    color: '#4F6F6B'
   },
   consultationTime: {
     fontSize: '11px',
-    color: '#9CA3AF'
+    color: '#4F6F6B'
   },
   earningAmount: {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#7C2A62',
+    color: '#009688',
     flexShrink: 0
   }
 };

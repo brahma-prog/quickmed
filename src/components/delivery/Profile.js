@@ -32,7 +32,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     mainContent: {
       padding: '20px',
       minHeight: '100vh',
-      backgroundColor: '#f8f9fa'
+      backgroundColor: '#E0F2F1'
     },
     header: {
       display: 'flex',
@@ -45,30 +45,31 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     greeting: {
       fontSize: '28px',
       fontWeight: '700',
-      color: '#1f2937',
+      color: '#124441',
       margin: '0 0 8px 0',
       textAlign: 'center'
     },
     subtitle: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       margin: 0,
       textAlign: 'center'
     },
     profileContainer: {
       maxWidth: '800px',
       margin: '0 auto',
-      backgroundColor: 'white',
-      borderRadius: '8px',
+      backgroundColor: '#FFFFFF',
+      borderRadius: '12px',
       padding: '30px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      boxShadow: '0 4px 6px rgba(0, 150, 136, 0.1)',
+      border: '1px solid #4DB6AC'
     },
     profileHeader: {
       display: 'flex',
       alignItems: 'center',
       marginBottom: '30px',
       paddingBottom: '20px',
-      borderBottom: '1px solid #e5e7eb'
+      borderBottom: '1px solid #E0F2F1'
     },
     profileAvatar: {
       marginRight: '20px',
@@ -79,28 +80,28 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       height: '80px',
       borderRadius: '50%',
       objectFit: 'cover',
-      border: '3px solid #7C2A62'
+      border: '3px solid #009688'
     },
     profileImagePlaceholder: {
       width: '80px',
       height: '80px',
       borderRadius: '50%',
-      backgroundColor: '#F7D9EB',
+      backgroundColor: '#E0F2F1',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      border: '3px solid #7C2A62'
+      border: '3px solid #009688'
     },
     avatarIcon: {
       fontSize: '32px',
-      color: '#7C2A62'
+      color: '#009688'
     },
     changePhotoButton: {
       position: 'absolute',
       bottom: '0',
       right: '0',
-      backgroundColor: '#7C2A62',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       border: 'none',
       borderRadius: '50%',
       width: '28px',
@@ -110,14 +111,14 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: '12px',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+      boxShadow: '0 2px 4px rgba(0, 150, 136, 0.3)'
     },
     profileUserInfo: {
       flex: 1
     },
     agentId: {
       fontSize: '16px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       margin: '0 0 10px 0',
       fontWeight: '500'
     },
@@ -127,14 +128,14 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     sectionTitle: {
       fontSize: '18px',
       fontWeight: '600',
-      color: '#1f2937',
+      color: '#124441',
       margin: '0 0 20px 0',
       paddingBottom: '10px',
-      borderBottom: '2px solid #7C2A62'
+      borderBottom: '2px solid #009688'
     },
     sectionSubtitle: {
       fontSize: '14px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       margin: '0 0 15px 0',
       fontStyle: 'italic'
     },
@@ -170,7 +171,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     label: {
       fontSize: '14px',
       fontWeight: '600',
-      color: '#374151',
+      color: '#124441',
       marginBottom: '6px',
       display: 'flex',
       alignItems: 'center',
@@ -179,14 +180,14 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     labelDisabled: {
       fontSize: '14px',
       fontWeight: '600',
-      color: '#6b7280',
+      color: '#4F6F6B',
       marginBottom: '6px',
       display: 'flex',
       alignItems: 'center',
       gap: '5px'
     },
     required: {
-      color: '#EF4444'
+      color: '#FF6B6B'
     },
     inputContainer: {
       position: 'relative',
@@ -195,46 +196,46 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     input: {
       width: '100%',
       padding: '10px 12px',
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC',
       borderRadius: '6px',
       fontSize: '14px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       transition: 'all 0.2s ease',
       outline: 'none',
       boxSizing: 'border-box'
     },
     inputEditing: {
-      borderColor: '#7C2A62',
-      backgroundColor: '#fafafa'
+      borderColor: '#009688',
+      backgroundColor: '#E0F2F1'
     },
     inputDisabled: {
-      backgroundColor: '#f3f4f6',
-      color: '#6b7280',
+      backgroundColor: '#F0F7F6',
+      color: '#4F6F6B',
       cursor: 'not-allowed',
-      border: '1px solid #d1d5db'
+      border: '1px solid #4DB6AC'
     },
     inputError: {
-      borderColor: '#EF4444',
-      backgroundColor: '#FEF2F2'
+      borderColor: '#FF6B6B',
+      backgroundColor: '#FFF5F5'
     },
     inputReadOnly: {
-      backgroundColor: '#f9fafb',
-      color: '#374151',
-      border: '1px solid #d1d5db'
+      backgroundColor: '#F0F7F6',
+      color: '#124441',
+      border: '1px solid #4DB6AC'
     },
     select: {
       width: '100%',
       padding: '10px 12px',
-      border: '1px solid #d1d5db',
+      border: '1px solid #4DB6AC',
       borderRadius: '6px',
       fontSize: '14px',
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       outline: 'none',
       boxSizing: 'border-box'
     },
     selectDisabled: {
-      backgroundColor: '#f8fafc',
-      color: '#6b7280',
+      backgroundColor: '#F0F7F6',
+      color: '#4F6F6B',
       cursor: 'not-allowed'
     },
     phonePrefix: {
@@ -242,7 +243,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       left: '12px',
       top: '50%',
       transform: 'translateY(-50%)',
-      color: '#6b7280',
+      color: '#4F6F6B',
       fontWeight: '500',
       fontSize: '14px'
     },
@@ -250,7 +251,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       paddingLeft: '40px'
     },
     errorText: {
-      color: '#EF4444',
+      color: '#FF6B6B',
       fontSize: '12px',
       marginTop: '4px',
       fontWeight: '500',
@@ -261,19 +262,19 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     fieldValue: {
       padding: '10px 12px',
       fontSize: '14px',
-      color: '#1f2937',
+      color: '#124441',
       fontWeight: '500',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1',
       borderRadius: '6px',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC',
       minHeight: '40px',
       display: 'flex',
       alignItems: 'center'
     },
     sensitiveData: {
-      color: '#EF4444',
+      color: '#009688',
       fontWeight: '600',
-      backgroundColor: '#FEF2F2',
+      backgroundColor: '#E0F2F1',
       padding: '2px 6px',
       borderRadius: '4px'
     },
@@ -285,34 +286,34 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     },
     statItem: {
       padding: '15px',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1',
       borderRadius: '8px',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC',
       textAlign: 'center'
     },
     statLabel: {
       fontSize: '12px',
-      color: '#6b7280',
+      color: '#4F6F6B',
       fontWeight: '600',
       textTransform: 'uppercase',
       marginBottom: '5px'
     },
     statValue: {
       fontSize: '16px',
-      color: '#1f2937',
+      color: '#124441',
       fontWeight: '600'
     },
     emergencyContactSection: {
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#E0F2F1',
       padding: '20px',
       borderRadius: '8px',
-      border: '1px solid #e5e7eb',
+      border: '1px solid #4DB6AC',
       marginBottom: '20px'
     },
     emergencyContactHeader: {
       fontSize: '16px',
       fontWeight: '600',
-      color: '#1f2937',
+      color: '#124441',
       marginBottom: '15px',
       display: 'flex',
       alignItems: 'center',
@@ -331,31 +332,11 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       justifyContent: 'flex-end',
       marginTop: '30px',
       paddingTop: '20px',
-      borderTop: '1px solid #e5e7eb'
+      borderTop: '1px solid #E0F2F1'
     },
     saveButton: {
-      backgroundColor: '#7C2A62',
-      color: 'white',
-      border: 'none',
-      borderRadius: '6px',
-      padding: '12px 24px',
-      fontSize: '14px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease',
-      minWidth: '140px'
-    },
-    saveButtonDisabled: {
-      backgroundColor: '#9CA3AF',
-      cursor: 'not-allowed'
-    },
-    saveButtonHover: {
-      backgroundColor: '#6B2252',
-      transform: 'translateY(-1px)'
-    },
-    editButton: {
-      backgroundColor: '#374151',
-      color: 'white',
+      backgroundColor: '#009688',
+      color: '#FFFFFF',
       border: 'none',
       borderRadius: '6px',
       padding: '12px 24px',
@@ -364,7 +345,36 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       cursor: 'pointer',
       transition: 'all 0.2s ease',
       minWidth: '140px',
-      marginTop: '10px'
+      boxShadow: '0 2px 4px rgba(0, 150, 136, 0.2)'
+    },
+    saveButtonDisabled: {
+      backgroundColor: '#4DB6AC',
+      opacity: 0.6,
+      cursor: 'not-allowed'
+    },
+    saveButtonHover: {
+      backgroundColor: '#00796B',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(0, 150, 136, 0.3)'
+    },
+    editButton: {
+      backgroundColor: '#124441',
+      color: '#FFFFFF',
+      border: 'none',
+      borderRadius: '6px',
+      padding: '12px 24px',
+      fontSize: '14px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      minWidth: '140px',
+      marginTop: '10px',
+      boxShadow: '0 2px 4px rgba(18, 68, 65, 0.2)'
+    },
+    editButtonHover: {
+      backgroundColor: '#0A2D2A',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 8px rgba(18, 68, 65, 0.3)'
     }
   };
 
@@ -610,7 +620,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
         <label style={isReadOnly ? styles.labelDisabled : styles.label}>
           {label}
           {isRequired && <span style={styles.required}>*</span>}
-          {isReadOnly && <span style={{fontSize: '12px', color: '#6b7280', marginLeft: '8px'}}>(Cannot be changed)</span>}
+          {isReadOnly && <span style={{fontSize: '12px', color: '#4F6F6B', marginLeft: '8px'}}>(Cannot be changed)</span>}
         </label>
         
         {isEditing ? (
@@ -669,7 +679,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
         <label style={isReadOnly ? styles.labelDisabled : styles.label}>
           {label}
           {isRequired && <span style={styles.required}>*</span>}
-          {isReadOnly && <span style={{fontSize: '12px', color: '#6b7280', marginLeft: '8px'}}>(Cannot be changed)</span>}
+          {isReadOnly && <span style={{fontSize: '12px', color: '#4F6F6B', marginLeft: '8px'}}>(Cannot be changed)</span>}
         </label>
         
         {isEditing ? (
@@ -750,6 +760,11 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     return Object.keys(fieldErrors).length > 0;
   };
 
+  const [hoverState, setHoverState] = useState({
+    editButton: false,
+    saveButton: false
+  });
+
   return (
     <div style={styles.mainContent}>
       <div style={styles.header}>
@@ -776,6 +791,14 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
               style={styles.changePhotoButton}
               onClick={() => setShowProfileImageUpload(true)}
               title="Change profile photo"
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#00796B';
+                e.target.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#009688';
+                e.target.style.transform = 'scale(1)';
+              }}
             >
               📷
             </button>
@@ -785,8 +808,13 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
               <strong>AGENT ID:</strong> {profileData.agentId}
             </div>
             <button
-              style={styles.editButton}
+              style={{
+                ...styles.editButton,
+                ...(hoverState.editButton ? styles.editButtonHover : {})
+              }}
               onClick={handleEditToggle}
+              onMouseEnter={() => setHoverState(s => ({ ...s, editButton: true }))}
+              onMouseLeave={() => setHoverState(s => ({ ...s, editButton: false }))}
             >
               {isEditing ? 'Cancel Editing' : 'Edit Profile'}
             </button>
@@ -812,7 +840,6 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
                 { value: 'Motorcycle', label: 'Motorcycle' },
                 { value: 'Scooter', label: 'Scooter' },
                 { value: 'Bicycle', label: 'Bicycle' },
-               
               ]
             )}
             {renderFormField('vehicleNumber', 'Vehicle Number', true)}
@@ -931,22 +958,13 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
             <button
               style={{
                 ...styles.saveButton,
-                ...(hasValidationErrors() ? styles.saveButtonDisabled : {})
+                ...(hasValidationErrors() ? styles.saveButtonDisabled : {}),
+                ...(hoverState.saveButton && !hasValidationErrors() ? styles.saveButtonHover : {})
               }}
               onClick={handleSaveChanges}
               disabled={hasValidationErrors()}
-              onMouseOver={(e) => {
-                if (!hasValidationErrors()) {
-                  e.target.style.backgroundColor = styles.saveButtonHover.backgroundColor;
-                  e.target.style.transform = styles.saveButtonHover.transform;
-                }
-              }}
-              onMouseOut={(e) => {
-                if (!hasValidationErrors()) {
-                  e.target.style.backgroundColor = styles.saveButton.backgroundColor;
-                  e.target.style.transform = 'translateY(0)';
-                }
-              }}
+              onMouseEnter={() => !hasValidationErrors() && setHoverState(s => ({ ...s, saveButton: true }))}
+              onMouseLeave={() => setHoverState(s => ({ ...s, saveButton: false }))}
             >
               Save Changes
             </button>

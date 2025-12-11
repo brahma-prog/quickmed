@@ -1,120 +1,6 @@
-// // DeliverySignup.js
-// import React from 'react';
-// import BaseSignup from './BaseSignup';
+import React, { useState, useEffect } from 'react';
 
-// const DeliverySignup = ({ onSignupSuccess }) => {
-//   const userDetails = {
-//     type: 'delivery',
-//     label: 'Delivery Partner',
-//     title: 'a Delivery Partner',
-//     quote: 'Join our network of trusted delivery partners and earn competitive rates',
-//     benefits: [
-//       'Flexible working hours',
-//       'Competitive commission rates',
-//       'Real-time delivery tracking',
-//       'Weekly payments',
-//       'Insurance coverage'
-//     ],
-//     customFields: [
-//       {
-//         name: 'vehicleType',
-//         label: 'Vehicle Type',
-//         type: 'select',
-//         placeholder: 'Select your vehicle type',
-//         required: true,
-//         options: [
-//           { value: 'bike', label: 'Bike' },
-//           { value: 'scooter', label: 'Scooter' },
-//           { value: 'car', label: 'Car' },
-//           { value: 'bicycle', label: 'Bicycle' },
-//           { value: 'walking', label: 'Walking' }
-//         ]
-//       },
-//       {
-//         name: 'vehicleNumber',
-//         label: 'Vehicle Registration Number',
-//         type: 'text',
-//         placeholder: 'Enter vehicle registration number',
-//         required: true
-//       },
-//       {
-//         name: 'idProof',
-//         label: 'ID Proof Type',
-//         type: 'select',
-//         placeholder: 'Select ID proof',
-//         required: true,
-//         options: [
-//           { value: 'aadhar', label: 'Aadhar Card' },
-//           { value: 'pan', label: 'PAN Card' },
-//           { value: 'driving-license', label: 'Driving License' },
-//           { value: 'voter-id', label: 'Voter ID' },
-//           { value: 'passport', label: 'Passport' }
-//         ]
-//       },
-//       {
-//         name: 'idNumber',
-//         label: 'ID Proof Number',
-//         type: 'text',
-//         placeholder: 'Enter ID proof number',
-//         required: true
-//       },
-//       {
-//         name: 'availability',
-//         label: 'Preferred Working Hours',
-//         type: 'select',
-//         placeholder: 'Select availability',
-//         required: true,
-//         options: [
-//           { value: 'morning', label: 'Morning (6 AM - 12 PM)' },
-//           { value: 'afternoon', label: 'Afternoon (12 PM - 6 PM)' },
-//           { value: 'evening', label: 'Evening (6 PM - 12 AM)' },
-//           { value: 'night', label: 'Night (12 AM - 6 AM)' },
-//           { value: 'full-day', label: 'Full Day (Flexible)' }
-//         ]
-//       }
-//     ],
-//     fieldValidations: {
-//       vehicleType: {
-//         required: true,
-//         message: 'Please select vehicle type'
-//       },
-//       vehicleNumber: {
-//         required: true,
-//         message: 'Vehicle number is required'
-//       },
-//       idProof: {
-//         required: true,
-//         message: 'Please select ID proof type'
-//       },
-//       idNumber: {
-//         required: true,
-//         message: 'ID proof number is required'
-//       },
-//       availability: {
-//         required: true,
-//         message: 'Please select availability'
-//       }
-//     }
-//   };
-
-//   return (
-//     <BaseSignup 
-//       userType="delivery"
-//       userDetails={userDetails}
-//       onSignupSuccess={onSignupSuccess}
-//     />
-//   );
-// };
-
-// export default DeliverySignup;
-
-
-
-
-
-import React, { useState } from 'react';
-
-const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
+const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelection }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -159,6 +45,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
   const [livePhoto, setLivePhoto] = useState(null);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isAadharVerified, setIsAadharVerified] = useState(false);
   const [aadharOtpSent, setAadharOtpSent] = useState(false);
   const [aadharOtp, setAadharOtp] = useState('');
   
@@ -173,25 +60,212 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     aadhar: false
   });
 
-  // Validation functions
+  // NEW: Edit mode states
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [originalEmail, setOriginalEmail] = useState('');
+  const [originalPhone, setOriginalPhone] = useState('');
+
+  // NEW: Track user existence during typing
+  const [existingUsers, setExistingUsers] = useState([]);
+
+  // Load existing users on component mount
+  useEffect(() => {
+    const storedUsers = localStorage.getItem('registeredUsers');
+    if (storedUsers) {
+      setExistingUsers(JSON.parse(storedUsers));
+    }
+  }, []);
+
+  // SVG Icons
+  const HomeIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+    </svg>
+  );
+
+  const ChangeRoleIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+    </svg>
+  );
+
+  const EyeIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+    </svg>
+  );
+
+  const EyeOffIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+    </svg>
+  );
+
+  const CheckIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+  );
+
+  const CloseIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
+  );
+
+  const UploadIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+    </svg>
+  );
+
+  const SuccessIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    </svg>
+  );
+
+  const ErrorIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+    </svg>
+  );
+
+  const InfoIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+    </svg>
+  );
+
+  const DeliveryIcon = () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+    </svg>
+  );
+
+  const StepIcon = ({ number, active }) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="17" stroke={active ? "#4DB6AC" : "rgba(255,255,255,0.3)"} strokeWidth="2"/>
+      <circle cx="18" cy="18" r="16" fill={active ? "white" : "transparent"}/>
+      <text x="18" y="22" textAnchor="middle" fontSize="14" fontWeight="600" fill={active ? "#009688" : "rgba(255,255,255,0.7)"}>
+        {number}
+      </text>
+    </svg>
+  );
+
+  const BenefitCheckIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="#4DB6AC">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+  );
+
+  const DocumentIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+    </svg>
+  );
+
+  const PhoneIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+    </svg>
+  );
+
+  const EmailIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+    </svg>
+  );
+
+  const EditIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+    </svg>
+  );
+
+  const CancelIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+    </svg>
+  );
+
+  const LoadingIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+    </svg>
+  );
+
+  // NEW: Check if email/phone already exists in system
+  const checkEmailExists = (email) => {
+    return existingUsers.some(user => user.email === email);
+  };
+
+  const checkPhoneExists = (phone) => {
+    return existingUsers.some(user => user.phone === phone);
+  };
+
+  // NEW: Enhanced validation functions with existence check
+  const validateEmailWithExistence = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email.trim()) return 'Email is required';
+    if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    
+    // Check if email exists (but not if we're editing and it's the same email)
+    if (!isEditingEmail && checkEmailExists(email)) {
+      return 'Email already registered. Please use a different email or login.';
+    }
+    
+    return '';
+  };
+
+  const validatePhoneWithExistence = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phone.trim()) return 'Phone number is required';
+    if (!phoneRegex.test(phone)) return 'Please enter a valid phone number';
+    
+    // Check if phone exists (but not if we're editing and it's the same phone)
+    if (!isEditingPhone && checkPhoneExists(phone)) {
+      return 'Phone number already registered. Please use a different number or login.';
+    }
+    
+    return '';
+  };
+
+  // NEW: Handle edit mode for email
+  const handleEditEmail = () => {
+    setIsEditingEmail(true);
+    setIsEmailVerified(false);
+    setEmailOtpSent(false);
+    setEmailOtp('');
+  };
+
+  // NEW: Handle edit mode for phone
+  const handleEditPhone = () => {
+    setIsEditingPhone(true);
+    setIsPhoneVerified(false);
+    setPhoneOtpSent(false);
+    setPhoneOtp('');
+  };
+
+  // NEW: Cancel edit mode
+  const handleCancelEditEmail = () => {
+    setIsEditingEmail(false);
+    setFormData(prev => ({ ...prev, email: originalEmail }));
+    setIsEmailVerified(true); // Re-verify since we're going back to original
+  };
+
+  const handleCancelEditPhone = () => {
+    setIsEditingPhone(false);
+    setFormData(prev => ({ ...prev, phone: originalPhone }));
+    setIsPhoneVerified(true); // Re-verify since we're going back to original
+  };
+
+  // Original validation functions (keep for other fields)
   const validateName = (name) => {
     const nameRegex = /^[A-Za-z\s]{2,}$/;
     if (!name.trim()) return 'Full name is required';
     if (!nameRegex.test(name)) return 'Name should contain only alphabets and spaces (min 2 characters)';
-    return '';
-  };
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!email.trim()) return 'Email is required';
-    if (!emailRegex.test(email)) return 'Please enter a valid email address';
-    return '';
-  };
-
-  const validatePhone = (phone) => {
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phone.trim()) return 'Phone number is required';
-    if (!phoneRegex.test(phone)) return 'Please enter a valid phone number';
     return '';
   };
 
@@ -222,13 +296,15 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
   const validateVehicleNumber = (vehicle) => {
     const vehicleRegex = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/;
     if (!vehicle.trim()) return 'Vehicle number is required';
-    if (!vehicleRegex.test(vehicle)) return 'Invalid vehicle number format';
+    if (!vehicleRegex.test(vehicle)) return 'Invalid vehicle number format (e.g., KA01AB1234)';
+    if (vehicle.length > 10) return 'Vehicle number max 10 characters';
     return '';
   };
 
   const validateDrivingLicense = (license) => {
+    const licenseRegex = /^[A-Z0-9]{10,16}$/;
     if (!license.trim()) return 'Driving license number is required';
-    if (license.length < 5) return 'Invalid driving license number';
+    if (!licenseRegex.test(license)) return 'Invalid driving license number (10-16 alphanumeric characters)';
     return '';
   };
 
@@ -237,9 +313,42 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
+  // Add a safe wrapper for onSwitchToLogin
+  const handleSwitchToLogin = () => {
+    if (typeof onSwitchToLogin === 'function') {
+      onSwitchToLogin();
+    } else {
+      console.warn('onSwitchToLogin prop is not provided');
+      setToastMessage('Login switch function not available');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
+  // Add a safe wrapper for onSwitchToRoleSelection
+  const handleSwitchToRoleSelection = () => {
+    if (typeof onSwitchToRoleSelection === 'function') {
+      onSwitchToRoleSelection();
+    } else {
+      console.warn('onSwitchToRoleSelection prop is not provided');
+      setToastMessage('Role selection function not available');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
+  // Home navigation handler
+  const handleHomeNavigation = () => {
+    window.location.href = '/';
+  };
+
   // Phone verification handlers
   const sendPhoneOtp = async () => {
-    if (!formData.phone || formErrors.phone) {
+    const phoneError = validatePhoneWithExistence(formData.phone);
+    if (phoneError) {
+      setFormErrors(prev => ({ ...prev, phone: phoneError }));
       setToastMessage('Please enter a valid phone number');
       setToastType('error');
       setShowToast(true);
@@ -279,6 +388,8 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     
     if (phoneOtp.length === 6) {
       setIsPhoneVerified(true);
+      setIsEditingPhone(false); // Exit edit mode
+      setOriginalPhone(formData.phone); // Save as original
       setToastMessage('Phone number verified successfully!');
       setToastType('success');
     } else {
@@ -293,7 +404,9 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
   // Email verification handlers
   const sendEmailOtp = async () => {
-    if (!formData.email || formErrors.email) {
+    const emailError = validateEmailWithExistence(formData.email);
+    if (emailError) {
+      setFormErrors(prev => ({ ...prev, email: emailError }));
       setToastMessage('Please enter a valid email address');
       setToastType('error');
       setShowToast(true);
@@ -332,6 +445,8 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     
     if (emailOtp.length === 6) {
       setIsEmailVerified(true);
+      setIsEditingEmail(false); // Exit edit mode
+      setOriginalEmail(formData.email); // Save as original
       setToastMessage('Email verified successfully!');
       setToastType('success');
     } else {
@@ -384,10 +499,10 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     if (aadharOtp.length === 6) {
+      setIsAadharVerified(true);
       setToastMessage('Aadhar verified successfully!');
       setToastType('success');
       setShowToast(true);
-      setCurrentStep(3);
     } else {
       setToastMessage('Invalid OTP. Please try again.');
       setToastType('error');
@@ -412,7 +527,23 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     } else if (name === 'panNumber') {
       processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
     } else if (name === 'vehicleNumber') {
-      processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    } else if (name === 'drivingLicenseNumber') {
+      processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16);
+    } else if (name === 'email') {
+      // Clear OTP and verification status if email is changed
+      if (isEmailVerified && value !== originalEmail) {
+        setIsEmailVerified(false);
+        setEmailOtpSent(false);
+        setEmailOtp('');
+      }
+    } else if (name === 'phone') {
+      // Clear OTP and verification status if phone is changed
+      if (isPhoneVerified && value !== originalPhone) {
+        setIsPhoneVerified(false);
+        setPhoneOtpSent(false);
+        setPhoneOtp('');
+      }
     }
     
     setFormData({
@@ -420,6 +551,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
       [name]: processedValue
     });
 
+    // Clear error for this field when user starts typing
     if (formErrors[name]) {
       setFormErrors({
         ...formErrors,
@@ -437,10 +569,10 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
         error = validateName(value);
         break;
       case 'email':
-        error = validateEmail(value);
+        error = validateEmailWithExistence(value);
         break;
       case 'phone':
-        error = validatePhone(value);
+        error = validatePhoneWithExistence(value);
         break;
       case 'password':
         if (value && !validatePassword(value)) {
@@ -474,7 +606,9 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     });
   };
 
-  // File upload handlers
+  // ... [rest of the file upload handlers remain the same] ...
+
+  // File upload handlers (keep as is)
   const handleFileUpload = (fileType, file) => {
     if (!file) return;
 
@@ -527,8 +661,8 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
   const nextStep = () => {
     if (currentStep === 1) {
       const nameError = validateName(formData.fullName);
-      const emailError = validateEmail(formData.email);
-      const phoneError = validatePhone(formData.phone);
+      const emailError = validateEmailWithExistence(formData.email);
+      const phoneError = validatePhoneWithExistence(formData.phone);
       const passwordError = formData.password && !validatePassword(formData.password) 
         ? 'Invalid password' : '';
       const confirmPasswordError = formData.confirmPassword && formData.password !== formData.confirmPassword 
@@ -576,6 +710,31 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
         setTimeout(() => setShowToast(false), 3000);
         return;
       }
+
+      if (!isAadharVerified) {
+        setToastMessage('Please verify your Aadhar with OTP before proceeding');
+        setToastType('error');
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        return;
+      }
+    } else if (currentStep === 3) {
+      const vehicleError = validateVehicleNumber(formData.vehicleNumber);
+      const licenseError = validateDrivingLicense(formData.drivingLicenseNumber);
+      
+      setFormErrors(prev => ({
+        ...prev,
+        vehicleNumber: vehicleError,
+        drivingLicenseNumber: licenseError
+      }));
+
+      if (vehicleError || licenseError || !drivingLicenseFront || !drivingLicenseBack || !vehicleRC) {
+        setToastMessage('Please complete all driving license and vehicle details');
+        setToastType('error');
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        return;
+      }
     }
 
     setCurrentStep(currentStep + 1);
@@ -583,6 +742,17 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
 
   const prevStep = () => {
     setCurrentStep(currentStep - 1);
+  };
+
+  // Check if user already exists
+  const checkExistingUser = () => {
+    const storedUsers = localStorage.getItem('registeredUsers');
+    if (!storedUsers) return null;
+    
+    const existingUsers = JSON.parse(storedUsers);
+    return existingUsers.find(user => 
+      user.email === formData.email || user.phone === formData.phone
+    );
   };
 
   // Handle Submit Function
@@ -597,13 +767,11 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
       return;
     }
 
-    setIsLoading(true);
-
     // Validate all fields
     const errors = {
       fullName: validateName(formData.fullName),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
+      email: validateEmailWithExistence(formData.email),
+      phone: validatePhoneWithExistence(formData.phone),
       password: formData.password && !validatePassword(formData.password) ? 'Invalid password' : '',
       confirmPassword: formData.confirmPassword && formData.password !== formData.confirmPassword ? 'Passwords do not match' : '',
       aadharNumber: validateAadhar(formData.aadharNumber),
@@ -634,45 +802,69 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
       return;
     }
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const storedUsers = localStorage.getItem('registeredUsers');
-    const existingUsers = storedUsers ? JSON.parse(storedUsers) : [];
-
-    const userExists = existingUsers.find(user => 
-      user.email === formData.email || user.phone === formData.phone
-    );
-    
-    if (userExists) {
-      setToastMessage('User already exists with this email or phone');
+    // Final check for existing user
+    const existingUser = checkExistingUser();
+    if (existingUser) {
+      setToastMessage('User already exists with this email or phone number');
       setToastType('error');
       setShowToast(true);
-      setIsLoading(false);
       setTimeout(() => setShowToast(false), 3000);
       return;
     }
 
+    setIsLoading(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Create user object with proper structure
     const newUser = {
       id: Date.now(),
-      ...formData,
-      userType: 'delivery', // Explicitly set user type
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+      userType: 'delivery',
       createdAt: new Date().toISOString(),
-      // Include delivery specific data
-      aadharFront,
-      aadharBack,
-      drivingLicenseFront,
-      drivingLicenseBack,
-      panCard,
-      vehicleRC,
-      livePhoto,
-      isPhoneVerified,
-      isEmailVerified,
-      verificationStatus: 'pending'
+      documents: {
+        aadharNumber: formData.aadharNumber,
+        panNumber: formData.panNumber,
+        vehicleNumber: formData.vehicleNumber,
+        drivingLicenseNumber: formData.drivingLicenseNumber,
+        aadharFrontFileName: aadharFront ? aadharFront.name : '',
+        aadharBackFileName: aadharBack ? aadharBack.name : '',
+        drivingLicenseFrontFileName: drivingLicenseFront ? drivingLicenseFront.name : '',
+        drivingLicenseBackFileName: drivingLicenseBack ? drivingLicenseBack.name : '',
+        panCardFileName: panCard ? panCard.name : '',
+        vehicleRCFileName: vehicleRC ? vehicleRC.name : '',
+        livePhotoFileName: livePhoto ? livePhoto.name : ''
+      },
+      verification: {
+        isPhoneVerified: true,
+        isEmailVerified: true,
+        isAadharVerified: true,
+        status: 'pending'
+      },
+      isActive: true,
+      deliveriesCompleted: 0,
+      rating: 0,
+      earnings: 0
     };
 
+    const storedUsers = localStorage.getItem('registeredUsers');
+    const existingUsers = storedUsers ? JSON.parse(storedUsers) : [];
     const updatedUsers = [...existingUsers, newUser];
+    
     localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+
+    // Also set current user in localStorage for immediate login
+    localStorage.setItem('currentUser', JSON.stringify({
+      id: newUser.id,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      userType: newUser.userType,
+      isVerified: true
+    }));
 
     setToastMessage(`Account created! Welcome ${formData.fullName}`);
     setToastType('success');
@@ -704,12 +896,17 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     setLivePhoto(null);
     setIsPhoneVerified(false);
     setIsEmailVerified(false);
+    setIsAadharVerified(false);
     setAadharOtpSent(false);
     setAadharOtp('');
     setPhoneOtpSent(false);
     setPhoneOtp('');
     setEmailOtpSent(false);
     setEmailOtp('');
+    setIsEditingEmail(false);
+    setIsEditingPhone(false);
+    setOriginalEmail('');
+    setOriginalPhone('');
 
     setTimeout(() => {
       setShowToast(false);
@@ -731,7 +928,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  // File upload component
+  // File upload component with SVG Icons
   const FileUploadField = ({ label, file, onFileChange, required = false }) => (
     <div style={{ marginBottom: '16px', textAlign: 'left' }}>
       <label style={{
@@ -768,13 +965,17 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
         />
         {file ? (
           <div>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>✅</div>
+            <div style={{ marginBottom: '8px' }}>
+              <SuccessIcon />
+            </div>
             <div style={{ fontSize: '12px', color: '#009688' }}>File uploaded</div>
             <div style={{ fontSize: '10px', color: '#4F6F6B' }}>{file.name}</div>
           </div>
         ) : (
           <div>
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>📁</div>
+            <div style={{ marginBottom: '8px' }}>
+              <UploadIcon />
+            </div>
             <div style={{ fontSize: '12px', color: '#4F6F6B' }}>Click to upload</div>
             <div style={{ fontSize: '10px', color: '#4DB6AC' }}>JPEG, PNG (Max 5MB)</div>
           </div>
@@ -783,11 +984,18 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     </div>
   );
 
-  // Step 1: Basic Information
+  // Step 1: Basic Information (UPDATED with SVG Icons)
   const renderStep1 = () => (
     <div>
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Full Name</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            Full Name
+          </div>
+        </label>
         <input
           type="text"
           name="fullName"
@@ -801,9 +1009,61 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
         {formErrors.fullName && <div style={errorStyle}>{formErrors.fullName}</div>}
       </div>
 
-      {/* Email with OTP Verification */}
+      {/* Email with OTP Verification - UPDATED with Edit Mode and SVG Icons */}
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Email Address</label>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={labelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <EmailIcon />
+              Email Address
+            </div>
+          </label>
+          {isEmailVerified && !isEditingEmail && (
+            <button
+              type="button"
+              onClick={handleEditEmail}
+              style={{
+                fontSize: '11px',
+                backgroundColor: 'transparent',
+                color: '#009688',
+                border: '1px solid #009688',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <EditIcon />
+              Edit
+            </button>
+          )}
+          {isEditingEmail && (
+            <button
+              type="button"
+              onClick={handleCancelEditEmail}
+              style={{
+                fontSize: '11px',
+                backgroundColor: 'transparent',
+                color: '#EF4444',
+                border: '1px solid #EF4444',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <CancelIcon />
+              Cancel
+            </button>
+          )}
+        </div>
+        
         <div style={{ position: 'relative' }}>
           <input
             type="email"
@@ -815,12 +1075,24 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
             placeholder="Enter your email"
             style={{
               ...inputStyle(formErrors.email),
-              paddingRight: emailOtpSent ? '200px' : '120px',
+              paddingLeft: '36px',
+              paddingRight: isEmailVerified && !isEditingEmail ? '120px' : emailOtpSent ? '200px' : '120px',
               borderColor: isEmailVerified ? '#009688' : formErrors.email ? '#EF4444' : '#4DB6AC'
             }}
-            disabled={isEmailVerified}
+            disabled={isEmailVerified && !isEditingEmail}
           />
-          {!isEmailVerified ? (
+          
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: isEmailVerified ? '#009688' : formErrors.email ? '#EF4444' : '#4DB6AC'
+          }}>
+            <EmailIcon />
+          </div>
+          
+          {!isEmailVerified || isEditingEmail ? (
             <button
               type="button"
               onClick={emailOtpSent ? null : sendEmailOtp}
@@ -837,10 +1109,25 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 border: 'none',
                 borderRadius: '4px',
                 cursor: (emailOtpSent || verificationLoading.email || !formData.email || formErrors.email) ? 'not-allowed' : 'pointer',
-                opacity: (emailOtpSent || !formData.email || formErrors.email) ? 0.6 : 1
+                opacity: (emailOtpSent || !formData.email || formErrors.email) ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
               }}
             >
-              {verificationLoading.email ? 'Sending...' : emailOtpSent ? 'OTP Sent' : 'Send OTP'}
+              {verificationLoading.email ? (
+                <>
+                  <LoadingIcon />
+                  Sending...
+                </>
+              ) : emailOtpSent ? (
+                <>
+                  <CheckIcon />
+                  OTP Sent
+                </>
+              ) : (
+                'Send OTP'
+              )}
             </button>
           ) : (
             <div style={{
@@ -853,16 +1140,20 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
               backgroundColor: '#009688',
               color: 'white',
               border: 'none',
-              borderRadius: '4px'
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
             }}>
-              Verified ✓
+              <CheckIcon />
+              Verified
             </div>
           )}
         </div>
         {formErrors.email && <div style={errorStyle}>{formErrors.email}</div>}
         
         {/* Email OTP Input */}
-        {emailOtpSent && !isEmailVerified && (
+        {emailOtpSent && (!isEmailVerified || isEditingEmail) && (
           <div style={{ marginTop: '8px' }}>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <input
@@ -870,8 +1161,19 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 value={emailOtp}
                 onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="Enter 6-digit OTP"
-                style={{...inputStyle(false), flex: 1}}
+                style={{...inputStyle(false), flex: 1, paddingLeft: '36px'}}
               />
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#4DB6AC'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </div>
               <button
                 type="button"
                 onClick={verifyEmailOtp}
@@ -884,22 +1186,88 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                   border: 'none',
                   borderRadius: '6px',
                   cursor: (verificationLoading.email || !emailOtp || emailOtp.length !== 6) ? 'not-allowed' : 'pointer',
-                  opacity: (!emailOtp || emailOtp.length !== 6) ? 0.6 : 1
+                  opacity: (!emailOtp || emailOtp.length !== 6) ? 0.6 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}
               >
-                {verificationLoading.email ? 'Verifying...' : 'Verify'}
+                {verificationLoading.email ? (
+                  <>
+                    <LoadingIcon />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    <CheckIcon />
+                    Verify
+                  </>
+                )}
               </button>
             </div>
-            <div style={{ fontSize: '11px', color: '#4F6F6B', marginTop: '4px' }}>
+            <div style={{ fontSize: '11px', color: '#4F6F6B', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <InfoIcon />
               Check your email for OTP (Mock: {emailOtp})
             </div>
           </div>
         )}
       </div>
 
-      {/* Phone with OTP Verification */}
+      {/* Phone with OTP Verification - UPDATED with Edit Mode and SVG Icons */}
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Phone Number</label>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={labelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <PhoneIcon />
+              Phone Number
+            </div>
+          </label>
+          {isPhoneVerified && !isEditingPhone && (
+            <button
+              type="button"
+              onClick={handleEditPhone}
+              style={{
+                fontSize: '11px',
+                backgroundColor: 'transparent',
+                color: '#009688',
+                border: '1px solid #009688',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <EditIcon />
+              Edit
+            </button>
+          )}
+          {isEditingPhone && (
+            <button
+              type="button"
+              onClick={handleCancelEditPhone}
+              style={{
+                fontSize: '11px',
+                backgroundColor: 'transparent',
+                color: '#EF4444',
+                border: '1px solid #EF4444',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <CancelIcon />
+              Cancel
+            </button>
+          )}
+        </div>
+        
         <div style={{ position: 'relative' }}>
           <input
             type="tel"
@@ -911,12 +1279,24 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
             placeholder="Enter your 10-digit phone number"
             style={{
               ...inputStyle(formErrors.phone),
-              paddingRight: phoneOtpSent ? '200px' : '120px',
+              paddingLeft: '36px',
+              paddingRight: isPhoneVerified && !isEditingPhone ? '120px' : phoneOtpSent ? '200px' : '120px',
               borderColor: isPhoneVerified ? '#009688' : formErrors.phone ? '#EF4444' : '#4DB6AC'
             }}
-            disabled={isPhoneVerified}
+            disabled={isPhoneVerified && !isEditingPhone}
           />
-          {!isPhoneVerified ? (
+          
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: isPhoneVerified ? '#009688' : formErrors.phone ? '#EF4444' : '#4DB6AC'
+          }}>
+            <PhoneIcon />
+          </div>
+          
+          {!isPhoneVerified || isEditingPhone ? (
             <button
               type="button"
               onClick={phoneOtpSent ? null : sendPhoneOtp}
@@ -933,10 +1313,25 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 border: 'none',
                 borderRadius: '4px',
                 cursor: (phoneOtpSent || verificationLoading.phone || !formData.phone || formErrors.phone) ? 'not-allowed' : 'pointer',
-                opacity: (phoneOtpSent || !formData.phone || formErrors.phone) ? 0.6 : 1
+                opacity: (phoneOtpSent || !formData.phone || formErrors.phone) ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
               }}
             >
-              {verificationLoading.phone ? 'Sending...' : phoneOtpSent ? 'OTP Sent' : 'Send OTP'}
+              {verificationLoading.phone ? (
+                <>
+                  <LoadingIcon />
+                  Sending...
+                </>
+              ) : phoneOtpSent ? (
+                <>
+                  <CheckIcon />
+                  OTP Sent
+                </>
+              ) : (
+                'Send OTP'
+              )}
             </button>
           ) : (
             <div style={{
@@ -949,16 +1344,20 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
               backgroundColor: '#009688',
               color: 'white',
               border: 'none',
-              borderRadius: '4px'
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
             }}>
-              Verified ✓
+              <CheckIcon />
+              Verified
             </div>
           )}
         </div>
         {formErrors.phone && <div style={errorStyle}>{formErrors.phone}</div>}
         
         {/* Phone OTP Input */}
-        {phoneOtpSent && !isPhoneVerified && (
+        {phoneOtpSent && (!isPhoneVerified || isEditingPhone) && (
           <div style={{ marginTop: '8px' }}>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <input
@@ -966,8 +1365,19 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 value={phoneOtp}
                 onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="Enter 6-digit OTP"
-                style={{...inputStyle(false), flex: 1}}
+                style={{...inputStyle(false), flex: 1, paddingLeft: '36px'}}
               />
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#4DB6AC'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+              </div>
               <button
                 type="button"
                 onClick={verifyPhoneOtp}
@@ -980,22 +1390,43 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                   border: 'none',
                   borderRadius: '6px',
                   cursor: (verificationLoading.phone || !phoneOtp || phoneOtp.length !== 6) ? 'not-allowed' : 'pointer',
-                  opacity: (!phoneOtp || phoneOtp.length !== 6) ? 0.6 : 1
+                  opacity: (!phoneOtp || phoneOtp.length !== 6) ? 0.6 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}
               >
-                {verificationLoading.phone ? 'Verifying...' : 'Verify'}
+                {verificationLoading.phone ? (
+                  <>
+                    <LoadingIcon />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    <CheckIcon />
+                    Verify
+                  </>
+                )}
               </button>
             </div>
-            <div style={{ fontSize: '11px', color: '#4F6F6B', marginTop: '4px' }}>
+            <div style={{ fontSize: '11px', color: '#4F6F6B', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <InfoIcon />
               Check your phone for OTP (Mock: {phoneOtp})
             </div>
           </div>
         )}
       </div>
 
-      {/* Password Fields */}
+      {/* Password Fields with SVG Icons */}
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Password</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+            Password
+          </div>
+        </label>
         <div style={{ position: 'relative' }}>
           <input
             type={showPassword ? 'text' : 'password'}
@@ -1005,26 +1436,70 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
             onBlur={handleBlur}
             required
             placeholder="Create a strong password"
-            style={{...inputStyle(formErrors.password), paddingRight: '45px'}}
+            style={{...inputStyle(formErrors.password), paddingLeft: '36px', paddingRight: '45px'}}
           />
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: formErrors.password ? '#EF4444' : '#4DB6AC'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+          </div>
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            style={visibilityButtonStyle}
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#4F6F6B',
+              padding: '4px',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '30px',
+              height: '30px'
+            }}
           >
-            {showPassword ? '👁️' : '👁️‍🗨️'}
+            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
           </button>
         </div>
         {formData.password && !formErrors.password && (
           <div style={passwordStrength === 'strong' ? successStyle : errorStyle}>
-            {passwordStrength === 'strong' ? '✓ Strong password' : '✗ Weak password'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {passwordStrength === 'strong' ? <CheckIcon /> : <CloseIcon />}
+              {passwordStrength === 'strong' ? 'Strong password' : 'Weak password'}
+            </div>
           </div>
         )}
-        {formErrors.password && <div style={errorStyle}>{formErrors.password}</div>}
+        {formErrors.password && (
+          <div style={errorStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CloseIcon />
+              {formErrors.password}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ marginBottom: '20px', textAlign: 'left' }}>
-        <label style={labelStyle}>Confirm Password</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+            Confirm Password
+          </div>
+        </label>
         <div style={{ position: 'relative' }}>
           <input
             type={showConfirmPassword ? 'text' : 'password'}
@@ -1034,20 +1509,54 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
             onBlur={handleBlur}
             required
             placeholder="Confirm your password"
-            style={{...inputStyle(formErrors.confirmPassword), paddingRight: '45px'}}
+            style={{...inputStyle(formErrors.confirmPassword), paddingLeft: '36px', paddingRight: '45px'}}
           />
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: formErrors.confirmPassword ? '#EF4444' : '#4DB6AC'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
           <button
             type="button"
             onClick={toggleConfirmPasswordVisibility}
-            style={visibilityButtonStyle}
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#4F6F6B',
+              padding: '4px',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '30px',
+              height: '30px'
+            }}
           >
-            {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+            {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
           </button>
         </div>
-        {formErrors.confirmPassword && <div style={errorStyle}>{formErrors.confirmPassword}</div>}
+        {formErrors.confirmPassword && (
+          <div style={errorStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CloseIcon />
+              {formErrors.confirmPassword}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Verification Status */}
+      {/* Verification Status - UPDATED with SVG Icons */}
       {(isPhoneVerified || isEmailVerified) && (
         <div style={{
           backgroundColor: '#E0F2F1',
@@ -1056,14 +1565,28 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
           padding: '12px',
           marginBottom: '16px'
         }}>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#124441', marginBottom: '4px' }}>
+          <div style={{ fontSize: '12px', fontWeight: '600', color: '#124441', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <InfoIcon />
             Verification Status:
           </div>
-          <div style={{ fontSize: '11px', color: '#4F6F6B' }}>
-            {isPhoneVerified && <div>✓ Phone Number Verified</div>}
-            {isEmailVerified && <div>✓ Email Address Verified</div>}
+          <div style={{ fontSize: '11px', color: '#4F6F6B', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {isPhoneVerified && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckIcon />
+                Phone Number Verified {isEditingPhone ? '(Editing...)' : ''}
+              </div>
+            )}
+            {isEmailVerified && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckIcon />
+                Email Address Verified {isEditingEmail ? '(Editing...)' : ''}
+              </div>
+            )}
             {(!isPhoneVerified || !isEmailVerified) && (
-              <div>Please complete all verifications to proceed</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <InfoIcon />
+                Please complete all verifications to proceed
+              </div>
             )}
           </div>
         </div>
@@ -1071,11 +1594,18 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     </div>
   );
 
-  // Step 2: Aadhar & PAN Verification
+  // Step 2: Aadhar & PAN Verification (with SVG Icons)
   const renderStep2 = () => (
     <div>
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Aadhar Number</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+            </svg>
+            Aadhar Number
+          </div>
+        </label>
         <div style={{ position: 'relative' }}>
           <input
             type="text"
@@ -1087,45 +1617,119 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
             placeholder="Enter 12-digit Aadhar number"
             style={{
               ...inputStyle(formErrors.aadharNumber),
-              paddingRight: aadharOtpSent ? '200px' : '120px'
+              paddingLeft: '36px',
+              paddingRight: aadharOtpSent ? '200px' : '120px',
+              borderColor: isAadharVerified ? '#009688' : formErrors.aadharNumber ? '#EF4444' : '#4DB6AC'
             }}
           />
-          <button
-            type="button"
-            onClick={aadharOtpSent ? null : sendAadharOtp}
-            disabled={aadharOtpSent || verificationLoading.aadhar || !formData.aadharNumber || formErrors.aadharNumber}
-            style={{
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: isAadharVerified ? '#009688' : formErrors.aadharNumber ? '#EF4444' : '#4DB6AC'
+          }}>
+            <DocumentIcon />
+          </div>
+          {!isAadharVerified ? (
+            <button
+              type="button"
+              onClick={aadharOtpSent ? null : sendAadharOtp}
+              disabled={aadharOtpSent || verificationLoading.aadhar || !formData.aadharNumber || formErrors.aadharNumber}
+              style={{
+                position: 'absolute',
+                right: aadharOtpSent ? '100px' : '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                padding: '6px 12px',
+                fontSize: '11px',
+                backgroundColor: aadharOtpSent ? '#4F6F6B' : '#009688',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: (aadharOtpSent || verificationLoading.aadhar || !formData.aadharNumber || formErrors.aadharNumber) ? 'not-allowed' : 'pointer',
+                opacity: (aadharOtpSent || !formData.aadharNumber || formErrors.aadharNumber) ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              {verificationLoading.aadhar ? (
+                <>
+                  <LoadingIcon />
+                  Sending...
+                </>
+              ) : aadharOtpSent ? (
+                <>
+                  <CheckIcon />
+                  OTP Sent
+                </>
+              ) : (
+                'Send OTP'
+              )}
+            </button>
+          ) : (
+            <div style={{
               position: 'absolute',
-              right: aadharOtpSent ? '100px' : '8px',
+              right: '8px',
               top: '50%',
               transform: 'translateY(-50%)',
               padding: '6px 12px',
               fontSize: '11px',
-              backgroundColor: aadharOtpSent ? '#4F6F6B' : '#009688',
+              backgroundColor: '#009688',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: (aadharOtpSent || verificationLoading.aadhar || !formData.aadharNumber || formErrors.aadharNumber) ? 'not-allowed' : 'pointer',
-              opacity: (aadharOtpSent || !formData.aadharNumber || formErrors.aadharNumber) ? 0.6 : 1
-            }}
-          >
-            {verificationLoading.aadhar ? 'Sending...' : aadharOtpSent ? 'OTP Sent' : 'Send OTP'}
-          </button>
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <CheckIcon />
+              Verified
+            </div>
+          )}
         </div>
-        {formErrors.aadharNumber && <div style={errorStyle}>{formErrors.aadharNumber}</div>}
+        {formErrors.aadharNumber && (
+          <div style={errorStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CloseIcon />
+              {formErrors.aadharNumber}
+            </div>
+          </div>
+        )}
       </div>
 
-      {aadharOtpSent && (
+      {aadharOtpSent && !isAadharVerified && (
         <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-          <label style={labelStyle}>Aadhar OTP</label>
+          <label style={labelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+                <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+              </svg>
+              Aadhar OTP
+            </div>
+          </label>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input
-              type="text"
-              value={aadharOtp}
-              onChange={(e) => setAadharOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="Enter 6-digit OTP"
-              style={{...inputStyle(false), flex: 1}}
-            />
+            <div style={{ position: 'relative', flex: 1 }}>
+              <input
+                type="text"
+                value={aadharOtp}
+                onChange={(e) => setAadharOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="Enter 6-digit OTP"
+                style={{...inputStyle(false), paddingLeft: '36px'}}
+              />
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#4DB6AC'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+            </div>
             <button
               type="button"
               onClick={verifyAadharOtp}
@@ -1138,20 +1742,41 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                 border: 'none',
                 borderRadius: '6px',
                 cursor: (verificationLoading.aadhar || !aadharOtp || aadharOtp.length !== 6) ? 'not-allowed' : 'pointer',
-                opacity: (!aadharOtp || aadharOtp.length !== 6) ? 0.6 : 1
+                opacity: (!aadharOtp || aadharOtp.length !== 6) ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
               }}
             >
-              {verificationLoading.aadhar ? 'Verifying...' : 'Verify OTP'}
+              {verificationLoading.aadhar ? (
+                <>
+                  <LoadingIcon />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  <CheckIcon />
+                  Verify OTP
+                </>
+              )}
             </button>
           </div>
-          <div style={{ fontSize: '11px', color: '#4F6F6B', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#4F6F6B', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <InfoIcon />
             Aadhar OTP sent (Mock: {aadharOtp})
           </div>
         </div>
       )}
 
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>PAN Number</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+            </svg>
+            PAN Number
+          </div>
+        </label>
         <input
           type="text"
           name="panNumber"
@@ -1160,9 +1785,17 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
           onBlur={handleBlur}
           required
           placeholder="Enter PAN number (e.g., ABCDE1234F)"
-          style={inputStyle(formErrors.panNumber)}
+          maxLength="10"
+          style={{...inputStyle(formErrors.panNumber), paddingLeft: '36px'}}
         />
-        {formErrors.panNumber && <div style={errorStyle}>{formErrors.panNumber}</div>}
+        {formErrors.panNumber && (
+          <div style={errorStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CloseIcon />
+              {formErrors.panNumber}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
@@ -1189,11 +1822,18 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     </div>
   );
 
-  // Step 3: Driving License & Vehicle Details
+  // Step 3: Driving License & Vehicle Details (with SVG Icons)
   const renderStep3 = () => (
     <div>
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Driving License Number</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H15V3H9v2H6.5c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+            </svg>
+            Driving License Number
+          </div>
+        </label>
         <input
           type="text"
           name="drivingLicenseNumber"
@@ -1201,14 +1841,29 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
           onChange={handleChange}
           onBlur={handleBlur}
           required
-          placeholder="Enter driving license number"
-          style={inputStyle(formErrors.drivingLicenseNumber)}
+          placeholder="Enter driving license number (10-16 chars)"
+          maxLength="16"
+          style={{...inputStyle(formErrors.drivingLicenseNumber), paddingLeft: '36px'}}
         />
-        {formErrors.drivingLicenseNumber && <div style={errorStyle}>{formErrors.drivingLicenseNumber}</div>}
+        {formErrors.drivingLicenseNumber && (
+          <div style={errorStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CloseIcon />
+              {formErrors.drivingLicenseNumber}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-        <label style={labelStyle}>Vehicle Number</label>
+        <label style={labelStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#124441">
+              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H15V3H9v2H6.5c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+            </svg>
+            Vehicle Number
+          </div>
+        </label>
         <input
           type="text"
           name="vehicleNumber"
@@ -1217,9 +1872,17 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
           onBlur={handleBlur}
           required
           placeholder="Enter vehicle number (e.g., KA01AB1234)"
-          style={inputStyle(formErrors.vehicleNumber)}
+          maxLength="10"
+          style={{...inputStyle(formErrors.vehicleNumber), paddingLeft: '36px'}}
         />
-        {formErrors.vehicleNumber && <div style={errorStyle}>{formErrors.vehicleNumber}</div>}
+        {formErrors.vehicleNumber && (
+          <div style={errorStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CloseIcon />
+              {formErrors.vehicleNumber}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
@@ -1246,7 +1909,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     </div>
   );
 
-  // Step 4: Final Verification
+  // Step 4: Final Verification (with SVG Icons)
   const renderStep4 = () => (
     <div>
       <FileUploadField
@@ -1264,15 +1927,39 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
         marginBottom: '20px',
         textAlign: 'center'
       }}>
-        <div style={{ fontSize: '24px', marginBottom: '8px' }}>📋</div>
+        <div style={{ marginBottom: '8px' }}>
+          <DocumentIcon />
+        </div>
         <h4 style={{ margin: '0 0 8px 0', color: '#124441' }}>Verification Summary</h4>
         <div style={{ fontSize: '12px', color: '#4F6F6B', textAlign: 'left' }}>
-          <div>✓ Basic Information: Completed</div>
-          <div>✓ Phone & Email: Verified</div>
-          <div>✓ Aadhar & PAN: Uploaded</div>
-          <div>✓ Driving License: Uploaded</div>
-          <div>✓ Vehicle Details: Provided</div>
-          <div>{livePhoto ? '✓ Live Photo: Uploaded' : '✗ Live Photo: Pending'}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {isPhoneVerified && isEmailVerified ? <CheckIcon /> : <CloseIcon />}
+            Basic Information: {isPhoneVerified && isEmailVerified ? 'Completed' : 'Pending'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {isPhoneVerified && isEmailVerified ? <CheckIcon /> : <CloseIcon />}
+            Phone & Email: {isPhoneVerified && isEmailVerified ? 'Verified' : 'Pending'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {isAadharVerified ? <CheckIcon /> : <CloseIcon />}
+            Aadhar: {isAadharVerified ? 'Verified' : 'Pending'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {panCard ? <CheckIcon /> : <CloseIcon />}
+            PAN Card: {panCard ? 'Uploaded' : 'Pending'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {drivingLicenseFront && drivingLicenseBack ? <CheckIcon /> : <CloseIcon />}
+            Driving License: {drivingLicenseFront && drivingLicenseBack ? 'Uploaded' : 'Pending'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {vehicleRC ? <CheckIcon /> : <CloseIcon />}
+            Vehicle RC: {vehicleRC ? 'Uploaded' : 'Pending'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {livePhoto ? <CheckIcon /> : <CloseIcon />}
+            Live Photo: {livePhoto ? 'Uploaded' : 'Pending'}
+          </div>
         </div>
       </div>
     </div>
@@ -1314,37 +2001,42 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
     fontWeight: '500'
   };
 
-  const visibilityButtonStyle = {
-    position: 'absolute',
-    right: '12px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#4F6F6B',
-    fontSize: '18px',
-    padding: '4px',
-    borderRadius: '4px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '30px',
-    height: '30px'
-  };
-
   return (
     <div style={containerStyle}>
       {showToast && (
         <div style={toastStyle(toastType)}>
-          {toastType === 'success' ? '✅ ' : '❌ '}{toastMessage}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {toastType === 'success' ? <SuccessIcon /> : <ErrorIcon />}
+            {toastMessage}
+          </div>
         </div>
       )}
+
+      {/* Top Navigation Buttons */}
+      <div style={topNavContainerStyle}>
+        <button 
+          style={homeButtonStyle}
+          onClick={handleHomeNavigation}
+        >
+          <HomeIcon />
+          Home
+        </button>
+        <button 
+          style={changeRoleButtonStyle}
+          onClick={handleSwitchToRoleSelection}
+        >
+          <ChangeRoleIcon />
+          Change Role
+        </button>
+      </div>
 
       <div style={cardContainerStyle}>
         {/* Left Side - Updated Design */}
         <div style={leftSideStyle}>
           <div style={contentStyle}>
+            <div style={{ marginBottom: '16px' }}>
+              <DeliveryIcon />
+            </div>
             <h2 style={titleStyle}>
               Join as a Delivery Partner
             </h2>
@@ -1356,7 +2048,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
             {/* Progress Steps */}
             <div style={stepsContainerStyle}>
               <div style={stepStyle(currentStep >= 1)}>
-                <div style={stepNumberStyle}>1</div>
+                <StepIcon number="1" active={currentStep >= 1} />
                 <div>
                   <div style={stepTitleStyle}>Personal Info</div>
                   <div style={stepSubtitleStyle}>Basic details & contact</div>
@@ -1366,7 +2058,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
               <div style={stepDividerStyle}></div>
               
               <div style={stepStyle(currentStep >= 2)}>
-                <div style={stepNumberStyle}>2</div>
+                <StepIcon number="2" active={currentStep >= 2} />
                 <div>
                   <div style={stepTitleStyle}>Security</div>
                   <div style={stepSubtitleStyle}>Aadhar & PAN verification</div>
@@ -1376,7 +2068,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
               <div style={stepDividerStyle}></div>
               
               <div style={stepStyle(currentStep >= 3)}>
-                <div style={stepNumberStyle}>3</div>
+                <StepIcon number="3" active={currentStep >= 3} />
                 <div>
                   <div style={stepTitleStyle}>Delivery Partner Details</div>
                   <div style={stepSubtitleStyle}>License & vehicle info</div>
@@ -1389,23 +2081,23 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
               <h4 style={benefitsTitleStyle}>Benefits:</h4>
               <div style={benefitsListStyle}>
                 <div style={benefitItemStyle}>
-                  <span style={checkmarkStyle}>✓</span>
+                  <BenefitCheckIcon />
                   <span>Flexible working hours</span>
                 </div>
                 <div style={benefitItemStyle}>
-                  <span style={checkmarkStyle}>✓</span>
+                  <BenefitCheckIcon />
                   <span>Competitive commission rates</span>
                 </div>
                 <div style={benefitItemStyle}>
-                  <span style={checkmarkStyle}>✓</span>
+                  <BenefitCheckIcon />
                   <span>Real-time delivery tracking</span>
                 </div>
                 <div style={benefitItemStyle}>
-                  <span style={checkmarkStyle}>✓</span>
+                  <BenefitCheckIcon />
                   <span>Weekly payments</span>
                 </div>
                 <div style={benefitItemStyle}>
-                  <span style={checkmarkStyle}>✓</span>
+                  <BenefitCheckIcon />
                   <span>Insurance coverage</span>
                 </div>
               </div>
@@ -1489,7 +2181,14 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
                   disabled={isLoading}
                   style={{...primaryButtonStyle, opacity: isLoading ? 0.7 : 1}}
                 >
-                  {isLoading ? 'Creating Account...' : 'Complete Registration'}
+                  {isLoading ? (
+                    <>
+                      <LoadingIcon />
+                      Creating Account...
+                    </>
+                  ) : (
+                    'Complete Registration'
+                  )}
                 </button>
               )}
             </div>
@@ -1498,10 +2197,10 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
           <div style={switchAuthStyle}>
             <p style={switchTextStyle}>
               Already have an account? <span 
-                onClick={() => !isLoading && onSwitchToLogin()}
+                onClick={() => !isLoading && handleSwitchToLogin()}
                 style={switchLinkStyle}
               >
-                Sign in
+                Login here 
               </span>
             </p>
           </div>
@@ -1515,16 +2214,58 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess }) => {
 const containerStyle = {
   minHeight: '100vh',
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
   backgroundColor: '#E0F2F1',
-  padding: '20px'
+  padding: '20px',
+  position: 'relative'
+};
+
+const topNavContainerStyle = {
+  position: 'absolute',
+  top: '20px',
+  left: '20px',
+  display: 'flex',
+  gap: '12px',
+  zIndex: 100
+};
+
+const homeButtonStyle = {
+  padding: '10px 20px',
+  backgroundColor: '#009688',
+  color: 'white',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '14px',
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  boxShadow: '0 2px 8px rgba(0, 150, 136, 0.3)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '6px'
+};
+
+const changeRoleButtonStyle = {
+  padding: '10px 20px',
+  backgroundColor: 'white',
+  color: '#009688',
+  border: '2px solid #009688',
+  borderRadius: '8px',
+  fontSize: '14px',
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '6px'
 };
 
 const toastStyle = (type) => ({
   position: 'fixed',
-  top: '20px',
+  top: '80px',
   right: '20px',
   backgroundColor: type === 'success' ? '#009688' : '#EF4444',
   color: 'white',
@@ -1545,7 +2286,8 @@ const cardContainerStyle = {
   borderRadius: '16px',
   boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
   overflow: 'hidden',
-  minHeight: '700px'
+  minHeight: '700px',
+  marginTop: '60px'
 };
 
 const leftSideStyle = {
@@ -1555,8 +2297,7 @@ const leftSideStyle = {
   padding: '50px 40px',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
-  position: 'relative'
+  justifyContent: 'center'
 };
 
 const contentStyle = {
@@ -1594,20 +2335,6 @@ const stepStyle = (isActive) => ({
   opacity: isActive ? 1 : 0.7
 });
 
-const stepNumberStyle = {
-  width: '36px',
-  height: '36px',
-  borderRadius: '50%',
-  backgroundColor: 'white',
-  color: '#009688',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontWeight: '600',
-  fontSize: '16px',
-  flexShrink: 0
-};
-
 const stepTitleStyle = {
   fontSize: '16px',
   fontWeight: '600',
@@ -1623,7 +2350,7 @@ const stepDividerStyle = {
   height: '20px',
   width: '2px',
   backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  marginLeft: '18px',
+  marginLeft: '27px',
   marginBottom: '8px'
 };
 
@@ -1653,12 +2380,6 @@ const benefitItemStyle = {
   alignItems: 'center',
   gap: '12px',
   fontSize: '14px'
-};
-
-const checkmarkStyle = {
-  color: '#4DB6AC',
-  fontWeight: 'bold',
-  fontSize: '16px'
 };
 
 const rightSideStyle = {
@@ -1722,7 +2443,11 @@ const primaryButtonStyle = {
   fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
-  boxShadow: '0 4px 12px rgba(0, 150, 136, 0.3)'
+  boxShadow: '0 4px 12px rgba(0, 150, 136, 0.3)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px'
 };
 
 const secondaryButtonStyle = {
