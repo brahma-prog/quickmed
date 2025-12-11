@@ -307,7 +307,7 @@ const PREGNANCY_CARE_PACKAGES = [
   }
 ];
 
-// 9-Month Pregnancy Diet Plans - COMPLETE AND FIXED
+// 9-Month Pregnancy Diet Plans
 const PREGNANCY_DIET_PLANS = {
   1: {
     month: 1,
@@ -534,7 +534,7 @@ const PregnancyCareView = ({
   // Props from UserDashboard
   userSubscriptions = [],
   isSubscribed = false,
-  handleSubscribe,
+  handleSubscribe, // This is the Razorpay function from UserDashboard
   handleUpgradeSubscription,
   paymentLoading = false,
   showSubscriptionModal = false,
@@ -586,13 +586,7 @@ const PregnancyCareView = ({
   const [showRegenerationModal, setShowRegenerationModal] = useState(false);
   const [regenerationProgress, setRegenerationProgress] = useState(0);
 
-  // NEW: Payment modal state
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedPackageForPayment, setSelectedPackageForPayment] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [paymentProcessing, setPaymentProcessing] = useState(false);
-
-  // NEW: Share with Doctor modal state
+  // Share with Doctor modal state
   const [showShareDoctorModal, setShowShareDoctorModal] = useState(false);
   const [shareDoctorData, setShareDoctorData] = useState(null);
 
@@ -789,7 +783,7 @@ const PregnancyCareView = ({
     setShowPackageDetailsModal(true);
   };
 
-  // Handle subscription navigation - UPDATED FUNCTION
+  // Handle subscription navigation
   const handleSubscribeToAccess = () => {
     // Navigate to subscription plans tab
     setActiveTab('plans');
@@ -828,15 +822,28 @@ const PregnancyCareView = ({
     setShowShareDoctorModal(true);
   };
 
-  // Regenerate AI diet plan - UPDATED FUNCTION
+  // Regenerate AI diet plan
   const handleRegenerateAIPlan = () => {
-    // Optional: Show a demo mode message for non-premium users
+    // Check if user has premium access
     if (!hasPremiumAccess()) {
       addNotification(
-        'AI Plan Demo',
-        `Generating AI-optimized diet plan for Month ${currentMonth}`,
-        'info'
+        'Premium Feature Required',
+        'AI Diet Plan Regeneration requires a pregnancy care package subscription',
+        'alert'
       );
+      
+      // Redirect to packages tab
+      setActiveTab('plans');
+      
+      // Scroll to packages section
+      setTimeout(() => {
+        const packagesSection = document.querySelector('.subscription-plans-section');
+        if (packagesSection) {
+          packagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      
+      return;
     }
 
     setRegeneratingPlan(true);
@@ -974,7 +981,7 @@ const PregnancyCareView = ({
     return nutrients + ' (AI Optimized)';
   };
 
-  // Handle share functionality - UPDATED FUNCTION
+  // Handle share functionality
   const handleSharePlan = () => {
     const shareData = {
       title: `Pregnancy Diet Plan - Month ${currentMonth}`,
@@ -1047,7 +1054,7 @@ const PregnancyCareView = ({
     generateMonthlyDietPlan();
   }, []);
 
-  // Generate monthly diet plan - FIXED FUNCTION
+  // Generate monthly diet plan
   const generateMonthlyDietPlan = () => {
     // Use safe access with defaults
     const monthPlan = PREGNANCY_DIET_PLANS[currentMonth] || PREGNANCY_DIET_PLANS[1];
@@ -1075,65 +1082,13 @@ const PregnancyCareView = ({
     }
   };
 
-  // Navigation between months - UPDATED FUNCTION
+  // Navigation between months
   const navigateMonth = (direction) => {
     const newMonth = currentMonth + direction;
     if (newMonth >= 1 && newMonth <= 9) {
       setCurrentMonth(newMonth);
       generateMonthlyDietPlan();
     }
-  };
-
-  // NEW: Handle payment modal open
-  const handlePaymentModalOpen = (packageItem) => {
-    setSelectedPackageForPayment(packageItem);
-    setShowPaymentModal(true);
-  };
-
-  // NEW: Handle payment submission
-  const handlePaymentSubmit = async () => {
-    if (!selectedPackageForPayment) return;
-    
-    setPaymentProcessing(true);
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      setPaymentProcessing(false);
-      setShowPaymentModal(false);
-      
-      // Show success message
-      addNotification(
-        'Payment Successful',
-        `Your ${selectedPackageForPayment.title} package has been activated!`,
-        'success'
-      );
-      
-      // Reset selected package
-      setSelectedPackageForPayment(null);
-    }, 2000);
-  };
-
-  // Handle subscription selection in PregnancyCareView
-  const handleSubscribeInPregnancy = (plan) => {
-    handlePaymentModalOpen(plan);
-  };
-
-  // Handle package upgrade in PregnancyCareView
-  const handleUpgradeInPregnancy = (newPackage) => {
-    if (!activePregnancyPackage) {
-      handleSubscribeToAccess();
-      return;
-    }
-    
-    const currentPackagePrice = activePregnancyPackage.price || 0;
-    const newPackagePrice = newPackage.price || 0;
-    
-    if (newPackagePrice <= currentPackagePrice) {
-      alert('You can only upgrade to a higher-priced package');
-      return;
-    }
-    
-    handlePaymentModalOpen(newPackage);
   };
 
   // Mark medicine as taken
@@ -1255,7 +1210,7 @@ const PregnancyCareView = ({
     }
   };
 
-  // Vital functions - FIXED
+  // Vital functions
   const addVitalRecord = () => {
     // Validate required fields
     if (!newVital.type || !newVital.value || !newVital.date) {
@@ -1285,7 +1240,7 @@ const PregnancyCareView = ({
       return;
     }
 
-    // FIXED: Create consistent key names that match initial state
+    // Create consistent key names that match initial state
     const getVitalKey = (type) => {
       const keyMap = {
         'Blood Pressure': 'bloodPressure',
@@ -1323,7 +1278,7 @@ const PregnancyCareView = ({
     addNotification('Vital Recorded', `${newVital.type} recorded successfully`, 'health');
   };
 
-  // Fixed calculateTrend function
+  // Calculate trend function
   const calculateTrend = (type, newValue, oldValue) => {
     if (!oldValue || oldValue === '') return 'new';
     
@@ -1378,6 +1333,16 @@ const PregnancyCareView = ({
     setShowShareVitalsModal(false);
   };
 
+  // Add useEffect to handle month changes safely
+  useEffect(() => {
+    // Ensure current month is valid (1-9)
+    if (currentMonth < 1) setCurrentMonth(1);
+    if (currentMonth > 9) setCurrentMonth(9);
+    
+    // Generate diet plan when month changes
+    generateMonthlyDietPlan();
+  }, [currentMonth]);
+
   // Back Button Component
   const BackButton = ({ onClick, text = 'Back' }) => (
     <button 
@@ -1405,7 +1370,7 @@ const PregnancyCareView = ({
     </button>
   );
 
-  // Pregnancy Care Packages Section - UPDATED with side-by-side layout
+  // Pregnancy Care Packages Section - UPDATED to use handleSubscribe from UserDashboard
   const PregnancyPackagesSection = () => (
     <div className="subscription-plans-section">
       <div className="section-header">
@@ -1474,7 +1439,10 @@ const PregnancyCareView = ({
                 ) : canUpgrade ? (
                   <button
                     className="upgrade-button"
-                    onClick={() => handleUpgradeInPregnancy(pkg)}
+                    onClick={() => handleUpgradeSubscription({
+                      subscription: activePregnancyPackage,
+                      annualPlan: pkg
+                    })}
                     disabled={paymentLoading}
                   >
                     <Icon name="arrow" size={16} /> {paymentLoading ? 'Processing...' : 'Upgrade Package'}
@@ -1482,7 +1450,7 @@ const PregnancyCareView = ({
                 ) : (
                   <button
                     className="subscribe-button"
-                    onClick={() => handleSubscribeInPregnancy(pkg)}
+                    onClick={() => handleSubscribe(pkg)} // Use handleSubscribe from UserDashboard (Razorpay)
                     disabled={paymentLoading}
                   >
                     {paymentLoading ? 'Processing...' : 'Subscribe Now'}
@@ -1495,16 +1463,6 @@ const PregnancyCareView = ({
       </div>
     </div>
   );
-
-  // Add useEffect to handle month changes safely
-  useEffect(() => {
-    // Ensure current month is valid (1-9)
-    if (currentMonth < 1) setCurrentMonth(1);
-    if (currentMonth > 9) setCurrentMonth(9);
-    
-    // Generate diet plan when month changes
-    generateMonthlyDietPlan();
-  }, [currentMonth]);
 
   return (
     <div className="pregnancy-container">
@@ -1541,7 +1499,10 @@ const PregnancyCareView = ({
                 <button 
                   key={pkg.id}
                   className="upgrade-btn" 
-                  onClick={() => handleUpgradeInPregnancy(pkg)}
+                  onClick={() => handleUpgradeSubscription({
+                    subscription: activePregnancyPackage,
+                    annualPlan: pkg
+                  })}
                   disabled={paymentLoading}
                 >
                   <Icon name="arrow" size={16} /> {paymentLoading ? 'Processing...' : `Upgrade to ${pkg.title}`}
@@ -1786,7 +1747,7 @@ const PregnancyCareView = ({
                     </div>
                   </div>
 
-                  {/* Month-specific stats - FIXED with safe access */}
+                  {/* Month-specific stats */}
                   <div className="month-stats-grid">
                     <div className="month-stat">
                       <div className="stat-label">Daily Calories</div>
@@ -1840,7 +1801,7 @@ const PregnancyCareView = ({
                     ))}
                   </div>
                   
-                  {/* Premium tips for current month - FIXED with safe access */}
+                  {/* Premium tips for current month */}
                   {hasPremiumAccess() && PREGNANCY_DIET_PLANS[currentMonth]?.tips && (
                     <div className="card mt-30">
                       <h4><Icon name="ai" size={20} /> Premium Tips for Month {currentMonth}</h4>
@@ -2334,133 +2295,6 @@ const PregnancyCareView = ({
         </div>
       )}
 
-      {/* Payment Modal */}
-      {showPaymentModal && selectedPackageForPayment && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <div className="modal-header-stable">
-              <h3><Icon name="package" size={24} /> Complete Payment</h3>
-              <CloseButton onClick={() => {
-                setShowPaymentModal(false);
-                setSelectedPackageForPayment(null);
-              }} />
-            </div>
-            
-            <div className="modal-body">
-              <div className="payment-summary">
-                <div className="payment-package-info">
-                  <h4>{selectedPackageForPayment.title}</h4>
-                  <div className="payment-price">
-                    <Icon name="rupee" size={28} color="#7C2A62" />
-                    <span className="price">{selectedPackageForPayment.price.toLocaleString()}</span>
-                    <span className="duration">for {selectedPackageForPayment.duration}</span>
-                  </div>
-                  <div className="payment-features">
-                    <p><strong>Includes:</strong> {selectedPackageForPayment.features.slice(0, 3).join(', ')}...</p>
-                  </div>
-                </div>
-                
-                <div className="payment-methods">
-                  <h4>Select Payment Method</h4>
-                  <div className="payment-options">
-                    <label className={`payment-option ${paymentMethod === 'card' ? 'selected' : ''}`}>
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="card" 
-                        checked={paymentMethod === 'card'} 
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                      />
-                      <div className="payment-option-content">
-                        <Icon name="shield" size={24} />
-                        <div>
-                          <span className="payment-option-title">Credit/Debit Card</span>
-                          <span className="payment-option-desc">Pay securely with your card</span>
-                        </div>
-                      </div>
-                    </label>
-                    
-                    <label className={`payment-option ${paymentMethod === 'upi' ? 'selected' : ''}`}>
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="upi" 
-                        checked={paymentMethod === 'upi'} 
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                      />
-                      <div className="payment-option-content">
-                        <Icon name="user" size={24} />
-                        <div>
-                          <span className="payment-option-title">UPI</span>
-                          <span className="payment-option-desc">Google Pay, PhonePe, Paytm</span>
-                        </div>
-                      </div>
-                    </label>
-                    
-                    <label className={`payment-option ${paymentMethod === 'netbanking' ? 'selected' : ''}`}>
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="netbanking" 
-                        checked={paymentMethod === 'netbanking'} 
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                      />
-                      <div className="payment-option-content">
-                        <div className="payment-icon">🏦</div>
-                        <div>
-                          <span className="payment-option-title">Net Banking</span>
-                          <span className="payment-option-desc">All major banks supported</span>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-                
-                <div className="payment-security">
-                  <div className="security-badge">
-                    <Icon name="lock" size={16} color="#4CAF50" />
-                    <span>Secure SSL Encrypted Payment</span>
-                  </div>
-                  <div className="security-badge">
-                    <Icon name="shield" size={16} color="#4CAF50" />
-                    <span>Your data is protected</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="modal-footer gap-10">
-              <button 
-                className="button" 
-                onClick={handlePaymentSubmit}
-                disabled={paymentProcessing}
-              >
-                {paymentProcessing ? (
-                  <>
-                    <span className="spinner" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid #f3f3f3', borderTop: '2px solid #3498db', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
-                    Processing Payment...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="check" size={18} /> Pay ₹{selectedPackageForPayment.price.toLocaleString()}
-                  </>
-                )}
-              </button>
-              <button 
-                className="secondary-button" 
-                onClick={() => {
-                  setShowPaymentModal(false);
-                  setSelectedPackageForPayment(null);
-                }}
-                disabled={paymentProcessing}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Payment Cancelled Modal */}
       {showPaymentCancelledModal && (
         <div className="modal-overlay">
@@ -2586,7 +2420,7 @@ const PregnancyCareView = ({
                     className="button" 
                     onClick={() => {
                       setShowPackageDetailsModal(false);
-                      handleSubscribeInPregnancy(selectedPackageDetails);
+                      handleSubscribe(selectedPackageDetails); // Use handleSubscribe from UserDashboard (Razorpay)
                     }}
                   >
                     <Icon name="package" size={18} /> Subscribe Now
