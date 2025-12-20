@@ -188,7 +188,7 @@ const PregnancyCareView = ({
   // Props from UserDashboard
   userSubscriptions = [],
   isSubscribed = false,
-  handleSubscribe,
+  handleSubscribe, // This is the Razorpay function from UserDashboard
   handleUpgradeSubscription,
   paymentLoading = false,
   showSubscriptionModal = false,
@@ -232,7 +232,17 @@ const PregnancyCareView = ({
   const [paymentCancelledMessage, setPaymentCancelledMessage] = useState('');
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [selectedPackageDetails, setSelectedPackageDetails] = useState(null);
-  
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareOptions, setShareOptions] = useState(null);
+  const [selectedShareOption, setSelectedShareOption] = useState('');
+  const [regeneratingPlan, setRegeneratingPlan] = useState(false);
+  const [showRegenerationModal, setShowRegenerationModal] = useState(false);
+  const [regenerationProgress, setRegenerationProgress] = useState(0);
+
+  // Share with Doctor modal state
+  const [showShareDoctorModal, setShowShareDoctorModal] = useState(false);
+  const [shareDoctorData, setShareDoctorData] = useState(null);
+
   // Payment state
   const [processingPayment, setProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState(null);
@@ -291,6 +301,249 @@ const PregnancyCareView = ({
   const showPackageDetails = (packageItem) => {
     setSelectedPackageDetails(packageItem);
     setShowPackageDetailsModal(true);
+  };
+
+  // Handle subscription navigation
+  const handleSubscribeToAccess = () => {
+    // Navigate to subscription plans tab
+    setActiveTab('plans');
+    
+    // Scroll to packages section
+    setTimeout(() => {
+      const packagesSection = document.querySelector('.subscription-plans-section');
+      if (packagesSection) {
+        packagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+    
+    addNotification('Subscription Plans', 'Please select a pregnancy care package to access premium features', 'info');
+  };
+
+  // Handle share with doctor link
+  const handleShareWithDoctorLink = (packageData = null) => {
+    const shareData = {
+      title: packageData ? `Pregnancy Care Package - ${packageData.title}` : 'Pregnancy Health Records',
+      text: packageData 
+        ? `I'm interested in the ${packageData.title} package for my pregnancy care. Please review and share your recommendations.`
+        : 'Please review my pregnancy health records and vitals for your expert opinion.',
+      type: packageData ? 'package' : 'records',
+      data: packageData || {
+        vitals: Object.entries(vitals).filter(([key, val]) => val.value && val.value.trim() !== ''),
+        reports: medicalReports.length,
+        currentWeek: pregnancyData.currentWeek
+      },
+      timestamp: new Date().toLocaleString(),
+      // Generate a unique share link
+      shareLink: `${window.location.origin}/doctor-share/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      accessCode: Math.random().toString(36).substr(2, 8).toUpperCase()
+    };
+
+    setShareDoctorData(shareData);
+    setShowShareDoctorModal(true);
+  };
+
+  // Regenerate AI diet plan
+  const handleRegenerateAIPlan = () => {
+    // Check if user has premium access
+    if (!hasPremiumAccess()) {
+      addNotification(
+        'Premium Feature Required',
+        'AI Diet Plan Regeneration requires a pregnancy care package subscription',
+        'alert'
+      );
+      
+      // Redirect to packages tab
+      setActiveTab('plans');
+      
+      // Scroll to packages section
+      setTimeout(() => {
+        const packagesSection = document.querySelector('.subscription-plans-section');
+        if (packagesSection) {
+          packagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      
+      return;
+    }
+
+    setRegeneratingPlan(true);
+    setRegenerationProgress(0);
+    setShowRegenerationModal(true);
+    
+    // Simulate AI processing with progress updates
+    const progressInterval = setInterval(() => {
+      setRegenerationProgress(prev => {
+        const newProgress = prev + 25;
+        if (newProgress >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return newProgress;
+      });
+    }, 500);
+
+    // Get current month's focus - SAFE ACCESS
+    const monthPlan = PREGNANCY_DIET_PLANS[currentMonth] || PREGNANCY_DIET_PLANS[1];
+    
+    // Simulate AI processing delay
+    setTimeout(() => {
+      // Generate new AI-optimized meal plan
+      const mealVariations = {
+        1: ['Oatmeal with berries and almonds', 'Greek yogurt with honey and nuts', 'Whole grain toast with avocado'],
+        2: ['Apple with peanut butter', 'Handful of walnuts and almonds', 'Orange slices with cottage cheese'],
+        3: ['Grilled chicken with quinoa', 'Lentil soup with vegetables', 'Tofu stir-fry with brown rice'],
+        4: ['Cottage cheese with fruits', 'Yogurt with granola', 'Protein smoothie'],
+        5: ['Baked fish with vegetables', 'Grilled salmon with sweet potato', 'Chicken vegetable stew'],
+        6: ['Warm milk with turmeric', 'Chamomile tea', 'Herbal infusion']
+      };
+
+      const updatedPlan = realTimeDietData.map((meal, index) => {
+        const mealKey = index + 1;
+        const variations = mealVariations[mealKey] || meal.meals;
+        const randomMeal = variations[Math.floor(Math.random() * variations.length)];
+        
+        // Generate AI recommendations
+        const recommendation = generateAIRecommendation(currentMonth, index);
+        const nutrients = generateNutrientInfo(currentMonth, index);
+        
+        return {
+          ...meal,
+          meals: [`${randomMeal} [AI Optimized]`],
+          recommendation: recommendation,
+          nutrients: nutrients,
+          aiGenerated: true,
+          timestamp: new Date().toLocaleTimeString(),
+          month: currentMonth,
+          focus: monthPlan?.focus || 'Nutrition & Health',
+          calories: (monthPlan?.dailyCalories || 2200) + Math.floor(Math.random() * 100) - 50 // Random variation
+        };
+      });
+
+      setAiDietPlan(updatedPlan);
+      setRegeneratingPlan(false);
+      clearInterval(progressInterval);
+      
+      // Close modal after a delay
+      setTimeout(() => {
+        setShowRegenerationModal(false);
+        setRegenerationProgress(0);
+      }, 1000);
+      
+      addNotification(
+        'AI Plan Regenerated',
+        `Your Month ${currentMonth} diet plan has been updated with AI optimizations`,
+        'health'
+      );
+    }, 2000);
+  };
+
+  // Generate AI recommendation based on month and meal time
+  const generateAIRecommendation = (month, mealIndex) => {
+    const recommendations = {
+      morning: [
+        'High protein breakfast supports morning energy',
+        'Fiber-rich meal helps digestion throughout the day',
+        'Complex carbs provide sustained energy'
+      ],
+      midday: [
+        'Balanced nutrients support baby development',
+        'Iron-rich food enhances blood production',
+        'Calcium intake supports bone development'
+      ],
+      evening: [
+        'Light dinner aids digestion and sleep',
+        'Protein supports overnight tissue repair',
+        'Low glycemic index prevents blood sugar spikes'
+      ]
+    };
+
+    let timeOfDay = 'midday';
+    if (mealIndex === 0) timeOfDay = 'morning';
+    else if (mealIndex >= realTimeDietData.length - 2) timeOfDay = 'evening';
+
+    const specificRecs = {
+      1: 'Extra folic acid for early development',
+      2: 'Protein for organ formation',
+      3: 'Omega-3 for brain development',
+      4: 'Calcium for bone growth',
+      5: 'Iron for increased blood volume',
+      6: 'Healthy fats for baby\'s brain growth',
+      7: 'Vitamin C for immune support',
+      8: 'Complex carbs for energy storage',
+      9: 'Vitamin K for labor preparation'
+    };
+
+    const baseRec = recommendations[timeOfDay]?.[mealIndex % (recommendations[timeOfDay]?.length || 3)] || 'Balanced nutrition for pregnancy';
+    const specificRec = specificRecs[month] || 'Tailored for your pregnancy stage.';
+    
+    return `${baseRec}. ${specificRec}`;
+  };
+
+  // Generate nutrient information
+  const generateNutrientInfo = (month, mealIndex) => {
+    const nutrientProfiles = {
+      1: { protein: '20-25g', fiber: '8-10g', calcium: '15% DV', folate: '100% DV' },
+      2: { protein: '25-30g', fiber: '10-12g', calcium: '20% DV', iron: '15% DV' },
+      3: { protein: '30-35g', fiber: '12-15g', omega3: '500mg', iodine: '100% DV' },
+      4: { protein: '35-40g', fiber: '15-18g', calcium: '30% DV', vitaminD: '50% DV' },
+      5: { protein: '40-45g', fiber: '18-20g', iron: '20% DV', vitaminC: '100% DV' },
+      6: { protein: '35-40g', fiber: '15-18g', healthyFats: '20g', vitaminE: '30% DV' },
+      7: { protein: '30-35g', fiber: '12-15g', vitaminC: '120% DV', betaCarotene: '80% DV' },
+      8: { protein: '25-30g', fiber: '10-12g', complexCarbs: '50g', iron: '25% DV' },
+      9: { protein: '20-25g', fiber: '8-10g', vitaminK: '100% DV', carbs: '45g' }
+    };
+
+    const profile = nutrientProfiles[month] || nutrientProfiles[1] || {};
+    const nutrients = Object.entries(profile).map(([key, value]) => 
+      `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`
+    ).join(', ');
+
+    return nutrients + ' (AI Optimized)';
+  };
+
+  // Handle share functionality
+  const handleSharePlan = () => {
+    const shareData = {
+      title: `Pregnancy Diet Plan - Month ${currentMonth}`,
+      text: `Check out my AI-optimized pregnancy diet plan for Month ${currentMonth}: ${PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Pregnancy Nutrition'}`,
+      month: currentMonth,
+      focus: PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Nutrition & Health',
+      plan: aiDietPlan.slice(0, 3), // Share first 3 meals as preview
+      timestamp: new Date().toLocaleString(),
+      url: window.location.href
+    };
+
+    // Check if Web Share API is available
+    if (navigator.share) {
+      navigator.share({
+        title: shareData.title,
+        text: shareData.text,
+        url: shareData.url
+      })
+      .then(() => {
+        addNotification('Plan Shared', 'Diet plan shared successfully', 'share');
+      })
+      .catch((error) => {
+        console.log('Error sharing:', error);
+        // Fallback to show share options
+        setShareOptions({
+          title: 'Share Diet Plan',
+          message: `Share your Month ${currentMonth} pregnancy diet plan`,
+          options: ['Copy Link', 'Send Email', 'Download PDF', 'Share with Doctor'],
+          data: shareData
+        });
+        setShowShareModal(true);
+      });
+    } else {
+      // Fallback: Show share options modal
+      setShareOptions({
+        title: 'Share Diet Plan',
+        message: `Share your Month ${currentMonth} pregnancy diet plan`,
+        options: ['Copy Link', 'Send Email', 'Download PDF', 'Share with Doctor'],
+        data: shareData
+      });
+      setShowShareModal(true);
+    }
   };
 
   // Initialize user data
@@ -706,8 +959,49 @@ const PregnancyCareView = ({
       alert('Please fill all required fields');
       return;
     }
+    
+    // Validate value format
+    const validation = validateVitalInput(newVital.type, newVital.value);
+    if (!validation.valid) {
+      alert(validation.message);
+      return;
+    }
+    
+    // Additional validation for date
+    const today = new Date().toISOString().split('T')[0];
+    const selectedDate = new Date(newVital.date);
+    const currentDate = new Date();
+    
+    // Reset time part for comparison
+    selectedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+    
+    // Allow dates up to today (not future)
+    if (selectedDate > currentDate) {
+      alert('Cannot record vitals for future dates');
+      return;
+    }
 
-    const key = newVital.type.toLowerCase().replace(/\s+/g, '');
+    // Create consistent key names that match initial state
+    const getVitalKey = (type) => {
+      const keyMap = {
+        'Blood Pressure': 'bloodPressure',
+        'Weight': 'weight',
+        'Blood Sugar': 'bloodSugar',
+        'Temperature': 'temperature',
+        'Heart Rate': 'heartRate',
+        'Fetal Heart Rate': 'fetalHeartRate'
+      };
+      return keyMap[type] || type.toLowerCase().replace(/\s+/g, '');
+    };
+
+    const key = getVitalKey(newVital.type);
+    
+    // Check if this vital type already exists
+    if (vitals[key] && vitals[key].value && !window.confirm(`A ${newVital.type} record already exists. Do you want to update it?`)) {
+      return;
+    }
+
     setVitals(prev => ({
       ...prev,
       [key]: {
@@ -724,6 +1018,48 @@ const PregnancyCareView = ({
     addNotification('Vital Recorded', `${newVital.type} recorded successfully`, 'health');
   };
 
+  // Validate vital input
+  const validateVitalInput = (type, value) => {
+    if (type === 'Blood Pressure') {
+      const bpRegex = /^\d{2,3}\/\d{2,3}$/;
+      if (!bpRegex.test(value)) {
+        return { valid: false, message: 'Please enter blood pressure in format: 120/80' };
+      }
+      const [systolic, diastolic] = value.split('/').map(Number);
+      if (systolic < 70 || systolic > 200 || diastolic < 40 || diastolic > 130) {
+        return { valid: false, message: 'Blood pressure values seem abnormal. Please check.' };
+      }
+    }
+    
+    if (type === 'Weight') {
+      const weightRegex = /^\d+(\.\d+)?\s*(kg|KG|Kg|kG)?$/;
+      if (!weightRegex.test(value)) {
+        return { valid: false, message: 'Please enter weight in format: 65 kg' };
+      }
+    }
+    
+    if (type === 'Blood Sugar') {
+      const sugarRegex = /^\d{2,3}\s*(mg\/dL|mg\/dl|MG\/DL)?$/;
+      if (!sugarRegex.test(value)) {
+        return { valid: false, message: 'Please enter blood sugar in format: 95 mg/dL' };
+      }
+    }
+    
+    if (type === 'Temperature') {
+      const tempRegex = /^\d{2}(\.\d)?\s*(°C|°c|C|c)?$/;
+      if (!tempRegex.test(value)) {
+        return { valid: false, message: 'Please enter temperature in format: 36.8°C' };
+      }
+      const temp = parseFloat(value);
+      if (temp < 35 || temp > 41) {
+        return { valid: false, message: 'Temperature seems abnormal. Please check.' };
+      }
+    }
+    
+    return { valid: true };
+  };
+
+  // Calculate trend function
   const calculateTrend = (type, newValue, oldValue) => {
     if (!oldValue) return 'new';
     
@@ -760,6 +1096,16 @@ const PregnancyCareView = ({
     addNotification('Vitals Shared', 'Health vitals shared with your doctor', 'share');
     setShowShareVitalsModal(false);
   };
+
+  // Add useEffect to handle month changes safely
+  useEffect(() => {
+    // Ensure current month is valid (1-9)
+    if (currentMonth < 1) setCurrentMonth(1);
+    if (currentMonth > 9) setCurrentMonth(9);
+    
+    // Generate diet plan when month changes
+    generateMonthlyDietPlan();
+  }, [currentMonth]);
 
   // Back Button Component
   const BackButton = ({ onClick, text = 'Back' }) => (
@@ -846,18 +1192,21 @@ const PregnancyCareView = ({
                 ) : canUpgrade ? (
                   <button
                     className="upgrade-button"
-                    onClick={() => handleUpgradeInPregnancy(pkg)}
-                    disabled={processingPayment}
+                    onClick={() => handleUpgradeSubscription({
+                      subscription: activePregnancyPackage,
+                      annualPlan: pkg
+                    })}
+                    disabled={paymentLoading}
                   >
-                    <Icon name="arrow" size={16} /> {processingPayment ? 'Processing...' : 'Upgrade Package'}
+                    <Icon name="arrow" size={16} /> {paymentLoading ? 'Processing...' : 'Upgrade Package'}
                   </button>
                 ) : (
                   <button
                     className="subscribe-button"
-                    onClick={() => handleSubscribeInPregnancy(pkg)}
-                    disabled={processingPayment}
+                    onClick={() => handleSubscribe(pkg)}
+                    disabled={paymentLoading}
                   >
-                    {processingPayment ? 'Processing...' : 'Subscribe Now'}
+                    {paymentLoading ? 'Processing...' : 'Subscribe Now'}
                   </button>
                 )}
               </div>
@@ -866,6 +1215,11 @@ const PregnancyCareView = ({
         })}
       </div>
     </div>
+  );
+
+  // Close button component for modals
+  const CloseButton = ({ onClick }) => (
+    <button className="close-btn" onClick={onClick}>×</button>
   );
 
   return (
@@ -903,10 +1257,13 @@ const PregnancyCareView = ({
                 <button 
                   key={pkg.id}
                   className="upgrade-btn" 
-                  onClick={() => handleUpgradeInPregnancy(pkg)}
-                  disabled={processingPayment}
+                  onClick={() => handleUpgradeSubscription({
+                    subscription: activePregnancyPackage,
+                    annualPlan: pkg
+                  })}
+                  disabled={paymentLoading}
                 >
-                  <Icon name="arrow" size={16} /> {processingPayment ? 'Processing...' : `Upgrade to ${pkg.title}`}
+                  <Icon name="arrow" size={16} /> {paymentLoading ? 'Processing...' : `Upgrade to ${pkg.title}`}
                 </button>
               ))}
               <button className="manage-btn" onClick={() => setActiveView('profile')}>
@@ -1101,22 +1458,34 @@ const PregnancyCareView = ({
                           <Icon name="lock" size={16} /> Subscribe to Access
                         </button>
                       )}
-                      <button className="secondary-button" onClick={generateNewDietPlan}>
+                      <button className="secondary-button" onClick={handleRegenerateAIPlan}>
                         <Icon name="ai" size={16} /> Regenerate AI Plan
                       </button>
-                      <button className="button" onClick={() => addNotification('Diet Shared', 'Diet plan shared with nutritionist', 'share')}>
+                      <button className="button" onClick={handleSharePlan}>
                         <Icon name="share" size={16} /> Share
                       </button>
                     </div>
                   </div>
 
-                  {/* Month-specific diet information */}
-                  <div className="diet-plan-month">
-                    <h4><Icon name="calendar" size={20} /> Month {currentMonth} Focus</h4>
-                    <p><strong>{PREGNANCY_DIET_PLANS[currentMonth]?.focus || 'Early Nutrition'}</strong></p>
-                    <div className="flex-between mt-15">
-                      <span>Daily Calories: {PREGNANCY_DIET_PLANS[currentMonth]?.dailyCalories || 2200}</span>
-                      <span>Key Nutrients: {PREGNANCY_DIET_PLANS[currentMonth]?.keyNutrients?.join(', ') || 'Folic Acid, Iron'}</span>
+                  {/* Month-specific stats */}
+                  <div className="month-stats-grid">
+                    <div className="month-stat">
+                      <div className="stat-label">Daily Calories</div>
+                      <div className="stat-value">
+                        {PREGNANCY_DIET_PLANS[currentMonth]?.dailyCalories || 2200}
+                      </div>
+                    </div>
+                    <div className="month-stat">
+                      <div className="stat-label">Key Nutrients</div>
+                      <div className="stat-value-nutrients">
+                        {PREGNANCY_DIET_PLANS[currentMonth]?.keyNutrients?.slice(0, 3).join(', ') || 'Folic Acid, Iron'}
+                      </div>
+                    </div>
+                    <div className="month-stat">
+                      <div className="stat-label">Recommended Foods</div>
+                      <div className="stat-value-foods">
+                        {PREGNANCY_DIET_PLANS[currentMonth]?.foods?.recommended?.slice(0, 3).join(', ') || 'Leafy greens, Citrus fruits'}
+                      </div>
                     </div>
                   </div>
 
@@ -1442,6 +1811,181 @@ const PregnancyCareView = ({
         </div>
       )}
 
+      {/* Regenerate AI Plan Modal */}
+      {showRegenerationModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h3><Icon name="ai" size={24} /> Regenerating AI Diet Plan</h3>
+              <CloseButton onClick={() => {
+                if (!regeneratingPlan) {
+                  setShowRegenerationModal(false);
+                }
+              }} />
+            </div>
+            
+            <div className="modal-body text-center">
+              <div className="ai-regeneration-animation">
+                <div className="spinner-large" style={{
+                  width: '60px',
+                  height: '60px',
+                  border: '4px solid #f3f3f3',
+                  borderTop: '4px solid #3498db',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  margin: '0 auto 20px'
+                }}></div>
+                <h4>AI is generating your personalized diet plan</h4>
+                <p>Analyzing Month {currentMonth} nutritional needs...</p>
+                
+                <div className="ai-steps" style={{ margin: '20px 0' }}>
+                  <div className={`ai-step ${regenerationProgress >= 33 ? 'active' : ''}`}>
+                    <Icon name="ai" size={20} color={regenerationProgress >= 33 ? '#4CAF50' : '#ccc'} />
+                    <span>Analyzing nutritional requirements</span>
+                  </div>
+                  <div className={`ai-step ${regenerationProgress >= 66 ? 'active' : ''}`}>
+                    <Icon name="nutrition" size={20} color={regenerationProgress >= 66 ? '#4CAF50' : '#ccc'} />
+                    <span>Optimizing meal combinations</span>
+                  </div>
+                  <div className={`ai-step ${regenerationProgress >= 100 ? 'active' : ''}`}>
+                    <Icon name="check" size={20} color={regenerationProgress >= 100 ? '#4CAF50' : '#ccc'} />
+                    <span>Generating personalized plan</span>
+                  </div>
+                </div>
+                
+                <div className="progress-bar mt-20">
+                  <div 
+                    className="progress-fill" 
+                    style={{ width: `${regenerationProgress}%` }}
+                  />
+                </div>
+                <div className="flex-between mt-5">
+                  <small>{regenerationProgress}% Complete</small>
+                  <small>{regeneratingPlan ? 'Processing...' : 'Complete!'}</small>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer gap-10">
+              <button 
+                className="button" 
+                onClick={() => {
+                  if (!regeneratingPlan) {
+                    setShowRegenerationModal(false);
+                  }
+                }}
+                disabled={regeneratingPlan}
+              >
+                {regeneratingPlan ? 'Please wait...' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Diet Plan Modal */}
+      {showShareModal && shareOptions && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h3><Icon name="share" size={24} /> {shareOptions.title}</h3>
+              <CloseButton onClick={() => {
+                setShowShareModal(false);
+                setSelectedShareOption('');
+              }} />
+            </div>
+            
+            <div className="modal-body">
+              <div className="share-options">
+                <p>{shareOptions.message}</p>
+                
+                <div className="share-option-grid">
+                  {shareOptions.options.map((option, index) => (
+                    <div 
+                      key={index}
+                      className={`share-option ${selectedShareOption === option ? 'selected' : ''}`}
+                      onClick={() => setSelectedShareOption(option)}
+                    >
+                      <Icon 
+                        name={
+                          option === 'Copy Link' ? 'link' :
+                          option === 'Send Email' ? 'mail' :
+                          option === 'Download PDF' ? 'download' :
+                          option === 'Share with Doctor' ? 'doctor' :
+                          'share'
+                        } 
+                        size={24} 
+                      />
+                      <span>{option}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                {selectedShareOption && (
+                  <div className="share-details mt-20">
+                    <h4>Share Details</h4>
+                    <div className="input-group">
+                      <label>Share Message (Optional)</label>
+                      <textarea 
+                        className="textarea" 
+                        placeholder={`Add a message for ${selectedShareOption.toLowerCase()}...`}
+                        rows="3"
+                        defaultValue={`Hi, I'd like to share my Month ${currentMonth} pregnancy diet plan for review.`}
+                        id="share-message"
+                      />
+                    </div>
+                    
+                    {selectedShareOption === 'Download PDF' && (
+                      <div className="card mt-15" style={{ background: '#f0f7ff' }}>
+                        <h5><Icon name="download" size={18} /> PDF Download Options</h5>
+                        <div className="checkbox-group mt-10">
+                          <label className="checkbox">
+                            <input type="checkbox" defaultChecked id="include-nutrition-tips" />
+                            <span>Include nutrition tips</span>
+                          </label>
+                          <label className="checkbox">
+                            <input type="checkbox" defaultChecked id="include-meal-timings" />
+                            <span>Include meal timings</span>
+                          </label>
+                          <label className="checkbox">
+                            <input type="checkbox" id="include-shopping-list" />
+                            <span>Include shopping list</span>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="modal-footer gap-10">
+              <button 
+                className="button" 
+                onClick={() => {
+                  if (!selectedShareOption) {
+                    alert('Please select a sharing option');
+                    return;
+                  }
+                }}
+                disabled={!selectedShareOption}
+              >
+                <Icon name="share" size={18} /> {selectedShareOption}
+              </button>
+              <button 
+                className="secondary-button" 
+                onClick={() => {
+                  setShowShareModal(false);
+                  setSelectedShareOption('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Payment Cancelled Modal */}
       {showPaymentCancelledModal && (
         <div className="modal-overlay">
@@ -1577,7 +2121,7 @@ const PregnancyCareView = ({
                     className="button" 
                     onClick={() => {
                       setShowPackageDetailsModal(false);
-                      handleSubscribeInPregnancy(selectedPackageDetails);
+                      handleSubscribe(selectedPackageDetails);
                     }}
                     disabled={processingPayment}
                   >
