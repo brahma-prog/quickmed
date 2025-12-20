@@ -1,3 +1,4 @@
+// UserDashboard.js - Complete integrated code
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
@@ -21,7 +22,7 @@ import PregnancyCareView from './PregnancyCareView';
 import LabTestsView from './LabTestsView';
 import HealthRecordsView from './HealthRecordsView';
 import BloodBankView from './BloodBankView';
-import BabyCareView from './BabyCareView';
+import BabycareView from './Babycare';  // Add Babycare import
 
 // Color Scheme Constants
 const COLORS = {
@@ -279,6 +280,7 @@ const DASHBOARD_STYLES = {
   }
 };
 
+// Add baby-care to the SERVICES array
 const SERVICES = [
   { 
     view: 'medicine',  
@@ -323,9 +325,9 @@ const SERVICES = [
     icon: '🩸'
   },
   { 
-    view: 'baby-care',  
+    view: 'baby-care',  // NEW SERVICE ADDED
     title: 'Baby Care', 
-    desc: 'Track your baby\'s growth, vaccination schedule, feeding, and development milestones.',
+    desc: 'Professional baby care services with subscription plans for newborns and infants.',
     icon: '👶'
   },
   {
@@ -336,53 +338,14 @@ const SERVICES = [
   }
 ];
 
-// Subscription Plans Data
+// Subscription Plans Data - UPDATED WITH BABYCARE PLANS
 const SUBSCRIPTION_PLANS = {
-  babyCare: [
-    {
-      id: 'baby-monthly',
-      title: 'Baby Care Monthly',
-      price: 499,
-      duration: 'month',
-      savings: 'Save 10%',
-      popular: false,
-      features: [
-        'Personalized baby diet plan by age',
-        'Daily activity & growth monitoring',
-        'Health check reminders',
-        'Vaccination schedule tracker',
-        'Access to pediatric expert tips',
-        'Weekly progress reports',
-        '24/7 pediatric nurse support',
-        'Emergency consultation priority'
-      ]
-    },
-    {
-      id: 'baby-annual',
-      title: 'Baby Care Annual',
-      price: 4999,
-      duration: 'year',
-      savings: 'Save 25%',
-      popular: true,
-      features: [
-        'All Monthly plan features',
-        '4 free pediatric consultations',
-        'Free vaccination at home',
-        'Monthly developmental assessment',
-        'Personal growth chart analysis',
-        'Nutritional supplements guidance',
-        'Milestone achievement rewards',
-        'Priority emergency response'
-      ]
-    }
-  ],
   pregnancyCare: [
     {
       id: 'pregnancy-basic',
       title: 'Basic Pregnancy Care',
       price: 25000,
       duration: '9 months',
-      patientsEnrolled: '450+ Patients',
       popular: false,
       features: [
         'Monthly checkups',
@@ -397,7 +360,6 @@ const SUBSCRIPTION_PLANS = {
       title: 'Premium Pregnancy Care',
       price: 50000,
       duration: '9 months',
-      patientsEnrolled: '680+ Patients',
       popular: true,
       features: [
         'Fortnightly checkups',
@@ -413,7 +375,6 @@ const SUBSCRIPTION_PLANS = {
       title: 'Comprehensive Pregnancy Care',
       price: 75000,
       duration: '9 months',
-      patientsEnrolled: '320+ Patients',
       popular: false,
       features: [
         'Weekly checkups',
@@ -422,6 +383,53 @@ const SUBSCRIPTION_PLANS = {
         'Personalized nutrition plan',
         'Delivery preparation classes',
         'Complete postnatal care'
+      ]
+    }
+  ],
+  babyCare: [
+    {
+      id: 'baby-basic',
+      title: 'Basic Baby Care',
+      price: 15000,
+      duration: 'monthly',
+      popular: false,
+      features: [
+        'Monthly essentials delivery (diapers, wipes)',
+        'Basic feeding assistance',
+        'Up to 8 hours/day caregiver support',
+        'Hygiene & comfort maintenance',
+        'Monthly check-in advice line'
+      ]
+    },
+    {
+      id: 'baby-premium',
+      title: 'Premium Baby Care',
+      price: 30000,
+      duration: 'monthly',
+      popular: true,
+      features: [
+        'Everything in Basic, plus:',
+        'Extended caregiver hours (12 hours/day)',
+        'Enhanced hygiene & care',
+        'Play & developmental support',
+        'Sleep & routine establishment',
+        'Daily/weekly progress reports'
+      ]
+    },
+    {
+      id: 'baby-comprehensive',
+      title: 'Comprehensive Baby Care',
+      price: 60000,
+      duration: 'monthly',
+      popular: false,
+      features: [
+        'Everything in Premium, plus:',
+        '24×7 live-in caregiver/nanny',
+        'Health monitoring & vaccination reminders',
+        'Expert guidance & consultation',
+        'Postnatal & mother support',
+        'Premium supplies & extras',
+        'Replacement guarantee'
       ]
     }
   ]
@@ -493,6 +501,28 @@ const loadAppointmentsFromLocalStorage = () => {
   return [];
 };
 
+// Helper function to save orders to localStorage
+const saveOrdersToLocalStorage = (orders) => {
+  try {
+    localStorage.setItem('quickmed_orders', JSON.stringify(orders));
+  } catch (error) {
+    console.error('Error saving orders to localStorage:', error);
+  }
+};
+
+// Helper function to load orders from localStorage
+const loadOrdersFromLocalStorage = () => {
+  try {
+    const savedOrders = localStorage.getItem('quickmed_orders');
+    if (savedOrders) {
+      return JSON.parse(savedOrders);
+    }
+  } catch (error) {
+    console.error('Error loading orders from localStorage:', error);
+  }
+  return [];
+};
+
 // Add Razorpay script dynamically
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -517,17 +547,19 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   const location = useLocation();
   const navigate = useNavigate();
   
+  // Update validViews array to include baby-care
+  const validViews = [
+    'dashboard', 'profile', 'appointments', 'orders', 'medicine',
+    'products', 'cart', 'consultation', 'live-tracking', 'notifications',
+    'pregnancy-care', 'lab-tests', 'health-records', 'blood-bank',
+    'baby-care', 'vehicle-dashboard'  // ADDED baby-care
+  ];
+  
   // Get initial view from URL
   const getInitialView = () => {
     const path = location.pathname;
     const segments = path.split('/');
     const currentView = segments[segments.length - 1];
-    
-    const validViews = [
-      'dashboard', 'profile', 'appointments', 'orders', 'medicine',
-      'products', 'cart', 'consultation', 'live-tracking', 'notifications',
-      'pregnancy-care', 'lab-tests', 'health-records', 'blood-bank', 'baby-care', 'vehicle-dashboard'
-    ];
     
     return validViews.includes(currentView) ? currentView : 'dashboard';
   };
@@ -535,7 +567,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   const [activeView, setActiveView] = useState(getInitialView());
   const [cart, setCart] = useState(() => loadCartFromLocalStorage());
   const [searchQuery, setSearchQuery] = useState('');
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(() => loadOrdersFromLocalStorage());
   const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
@@ -570,7 +602,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
-  // New state for subscription modal - REMOVED showSubscriptionModal
+  // New state for subscription modal
   const [selectedSubscription, setSelectedSubscription] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedUpgradePlan, setSelectedUpgradePlan] = useState(null);
@@ -579,7 +611,8 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   // New state for phone confirmation
   const [showPhoneConfirm, setShowPhoneConfirm] = useState(false);
   const [tempPhone, setTempPhone] = useState('');
-  const [paymentPlan, setPaymentPlan] = useState(null);
+  const [phoneError, setPhoneError] = useState('');
+  const [ setPaymentPlan] = useState(null);
   const [checkoutData, setCheckoutData] = useState(null);
   const [paymentType, setPaymentType] = useState(''); // 'subscription' or 'checkout'
 
@@ -612,13 +645,6 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     const segments = path.split('/');
     const currentView = segments[segments.length - 1];
     
-    // List of valid views
-    const validViews = [
-      'dashboard', 'profile', 'appointments', 'orders', 'medicine',
-      'products', 'cart', 'consultation', 'live-tracking', 'notifications',
-      'pregnancy-care', 'lab-tests', 'health-records', 'blood-bank', 'baby-care', 'vehicle-dashboard'
-    ];
-    
     // If URL contains a valid view and it's different from current activeView, update state
     if (validViews.includes(currentView) && currentView !== activeView) {
       setActiveView(currentView);
@@ -644,6 +670,11 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
   useEffect(() => {
     saveCartToLocalStorage(cart);
   }, [cart]);
+
+  // Save orders to localStorage whenever they change
+  useEffect(() => {
+    saveOrdersToLocalStorage(orders);
+  }, [orders]);
 
   // Core Functions
   const handleNavigation = useCallback((view) => {
@@ -738,6 +769,12 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
 
   const clearCart = useCallback(() => {
     setCart([]);
+    // Also clear cart from localStorage
+    try {
+      localStorage.removeItem('quickmed_cart');
+    } catch (error) {
+      console.error('Error clearing cart from localStorage:', error);
+    }
   }, []);
 
   const getTotalPrice = useCallback(() => 
@@ -762,60 +799,51 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     initializeRazorpay();
   }, []);
 
+  // ========== UPDATED PHONE VALIDATION FUNCTION ==========
+  const validatePhoneNumber = (phone) => {
+    // Check if phone is exactly 10 digits
+    if (phone.length !== 10) {
+      return 'Phone number must be exactly 10 digits';
+    }
+    
+    // Check if phone starts with 6, 7, 8, or 9
+    const validStartDigits = ['6', '7', '8', '9'];
+    if (!validStartDigits.includes(phone.charAt(0))) {
+      return 'Phone number must start with 6, 7, 8, or 9';
+    }
+    
+    // Check if all characters are digits
+    if (!/^\d+$/.test(phone)) {
+      return 'Phone number must contain only digits';
+    }
+    
+    return ''; // No error
+  };
+
   // ========== PHONE CONFIRMATION FUNCTIONS ==========
   
   const showPhoneConfirmation = (plan, type = 'subscription') => {
     setPaymentPlan(plan);
     setPaymentType(type);
     setTempPhone(profile?.phone || '');
+    setPhoneError('');
     setShowPhoneConfirm(true);
-  };
-
-  const handlePhoneConfirm = () => {
-    if (tempPhone.length !== 10) {
-      alert('Please enter a valid 10-digit mobile number');
-      return;
-    }
-    
-    // Update profile if phone changed
-    if (tempPhone !== profile?.phone) {
-      updateProfile({ ...profile, phone: tempPhone });
-    }
-    
-    // Only close the modal
-    setShowPhoneConfirm(false);
-    
-    // Based on payment type, initiate the actual payment
-    if (paymentType === 'subscription' && paymentPlan) {
-      proceedWithSubscriptionPayment(paymentPlan, tempPhone);
-    } else if (paymentType === 'checkout' && checkoutData) {
-      proceedWithCheckoutPayment(checkoutData, tempPhone);
-    } else {
-      // For backward compatibility with old flow
-      initiatePayment();
-    }
-    
-    // Reset state (except phone which we want to keep for Razorpay)
-    setPaymentPlan(null);
-    setCheckoutData(null);
-    setPaymentType('');
   };
 
   // ========== UPDATED PAYMENT FUNCTIONS ==========
 
-  // Subscription Payment with Phone Confirmation - DIRECT PAYMENT (NO POPUP)
+  // Subscription Payment - NO PHONE CONFIRMATION FOR SUBSCRIPTIONS
   const initiateSubscriptionPayment = async (plan) => {
     if (!razorpayLoaded) {
       addNotification('Payment Error', 'Payment service is not available. Please try again.', 'error');
       return false;
     }
 
-    // Show phone confirmation modal instead of subscription info popup
-    showPhoneConfirmation(plan, 'subscription');
-    return true;
+    // Direct payment without phone confirmation for subscriptions
+    return await proceedWithSubscriptionPayment(plan);
   };
 
-  const proceedWithSubscriptionPayment = async (plan, phoneNumber) => {
+  const proceedWithSubscriptionPayment = async (plan) => {
     setPaymentLoading(true);
 
     try {
@@ -829,7 +857,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
         prefill: {
           name: profile?.fullName || 'Customer',
           email: profile?.email || 'customer@example.com',
-          contact: phoneNumber  // Use confirmed phone number
+          contact: profile?.phone || '9876543210'  // Use profile phone or default
         },
         theme: { color: COLORS.primary },
         modal: {
@@ -864,8 +892,11 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
       // For pregnancy plans, set end date to 9 months from now
       if (plan.id.includes('pregnancy')) {
         endDate.setMonth(endDate.getMonth() + 9);
-      } else if (plan.duration === 'month') {
-        endDate.setMonth(endDate.getMonth() + 1);
+      } else if (plan.id.includes('baby')) {
+        // For baby care, set end date based on duration
+        if (plan.duration.includes('month')) {
+          endDate.setMonth(endDate.getMonth() + 1);
+        }
       } else if (plan.duration === 'year') {
         endDate.setFullYear(endDate.getFullYear() + 1);
       }
@@ -874,7 +905,8 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
         id: `sub-${Date.now()}`,
         planId: plan.id,
         title: plan.title,
-        planType: plan.id.includes('pregnancy') ? 'pregnancyCare' : 'babyCare',
+        planType: plan.id.includes('pregnancy') ? 'pregnancyCare' : 
+                 plan.id.includes('baby') ? 'babyCare' : 'general',
         status: 'active',
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
@@ -922,11 +954,11 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     });
   };
 
-  // Handle subscription from PregnancyCareView - DIRECT TO PAYMENT
+  // Handle subscription from PregnancyCareView or BabycareView - DIRECT TO PAYMENT
   const handleSubscribe = async (plan) => {
     setSelectedSubscription(plan);
     
-    // Initiate payment directly without showing subscription info popup
+    // Initiate payment directly without phone confirmation
     const paymentInitiated = await initiateSubscriptionPayment(plan);
     
     if (!paymentInitiated) {
@@ -1214,7 +1246,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     return progressMap[status] || 0;
   };
 
-  // ===== UPDATED PAYMENT FUNCTIONS WITH PHONE CONFIRMATION =====
+  // ===== UPDATED PAYMENT FUNCTIONS =====
   
   // Original payment function for backward compatibility
   const initiatePayment = async () => {
@@ -1227,7 +1259,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
       return;
     }
     
-    // Show phone confirmation first
+    // Show phone confirmation for regular checkout
     setCheckoutData({
       cartItems: cart,
       totalAmount: getTotalPrice(),
@@ -1237,26 +1269,34 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     });
     setPaymentType('checkout');
     setTempPhone(profile?.phone || '');
+    setPhoneError('');
     setShowPhoneConfirm(true);
   };
 
-  // Updated handleCheckoutConfirmation to include phone confirmation
+  // ========== UPDATED: FIXED handleCheckoutConfirmation to properly handle cart clearing ==========
   const handleCheckoutConfirmation = async (checkoutData) => {
-    console.log('Checkout data received:', checkoutData);
+    console.log('Processing checkout:', checkoutData);
     
     if (!checkoutData || !checkoutData.cartItems || checkoutData.cartItems.length === 0) {
       alert('Invalid checkout data. Please try again.');
-      return;
+      return false;
     }
     
     if (!window.Razorpay) {
       alert('Payment system is loading, please try again in a moment.');
-      return;
+      return false;
     }
     
-    // Store checkout data and show phone confirmation
-    setCheckoutData(checkoutData);
-    showPhoneConfirmation(checkoutData, 'checkout');
+    try {
+      // Store checkout data and show phone confirmation for checkout
+      setCheckoutData(checkoutData);
+      showPhoneConfirmation(checkoutData, 'checkout');
+      
+      return true;
+    } catch (error) {
+      console.error('Error in handleCheckoutConfirmation:', error);
+      return false;
+    }
   };
 
   // Proceed with checkout payment after phone confirmation
@@ -1297,7 +1337,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     }
   };
 
-  // Updated handlePaymentSuccess to handle tip data
+  // ========== CRITICAL FIX: UPDATED handlePaymentSuccess to properly remove purchased items ==========
   const handlePaymentSuccess = async (paymentResponse, checkoutData = null) => {
     try {
       // Verify payment with your backend (simulated here)
@@ -1328,12 +1368,40 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
           selectedItems: checkoutData.selectedItems || []
         };
         
+        // Save order to localStorage first
+        const savedOrders = JSON.parse(localStorage.getItem('quickmed_orders') || '[]');
+        savedOrders.unshift(newOrder);
+        localStorage.setItem('quickmed_orders', JSON.stringify(savedOrders));
+        
+        // Update orders state
         setOrders(prev => [newOrder, ...prev]);
         
-        // Remove selected items from cart
+        // ========== CRITICAL FIX: Properly remove purchased items from cart ==========
         if (checkoutData.selectedItems && checkoutData.selectedItems.length > 0) {
-          setCart(prev => prev.filter(item => !checkoutData.selectedItems.includes(item.id)));
+          console.log(`Removing ${checkoutData.selectedItems.length} selected items from cart`);
+          
+          setCart(prev => {
+            // Filter out only the items that were actually purchased (selectedItems)
+            const newCart = prev.filter(item => !checkoutData.selectedItems.includes(item.id));
+            
+            console.log('Cart before removal:', prev);
+            console.log('Cart after removal:', newCart);
+            
+            // Update localStorage
+            const cartData = {
+              items: newCart,
+              timestamp: new Date().getTime(),
+              expiresIn: 7 * 24 * 60 * 60 * 1000
+            };
+            localStorage.setItem('quickmed_cart', JSON.stringify(cartData));
+            
+            return newCart;
+          });
+          
+          addNotification('Cart Updated', `${checkoutData.selectedItems.length} item(s) removed from cart`, 'order');
         } else {
+          // If no selectedItems array, remove all cart items (for backward compatibility)
+          console.log('No selected items specified, clearing entire cart');
           clearCart();
         }
         
@@ -1344,7 +1412,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
         );
         
       } else {
-        // Original logic for regular checkout
+        // Original logic for regular checkout (without CartView selection)
         const newOrder = {
           id: orderId,
           date: new Date().toISOString().split('T')[0],
@@ -1364,7 +1432,14 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
           }
         };
         
+        // Save order to localStorage
+        const savedOrders = JSON.parse(localStorage.getItem('quickmed_orders') || '[]');
+        savedOrders.unshift(newOrder);
+        localStorage.setItem('quickmed_orders', JSON.stringify(savedOrders));
+        
         setOrders(prev => [newOrder, ...prev]);
+        
+        // Clear entire cart for backward compatibility
         clearCart();
         
         addNotification(
@@ -1379,6 +1454,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
       
     } catch (error) {
       console.error('Payment verification failed:', error);
+      addNotification('Payment Failed', 'Payment verification failed. Please try again.', 'error');
     } finally {
       setPaymentLoading(false);
     }
@@ -1414,43 +1490,33 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
     return true;
   });
 
+  // ========== UPDATED PHONE INPUT HANDLER ==========
+  const handlePhoneInput = (value) => {
+    // Remove all non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+    
+    // If empty, clear error
+    if (digitsOnly === '') {
+      setTempPhone('');
+      setPhoneError('');
+      return;
+    }
+    
+    // Limit to 10 digits
+    const limitedDigits = digitsOnly.slice(0, 10);
+    setTempPhone(limitedDigits);
+    
+    // Validate if we have at least 1 digit
+    if (limitedDigits.length > 0) {
+      const error = validatePhoneNumber(limitedDigits);
+      setPhoneError(error);
+    } else {
+      setPhoneError('');
+    }
+  };
+
   // Effects - FIXED: Ensure trackingOrder has items property
   useEffect(() => {
-    const ordersData = [
-      {
-        id: 'ORD001',
-        date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        items: [{ name: 'Paracetamol 500mg', quantity: 2, price: 30 }, { name: 'Vitamin C 1000mg', quantity: 1, price: 40 }],
-        total: 100,
-        subtotal: 100,
-        tip: 0,
-        status: 'Delivered',
-        trackingAvailable: false
-      },
-      {
-        id: 'ORD002',
-        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        items: [{ name: 'Aspirin 75mg', quantity: 1, price: 25 }],
-        total: 25,
-        subtotal: 25,
-        tip: 0,
-        status: 'In Transit',
-        trackingAvailable: true,
-        deliveryPartner: { name: 'Rahul Kumar', phone: '+91 9876543210', estimatedTime: '25 min' }
-      }
-    ];
-    
-    setOrders(ordersData);
-    
-    // Set trackingOrder with proper items array
-    const trackingOrderData = ordersData.find(o => o.trackingAvailable && (o.status === 'In Transit' || o.status === 'On the Way'));
-    if (trackingOrderData) {
-      setTrackingOrder({
-        ...trackingOrderData,
-        items: trackingOrderData.items || [] // Ensure items exists
-      });
-    }
-
     // Initialize mock subscriptions for demo
     setUserSubscriptions([
       {
@@ -1517,13 +1583,16 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
 
   // ========== MODAL COMPONENTS ==========
   
-  // Phone Confirmation Modal Component - FIXED: Only continue when button is clicked
+  // Phone Confirmation Modal Component - UPDATED WITH VALIDATION
   const PhoneConfirmationModal = () => {
     if (!showPhoneConfirm) return null;
 
     const handlePhoneConfirmClick = () => {
-      if (tempPhone.length !== 10) {
-        alert('Please enter a valid 10-digit mobile number');
+      // Validate phone number
+      const validationError = validatePhoneNumber(tempPhone);
+      
+      if (validationError) {
+        setPhoneError(validationError);
         return;
       }
       
@@ -1534,11 +1603,10 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
       
       // Close the modal first
       setShowPhoneConfirm(false);
+      setPhoneError('');
       
       // Based on payment type, initiate the actual payment
-      if (paymentType === 'subscription' && paymentPlan) {
-        proceedWithSubscriptionPayment(paymentPlan, tempPhone);
-      } else if (paymentType === 'checkout' && checkoutData) {
+      if (paymentType === 'checkout' && checkoutData) {
         proceedWithCheckoutPayment(checkoutData, tempPhone);
       } else {
         // For backward compatibility with old flow
@@ -1597,7 +1665,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              border: `1px solid ${tempPhone.length === 10 ? '#4CAF50' : COLORS.mint}`,
+              border: `1px solid ${phoneError ? '#f44336' : tempPhone.length === 10 && !phoneError ? '#4CAF50' : COLORS.mint}`,
               borderRadius: '8px',
               padding: 'max(12px, 1.2vw) max(15px, 1.5vw)',
               backgroundColor: '#f9f9f9',
@@ -1623,7 +1691,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
               <input
                 type="tel"
                 value={tempPhone}
-                onChange={(e) => setTempPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                onChange={(e) => handlePhoneInput(e.target.value)}
                 placeholder="6300604470"
                 style={{
                   flex: 1,
@@ -1636,12 +1704,10 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
                 }}
                 maxLength={10}
                 autoFocus
-                // REMOVED: Don't automatically submit on Enter key or when reaching 10 digits
-                // Only allow manual submission via the Continue button
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && tempPhone.length === 10) {
-                    // Prevent automatic submission when pressing Enter
+                  if (e.key === 'Enter' && tempPhone.length === 10 && !phoneError) {
                     e.preventDefault();
+                    handlePhoneConfirmClick();
                   }
                 }}
               />
@@ -1649,17 +1715,34 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
             
             <div style={{ 
               fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)', 
-              color: COLORS.softtext,
               marginTop: 'max(5px, 0.5vw)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <span>{tempPhone.length}/10 digits</span>
-              {tempPhone.length === 10 && (
+              <span style={{ 
+                color: phoneError ? '#f44336' : tempPhone.length === 10 ? '#4CAF50' : COLORS.softtext
+              }}>
+                {phoneError || `${tempPhone.length}/10 digits`}
+              </span>
+              {tempPhone.length === 10 && !phoneError && (
                 <span style={{ color: '#4CAF50', fontWeight: 'bold' }}>✓ Valid number</span>
               )}
             </div>
+            
+            {/* Validation Hint */}
+            {tempPhone.length > 0 && !phoneError && tempPhone.length < 10 && (
+              <div style={{ 
+                fontSize: 'clamp(0.75rem, 1.5vw, 0.8rem)', 
+                color: '#ff9800',
+                marginTop: 'max(8px, 0.8vw)',
+                padding: 'max(5px, 0.5vw) max(10px, 1vw)',
+                backgroundColor: '#fff3e0',
+                borderRadius: '4px'
+              }}>
+                Must start with 6, 7, 8, or 9
+              </div>
+            )}
           </div>
           
           <div style={{ 
@@ -1673,6 +1756,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
                 setPaymentPlan(null);
                 setCheckoutData(null);
                 setTempPhone('');
+                setPhoneError('');
                 setPaymentType('');
                 setPaymentLoading(false);
               }}
@@ -1702,27 +1786,27 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
             
             <button
               onClick={handlePhoneConfirmClick}
-              disabled={tempPhone.length !== 10}
+              disabled={tempPhone.length !== 10 || !!phoneError}
               style={{
-                backgroundColor: tempPhone.length === 10 ? COLORS.primary : '#ccc',
+                backgroundColor: (tempPhone.length === 10 && !phoneError) ? COLORS.primary : '#ccc',
                 color: COLORS.white,
                 border: 'none',
                 padding: 'max(12px, 1.2vw) max(24px, 2.4vw)',
                 borderRadius: '25px',
                 fontSize: 'clamp(0.9rem, 2vw, 1rem)',
                 fontWeight: 'bold',
-                cursor: tempPhone.length === 10 ? 'pointer' : 'not-allowed',
+                cursor: (tempPhone.length === 10 && !phoneError) ? 'pointer' : 'not-allowed',
                 flex: 1,
                 transition: 'background-color 0.3s ease',
                 minWidth: '120px'
               }}
               onMouseEnter={(e) => {
-                if (tempPhone.length === 10) {
+                if (tempPhone.length === 10 && !phoneError) {
                   e.target.style.backgroundColor = '#00897B';
                 }
               }}
               onMouseLeave={(e) => {
-                if (tempPhone.length === 10) {
+                if (tempPhone.length === 10 && !phoneError) {
                   e.target.style.backgroundColor = COLORS.primary;
                 }
               }}
@@ -1767,7 +1851,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
         </p>
         
         {/* Pregnancy Care Subscriptions */}
-        <div style={{ marginBottom: 'max(30px, 3vw)' }}>
+        <div style={{ marginBottom: 'max(40px, 4vw)' }}>
           <h3 style={{ 
             fontSize: 'clamp(1.2rem, 3vw, 1.3rem)', 
             fontWeight: 'bold', 
@@ -1909,10 +1993,6 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
               const isActive = userSubscriptions.some(sub => 
                 sub.planId === plan.id && sub.status === 'active'
               );
-              const activeSubscription = userSubscriptions.find(sub => 
-                sub.planType === 'babyCare' && sub.status === 'active'
-              );
-              const canUpgrade = activeSubscription && activeSubscription.duration === 'month' && plan.duration === 'year';
               
               return (
                 <div
@@ -1950,41 +2030,35 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
                     </div>
                   )}
                   
-                  {plan.savings && (
+                  {plan.patientsEnrolled && (
                     <div style={{
                       position: 'absolute',
                       top: '15px',
                       right: '15px',
-                      backgroundColor: '#4CAF50',
+                      backgroundColor: '#2196F3',
                       color: COLORS.white,
                       padding: 'max(4px, 0.4vw) max(10px, 1vw)',
                       borderRadius: '12px',
                       fontSize: 'clamp(0.7rem, 1.5vw, 0.75rem)',
                       fontWeight: 'bold'
                     }}>
-                      {plan.savings}
+                      {plan.patientsEnrolled}
                     </div>
                   )}
                   
                   <div style={DASHBOARD_STYLES.subscriptionHeader}>
                     <h3 style={DASHBOARD_STYLES.subscriptionTitle}>{plan.title}</h3>
-                    <div style={DASHBOARD_STYLES.subscriptionPrice}>₹{plan.price}</div>
-                    <div style={DASHBOARD_STYLES.subscriptionDuration}>per {plan.duration}</div>
+                    <div style={DASHBOARD_STYLES.subscriptionPrice}>₹{plan.price.toLocaleString()}</div>
+                    <div style={DASHBOARD_STYLES.subscriptionDuration}>{plan.duration}</div>
                   </div>
                   
                   <div style={DASHBOARD_STYLES.featureList}>
-                    {plan.features.slice(0, 6).map((feature, index) => (
+                    {plan.features.map((feature, index) => (
                       <div key={index} style={DASHBOARD_STYLES.featureItem}>
                         <span style={{ color: '#4CAF50', marginRight: '10px' }}>✓</span>
                         <span style={{ color: COLORS.darktext }}>{feature}</span>
                       </div>
                     ))}
-                    {plan.features.length > 6 && (
-                      <div style={{ ...DASHBOARD_STYLES.featureItem, color: COLORS.primary, fontWeight: 'bold' }}>
-                        <span style={{ marginRight: '10px' }}>+</span>
-                        <span>And {plan.features.length - 6} more features...</span>
-                      </div>
-                    )}
                   </div>
                   
                   {isActive ? (
@@ -2000,31 +2074,6 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
                     }}>
                       ✓ Active Subscription
                     </div>
-                  ) : canUpgrade ? (
-                    <button
-                      onClick={() => handleUpgradeSubscription({
-                        planType: 'babyCare',
-                        subscription: activeSubscription,
-                        annualPlan: plan
-                      })}
-                      style={{
-                        backgroundColor: '#ff9800',
-                        color: COLORS.white,
-                        border: 'none',
-                        padding: 'max(12px, 1.2vw) max(24px, 2.4vw)',
-                        borderRadius: '25px',
-                        fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        width: '100%',
-                        marginTop: 'auto',
-                        transition: 'background-color 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = '#f57c00'}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = '#ff9800'}
-                    >
-                      Upgrade Now
-                    </button>
                   ) : (
                     <button
                       onClick={() => handleSubscribe(plan)}
@@ -2529,7 +2578,7 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
         />
         <Modals {...modalProps} />
         
-        {/* Phone Confirmation Modal - FIXED VERSION */}
+        {/* Phone Confirmation Modal - ONLY FOR CHECKOUT, NOT SUBSCRIPTIONS */}
         <PhoneConfirmationModal />
         
         {/* Render the correct view based on activeView */}
@@ -2679,10 +2728,22 @@ const UserDashboardContent = ({ user, onLogout, onWriteReview }) => {
           />
         )}
         {activeView === 'baby-care' && (
-          <BabyCareView
+          <BabycareView
             setActiveView={safeSetActiveView}
             addNotification={addNotification}
             colors={COLORS}
+            user={profile}
+            userSubscriptions={userSubscriptions}
+            isSubscribed={isSubscribed('babyCare')}
+            handleSubscribe={handleSubscribe}
+            handleUpgradeSubscription={handleUpgradeSubscription}
+            paymentLoading={paymentLoading}
+            selectedSubscription={selectedSubscription}
+            setSelectedSubscription={setSelectedSubscription}
+            showUpgradeModal={showUpgradeModal}
+            setShowUpgradeModal={setShowUpgradeModal}
+            selectedUpgradePlan={selectedUpgradePlan}
+            setSelectedUpgradePlan={setSelectedUpgradePlan}
           />
         )}
         {activeView === 'vehicle-dashboard' && (

@@ -65,6 +65,149 @@ const Performance = () => {
     return () => clearInterval(interval);
   }, [performanceFilter]);
 
+  // SVG Icon Components
+  const PerformanceIcon = ({ type, size = 32, color = "#009688" }) => {
+    const icons = {
+      completionRate: (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      ),
+      averageRating: (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+      onTimeDelivery: (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+      responseTime: (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      ),
+      customerSatisfaction: (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+          <line x1="9" y1="9" x2="9.01" y2="9" />
+          <line x1="15" y1="9" x2="15.01" y2="9" />
+        </svg>
+      ),
+      efficiency: (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M12 20V10" />
+          <path d="M18 20V4" />
+          <path d="M6 20v-4" />
+        </svg>
+      )
+    };
+
+    return icons[type] || icons.completionRate;
+  };
+
+  const FilterIcon = ({ type, color = "#4F6F6B" }) => {
+    const icons = {
+      thisMonth: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      ),
+      last3Months: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+          <path d="M8 14h.01" />
+          <path d="M12 14h.01" />
+          <path d="M16 14h.01" />
+          <path d="M8 18h.01" />
+          <path d="M12 18h.01" />
+          <path d="M16 18h.01" />
+        </svg>
+      ),
+      allTime: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M12 2a10 10 0 0 0-10 10c0 5.5 10 10 10 10s10-4.5 10-10A10 10 0 0 0 12 2z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+      )
+    };
+
+    return icons[type] || icons.thisMonth;
+  };
+
+  const HeaderIcon = () => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#009688" strokeWidth="2">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  );
+
+  const LiveIcon = ({ color = "#4DB6AC", size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3">
+      <circle cx="12" cy="12" r="10" />
+    </svg>
+  );
+
+  const StatsIcon = ({ type, color = "#009688" }) => {
+    const icons = {
+      activeDeliveries: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+          <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+      ),
+      completedToday: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      ),
+      currentRating: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+      responseRate: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+      )
+    };
+
+    return icons[type] || icons.activeDeliveries;
+  };
+
+  const LoadingSpinner = () => (
+    <svg width="48" height="48" viewBox="0 0 50 50" style={{ animation: 'rotate 2s linear infinite' }}>
+      <circle cx="25" cy="25" r="20" fill="none" stroke="#E0F2F1" strokeWidth="5" />
+      <circle cx="25" cy="25" r="20" fill="none" stroke="#4DB6AC" strokeWidth="5" strokeLinecap="round"
+        strokeDasharray="1, 150" strokeDashoffset="0" style={{ animation: 'dash 1.5s ease-in-out infinite' }} />
+      <style>
+        {`
+          @keyframes rotate {
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes dash {
+            0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+            50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+            100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+          }
+        `}
+      </style>
+    </svg>
+  );
+
   const styles = {
     mainContent: {
       padding: '30px',
@@ -75,13 +218,18 @@ const Performance = () => {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      marginBottom: '30px'
+      marginBottom: '30px',
+      flexWrap: 'wrap',
+      gap: '20px'
     },
     greeting: {
       fontSize: '28px',
       fontWeight: '700',
       color: '#124441', // darktext
-      margin: '0 0 8px 0'
+      margin: '0 0 8px 0',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
     },
     subtitle: {
       fontSize: '16px',
@@ -94,7 +242,8 @@ const Performance = () => {
       backgroundColor: '#FFFFFF', // white
       padding: '4px',
       borderRadius: '8px',
-      border: '1px solid #4DB6AC' // mint
+      border: '1px solid #4DB6AC', // mint
+      flexWrap: 'wrap'
     },
     performanceFilterButton: {
       padding: '8px 16px',
@@ -105,7 +254,10 @@ const Performance = () => {
       fontSize: '14px',
       fontWeight: '500',
       transition: 'all 0.3s ease',
-      color: '#4F6F6B' // softtext
+      color: '#4F6F6B', // softtext
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px'
     },
     performanceFilterButtonActive: {
       backgroundColor: '#009688', // primary
@@ -113,22 +265,26 @@ const Performance = () => {
     },
     performanceGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
       gap: '20px',
       marginBottom: '30px'
     },
     performanceCard: {
       backgroundColor: '#FFFFFF', // white
-      padding: '20px',
+      padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
       display: 'flex',
       alignItems: 'center',
-      gap: '16px',
-      border: '1px solid #4DB6AC' // mint
+      gap: '20px',
+      border: '1px solid #4DB6AC', // mint
+      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+      }
     },
     performanceIcon: {
-      fontSize: '32px',
       width: '60px',
       height: '60px',
       display: 'flex',
@@ -136,7 +292,7 @@ const Performance = () => {
       justifyContent: 'center',
       backgroundColor: '#E0F2F1', // softbg
       borderRadius: '12px',
-      color: '#009688' // primary
+      flexShrink: 0
     },
     performanceContent: {
       flex: 1
@@ -157,7 +313,7 @@ const Performance = () => {
       backgroundColor: '#FFFFFF', // white
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
       marginBottom: '24px',
       border: '1px solid #4DB6AC' // mint
     },
@@ -165,7 +321,10 @@ const Performance = () => {
       fontSize: '20px',
       fontWeight: '600',
       color: '#124441', // darktext
-      margin: '0 0 16px 0'
+      margin: '0 0 16px 0',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
     },
     performanceChart: {
       display: 'flex',
@@ -217,7 +376,7 @@ const Performance = () => {
     legendItem: {
       display: 'flex',
       alignItems: 'center',
-      gap: '6px',
+      gap: '8px',
       fontSize: '12px',
       color: '#4F6F6B' // softtext
     },
@@ -232,7 +391,7 @@ const Performance = () => {
     },
     realTimeGrid: {
       display: 'grid',
-      gridTemplateColumns: '2fr 1fr',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
       gap: '24px',
       marginBottom: '30px'
     },
@@ -240,14 +399,14 @@ const Performance = () => {
       backgroundColor: '#FFFFFF', // white
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
       border: '1px solid #4DB6AC' // mint
     },
     realTimeStatsContainer: {
       backgroundColor: '#FFFFFF', // white
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
       border: '1px solid #4DB6AC' // mint
     },
     realTimeHeader: {
@@ -260,14 +419,18 @@ const Performance = () => {
       fontSize: '18px',
       fontWeight: '600',
       color: '#124441', // darktext
-      margin: 0
+      margin: 0,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
     },
     realTimeIndicator: {
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
       fontSize: '12px',
-      color: '#4DB6AC' // mint
+      color: '#4DB6AC', // mint
+      fontWeight: '500'
     },
     pulseDot: {
       width: '8px',
@@ -306,7 +469,23 @@ const Performance = () => {
       borderRadius: '3px 3px 0 0',
       minHeight: '4px',
       transition: 'all 0.5s ease',
-      position: 'relative'
+      position: 'relative',
+      '&:hover': {
+        '&::after': {
+          content: 'attr(title)',
+          position: 'absolute',
+          bottom: '100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#124441',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '4px',
+          fontSize: '10px',
+          whiteSpace: 'nowrap',
+          marginBottom: '8px'
+        }
+      }
     },
     realTimeRatingBar: {
       width: '16px',
@@ -320,18 +499,29 @@ const Performance = () => {
       fontSize: '10px',
       color: '#4F6F6B', // softtext
       fontWeight: '500',
-      marginTop: '4px'
+      marginTop: '4px',
+      textAlign: 'center'
     },
     statsGrid: {
-      display: 'flex',
-      flexDirection: 'column',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, 1fr)',
       gap: '16px'
     },
     statCard: {
-      padding: '16px',
+      padding: '20px',
       backgroundColor: '#E0F2F1', // softbg
       borderRadius: '8px',
-      border: '1px solid #4DB6AC' // mint
+      border: '1px solid #4DB6AC', // mint
+      transition: 'transform 0.3s ease',
+      '&:hover': {
+        transform: 'translateY(-2px)'
+      }
+    },
+    statHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      marginBottom: '8px'
     },
     statValue: {
       fontSize: '24px',
@@ -348,15 +538,17 @@ const Performance = () => {
     },
     loadingSpinner: {
       display: 'flex',
+      flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '120px',
+      height: '180px',
       fontSize: '14px',
-      color: '#4F6F6B' // softtext
+      color: '#4F6F6B', // softtext
+      gap: '12px'
     }
   };
 
-  // Performance data based on filter (EXISTING FUNCTION - UNCHANGED)
+  // Performance data based on filter
   const getPerformanceData = () => {
     const baseData = {
       thisMonth: {
@@ -420,10 +612,13 @@ const Performance = () => {
 
   return (
     <div style={styles.mainContent}>
-      {/* EXISTING HEADER - UNCHANGED */}
+      {/* Header with SVG Icon */}
       <div style={styles.header}>
         <div>
-          <h1 style={styles.greeting}>Performance Analytics</h1>
+          <h1 style={styles.greeting}>
+            <HeaderIcon />
+            Performance Analytics
+          </h1>
           <p style={styles.subtitle}>Track your delivery performance and metrics</p>
         </div>
         <div style={styles.performanceFilters}>
@@ -434,6 +629,7 @@ const Performance = () => {
             }}
             onClick={() => setPerformanceFilter('thisMonth')}
           >
+            <FilterIcon type="thisMonth" color={performanceFilter === 'thisMonth' ? '#FFFFFF' : '#4F6F6B'} />
             This Month
           </button>
           <button
@@ -443,6 +639,7 @@ const Performance = () => {
             }}
             onClick={() => setPerformanceFilter('last3Months')}
           >
+            <FilterIcon type="last3Months" color={performanceFilter === 'last3Months' ? '#FFFFFF' : '#4F6F6B'} />
             Last 3 Months
           </button>
           <button
@@ -452,22 +649,18 @@ const Performance = () => {
             }}
             onClick={() => setPerformanceFilter('allTime')}
           >
+            <FilterIcon type="allTime" color={performanceFilter === 'allTime' ? '#FFFFFF' : '#4F6F6B'} />
             All Time
           </button>
         </div>
       </div>
 
-      {/* EXISTING PERFORMANCE GRID - UNCHANGED */}
+      {/* Performance Grid with SVG Icons */}
       <div style={styles.performanceGrid}>
         {Object.entries(performanceData.metrics).map(([key, value]) => (
           <div key={key} style={styles.performanceCard}>
             <div style={styles.performanceIcon}>
-              {key === 'completionRate' && '✅'}
-              {key === 'averageRating' && '⭐'}
-              {key === 'onTimeDelivery' && '⏱️'}
-              {key === 'responseTime' && '⚡'}
-              {key === 'customerSatisfaction' && '😊'}
-              {key === 'efficiency' && '📊'}
+              <PerformanceIcon type={key} />
             </div>
             <div style={styles.performanceContent}>
               <h3 style={styles.performanceValue}>{value}</h3>
@@ -479,9 +672,14 @@ const Performance = () => {
         ))}
       </div>
 
-      {/* EXISTING CHART CONTAINER - UNCHANGED */}
+      {/* Performance Chart Container */}
       <div style={styles.chartContainer}>
         <h3 style={styles.sectionTitle}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#009688" strokeWidth="2">
+            <path d="M18 20V10" />
+            <path d="M12 20V4" />
+            <path d="M6 20v-6" />
+          </svg>
           {performanceFilter === 'thisMonth' && 'Weekly Performance Trend'}
           {performanceFilter === 'last3Months' && 'Monthly Performance Trend (Last 3 Months)'}
           {performanceFilter === 'allTime' && 'Yearly Performance Trend'}
@@ -521,22 +719,29 @@ const Performance = () => {
         </div>
       </div>
 
-      {/* NEW REAL-TIME GRAPH SECTION */}
+      {/* Real-Time Graph Section */}
       <div style={styles.realTimeSection}>
         <div style={styles.realTimeGrid}>
           {/* Real-time Chart */}
           <div style={styles.realTimeChartContainer}>
             <div style={styles.realTimeHeader}>
-              <h3 style={styles.realTimeTitle}>Real-Time Performance</h3>
+              <h3 style={styles.realTimeTitle}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#009688" strokeWidth="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                Real-Time Performance
+              </h3>
               <div style={styles.realTimeIndicator}>
-                <div style={styles.pulseDot}></div>
+                <LiveIcon />
                 <span>Live Updates</span>
               </div>
             </div>
             
             {isLoading ? (
               <div style={styles.loadingSpinner}>
-                Loading real-time data...
+                <LoadingSpinner />
+                <span>Loading real-time data...</span>
               </div>
             ) : (
               <>
@@ -579,30 +784,48 @@ const Performance = () => {
 
           {/* Real-time Stats */}
           <div style={styles.realTimeStatsContainer}>
-            <h3 style={styles.realTimeTitle}>Current Status</h3>
+            <h3 style={styles.realTimeTitle}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#009688" strokeWidth="2">
+                <path d="M12 2a10 10 0 1 0 10 10" />
+                <path d="M12 2v10l5 5" />
+              </svg>
+              Current Status
+            </h3>
             <div style={styles.statsGrid}>
               <div style={styles.statCard}>
-                <h4 style={styles.statValue}>
-                  {isLoading ? '...' : realTimeMetrics.activeDeliveries}
-                </h4>
+                <div style={styles.statHeader}>
+                  <StatsIcon type="activeDeliveries" />
+                  <h4 style={styles.statValue}>
+                    {isLoading ? '...' : realTimeMetrics.activeDeliveries}
+                  </h4>
+                </div>
                 <p style={styles.statLabel}>Active Deliveries</p>
               </div>
               <div style={styles.statCard}>
-                <h4 style={styles.statValue}>
-                  {isLoading ? '...' : realTimeMetrics.completedToday}
-                </h4>
+                <div style={styles.statHeader}>
+                  <StatsIcon type="completedToday" />
+                  <h4 style={styles.statValue}>
+                    {isLoading ? '...' : realTimeMetrics.completedToday}
+                  </h4>
+                </div>
                 <p style={styles.statLabel}>Completed Today</p>
               </div>
               <div style={styles.statCard}>
-                <h4 style={styles.statValue}>
-                  {isLoading ? '...' : realTimeMetrics.currentRating}
-                </h4>
+                <div style={styles.statHeader}>
+                  <StatsIcon type="currentRating" />
+                  <h4 style={styles.statValue}>
+                    {isLoading ? '...' : realTimeMetrics.currentRating}
+                  </h4>
+                </div>
                 <p style={styles.statLabel}>Current Rating</p>
               </div>
               <div style={styles.statCard}>
-                <h4 style={styles.statValue}>
-                  {isLoading ? '...' : realTimeMetrics.responseRate}%
-                </h4>
+                <div style={styles.statHeader}>
+                  <StatsIcon type="responseRate" />
+                  <h4 style={styles.statValue}>
+                    {isLoading ? '...' : realTimeMetrics.responseRate}%
+                  </h4>
+                </div>
                 <p style={styles.statLabel}>Response Rate</p>
               </div>
             </div>

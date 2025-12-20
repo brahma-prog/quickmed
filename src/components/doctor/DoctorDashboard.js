@@ -92,8 +92,31 @@ const DoctorTimeslotDetail = () => {
 // Main DoctorDashboard component with routing
 const DoctorDashboard = ({ user, onLogout }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [windowSize, setWindowSize] = React.useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+  
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Handle window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+      
+      // Auto-close sidebar on desktop
+      if (window.innerWidth > 768) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Get state and state setters
   const state = useDoctorState(user);
@@ -115,7 +138,6 @@ const DoctorDashboard = ({ user, onLogout }) => {
     patientMessages,
     selectedPatient,
     formErrors,
-    windowSize,
     timeslots,
     pregnancyFilter,
     babyCareFilter
@@ -142,7 +164,6 @@ const DoctorDashboard = ({ user, onLogout }) => {
     setPatientMessages: state.setPatientMessages,
     setFormErrors: state.setFormErrors,
     setSelectedPatient: state.setSelectedPatient,
-    setIsSidebarOpen: state.setIsSidebarOpen,
     setTimeslots: state.setTimeslots,
     setPregnancyFilter: state.setPregnancyFilter,
     setBabyCareFilter: state.setBabyCareFilter
@@ -161,6 +182,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
     handleAddNotes,
     handleViewFullHistory,
     handleProfileUpdate,
+    handleResetProfile,
     handleMarkNotificationAsRead,
     handleMarkAllNotificationsAsRead,
     handleClearAllNotifications,
@@ -262,6 +284,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
 
   // Check if current route is messages page
   const isMessagesPage = location.pathname.includes('/messages');
+  const isMobile = windowSize.width <= 768;
 
   return (
     <div style={styles.container}>
@@ -283,6 +306,11 @@ const DoctorDashboard = ({ user, onLogout }) => {
               timeslots: '/doctor/dashboard/timeslots'
             };
             navigate(routeMap[page] || '/doctor/dashboard');
+            
+            // Close sidebar on mobile after navigation
+            if (isMobile) {
+              setIsSidebarOpen(false);
+            }
           }}
           userProfile={userProfile}
           getUnreadMessagesCount={getUnreadMessagesCount}
@@ -290,14 +318,15 @@ const DoctorDashboard = ({ user, onLogout }) => {
           setShowLogoutConfirm={state.setShowLogoutConfirm}
           navigationItems={navigationItems}
           isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={state.setIsSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          isMobile={isMobile}
         />
       )}
 
       <div style={{
         ...styles.content,
-        marginLeft: !isMessagesPage && window.innerWidth > 768 ? '280px' : '0',
-        width: !isMessagesPage && window.innerWidth > 768 ? 'calc(100% - 280px)' : '100%'
+        marginLeft: !isMessagesPage && !isMobile ? '280px' : '0',
+        width: !isMessagesPage && !isMobile ? 'calc(100% - 280px)' : '100%'
       }}>
         <DoctorHeader
           activePage={activePage}
@@ -305,7 +334,8 @@ const DoctorDashboard = ({ user, onLogout }) => {
           getUnreadNotificationsCount={getUnreadNotificationsCount}
           setShowNotificationsModal={state.setShowNotificationsModal}
           isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={state.setIsSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          isMobile={isMobile}
         />
         
         {/* Main Content with Routing */}
@@ -382,6 +412,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
           setUserProfile: state.setUserProfile,
           setFormErrors: state.setFormErrors,
           handleProfileUpdate,
+          handleResetProfile,
           handleMarkNotificationAsRead,
           handleMarkAllNotificationsAsRead,
           handleClearAllNotifications,

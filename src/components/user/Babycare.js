@@ -51,30 +51,177 @@ import {
   AccordionSummary,
   AccordionDetails,
   Collapse,
-  Fab
+  Fab,
+  AppBar,
+  Toolbar,
+  Breadcrumbs,
+  Link
 } from '@mui/material';
-import {
-  Download as DownloadIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Add as AddIcon,
-  ExpandMore as ExpandMoreIcon,
-  CalendarToday as CalendarIcon,
-  LocalHospital as HospitalIcon,
-  Timeline as TimelineIcon,
-  Assessment as AssessmentIcon,
-  Vaccines as VaccinesIcon,
-  ChildCare as ChildCareIcon,
-  NotificationsActive as NotificationsIcon,
-  Print as PrintIcon,
-  Share as ShareIcon,
-  CloudUpload as CloudUploadIcon,
-  Visibility as VisibilityIcon,
-  CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
-  Info as InfoIcon,
-  ArrowBack as ArrowBackIcon
-} from '@mui/icons-material';
+
+// Create custom SVG icons as React components
+const DownloadIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+  </svg>
+);
+
+const DeleteIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+  </svg>
+);
+
+const AddIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+  </svg>
+);
+
+const HospitalIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 6.82L17.18 5 15 7.18 12.82 5 11 6.82 13.18 9 11 11.18 12.82 13 15 10.82 17.18 13 19 11.18 16.82 9zM1.99 19V5c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v14c0 1.1.9 2 2 2H4c-1.1 0-2-.9-2-2zm16-8h2v-2h-2v2zm0 4h2v-2h-2v2zm-8-4h2v-2h-2v2zm0 4h2v-2h-2v2zM5 19h2v-2H5v2zm0-4h2v-2H5v2zm0-4h2v-2H5v2z" />
+  </svg>
+);
+
+const TimelineIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z" />
+  </svg>
+);
+
+const AssessmentIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+  </svg>
+);
+
+const VaccinesIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M11 15h2v2h-2z" />
+    <path d="M19 9h-4V3H9v6H5v2h2v10h10V11h2zM9 9h2V5h2v4h2V5h2v4h2v2H7V9z" />
+  </svg>
+);
+
+const ChildCareIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+  </svg>
+);
+
+const NotificationsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+  </svg>
+);
+
+const PrintIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" />
+  </svg>
+);
+
+const ShareIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+  </svg>
+);
+
+const CloudUploadIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+  </svg>
+);
+
+const VisibilityIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+  </svg>
+);
+
+const CheckCircleIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+  </svg>
+);
+
+const WarningIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+  </svg>
+);
+
+const InfoIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+  </svg>
+);
+
+const ArrowBackIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+  </svg>
+);
+
+// Add Folder Icon
+const FolderIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+  </svg>
+);
+
+// Add File Icon
+const FileIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z" />
+  </svg>
+);
+
+// Add Image Icon
+const ImageIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+  </svg>
+);
+
+// Add PDF Icon
+const PdfIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z" />
+  </svg>
+);
+
+// Add ExpandMore Icon
+const ExpandMoreIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
+  </svg>
+);
+
+// Appointment Icon
+const AppointmentIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+  </svg>
+);
+
+// Add Zip Icon
+const ZipIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2 6h-2v2h2v2h-2v2h-2v-2h2v-2h-2v-2h2v-2h-2V8h2v2h2v2z" />
+  </svg>
+);
 
 // SVG Icons for Babycare
 const BabyCareIcons = {
@@ -106,7 +253,8 @@ const BabyCareIcons = {
   ),
   Feeding: () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 6C13.1 6 14 6.9 14 8C14 9.1 13.1 10 12 10C10.9 10 10 9.1 10 8C10 6.9 10.9 6 12 6ZM18 8C18 5.79 16.21 4 14 4C13.24 4 12.55 4.29 12 4.77C11.45 4.29 10.76 4 10 4C7.79 4 6 5.79 6 8C6 10.21 7.79 12 10 12C10.76 12 11.45 11.71 12 11.23C12.55 11.71 13.24 12 14 12C16.21 12 18 10.21 18 8ZM4 18V20H20V18C20 15.34 16.67 14 12 14C7.33 14 4 15.34 4 18Z" fill="#FF9800"/>
+      <path d="M12 6C13.1 6 14 6.9 14 8C14 9.1 13.1 10 12 10C10.9 10 10 9.1 10 8C10 6.9 10.9 6 12 6ZM18 8C18 5.79 16.21 4 14 4C13.24 4 12.55 4.29 12 4.77C11.45 4.29 10.76 4 10 4C7.79 4 6 5.79 6 8C6 10.21 7.79 12 10 12C10.76 12 11.45 11.71 12 11.23C12.55 11.71 13.24 12 14 12C16.21 12 18 10.21 18 8Z" fill="#FF9800"/>
+      <path d="M4 18V20H20V18C20 15.34 16.67 14 12 14C7.33 14 4 15.34 4 18Z" fill="#FF9800"/>
     </svg>
   ),
   Doctor: () => (
@@ -213,6 +361,31 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
     file: null
   });
 
+  // Folder State Management
+  const [babyFolders, setBabyFolders] = useState([]);
+  const [currentFolder, setCurrentFolder] = useState(null);
+  const [folderItems, setFolderItems] = useState([]);
+  const [openFolderDialog, setOpenFolderDialog] = useState(false);
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
+  const [newFolder, setNewFolder] = useState({ name: '', description: '' });
+  const [uploadFile, setUploadFile] = useState({
+    name: '',
+    type: 'document',
+    file: null,
+    description: ''
+  });
+  const [viewFileDialog, setViewFileDialog] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  // Development Guidelines State
+  const [developmentGuidelines, setDevelopmentGuidelines] = useState([]);
+  const [completedMilestones, setCompletedMilestones] = useState([]);
+
+  // Handle Book Appointments navigation
+  const handleBookAppointments = () => {
+    setActiveView('consultation');
+  };
+
   // Initialize with sample data
   useEffect(() => {
     // Load sample reports
@@ -268,7 +441,591 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
       { id: 5, age: '6 Months', milestone: 'Sits without support', status: 'pending', date: '2024-06-15' }
     ];
     setGrowthMilestones(sampleMilestones);
+
+    // Load sample folders
+    const sampleFolders = [
+      {
+        id: 1,
+        name: 'Vaccination Records',
+        icon: '💉',
+        color: '#4CAF50',
+        description: 'All vaccination certificates and records',
+        itemCount: 8,
+        lastUpdated: '2024-02-15'
+      },
+      {
+        id: 2,
+        name: 'Medical Reports',
+        icon: '📋',
+        color: '#2196F3',
+        description: 'Doctor visits, prescriptions, and medical reports',
+        itemCount: 12,
+        lastUpdated: '2024-02-10'
+      },
+      {
+        id: 3,
+        name: 'Growth Photos',
+        icon: '📸',
+        color: '#FF9800',
+        description: 'Monthly growth photos and videos',
+        itemCount: 24,
+        lastUpdated: '2024-02-01'
+      },
+      {
+        id: 4,
+        name: 'Development Milestones',
+        icon: '🎯',
+        color: '#9C27B0',
+        description: 'Videos and notes of developmental achievements',
+        itemCount: 15,
+        lastUpdated: '2024-01-30'
+      },
+      {
+        id: 5,
+        name: 'Prescriptions',
+        icon: '💊',
+        color: '#FF5722',
+        description: 'All medicine prescriptions',
+        itemCount: 6,
+        lastUpdated: '2024-02-05'
+      },
+      {
+        id: 6,
+        name: 'Birth Documents',
+        icon: '👶',
+        color: '#00BCD4',
+        description: 'Birth certificate and hospital documents',
+        itemCount: 5,
+        lastUpdated: '2024-01-10'
+      }
+    ];
+    setBabyFolders(sampleFolders);
+
+    // Load development guidelines
+    const initialGuidelines = [
+      {
+        age: '0-3 Months',
+        milestones: [
+          'Turns head towards sounds',
+          'Follows objects with eyes',
+          'Smiles spontaneously',
+          'Coos and makes gurgling sounds'
+        ],
+        healthChecks: ['Weight gain monitoring', 'Reflex assessment', 'Hearing test'],
+        planCoverage: ['All Plans', 'Premium+', 'Deluxe Only'],
+        completed: false
+      },
+      {
+        age: '4-6 Months',
+        milestones: [
+          'Rolls over in both directions',
+          'Sits with support',
+          'Laughs and squeals',
+          'Reaches for objects'
+        ],
+        healthChecks: ['Vision screening', 'Head circumference', 'Muscle tone assessment'],
+        planCoverage: ['All Plans', 'Premium+', 'Deluxe Only'],
+        completed: false
+      },
+      {
+        age: '7-9 Months',
+        milestones: [
+          'Crawls on hands and knees',
+          'Pulls to stand',
+          'Uses pincer grasp',
+          'Understands "no"'
+        ],
+        healthChecks: ['Solid food introduction', 'Teething check', 'Social development'],
+        planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+        completed: false
+      },
+      {
+        age: '10-12 Months',
+        milestones: [
+          'Walks holding furniture',
+          'Says "mama" and "dada"',
+          'Points at objects',
+          'Follows simple commands'
+        ],
+        healthChecks: ['First birthday checkup', 'Language assessment', 'Mobility evaluation'],
+        planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+        completed: false
+      },
+      {
+        age: '1-2 Years',
+        milestones: [
+          'Walks independently',
+          'Speaks 20+ words',
+          'Climbs stairs with help',
+          'Uses spoon'
+        ],
+        healthChecks: ['Annual checkup', 'Speech development', 'Social skills'],
+        planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+        completed: false
+      },
+      {
+        age: '2-3 Years',
+        milestones: [
+          'Runs and jumps',
+          'Speaks in sentences',
+          'Recognizes colors',
+          'Toilet training'
+        ],
+        healthChecks: ['Dental checkup', 'Vision and hearing', 'Behavioral assessment'],
+        planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+        completed: false
+      },
+      {
+        age: '3-5 Years',
+        milestones: [
+          'Rides tricycle',
+          'Counts to 10',
+          'Dresses self',
+          'Plays cooperatively'
+        ],
+        healthChecks: ['Preschool readiness', 'Fine motor skills', 'Cognitive assessment'],
+        planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+        completed: false
+      }
+    ];
+    setDevelopmentGuidelines(initialGuidelines);
+
+    // Load sample folder items for first folder
+    if (sampleFolders.length > 0) {
+      setCurrentFolder(sampleFolders[0]);
+      loadFolderItems(sampleFolders[0].id);
+    }
   }, []);
+
+  // Load folder items
+  const loadFolderItems = (folderId) => {
+    // Mock data for folder items
+    const folderItemsData = {
+      1: [
+        { id: 1, name: 'BCG Certificate.pdf', type: 'pdf', size: '2.4 MB', date: '2024-01-15', url: '#', icon: <PdfIcon /> },
+        { id: 2, name: 'Hepatitis B Record.pdf', type: 'pdf', size: '1.8 MB', date: '2024-01-15', url: '#', icon: <PdfIcon /> },
+        { id: 3, name: 'Vaccination Schedule.xlsx', type: 'excel', size: '1.2 MB', date: '2024-01-20', url: '#', icon: <FileIcon /> },
+        { id: 4, name: 'Vaccine Side Effects Notes.txt', type: 'text', size: '45 KB', date: '2024-01-18', url: '#', icon: <FileIcon /> }
+      ],
+      2: [
+        { id: 5, name: 'Monthly Checkup Report.pdf', type: 'pdf', size: '3.2 MB', date: '2024-02-10', url: '#', icon: <PdfIcon /> },
+        { id: 6, name: 'Blood Test Results.pdf', type: 'pdf', size: '2.1 MB', date: '2024-01-25', url: '#', icon: <PdfIcon /> },
+        { id: 7, name: 'Doctor Prescription.jpg', type: 'image', size: '1.5 MB', date: '2024-02-05', url: '#', icon: <ImageIcon /> }
+      ],
+      3: [
+        { id: 8, name: 'Month 1 Photo.jpg', type: 'image', size: '4.2 MB', date: '2024-01-10', url: '#', icon: <ImageIcon /> },
+        { id: 9, name: 'Month 2 Photo.jpg', type: 'image', size: '4.5 MB', date: '2024-02-10', url: '#', icon: <ImageIcon /> },
+        { id: 10, name: 'First Smile Video.mp4', type: 'video', size: '15.8 MB', date: '2024-01-20', url: '#', icon: <FileIcon /> }
+      ]
+    };
+
+    setFolderItems(folderItemsData[folderId] || []);
+  };
+
+  // Handle folder click
+  const handleFolderClick = (folder) => {
+    setCurrentFolder(folder);
+    loadFolderItems(folder.id);
+  };
+
+  // Handle create new folder
+  const handleCreateFolder = () => {
+    if (!newFolder.name.trim()) {
+      setSnackbar({
+        open: true,
+        message: 'Folder name is required',
+        severity: 'error'
+      });
+      return;
+    }
+
+    const folder = {
+      id: Date.now(),
+      name: newFolder.name,
+      icon: '📁',
+      color: '#607D8B',
+      description: newFolder.description,
+      itemCount: 0,
+      lastUpdated: new Date().toISOString().split('T')[0]
+    };
+
+    setBabyFolders([...babyFolders, folder]);
+    setNewFolder({ name: '', description: '' });
+    setOpenFolderDialog(false);
+
+    setSnackbar({
+      open: true,
+      message: 'Folder created successfully!',
+      severity: 'success'
+    });
+  };
+
+  // Handle file upload
+  const handleFileUpload = () => {
+    if (!uploadFile.name.trim() || !uploadFile.file) {
+      setSnackbar({
+        open: true,
+        message: 'File name and file are required',
+        severity: 'error'
+      });
+      return;
+    }
+
+    if (!currentFolder) {
+      setSnackbar({
+        open: true,
+        message: 'Please select a folder first',
+        severity: 'error'
+      });
+      return;
+    }
+
+    const fileItem = {
+      id: Date.now(),
+      name: uploadFile.name,
+      type: uploadFile.type,
+      size: `${(uploadFile.file.size / (1024 * 1024)).toFixed(2)} MB`,
+      date: new Date().toISOString().split('T')[0],
+      description: uploadFile.description,
+      url: URL.createObjectURL(uploadFile.file),
+      icon: getFileIcon(uploadFile.type)
+    };
+
+    setFolderItems([...folderItems, fileItem]);
+
+    // Update folder item count
+    setBabyFolders(babyFolders.map(folder => 
+      folder.id === currentFolder.id 
+        ? { ...folder, itemCount: folder.itemCount + 1, lastUpdated: new Date().toISOString().split('T')[0] }
+        : folder
+    ));
+
+    setUploadFile({ name: '', type: 'document', file: null, description: '' });
+    setOpenUploadDialog(false);
+
+    setSnackbar({
+      open: true,
+      message: 'File uploaded successfully!',
+      severity: 'success'
+    });
+  };
+
+  // Get file icon based on type
+  const getFileIcon = (fileType) => {
+    switch (fileType) {
+      case 'pdf': return <PdfIcon />;
+      case 'image': return <ImageIcon />;
+      case 'video': return <FileIcon />;
+      case 'document': return <FileIcon />;
+      case 'excel': return <FileIcon />;
+      case 'zip': return <ZipIcon />;
+      default: return <FileIcon />;
+    }
+  };
+
+  // Handle file download
+  const handleFileDownload = (file) => {
+    // Create a temporary link element
+    const link = document.createElement('a');
+    link.href = file.url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle file view
+  const handleFileView = (file) => {
+    setSelectedFile(file);
+    setViewFileDialog(true);
+  };
+
+  // Handle file delete
+  const handleFileDelete = (fileId) => {
+    setFolderItems(folderItems.filter(item => item.id !== fileId));
+    
+    // Update folder item count
+    if (currentFolder) {
+      setBabyFolders(babyFolders.map(folder => 
+        folder.id === currentFolder.id 
+          ? { ...folder, itemCount: folder.itemCount - 1 }
+          : folder
+      ));
+    }
+
+    setSnackbar({
+      open: true,
+      message: 'File deleted successfully',
+      severity: 'success'
+    });
+  };
+
+  // Handle folder delete
+  const handleFolderDelete = (folderId) => {
+    setBabyFolders(babyFolders.filter(folder => folder.id !== folderId));
+    
+    if (currentFolder && currentFolder.id === folderId) {
+      setCurrentFolder(null);
+      setFolderItems([]);
+    }
+
+    setSnackbar({
+      open: true,
+      message: 'Folder deleted successfully',
+      severity: 'success'
+    });
+  };
+
+  // Render Folder Tab
+  const renderFolderTab = () => (
+    <Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5" sx={{ color: colors.primary, fontWeight: 'bold' }}>
+          📁 Baby Documents & Files
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenFolderDialog(true)}
+            sx={{ color: colors.primary, borderColor: colors.primary }}
+          >
+            New Folder
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            onClick={() => setOpenUploadDialog(true)}
+            sx={{ bgcolor: colors.primary }}
+            disabled={!currentFolder}
+          >
+            Upload File
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Breadcrumb Navigation */}
+      <Paper sx={{ p: 2, mb: 3, bgcolor: colors.softbg }}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link
+            underline="hover"
+            color="inherit"
+            onClick={() => setCurrentFolder(null)}
+            sx={{ cursor: 'pointer' }}
+          >
+            All Folders
+          </Link>
+          {currentFolder && (
+            <Typography color="text.primary">{currentFolder.name}</Typography>
+          )}
+        </Breadcrumbs>
+      </Paper>
+
+      <Grid container spacing={3}>
+        {/* Folders List */}
+        <Grid item xs={12} md={currentFolder ? 4 : 12}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ color: colors.primary }}>
+                Folders ({babyFolders.length})
+              </Typography>
+              <List>
+                {babyFolders.map((folder) => (
+                  <ListItem
+                    key={folder.id}
+                    sx={{
+                      mb: 1,
+                      borderRadius: 1,
+                      bgcolor: currentFolder?.id === folder.id ? `${colors.primary}10` : 'transparent',
+                      borderLeft: currentFolder?.id === folder.id ? `4px solid ${folder.color}` : 'none',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        bgcolor: `${colors.primary}05`
+                      }
+                    }}
+                    onClick={() => handleFolderClick(folder)}
+                  >
+                    <ListItemIcon>
+                      <Avatar sx={{ bgcolor: `${folder.color}20`, color: folder.color }}>
+                        {folder.icon}
+                      </Avatar>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography fontWeight="medium">{folder.name}</Typography>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFolderDelete(folder.id);
+                            }}
+                            sx={{ color: colors.softtext }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      }
+                      secondary={
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            {folder.description}
+                          </Typography>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+                            <Typography variant="caption">
+                              {folder.itemCount} items
+                            </Typography>
+                            <Typography variant="caption">
+                              Updated: {folder.lastUpdated}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Folder Content */}
+        {currentFolder && (
+          <Grid item xs={12} md={8}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: `${currentFolder.color}20`, color: currentFolder.color, width: 40, height: 40 }}>
+                      {currentFolder.icon}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" sx={{ color: colors.primary, fontWeight: 'bold' }}>
+                        {currentFolder.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {currentFolder.description}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip 
+                    label={`${folderItems.length} files`}
+                    color="primary"
+                    variant="outlined"
+                  />
+                </Box>
+
+                {folderItems.length > 0 ? (
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Size</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {folderItems.map((file) => (
+                          <TableRow key={file.id} hover>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Box sx={{ color: colors.primary }}>
+                                  {file.icon}
+                                </Box>
+                                <Box>
+                                  <Typography variant="body2" fontWeight="medium">
+                                    {file.name}
+                                  </Typography>
+                                  {file.description && (
+                                    <Typography variant="caption" color="text.secondary">
+                                      {file.description}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Chip 
+                                label={file.type}
+                                size="small"
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {file.size}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {file.date}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Tooltip title="View">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleFileView(file)}
+                                    sx={{ color: colors.primary }}
+                                  >
+                                    <VisibilityIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Download">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleFileDownload(file)}
+                                    sx={{ color: colors.primary }}
+                                  >
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleFileDelete(file.id)}
+                                    sx={{ color: '#f44336' }}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <FolderIcon sx={{ fontSize: 64, color: colors.softtext, mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                      No files in this folder
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      Upload files to organize baby's documents and records
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                      onClick={() => setOpenUploadDialog(true)}
+                      sx={{ bgcolor: colors.primary }}
+                    >
+                      Upload First File
+                    </Button>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
 
   // Subscription plans data
   const subscriptionPlans = [
@@ -386,7 +1143,7 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
   ];
 
   // Age-based development guidelines (0-5 years)
-  const developmentGuidelines = [
+  const defaultDevelopmentGuidelines = [
     {
       age: '0-3 Months',
       milestones: [
@@ -396,7 +1153,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Coos and makes gurgling sounds'
       ],
       healthChecks: ['Weight gain monitoring', 'Reflex assessment', 'Hearing test'],
-      planCoverage: ['All Plans', 'Premium+', 'Deluxe Only']
+      planCoverage: ['All Plans', 'Premium+', 'Deluxe Only'],
+      completed: false
     },
     {
       age: '4-6 Months',
@@ -407,7 +1165,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Reaches for objects'
       ],
       healthChecks: ['Vision screening', 'Head circumference', 'Muscle tone assessment'],
-      planCoverage: ['All Plans', 'Premium+', 'Deluxe Only']
+      planCoverage: ['All Plans', 'Premium+', 'Deluxe Only'],
+      completed: false
     },
     {
       age: '7-9 Months',
@@ -418,7 +1177,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Understands "no"'
       ],
       healthChecks: ['Solid food introduction', 'Teething check', 'Social development'],
-      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only']
+      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+      completed: false
     },
     {
       age: '10-12 Months',
@@ -429,7 +1189,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Follows simple commands'
       ],
       healthChecks: ['First birthday checkup', 'Language assessment', 'Mobility evaluation'],
-      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only']
+      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+      completed: false
     },
     {
       age: '1-2 Years',
@@ -440,7 +1201,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Uses spoon'
       ],
       healthChecks: ['Annual checkup', 'Speech development', 'Social skills'],
-      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only']
+      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+      completed: false
     },
     {
       age: '2-3 Years',
@@ -451,7 +1213,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Toilet training'
       ],
       healthChecks: ['Dental checkup', 'Vision and hearing', 'Behavioral assessment'],
-      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only']
+      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+      completed: false
     },
     {
       age: '3-5 Years',
@@ -462,7 +1225,8 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
         'Plays cooperatively'
       ],
       healthChecks: ['Preschool readiness', 'Fine motor skills', 'Cognitive assessment'],
-      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only']
+      planCoverage: ['Premium+', 'Deluxe Only', 'Deluxe Only'],
+      completed: false
     }
   ];
 
@@ -600,7 +1364,7 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
       }
 
       const options = {
-        key: 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay key
+        key: 'rzp_test_1DP5mmOlF5G5ag',
         amount: selectedPlan.price * 100 * parseInt(subscriptionDuration),
         currency: 'INR',
         name: 'QuickMed Baby Care',
@@ -698,12 +1462,41 @@ const Babycare = ({ setActiveView, addNotification, colors, user }) => {
     const existingSubscriptions = JSON.parse(localStorage.getItem('babycareSubscriptions') || '[]');
     existingSubscriptions.push(subscriptionData);
     localStorage.setItem('babycareSubscriptions', JSON.stringify(existingSubscriptions));
+    
+    // Update development guidelines based on subscription plan
+    updateDevelopmentGuidelines();
+  };
+
+  // Update development guidelines based on plan
+  const updateDevelopmentGuidelines = () => {
+    const updatedGuidelines = defaultDevelopmentGuidelines.map(guideline => {
+      // Mark as covered based on plan
+      const isCovered = checkPlanCoverage(guideline.planCoverage);
+      return {
+        ...guideline,
+        isCovered,
+        isActive: true
+      };
+    });
+    setDevelopmentGuidelines(updatedGuidelines);
+  };
+
+  // Check if guideline is covered by current plan
+  const checkPlanCoverage = (planCoverage) => {
+    if (!selectedPlan) return false;
+    
+    const planLevel = selectedPlan.id === 'deluxe' ? 2 : selectedPlan.id === 'premium' ? 1 : 0;
+    return planCoverage.some(coverage => {
+      if (coverage === 'All Plans') return true;
+      if (coverage === 'Premium+' && planLevel >= 1) return true;
+      if (coverage === 'Deluxe Only' && planLevel >= 2) return true;
+      return false;
+    });
   };
 
   // Handle subscription start
   const handleStartSubscription = () => {
     setOpenDialog(false);
-    resetForm();
     setActiveTab(1); // Switch to Baby Profile tab
   };
 
@@ -838,73 +1631,257 @@ Notes: ${report.notes}
     );
   };
 
-  // Render Development Guidelines
-  const renderDevelopmentGuidelines = () => (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom sx={{ mb: 3, color: colors.primary }}>
-        Development Guidelines (0-5 Years)
-      </Typography>
-      <Grid container spacing={3}>
-        {developmentGuidelines.map((guideline, index) => (
-          <Grid item xs={12} md={6} key={index}>
-            <Card sx={{ height: '100%', borderLeft: `4px solid ${colors.primary}` }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6" sx={{ color: colors.primary, fontWeight: 'bold' }}>
-                    {guideline.age}
-                  </Typography>
-                  <Chip 
-                    label={selectedPlan?.id === 'deluxe' ? 'Covered' : 'Check Plan'} 
-                    size="small" 
-                    color={selectedPlan?.id === 'deluxe' ? 'success' : 'warning'}
-                  />
-                </Box>
-                
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography fontWeight="medium">Key Milestones</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <List dense>
-                      {guideline.milestones.map((milestone, idx) => (
-                        <ListItem key={idx} sx={{ px: 0, py: 0.5 }}>
-                          <ListItemIcon sx={{ minWidth: 30 }}>
-                            <CheckCircleIcon color="success" fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText primary={milestone} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </AccordionDetails>
-                </Accordion>
+  // Handle milestone completion for development guidelines
+  const handleCompleteMilestone = (ageGroup, milestoneIndex) => {
+    const updatedGuidelines = developmentGuidelines.map(guideline => {
+      if (guideline.age === ageGroup) {
+        const newCompletedMilestones = [...(guideline.completedMilestones || [])];
+        if (!newCompletedMilestones.includes(milestoneIndex)) {
+          newCompletedMilestones.push(milestoneIndex);
+        }
+        return {
+          ...guideline,
+          completedMilestones: newCompletedMilestones,
+          completionPercentage: Math.round((newCompletedMilestones.length / guideline.milestones.length) * 100)
+        };
+      }
+      return guideline;
+    });
+    setDevelopmentGuidelines(updatedGuidelines);
+    
+    setSnackbar({
+      open: true,
+      message: 'Milestone marked as completed!',
+      severity: 'success'
+    });
+  };
 
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography fontWeight="medium">Health Checks</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <List dense>
-                      {guideline.healthChecks.map((check, idx) => (
-                        <ListItem key={idx} sx={{ px: 0, py: 0.5 }}>
-                          <ListItemIcon sx={{ minWidth: 30 }}>
-                            <HospitalIcon color="primary" fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText 
-                            primary={check} 
-                            secondary={guideline.planCoverage[idx]}
+  // Render Development Guidelines Tab
+  const renderDevelopmentGuidelinesTab = () => {
+    const isSubscriptionActive = selectedPlan && babyDetails.name;
+    
+    return (
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h5" sx={{ color: colors.primary, fontWeight: 'bold' }}>
+            📋 Development Guidelines (0-5 Years)
+          </Typography>
+          {!isSubscriptionActive && (
+            <Button
+              variant="outlined"
+              onClick={() => setActiveTab(0)}
+              sx={{ color: colors.primary }}
+            >
+              Subscribe to Access
+            </Button>
+          )}
+        </Box>
+
+        {isSubscriptionActive ? (
+          <>
+            <Paper sx={{ p: 3, mb: 4, bgcolor: colors.softbg }}>
+              <Typography variant="h6" gutterBottom sx={{ color: colors.primary }}>
+                Development Progress for {babyDetails.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                Track your baby's developmental milestones based on age. Green checkmarks indicate completed milestones.
+              </Typography>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Chip 
+                  label={`Plan: ${selectedPlan.name}`}
+                  color="primary"
+                  variant="outlined"
+                />
+                <Chip 
+                  label={`Age: ${calculateBabyAge(babyDetails.dateOfBirth)}`}
+                  color="secondary"
+                  variant="outlined"
+                />
+              </Box>
+            </Paper>
+
+            <Grid container spacing={3}>
+              {developmentGuidelines.map((guideline, index) => {
+                const isCovered = checkPlanCoverage(guideline.planCoverage);
+                const completionPercentage = guideline.completionPercentage || 0;
+                const completedCount = guideline.completedMilestones?.length || 0;
+                const totalCount = guideline.milestones.length;
+                
+                return (
+                  <Grid item xs={12} md={6} key={index}>
+                    <Card sx={{ 
+                      height: '100%', 
+                      borderLeft: `4px solid ${isCovered ? colors.primary : colors.softtext}`,
+                      opacity: isCovered ? 1 : 0.7
+                    }}>
+                      <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                          <Typography variant="h6" sx={{ color: isCovered ? colors.primary : colors.softtext, fontWeight: 'bold' }}>
+                            {guideline.age}
+                          </Typography>
+                          <Chip 
+                            label={isCovered ? 'Covered' : 'Not Covered'} 
+                            size="small" 
+                            color={isCovered ? 'success' : 'default'}
+                            variant="outlined"
                           />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </AccordionDetails>
-                </Accordion>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
+                        </Box>
+                        
+                        {/* Progress Bar */}
+                        <Box sx={{ mb: 2 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="body2">
+                              Progress: {completedCount}/{totalCount} milestones
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold">
+                              {completionPercentage}%
+                            </Typography>
+                          </Box>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={completionPercentage} 
+                            sx={{ 
+                              height: 8, 
+                              borderRadius: 4,
+                              bgcolor: colors.softbg,
+                              '& .MuiLinearProgress-bar': {
+                                bgcolor: isCovered ? colors.primary : colors.softtext
+                              }
+                            }}
+                          />
+                        </Box>
+                        
+                        <Accordion disabled={!isCovered}>
+                          <AccordionSummary expandIcon={isCovered ? <ExpandMoreIcon /> : null}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography fontWeight="medium">Key Milestones</Typography>
+                              {!isCovered && (
+                                <Typography variant="caption" color="text.secondary">
+                                  (Upgrade plan to access)
+                                </Typography>
+                              )}
+                            </Box>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <List dense>
+                              {guideline.milestones.map((milestone, idx) => {
+                                const isCompleted = guideline.completedMilestones?.includes(idx);
+                                return (
+                                  <ListItem 
+                                    key={idx} 
+                                    sx={{ 
+                                      px: 0, 
+                                      py: 0.5,
+                                      cursor: isCovered ? 'pointer' : 'default',
+                                      '&:hover': isCovered ? { bgcolor: `${colors.primary}05` } : {}
+                                    }}
+                                    onClick={() => isCovered && !isCompleted && handleCompleteMilestone(guideline.age, idx)}
+                                  >
+                                    <ListItemIcon sx={{ minWidth: 30 }}>
+                                      {isCompleted ? (
+                                        <CheckCircleIcon />
+                                      ) : (
+                                        <Box sx={{ 
+                                          width: 20, 
+                                          height: 20, 
+                                          borderRadius: '50%', 
+                                          border: `2px solid ${isCovered ? colors.primary : colors.softtext}`,
+                                          opacity: isCovered ? 1 : 0.5
+                                        }} />
+                                      )}
+                                    </ListItemIcon>
+                                    <ListItemText 
+                                      primary={milestone}
+                                      primaryTypographyProps={{
+                                        sx: { 
+                                          color: isCompleted ? 'success.main' : 'text.primary',
+                                          textDecoration: isCompleted ? 'line-through' : 'none',
+                                          opacity: isCovered ? 1 : 0.7
+                                        }
+                                      }}
+                                    />
+                                  </ListItem>
+                                );
+                              })}
+                            </List>
+                          </AccordionDetails>
+                        </Accordion>
+
+                        <Accordion disabled={!isCovered}>
+                          <AccordionSummary expandIcon={isCovered ? <ExpandMoreIcon /> : null}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography fontWeight="medium">Health Checks</Typography>
+                            </Box>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <List dense>
+                              {guideline.healthChecks.map((check, idx) => (
+                                <ListItem key={idx} sx={{ px: 0, py: 0.5 }}>
+                                  <ListItemIcon sx={{ minWidth: 30 }}>
+                                    <HospitalIcon />
+                                  </ListItemIcon>
+                                  <ListItemText 
+                                    primary={check} 
+                                    secondary={guideline.planCoverage[idx]}
+                                  />
+                                </ListItem>
+                              ))}
+                            </List>
+                          </AccordionDetails>
+                        </Accordion>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </>
+        ) : (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <AssessmentIcon sx={{ fontSize: 64, color: colors.softtext, mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Development Guidelines Locked
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
+              Subscribe to a Baby Care plan to access personalized development guidelines, 
+              milestone tracking, and expert recommendations for your baby's growth.
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => setActiveTab(0)}
+              sx={{ bgcolor: colors.primary }}
+              size="large"
+            >
+              View Subscription Plans
+            </Button>
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
+  // Calculate baby's age
+  const calculateBabyAge = (dateOfBirth) => {
+    if (!dateOfBirth) return 'Not specified';
+    
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    
+    if (years > 0) {
+      return `${years} year${years > 1 ? 's' : ''} ${months} month${months > 1 ? 's' : ''}`;
+    } else {
+      return `${months} month${months > 1 ? 's' : ''}`;
+    }
+  };
 
   // Render step content
   const renderStepContent = (step) => {
@@ -1377,14 +2354,25 @@ Notes: ${report.notes}
         <Typography variant="h5" sx={{ color: colors.primary, fontWeight: 'bold' }}>
           👶 Baby Profile: {babyDetails.name || 'Not Set'}
         </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => setActiveTab(0)}
-          sx={{ color: colors.primary }}
-        >
-          Back to Plans
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => setActiveTab(0)}
+            sx={{ color: colors.primary }}
+          >
+            Back to Plans
+          </Button>
+          {babyDetails.name && (
+            <Button
+              variant="contained"
+              onClick={() => setActiveTab(3)}
+              sx={{ bgcolor: colors.primary }}
+            >
+              View Development Guidelines
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {babyDetails.name ? (
@@ -1411,6 +2399,12 @@ Notes: ${report.notes}
                   </ListItem>
                   <ListItem>
                     <ListItemText 
+                      primary="Age" 
+                      secondary={calculateBabyAge(babyDetails.dateOfBirth)}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText 
                       primary="Gender" 
                       secondary={babyDetails.gender}
                     />
@@ -1424,7 +2418,7 @@ Notes: ${report.notes}
                   <ListItem>
                     <ListItemText 
                       primary="Weight & Height" 
-                      secondary={`${babyDetails.weight} kg / ${babyDetails.height} cm`}
+                      secondary={`${babyDetails.weight || '--'} kg / ${babyDetails.height || '--'} cm`}
                     />
                   </ListItem>
                 </List>
@@ -1454,6 +2448,19 @@ Notes: ${report.notes}
                 </Box>
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="body2" gutterBottom>
+                    Development Progress
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={40} 
+                    sx={{ height: 10, borderRadius: 5, mb: 1 }}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    8 of 20 milestones achieved
+                  </Typography>
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body2" gutterBottom>
                     Growth Percentile
                   </Typography>
                   <LinearProgress 
@@ -1476,6 +2483,143 @@ Notes: ${report.notes}
                     variant="outlined"
                   />
                 </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Development Progress Card */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" sx={{ color: colors.primary, fontWeight: 'bold' }}>
+                    📈 Development Progress
+                  </Typography>
+                  <Button
+                    size="small"
+                    onClick={() => setActiveTab(3)}
+                    sx={{ color: colors.primary }}
+                  >
+                    View All
+                  </Button>
+                </Box>
+                
+                {developmentGuidelines.slice(0, 3).map((guideline, index) => {
+                  const completionPercentage = guideline.completionPercentage || 0;
+                  const isCovered = checkPlanCoverage(guideline.planCoverage);
+                  
+                  return (
+                    <Box key={index} sx={{ mb: 3 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="body2" fontWeight="medium">
+                          {guideline.age}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {completionPercentage}%
+                        </Typography>
+                      </Box>
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={completionPercentage} 
+                        sx={{ 
+                          height: 6, 
+                          borderRadius: 3,
+                          bgcolor: colors.softbg,
+                          '& .MuiLinearProgress-bar': {
+                            bgcolor: isCovered ? colors.primary : colors.softtext
+                          }
+                        }}
+                      />
+                    </Box>
+                  );
+                })}
+                
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => setActiveTab(3)}
+                  sx={{ mt: 2, color: colors.primary, borderColor: colors.primary }}
+                >
+                  Track All Milestones
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Subscription Info Card */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ color: colors.primary }}>
+                  Subscription Information
+                </Typography>
+                {selectedPlan ? (
+                  <List>
+                    <ListItem>
+                      <ListItemText 
+                        primary="Current Plan" 
+                        secondary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Avatar sx={{ bgcolor: `${selectedPlan.color}20`, color: selectedPlan.color, width: 24, height: 24 }}>
+                              {selectedPlan.icon}
+                            </Avatar>
+                            <Typography variant="body2" fontWeight="medium">
+                              {selectedPlan.name}
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText 
+                        primary="Status" 
+                        secondary={
+                          <Chip 
+                            label="Active" 
+                            size="small" 
+                            color="success"
+                          />
+                        }
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText 
+                        primary="Duration" 
+                        secondary={`${subscriptionDuration} month(s)`}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText 
+                        primary="Features Included" 
+                        secondary={
+                          <Box sx={{ mt: 1 }}>
+                            {selectedPlan.features.slice(0, 3).map((feature, idx) => (
+                              <Typography key={idx} variant="caption" display="block" sx={{ mb: 0.5 }}>
+                                • {feature.text}
+                              </Typography>
+                            ))}
+                            <Typography variant="caption" color="primary">
+                              +{selectedPlan.features.length - 3} more features
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    </ListItem>
+                  </List>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      No active subscription
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => setActiveTab(0)}
+                      sx={{ bgcolor: colors.primary, mt: 2 }}
+                    >
+                      Subscribe Now
+                    </Button>
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -1625,7 +2769,7 @@ Notes: ${report.notes}
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 'bold' }}>
-                  📈 Growth Milestones
+                  📊 Growth Milestones
                 </Typography>
                 <TableContainer>
                   <Table>
@@ -1821,6 +2965,231 @@ Notes: ${report.notes}
     </Dialog>
   );
 
+  // New Folder Dialog
+  const FolderDialog = () => (
+    <Dialog 
+      open={openFolderDialog} 
+      onClose={() => setOpenFolderDialog(false)}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <FolderIcon />
+          Create New Folder
+        </Box>
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Folder Name"
+              value={newFolder.name}
+              onChange={(e) => setNewFolder({...newFolder, name: e.target.value})}
+              placeholder="e.g., Vaccination Records"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Description"
+              value={newFolder.description}
+              onChange={(e) => setNewFolder({...newFolder, description: e.target.value})}
+              placeholder="Brief description of what this folder contains"
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpenFolderDialog(false)}>Cancel</Button>
+        <Button onClick={handleCreateFolder} variant="contained">
+          Create Folder
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  // Upload File Dialog
+  const UploadDialog = () => (
+    <Dialog 
+      open={openUploadDialog} 
+      onClose={() => setOpenUploadDialog(false)}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <CloudUploadIcon />
+          Upload File
+          {currentFolder && (
+            <Chip 
+              label={currentFolder.name}
+              size="small"
+              sx={{ ml: 2 }}
+            />
+          )}
+        </Box>
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="File Name"
+              value={uploadFile.name}
+              onChange={(e) => setUploadFile({...uploadFile, name: e.target.value})}
+              placeholder="e.g., BCG Certificate"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel>File Type</InputLabel>
+              <Select
+                value={uploadFile.type}
+                onChange={(e) => setUploadFile({...uploadFile, type: e.target.value})}
+                label="File Type"
+              >
+                <MenuItem value="document">Document</MenuItem>
+                <MenuItem value="pdf">PDF</MenuItem>
+                <MenuItem value="image">Image</MenuItem>
+                <MenuItem value="video">Video</MenuItem>
+                <MenuItem value="excel">Excel</MenuItem>
+                <MenuItem value="zip">Zip Archive</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              label="Description"
+              value={uploadFile.description}
+              onChange={(e) => setUploadFile({...uploadFile, description: e.target.value})}
+              placeholder="Brief description of this file"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="outlined"
+              startIcon={<CloudUploadIcon />}
+              component="label"
+              fullWidth
+            >
+              Select File
+              <input
+                type="file"
+                hidden
+                onChange={(e) => setUploadFile({...uploadFile, file: e.target.files[0]})}
+              />
+            </Button>
+            {uploadFile.file && (
+              <Box sx={{ mt: 2, p: 2, bgcolor: colors.softbg, borderRadius: 1 }}>
+                <Typography variant="body2" fontWeight="medium">
+                  Selected File:
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {uploadFile.file.name} ({(uploadFile.file.size / (1024 * 1024)).toFixed(2)} MB)
+                </Typography>
+              </Box>
+            )}
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpenUploadDialog(false)}>Cancel</Button>
+        <Button 
+          onClick={handleFileUpload} 
+          variant="contained"
+          disabled={!uploadFile.file}
+        >
+          Upload File
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  // View File Dialog
+  const ViewFileDialog = () => {
+    if (!selectedFile) return null;
+
+    return (
+      <Dialog 
+        open={viewFileDialog} 
+        onClose={() => setViewFileDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {selectedFile.icon}
+            <Box>
+              <Typography variant="h6">{selectedFile.name}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Added on {selectedFile.date} • {selectedFile.size}
+              </Typography>
+            </Box>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          {selectedFile.description && (
+            <Box sx={{ mb: 3, p: 2, bgcolor: colors.softbg, borderRadius: 1 }}>
+              <Typography variant="body2">
+                {selectedFile.description}
+              </Typography>
+            </Box>
+          )}
+          
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            {selectedFile.type === 'image' ? (
+              <img 
+                src={selectedFile.url} 
+                alt={selectedFile.name}
+                style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }}
+              />
+            ) : selectedFile.type === 'pdf' ? (
+              <Box sx={{ p: 4, bgcolor: '#f5f5f5', borderRadius: 2 }}>
+                <PdfIcon sx={{ fontSize: 64, color: '#f44336', mb: 2 }} />
+                <Typography variant="h6" color="text.secondary">
+                  PDF Document
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Click download to view this PDF file
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ p: 4, bgcolor: '#f5f5f5', borderRadius: 2 }}>
+                <FileIcon sx={{ fontSize: 64, color: colors.primary, mb: 2 }} />
+                <Typography variant="h6" color="text.secondary">
+                  {selectedFile.type.toUpperCase()} File
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Click download to save this file
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewFileDialog(false)}>Close</Button>
+          <Button 
+            onClick={() => {
+              handleFileDownload(selectedFile);
+              setViewFileDialog(false);
+            }}
+            variant="contained"
+            startIcon={<DownloadIcon />}
+          >
+            Download File
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+
   // Phone Confirmation Modal
   const PhoneConfirmationModal = () => {
     if (!showPhoneConfirm) return null;
@@ -1999,203 +3368,279 @@ Notes: ${report.notes}
 
   // Main render
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Typography variant="h3" gutterBottom sx={{ color: colors.primary, fontWeight: 'bold' }}>
-          👶 Baby Care & Development
-        </Typography>
-        <Typography variant="h6" color="text.secondary" paragraph>
-          Complete baby care solutions with health tracking, vaccination management, and developmental guidance
-        </Typography>
-        <Button
-          variant="outlined"
-          sx={{ 
-            mt: 2, 
-            borderColor: colors.primary, 
-            color: colors.primary,
-            '&:hover': {
-              borderColor: colors.darktext,
-              color: colors.darktext
-            }
-          }}
-          onClick={() => setActiveView('dashboard')}
-        >
-          ← Back to Dashboard
-        </Button>
+    <Box>
+      {/* Header with Back Button, Title, and Book Appointments Button */}
+      <Box sx={{ 
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        backgroundColor: 'white',
+        py: 2,
+        mb: 4,
+        borderBottom: '1px solid #e0e0e0',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <Container maxWidth="lg">
+          <Grid container alignItems="center" justifyContent="space-between">
+            {/* Left: Back to Dashboard Button */}
+            <Grid item>
+              <Button
+                variant="outlined"
+                sx={{ 
+                  borderColor: colors.primary, 
+                  color: colors.primary,
+                  '&:hover': {
+                    borderColor: colors.darktext,
+                    color: colors.darktext
+                  }
+                }}
+                onClick={() => setActiveView('dashboard')}
+                startIcon={<ArrowBackIcon />}
+              >
+                Back to Dashboard
+              </Button>
+            </Grid>
+
+            {/* Center: Title */}
+            <Grid item>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  color: colors.primary, 
+                  fontWeight: 'bold',
+                }}
+              >
+                👶 Baby Care
+              </Typography>
+            </Grid>
+
+            {/* Right: Book Appointments Button */}
+            <Grid item>
+              <Button
+                variant="contained"
+                sx={{ 
+                  bgcolor: colors.primary,
+                  '&:hover': {
+                    bgcolor: colors.darktext
+                  }
+                }}
+                onClick={handleBookAppointments}
+                startIcon={<AppointmentIcon />}
+              >
+                Book Appointments
+              </Button>
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
 
-      {/* Tabs Navigation */}
-      <Paper sx={{ mb: 4 }}>
-        <Tabs
-          value={activeTab}
-          onChange={(e, newValue) => setActiveTab(newValue)}
-          centered
-          sx={{
-            '& .MuiTab-root': { fontWeight: 'bold' },
-            '& .Mui-selected': { color: `${colors.primary} !important` }
-          }}
-        >
-          <Tab label="Subscription Plans" />
-          <Tab label="Baby Profile & Reports" />
-          <Tab label="Development Guidelines" />
-        </Tabs>
-      </Paper>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Subtitle */}
+        <Typography variant="h6" color="text.secondary" paragraph align="center" sx={{ mb: 4 }}>
+          Complete baby care solutions with health tracking, vaccination management, and developmental guidance
+        </Typography>
 
-      {/* Tab Content */}
-      {activeTab === 0 && (
-        <Box>
-          {/* Stepper */}
-          <Paper sx={{ p: 3, mb: 4, bgcolor: colors.softbg }}>
-            <Stepper activeStep={activeStep} alternativeLabel>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </Paper>
-
-          {/* Step Content */}
-          <Paper sx={{ p: 4, mb: 4, bgcolor: 'white' }}>
-            {renderStepContent(activeStep)}
-          </Paper>
-
-          {/* Navigation Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 6 }}>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ color: colors.primary }}
-            >
-              ← Back
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={loading || (activeStep === 0 && !selectedPlan)}
-              sx={{ 
-                bgcolor: colors.primary,
-                '&:hover': { bgcolor: colors.darktext },
-                '&:disabled': { bgcolor: '#ccc' }
-              }}
-              startIcon={activeStep === steps.length - 2 ? <span>💳</span> : null}
-            >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
-              ) : activeStep === steps.length - 2 ? (
-                'Proceed to Payment'
-              ) : activeStep === steps.length - 1 ? (
-                'Complete'
-              ) : (
-                'Next →'
-              )}
-            </Button>
-          </Box>
-
-          {/* Baby Care Operations */}
-          {renderOperations()}
-        </Box>
-      )}
-
-      {activeTab === 1 && renderBabyProfile()}
-      
-      {activeTab === 2 && renderDevelopmentGuidelines()}
-
-      {/* Success Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CheckCircleIcon />
-            Subscription Activated Successfully!
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Typography gutterBottom>
-            Your <strong>{selectedPlan?.name}</strong> has been activated for <strong>{babyDetails.name}</strong>.
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            A confirmation email has been sent to {parentDetails.email}. 
-            Our caregiver will contact you within 24 hours to schedule the first visit.
-          </Typography>
-          <Box sx={{ mt: 3, p: 2, bgcolor: colors.softbg, borderRadius: 1 }}>
-            <Typography variant="body2" fontWeight="medium">
-              Next Steps:
-            </Typography>
-            <List dense>
-              <ListItem sx={{ px: 0, py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 30 }}>
-                  <span>1️⃣</span>
-                </ListItemIcon>
-                <ListItemText primary="Expect a call from our team within 24 hours" />
-              </ListItem>
-              <ListItem sx={{ px: 0, py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 30 }}>
-                  <span>2️⃣</span>
-                </ListItemIcon>
-                <ListItemText primary="Schedule your first caregiver visit" />
-              </ListItem>
-              <ListItem sx={{ px: 0, py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 30 }}>
-                  <span>3️⃣</span>
-                </ListItemIcon>
-                <ListItemText primary="Access baby profile and tracking features" />
-              </ListItem>
-            </List>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={handleStartSubscription}
-            variant="contained"
-            sx={{ 
-              bgcolor: colors.primary,
-              '&:hover': { bgcolor: colors.darktext }
+        {/* Tabs Navigation */}
+        <Paper sx={{ mb: 4 }}>
+          <Tabs
+            value={activeTab}
+            onChange={(e, newValue) => setActiveTab(newValue)}
+            centered
+            sx={{
+              '& .MuiTab-root': { fontWeight: 'bold' },
+              '& .Mui-selected': { color: `${colors.primary} !important` }
             }}
           >
-            Go to Baby Profile
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <Tab label="Subscription Plans" />
+            <Tab label="Baby Profile & Reports" />
+            <Tab label="Documents & Files" />
+            <Tab label="Development Guidelines" />
+          </Tabs>
+        </Paper>
 
-      {/* Report Dialog */}
-      <ReportDialog />
+        {/* Tab Content */}
+        {activeTab === 0 && (
+          <Box>
+            {/* Stepper */}
+            <Paper sx={{ p: 3, mb: 4, bgcolor: colors.softbg }}>
+              <Stepper activeStep={activeStep} alternativeLabel>
+                {steps.map((label) => (
+                  <Step key={label}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </Paper>
 
-      {/* Phone Confirmation Modal */}
-      <PhoneConfirmationModal />
+            {/* Step Content */}
+            <Paper sx={{ p: 4, mb: 4, bgcolor: 'white' }}>
+              {renderStepContent(activeStep)}
+            </Paper>
 
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
+            {/* Navigation Buttons */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 6 }}>
+              <Button
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{ color: colors.primary }}
+              >
+                ← Back
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                disabled={loading || (activeStep === 0 && !selectedPlan)}
+                sx={{ 
+                  bgcolor: colors.primary,
+                  '&:hover': { bgcolor: colors.darktext },
+                  '&:disabled': { bgcolor: '#ccc' }
+                }}
+                startIcon={activeStep === steps.length - 2 ? <span>💳</span> : null}
+              >
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: 'white' }} />
+                ) : activeStep === steps.length - 2 ? (
+                  'Proceed to Payment'
+                ) : activeStep === steps.length - 1 ? (
+                  'Complete'
+                ) : (
+                  'Next →'
+                )}
+              </Button>
+            </Box>
+
+            {/* Baby Care Operations */}
+            {renderOperations()}
+          </Box>
+        )}
+
+        {activeTab === 1 && renderBabyProfile()}
+        
+        {activeTab === 2 && renderFolderTab()}
+        
+        {activeTab === 3 && renderDevelopmentGuidelinesTab()}
+
+        {/* Success Dialog */}
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+          <DialogTitle sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CheckCircleIcon />
+              Subscription Activated Successfully!
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <Typography gutterBottom>
+              Your <strong>{selectedPlan?.name}</strong> has been activated for <strong>{babyDetails.name}</strong>.
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              A confirmation email has been sent to {parentDetails.email}. 
+              Our caregiver will contact you within 24 hours to schedule the first visit.
+            </Typography>
+            <Box sx={{ mt: 3, p: 2, bgcolor: colors.softbg, borderRadius: 1 }}>
+              <Typography variant="body2" fontWeight="medium">
+                Next Steps:
+              </Typography>
+              <List dense>
+                <ListItem sx={{ px: 0, py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 30 }}>
+                    <span>1️⃣</span>
+                  </ListItemIcon>
+                  <ListItemText primary="Expect a call from our team within 24 hours" />
+                </ListItem>
+                <ListItem sx={{ px: 0, py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 30 }}>
+                    <span>2️⃣</span>
+                  </ListItemIcon>
+                  <ListItemText primary="Schedule your first caregiver visit" />
+                </ListItem>
+                <ListItem sx={{ px: 0, py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 30 }}>
+                    <span>3️⃣</span>
+                  </ListItemIcon>
+                  <ListItemText primary="Access baby profile and tracking features" />
+                </ListItem>
+                <ListItem sx={{ px: 0, py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 30 }}>
+                    <span>4️⃣</span>
+                  </ListItemIcon>
+                  <ListItemText primary="Start tracking development milestones" />
+                </ListItem>
+              </List>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={handleStartSubscription}
+              variant="contained"
+              sx={{ 
+                bgcolor: colors.primary,
+                '&:hover': { bgcolor: colors.darktext }
+              }}
+            >
+              Go to Baby Profile
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Report Dialog */}
+        <ReportDialog />
+
+        {/* Folder Dialogs */}
+        <FolderDialog />
+        <UploadDialog />
+        <ViewFileDialog />
+
+        {/* Phone Confirmation Modal */}
+        <PhoneConfirmationModal />
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
-      {/* Floating Action Button for Quick Actions */}
-      {activeTab === 1 && (
-        <Fab
-          color="primary"
-          sx={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            bgcolor: colors.primary
-          }}
-          onClick={handleAddReport}
-        >
-          <AddIcon />
-        </Fab>
-      )}
-    </Container>
+        {/* Floating Action Button for Quick Actions */}
+        {activeTab === 1 && (
+          <Fab
+            color="primary"
+            sx={{
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              bgcolor: colors.primary
+            }}
+            onClick={handleAddReport}
+          >
+            <AddIcon />
+          </Fab>
+        )}
+        
+        {activeTab === 2 && (
+          <Fab
+            color="primary"
+            sx={{
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              bgcolor: colors.primary
+            }}
+            onClick={() => setOpenUploadDialog(true)}
+          >
+            <CloudUploadIcon />
+          </Fab>
+        )}
+      </Container>
+    </Box>
   );
 };
 

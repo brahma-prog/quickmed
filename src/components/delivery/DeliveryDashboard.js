@@ -523,18 +523,13 @@ const DeliveryDashboard = ({ user, onLogout }) => {
     showToast('View All Notifications feature coming soon!', 'info');
   };
 
-  // AI Chat functions
-  const toggleAIChat = () => {
-    setShowAIChat(!showAIChat);
-  };
-
-  // Profile Image functions
-  const handleProfileImageChange = (newImage) => {
+  // Profile functions
+  const handleProfileUpdate = (updatedProfileData) => {
     setProfileData(prev => ({
       ...prev,
-      profileImage: newImage
+      ...updatedProfileData
     }));
-    showToast('Profile image updated successfully!', 'success');
+    showToast('Profile updated successfully!', 'success');
   };
 
   // Online status toggle
@@ -577,9 +572,8 @@ const DeliveryDashboard = ({ user, onLogout }) => {
     setSelectedTask,
     toggleNotifications,
     getUnreadCount,
-    toggleAIChat,
     setShowProfileImageUpload,
-    handleProfileImageChange,
+    handleProfileUpdate,
     navigateTo,
     acceptDelivery,
     startDelivery,
@@ -707,61 +701,18 @@ const DeliveryDashboard = ({ user, onLogout }) => {
         }}>
           <ProfileImageUpload
             currentImage={profileData.profileImage}
-            onImageChange={handleProfileImageChange}
+            onImageChange={(newImage) => {
+              setProfileData(prev => ({
+                ...prev,
+                profileImage: newImage
+              }));
+              showToast('Profile image updated successfully!', 'success');
+              setShowProfileImageUpload(false);
+            }}
             onCancel={() => setShowProfileImageUpload(false)}
           />
         </div>
       )}
-
-      {/* Mobile Header */}
-      {isMobile && (
-        <div style={styles.mobileHeader}>
-          <button 
-            className="mobile-menu-toggle"
-            style={styles.mobileMenuToggle}
-            onClick={toggleMobileMenu}
-          >
-            ☰
-          </button>
-          <h3 style={{ margin: 0, color: '#124441', fontSize: '1.1rem' }}>Delivery Dashboard</h3>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <button 
-              onClick={toggleNotifications}
-              style={{ 
-                background: 'none', 
-                border: '1px solid #4DB6AC',
-                borderRadius: '8px',
-                backgroundColor: '#FFFFFF',
-                position: 'relative', 
-                cursor: 'pointer',
-                fontSize: '1.2rem',
-                padding: '8px'
-              }}
-            >
-              🔔
-              {getUnreadCount() > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-5px',
-                  backgroundColor: '#009688',
-                  color: '#FFFFFF',
-                  borderRadius: '50%',
-                  width: '18px',
-                  height: '18px',
-                  fontSize: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  {getUnreadCount()}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Mobile Sidebar Overlay */}
       {isMobile && (
         <div style={styles.overlay} onClick={() => setIsMobileMenuOpen(false)} />
@@ -776,7 +727,6 @@ const DeliveryDashboard = ({ user, onLogout }) => {
             profileData={profileData}
             isOnline={isOnline}
             onLogout={handleLogout}
-            onToggleAIChat={toggleAIChat}
             isMobile={isMobile}
           />
         </div>
@@ -787,7 +737,6 @@ const DeliveryDashboard = ({ user, onLogout }) => {
           profileData={profileData}
           isOnline={isOnline}
           onLogout={handleLogout}
-          onToggleAIChat={toggleAIChat}
           isMobile={isMobile}
           isTablet={isTablet}
         />
@@ -821,59 +770,6 @@ const DeliveryDashboard = ({ user, onLogout }) => {
           onAcceptDelivery={acceptDelivery}
           isMobile={isMobile}
         />
-      )}
-
-      {/* Floating Action Button for Mobile */}
-      {isMobile && (
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-          zIndex: 100
-        }}>
-          <button
-            onClick={toggleAIChat}
-            style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              backgroundColor: '#009688',
-              color: '#FFFFFF',
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-              fontSize: '24px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            🤖
-          </button>
-          
-          <button
-            onClick={toggleOnlineStatus}
-            style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              backgroundColor: isOnline ? '#009688' : '#4F6F6B',
-              color: '#FFFFFF',
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-              fontSize: '24px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            {isOnline ? '✓' : '✕'}
-          </button>
-        </div>
       )}
     </div>
   );

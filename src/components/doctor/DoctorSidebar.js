@@ -8,10 +8,9 @@ const DoctorSidebar = ({
   setShowLogoutConfirm,
   navigationItems,
   isSidebarOpen,
-  setIsSidebarOpen
+  setIsSidebarOpen,
+  isMobile
 }) => {
-  const isMobile = window.innerWidth <= 768;
-
   return (
     <>
       {/* Mobile Overlay */}
@@ -54,11 +53,14 @@ const DoctorSidebar = ({
           )}
         </div>
 
-        {/* Doctor Profile Section - Moved to top */}
+        {/* Doctor Profile Section */}
         <div style={styles.profileSection}>
           <button 
             style={styles.profileButton}
-            onClick={() => setShowProfileModal(true)}
+            onClick={() => {
+              setShowProfileModal(true);
+              if (isMobile) setIsSidebarOpen(false);
+            }}
           >
             <div style={styles.userInfo}>
               <div style={styles.userAvatar}>👨‍⚕️</div>
@@ -94,7 +96,10 @@ const DoctorSidebar = ({
           <div style={styles.sidebarFooter}>
             <button 
               style={styles.logoutButton} 
-              onClick={() => setShowLogoutConfirm(true)}
+              onClick={() => {
+                setShowLogoutConfirm(true);
+                if (isMobile) setIsSidebarOpen(false);
+              }}
             >
               Logout
             </button>

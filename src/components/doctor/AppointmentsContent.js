@@ -4,159 +4,112 @@ const AppointmentsContent = ({ dashboardData, state, actions }) => {
   const { appointmentFilter, appointments } = state;
   const { 
     setAppointmentFilter, 
-    setActivePage,
-    handleStartConsultation,   
-    handleCancelAppointment,
-    handleApproveAppointment,
-    handleRejectAppointment,
-    handleViewFullHistory,
-    handleAddNotes
+    setActivePage
   } = actions;
 
   const isMobile = window.innerWidth <= 768;
 
-  // State for time slots management
-  const [videoCallActive, setVideoCallActive] = useState(false);
+  // State for appointments management
+  const [loadingAppointments, setLoadingAppointments] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [showVideoConsultation, setShowVideoConsultation] = useState(false);
   const [currentConsultation, setCurrentConsultation] = useState(null);
-  const [callStatus, setCallStatus] = useState('connecting');
-  const [loadingStates, setLoadingStates] = useState({});
-  
-  // Local appointments state to avoid dependency on setAppointments
-  const [localAppointments, setLocalAppointments] = useState(appointments);
-  
-  // State for notes modal
-  const [showNotesModal, setShowNotesModal] = useState(false);
-  const [notesPatientName, setNotesPatientName] = useState('');
-  const [notesText, setNotesText] = useState('');
-  const [notesLoading, setNotesLoading] = useState(false);
-  
-  // State for React-based notifications
-  const [notification, setNotification] = useState(null);
-  
+  const [isRecording, setIsRecording] = useState(false);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [callTime, setCallTime] = useState(0);
+
+  // Local state for appointments
+  const [localAppointments, setLocalAppointments] = useState({
+    pending: [...appointments.pending],
+    upcoming: [...appointments.upcoming],
+    cancelled: [...appointments.cancelled]
+  });
+
+  // Timer for video call
+  useEffect(() => {
+    let timer;
+    if (showVideoConsultation && callTime >= 0) {
+      timer = setInterval(() => {
+        setCallTime(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showVideoConsultation, callTime]);
+
   // Sync localAppointments with props when appointments change
   useEffect(() => {
-    setLocalAppointments(appointments);
+    setLocalAppointments({
+      pending: [...appointments.pending],
+      upcoming: [...appointments.upcoming],
+      cancelled: [...appointments.cancelled]
+    });
   }, [appointments]);
 
-  // Memoized notification function to prevent re-renders
-  const showNotification = useCallback((type, message) => {
-    setNotification({ type, message, id: Date.now() });
+  // Show simple notification
+  const showNotification = useCallback((message, type = 'info') => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, message, type }]);
     
-    const timer = setTimeout(() => {
-      setNotification(null);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
     }, 3000);
-    
-    return () => clearTimeout(timer);
   }, []);
 
-  // Notification Component - memoized to prevent re-renders
-  const Notification = useMemo(() => {
-    if (!notification) return null;
-    
-    const bgColor = notification.type === 'success' ? '#10B981' :
-                    notification.type === 'error' ? '#EF4444' :
-                    notification.type === 'warning' ? '#F59E0B' : '#009688';
-    
-    const icon = notification.type === 'success' ? '✅' :
-                 notification.type === 'error' ? '❌' :
-                 notification.type === 'warning' ? '⚠️' : 'ℹ️';
-    
-    return (
-      <div style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 10001,
-        animation: 'slideIn 0.3s ease'
-      }}>
-        <div style={{
-          padding: '15px 20px',
-          borderRadius: '8px',
-          backgroundColor: bgColor,
-          color: 'white',
-          fontWeight: '600',
-          minWidth: '300px',
-          maxWidth: '400px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif'
-        }}>
-          {icon} {notification.message}
-        </div>
-      </div>
-    );
-  }, [notification]);
+  // Handle appointment approval
+  const handleApproveAppointment = useCallback((appointment) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
 
-  // Direct function to handle view history
-  const handleViewHistory = useCallback((patientName) => {
-    if (handleViewFullHistory && typeof handleViewFullHistory === 'function') {
-      handleViewFullHistory(patientName);
-    } else {
-      showNotification('info', `Opening medical history for ${patientName}`);
-      if (setActivePage && typeof setActivePage === 'function') {
-        setActivePage('history');
-      }
-    }
-  }, [handleViewFullHistory, showNotification, setActivePage]);
-
-  // Function to handle Add Notes with modal
-  const handleAddNotesClick = useCallback((patientName) => {
-    setNotesPatientName(patientName);
-    setNotesText('');
-    setShowNotesModal(true);
-  }, []);
-
-  // Function to save notes
-  const handleSaveNotes = useCallback(() => {
-    if (!notesText.trim()) {
-      showNotification('error', 'Please enter notes before saving');
-      return;
-    }
-
-    setNotesLoading(true);
-    
-    // Simulate API call
     setTimeout(() => {
-      if (handleAddNotes && typeof handleAddNotes === 'function') {
-        handleAddNotes(notesPatientName, notesText);
-      } else {
-        // Fallback: Just show success message
-        console.log(`Notes saved for ${notesPatientName}: ${notesText}`);
-      }
+      setLocalAppointments(prev => {
+        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
+        if (pendingIndex === -1) return prev;
+
+        const approvedAppointment = prev.pending[pendingIndex];
+        const newPending = [...prev.pending];
+        newPending.splice(pendingIndex, 1);
+        
+        return {
+          ...prev,
+          pending: newPending,
+          upcoming: [...prev.upcoming, { 
+            ...approvedAppointment, 
+            status: 'upcoming',
+            approvedDate: new Date().toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'short', 
+              day: 'numeric' 
+            })
+          }]
+        };
+      });
       
-      showNotification('success', `Notes saved for ${notesPatientName}`);
-      setNotesLoading(false);
-      setShowNotesModal(false);
-      setNotesText('');
-      setNotesPatientName('');
+      showNotification(`Appointment approved for ${appointment.patientName}`, 'success');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
     }, 1000);
-  }, [notesText, notesPatientName, showNotification, handleAddNotes]);
-
-  const handleStartVideoConsultation = useCallback((appointment) => {
-    setCurrentConsultation(appointment);
-    setVideoCallActive(true);
-    setCallStatus('connecting');
-    
-    // Simulate call connection
-    setTimeout(() => {
-      setCallStatus('connected');
-      showNotification('success', `Video consultation started with ${appointment.patientName}`);
-    }, 2000);
   }, [showNotification]);
 
-  const handleCancelAppointmentClick = useCallback((appointmentId) => {
-    if (window.confirm('Are you sure you want to cancel this appointment?')) {
-      setLoadingStates(prev => ({ ...prev, [appointmentId]: true }));
-      
-      // Simulate API call
-      setTimeout(() => {
-        // Handle regular appointment cancellation using local state
-        const updatedAppointments = { ...localAppointments };
-        const appointment = updatedAppointments.upcoming.find(app => app.id === appointmentId);
+  // Handle appointment rejection/reschedule
+  const handleRejectAppointment = useCallback((appointment, reason) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
+
+    setTimeout(() => {
+      setLocalAppointments(prev => {
+        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
+        if (pendingIndex === -1) return prev;
+
+        const rejectedAppointment = prev.pending[pendingIndex];
+        const newPending = [...prev.pending];
+        newPending.splice(pendingIndex, 1);
         
-        if (appointment) {
-          updatedAppointments.upcoming = updatedAppointments.upcoming.filter(app => app.id !== appointmentId);
-          updatedAppointments.cancelled.push({
-            ...appointment,
+        return {
+          ...prev,
+          pending: newPending,
+          cancelled: [...prev.cancelled, { 
+            ...rejectedAppointment, 
+            status: 'cancelled',
             cancelledDate: new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'short', 
@@ -166,326 +119,765 @@ const AppointmentsContent = ({ dashboardData, state, actions }) => {
               hour: '2-digit', 
               minute: '2-digit' 
             }),
-            reason: 'Cancelled by doctor'
-          });
-          
-          // Update local state
-          setLocalAppointments(updatedAppointments);
-        }
-        
-        showNotification('success', 'Appointment cancelled successfully');
-        setLoadingStates(prev => ({ ...prev, [appointmentId]: false }));
-      }, 1000);
-    }
-  }, [localAppointments, showNotification]);
+            reason: reason,
+            rejectedBy: 'doctor'
+          }]
+        };
+      });
+      
+      showNotification(`Appointment rejected for ${appointment.patientName}`, 'info');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowRejectModal(false);
+      setSelectedAppointment(null);
+    }, 1000);
+  }, [showNotification]);
 
-  const handleApproveAppointmentClick = useCallback((appointmentId) => {
-    setLoadingStates(prev => ({ ...prev, [appointmentId]: true }));
+  // Handle appointment rescheduling
+  const handleRescheduleAppointment = useCallback((appointment, newDate, newTime) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
+
+    setTimeout(() => {
+      setLocalAppointments(prev => {
+        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
+        if (pendingIndex === -1) return prev;
+
+        const rescheduledAppointment = prev.pending[pendingIndex];
+        const newPending = [...prev.pending];
+        newPending.splice(pendingIndex, 1);
+        
+        return {
+          ...prev,
+          pending: newPending,
+          upcoming: [...prev.upcoming, { 
+            ...rescheduledAppointment, 
+            status: 'upcoming',
+            date: newDate,
+            time: newTime,
+            originalDate: rescheduledAppointment.date,
+            originalTime: rescheduledAppointment.time,
+            rescheduledBy: 'doctor',
+            rescheduledDate: new Date().toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'short', 
+              day: 'numeric' 
+            })
+          }]
+        };
+      });
+      
+      showNotification(`Appointment rescheduled for ${appointment.patientName}`, 'success');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowRejectModal(false);
+      setSelectedAppointment(null);
+    }, 1000);
+  }, [showNotification]);
+
+  // Start video consultation
+  const handleStartConsultation = useCallback((appointment) => {
+    setCurrentConsultation(appointment);
+    setShowVideoConsultation(true);
+    setCallTime(0);
+    showNotification(`Starting video consultation with ${appointment.patientName}`, 'info');
+  }, [showNotification]);
+
+  // End video consultation
+  const handleEndConsultation = useCallback(() => {
+    setShowVideoConsultation(false);
+    setIsRecording(false);
+    setIsScreenSharing(false);
+    showNotification(`Video consultation ended with ${currentConsultation?.patientName}`, 'info');
+    
+    // Move appointment from upcoming to completed
+    if (currentConsultation) {
+      setLocalAppointments(prev => {
+        const upcomingIndex = prev.upcoming.findIndex(a => a.id === currentConsultation.id);
+        if (upcomingIndex === -1) return prev;
+
+        const newUpcoming = [...prev.upcoming];
+        newUpcoming.splice(upcomingIndex, 1);
+        
+        return {
+          ...prev,
+          upcoming: newUpcoming
+        };
+      });
+    }
+    
+    setCurrentConsultation(null);
+  }, [currentConsultation, showNotification]);
+
+  // Toggle recording
+  const handleToggleRecording = useCallback(() => {
+    setIsRecording(!isRecording);
+    showNotification(isRecording ? 'Recording stopped' : 'Recording started', 'info');
+  }, [isRecording, showNotification]);
+
+  // Toggle screen sharing
+  const handleToggleScreenShare = useCallback(() => {
+    setIsScreenSharing(!isScreenSharing);
+    showNotification(isScreenSharing ? 'Screen sharing stopped' : 'Screen sharing started', 'info');
+  }, [isScreenSharing, showNotification]);
+
+  // Handle send reminder
+  const handleSendReminder = useCallback((appointment, message, method) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
     
     setTimeout(() => {
-      if (handleApproveAppointment) {
-        handleApproveAppointment(appointmentId);
-      } else {
-        // Fallback: Move from pending to upcoming using local state
-        const updatedAppointments = { ...localAppointments };
-        const appointment = updatedAppointments.pending.find(app => app.id === appointmentId);
-        
-        if (appointment) {
-          updatedAppointments.pending = updatedAppointments.pending.filter(app => app.id !== appointmentId);
-          updatedAppointments.upcoming.push(appointment);
-          setLocalAppointments(updatedAppointments);
-        }
-      }
-      showNotification('success', 'Appointment approved');
-      setLoadingStates(prev => ({ ...prev, [appointmentId]: false }));
+      showNotification(`Reminder sent via ${method.toUpperCase()} to ${appointment.patientName}`, 'success');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowReminderModal(false);
+      setSelectedAppointment(null);
     }, 1000);
-  }, [localAppointments, showNotification, handleApproveAppointment]);
+  }, [showNotification]);
 
-  const handleRejectAppointmentClick = useCallback((appointmentId) => {
-    const reason = window.prompt('Please enter reason for rejection:');
-    if (reason) {
-      setLoadingStates(prev => ({ ...prev, [appointmentId]: true }));
-      
-      setTimeout(() => {
-        if (handleRejectAppointment) {
-          handleRejectAppointment(appointmentId, reason);
-        } else {
-          // Fallback: Move from pending to cancelled with reason
-          const updatedAppointments = { ...localAppointments };
-          const appointment = updatedAppointments.pending.find(app => app.id === appointmentId);
-          
-          if (appointment) {
-            updatedAppointments.pending = updatedAppointments.pending.filter(app => app.id !== appointmentId);
-            updatedAppointments.cancelled.push({
-              ...appointment,
-              cancelledDate: new Date().toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-              }),
-              cancelledTime: new Date().toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              }),
-              reason: `Rejected: ${reason}`
-            });
-            setLocalAppointments(updatedAppointments);
-          }
-        }
-        showNotification('info', 'Appointment rejected');
-        setLoadingStates(prev => ({ ...prev, [appointmentId]: false }));
-      }, 1000);
-    }
-  }, [localAppointments, showNotification, handleRejectAppointment]);
+  // Format call time
+  const formatCallTime = useCallback((seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }, []);
 
+  // Get current date for date input
+  const getCurrentDate = useCallback(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }, []);
+
+  // Get filtered appointments
   const getFilteredAppointments = useCallback(() => {
     switch (appointmentFilter) {
-      case 'pending': return localAppointments.pending || [];
-      case 'upcoming': return localAppointments.upcoming || [];
-      case 'cancelled': return localAppointments.cancelled || [];
-      default: return localAppointments.upcoming || [];
+      case 'pending': return localAppointments.pending;
+      case 'upcoming': return localAppointments.upcoming;
+      case 'cancelled': return localAppointments.cancelled;
+      default: return localAppointments.upcoming;
     }
   }, [appointmentFilter, localAppointments]);
 
-  // Add Notes Modal Component - memoized to prevent re-renders
-  const AddNotesModal = useMemo(() => {
-    if (!showNotesModal) return null;
+  // Reject/Reschedule Modal Component
+  const RejectRescheduleModal = React.memo(({ 
+    show, 
+    appointment, 
+    onClose, 
+    onReject, 
+    onReschedule,
+    loading 
+  }) => {
+    const [rejectReason, setRejectReason] = useState('');
+    const [rescheduleDate, setRescheduleDate] = useState('');
+    const [rescheduleTime, setRescheduleTime] = useState('');
+
+    const handleRejectReasonChange = (e) => {
+      setRejectReason(e.target.value);
+    };
+
+    const handleRescheduleDateChange = (e) => {
+      setRescheduleDate(e.target.value);
+    };
+
+    const handleRescheduleTimeChange = (e) => {
+      setRescheduleTime(e.target.value);
+    };
+
+    const handleRejectSubmit = () => {
+      if (rejectReason.trim()) {
+        onReject(appointment, rejectReason);
+      }
+    };
+
+    const handleRescheduleSubmit = () => {
+      if (rescheduleDate && rescheduleTime) {
+        onReschedule(appointment, rescheduleDate, rescheduleTime);
+      }
+    };
+
+    if (!show || !appointment) return null;
 
     return (
       <div style={styles.modalOverlay}>
         <div style={styles.modal}>
           <div style={styles.modalHeader}>
-            <h3 style={styles.modalTitle}>Add Notes for {notesPatientName}</h3>
+            <h3 style={styles.modalTitle}>
+              Manage Appointment - {appointment.patientName}
+            </h3>
             <button 
               style={styles.closeButton}
-              onClick={() => {
-                setShowNotesModal(false);
-                setNotesText('');
-                setNotesPatientName('');
-              }}
+              onClick={onClose}
             >
               ✕
             </button>
           </div>
-          
+
           <div style={styles.modalContent}>
-            <div style={styles.notesForm}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Patient Name</label>
-                <input
-                  type="text"
-                  value={notesPatientName}
-                  readOnly
-                  style={styles.readOnlyInput}
-                />
-              </div>
-              
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Notes <span style={styles.required}>*</span></label>
-                <textarea
-                  value={notesText}
-                  onChange={(e) => setNotesText(e.target.value)}
-                  placeholder="Enter your notes here... (e.g., Symptoms, Diagnosis, Treatment plan, Follow-up instructions)"
-                  style={styles.notesTextarea}
-                  rows={8}
-                  autoFocus
-                />
-                <div style={styles.charCount}>
-                  {notesText.length}/1000 characters
-                </div>
-              </div>
-              
-              <div style={styles.notesTips}>
-                <h4 style={styles.tipsTitle}>Tips for effective notes:</h4>
-                <ul style={styles.tipsList}>
-                  <li>Include symptoms and observations</li>
-                  <li>Note diagnosis and prescribed medications</li>
-                  <li>Record follow-up requirements</li>
-                  <li>Add any special instructions for the patient</li>
-                </ul>
-              </div>
+            <div style={styles.appointmentInfoCard}>
+              <p><strong>Patient:</strong> {appointment.patientName}</p>
+              <p><strong>Age:</strong> {appointment.age}</p>
+              <p><strong>Scheduled:</strong> {appointment.date} at {appointment.time}</p>
+              <p><strong>Issue:</strong> {appointment.issue}</p>
+              <p><strong>Duration:</strong> {appointment.duration}</p>
+              {appointment.fee && (
+                <p><strong>Fee:</strong> {appointment.fee}</p>
+              )}
             </div>
-          </div>
-          
-          <div style={styles.modalFooter}>
-            <button
-              style={styles.cancelButton}
-              onClick={() => {
-                setShowNotesModal(false);
-                setNotesText('');
-                setNotesPatientName('');
-              }}
-              disabled={notesLoading}
-            >
-              Cancel
-            </button>
-            <button
-              style={styles.saveButton}
-              onClick={handleSaveNotes}
-              disabled={notesLoading}
-            >
-              {notesLoading ? 'Saving...' : 'Save Notes'}
-            </button>
+
+            <div style={styles.section}>
+              <h4 style={styles.sectionTitle}>Reject Appointment</h4>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Reason for rejection:</label>
+                <textarea 
+                  style={styles.textarea}
+                  placeholder="Provide reason for rejecting this appointment..."
+                  value={rejectReason}
+                  onChange={handleRejectReasonChange}
+                  rows="3"
+                />
+              </div>
+              <button 
+                style={styles.dangerButton}
+                onClick={handleRejectSubmit}
+                disabled={!rejectReason.trim() || loading}
+              >
+                {loading ? 'Processing...' : 'Reject Appointment'}
+              </button>
+            </div>
+
+            <div style={styles.divider}>
+              <span style={styles.dividerText}>OR</span>
+            </div>
+
+            <div style={styles.section}>
+              <h4 style={styles.sectionTitle}>Reschedule Appointment</h4>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>New Date:</label>
+                <input 
+                  type="date" 
+                  style={styles.input}
+                  min={getCurrentDate()}
+                  value={rescheduleDate}
+                  onChange={handleRescheduleDateChange}
+                />
+              </div>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>New Time:</label>
+                <input 
+                  type="time" 
+                  style={styles.input}
+                  value={rescheduleTime}
+                  onChange={handleRescheduleTimeChange}
+                />
+              </div>
+              <button 
+                style={styles.successButton}
+                onClick={handleRescheduleSubmit}
+                disabled={!rescheduleDate || !rescheduleTime || loading}
+              >
+                {loading ? 'Processing...' : 'Reschedule Appointment'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
-  }, [showNotesModal, notesPatientName, notesText, notesLoading, handleSaveNotes]);
+  });
 
-  // AppointmentCard Component - memoized to prevent re-renders
-  const AppointmentCard = useCallback(({ appointment }) => {
-    const isLoading = loadingStates[appointment.id];
+  // Reminder Modal Component
+  const ReminderModal = React.memo(({ 
+    show, 
+    appointment, 
+    onClose, 
+    onSendReminder,
+    loading 
+  }) => {
+    const [reminderMessage, setReminderMessage] = useState('');
+    const [reminderMethod, setReminderMethod] = useState('sms');
+
+    const handleReminderMessageChange = (e) => {
+      setReminderMessage(e.target.value);
+    };
+
+    const handleMethodChange = (method) => {
+      setReminderMethod(method);
+    };
+
+    const handleTimeOptionClick = (option) => {
+      let message = '';
+      switch(option) {
+        case '24h':
+          message = `Reminder: Your appointment with Dr. is scheduled for tomorrow at ${appointment.time}. Please be on time.`;
+          break;
+        case '1h':
+          message = `Reminder: Your appointment is in 1 hour. Please join the video call or arrive at the clinic.`;
+          break;
+        case 'now':
+          message = `Final reminder: Your appointment starts now. Please join the video consultation.`;
+          break;
+        default:
+          message = '';
+      }
+      setReminderMessage(message);
+    };
+
+    const handleSubmit = () => {
+      if (reminderMessage.trim()) {
+        onSendReminder(appointment, reminderMessage, reminderMethod);
+      }
+    };
+
+    if (!show || !appointment) return null;
 
     return (
-      <div style={{
-        ...styles.appointmentCard,
-        borderLeft: '4px solid #e5e7eb',
-        opacity: isLoading ? 0.7 : 1
-      }}>
+      <div style={styles.modalOverlay}>
+        <div style={styles.modal}>
+          <div style={styles.modalHeader}>
+            <h3 style={styles.modalTitle}>
+              Send Reminder - {appointment.patientName}
+            </h3>
+            <button 
+              style={styles.closeButton}
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={styles.modalContent}>
+            <div style={styles.appointmentInfoCard}>
+              <p><strong>Patient:</strong> {appointment.patientName}</p>
+              <p><strong>Age:</strong> {appointment.age}</p>
+              <p><strong>Scheduled:</strong> {appointment.date} at {appointment.time}</p>
+              <p><strong>Issue:</strong> {appointment.issue}</p>
+            </div>
+
+            <div style={styles.section}>
+              <h4 style={styles.sectionTitle}>Reminder Details</h4>
+              
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Select Method:</label>
+                <div style={styles.methodOptions}>
+                  <label style={{
+                    ...styles.methodOption,
+                    ...(reminderMethod === 'sms' && styles.activeMethodOption)
+                  }}>
+                    <input
+                      type="radio"
+                      value="sms"
+                      checked={reminderMethod === 'sms'}
+                      onChange={() => handleMethodChange('sms')}
+                      style={styles.radioInput}
+                    />
+                    <span style={styles.methodLabel}>📱 SMS</span>
+                  </label>
+                  <label style={{
+                    ...styles.methodOption,
+                    ...(reminderMethod === 'email' && styles.activeMethodOption)
+                  }}>
+                    <input
+                      type="radio"
+                      value="email"
+                      checked={reminderMethod === 'email'}
+                      onChange={() => handleMethodChange('email')}
+                      style={styles.radioInput}
+                    />
+                    <span style={styles.methodLabel}>📧 Email</span>
+                  </label>
+                  <label style={{
+                    ...styles.methodOption,
+                    ...(reminderMethod === 'whatsapp' && styles.activeMethodOption)
+                  }}>
+                    <input
+                      type="radio"
+                      value="whatsapp"
+                      checked={reminderMethod === 'whatsapp'}
+                      onChange={() => handleMethodChange('whatsapp')}
+                      style={styles.radioInput}
+                    />
+                    <span style={styles.methodLabel}>💬 WhatsApp</span>
+                  </label>
+                </div>
+              </div>
+
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Reminder Message:</label>
+                <textarea 
+                  style={styles.textarea}
+                  placeholder={`Reminder for ${appointment.patientName}'s appointment on ${appointment.date} at ${appointment.time}`}
+                  value={reminderMessage}
+                  onChange={handleReminderMessageChange}
+                  rows="4"
+                />
+                <div style={styles.messagePreview}>
+                  <strong>Preview:</strong>
+                  <div style={styles.previewText}>
+                    {reminderMessage || 'Your reminder message will appear here...'}
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Quick Templates:</label>
+                <div style={styles.timeOptions}>
+                  <button 
+                    type="button"
+                    style={styles.timeOption}
+                    onClick={() => handleTimeOptionClick('24h')}
+                  >
+                    24 hours before
+                  </button>
+                  <button 
+                    type="button"
+                    style={styles.timeOption}
+                    onClick={() => handleTimeOptionClick('1h')}
+                  >
+                    1 hour before
+                  </button>
+                  <button 
+                    type="button"
+                    style={styles.timeOption}
+                    onClick={() => handleTimeOptionClick('now')}
+                  >
+                    At appointment time
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                style={styles.primaryButton}
+                onClick={handleSubmit}
+                disabled={!reminderMessage.trim() || loading}
+              >
+                {loading ? 'Sending...' : `Send ${reminderMethod.toUpperCase()} Reminder`}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Video Consultation Modal Component
+  const VideoConsultationModal = React.memo(({ 
+    show, 
+    consultation, 
+    callTime,
+    isRecording,
+    isScreenSharing,
+    onEndCall,
+    onToggleRecording,
+    onToggleScreenShare,
+    onClose 
+  }) => {
+    const [notes, setNotes] = useState('');
+
+    const handleNotesChange = (e) => {
+      setNotes(e.target.value);
+    };
+
+    const handleSaveNotes = () => {
+      if (notes.trim()) {
+        showNotification('Consultation notes saved', 'success');
+      } else {
+        showNotification('Please add some notes before saving', 'error');
+      }
+    };
+
+    if (!show || !consultation) return null;
+
+    return (
+      <div style={styles.videoModalOverlay}>
+        <div style={styles.videoModal}>
+          <div style={styles.videoHeader}>
+            <div style={styles.videoHeaderInfo}>
+              <div style={styles.videoStatus}>
+                <span style={styles.connectedDot}>●</span>
+                <span>Status: connected</span>
+              </div>
+              <div style={styles.callTimer}>
+                <span>{formatCallTime(callTime)}</span>
+              </div>
+            </div>
+            <button 
+              style={styles.endCallButton}
+              onClick={onEndCall}
+            >
+              End Call
+            </button>
+          </div>
+
+          <div style={styles.videoMainArea}>
+            <div style={styles.patientVideoContainer}>
+              <div style={styles.patientVideoHeader}>
+                <div style={styles.patientVideoInfo}>
+                  <h3 style={styles.patientVideoName}>{consultation.patientName}</h3>
+                  <div style={styles.appointmentInfo}>
+                    Age: {consultation.age} • {consultation.issue}
+                  </div>
+                </div>
+              </div>
+              
+              <div style={styles.videoFeed}>
+                <div style={styles.videoMock}>
+                  <div style={styles.videoMockContent}>
+                    <div style={styles.videoMockAvatar}>
+                      <span style={styles.avatarEmoji}>👤</span>
+                    </div>
+                    <div style={styles.videoMockInfo}>
+                      <p style={styles.videoMockText}>Live Video Feed</p>
+                      <p style={styles.videoMockSubtext}>{consultation.patientName}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style={styles.selfView}>
+                  <div style={styles.selfViewHeader}>
+                    <span style={styles.selfViewLabel}>You</span>
+                  </div>
+                  <div style={styles.selfViewVideo}>
+                    <div style={styles.selfViewMock}>
+                      <span style={styles.selfViewEmoji}>👨‍⚕️</span>
+                      <p style={styles.selfViewText}>Dr. View</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={styles.quickTools}>
+              <div style={styles.quickToolsHeader}>
+                <h4 style={styles.quickToolsTitle}>Consultation Tools</h4>
+              </div>
+              
+              <div style={styles.toolButtons}>
+                <button 
+                  style={isScreenSharing ? styles.activeToolButton : styles.toolButton}
+                  onClick={onToggleScreenShare}
+                >
+                  <span style={styles.toolIcon}>🖥️</span>
+                  <span>Share Screen</span>
+                </button>
+                
+                <button 
+                  style={isRecording ? styles.recordingButton : styles.toolButton}
+                  onClick={onToggleRecording}
+                >
+                  <span style={styles.toolIcon}>⏺️</span>
+                  <span>{isRecording ? 'Recording...' : 'Record'}</span>
+                </button>
+                
+                <button 
+                  style={styles.toolButton}
+                  onClick={() => showNotification('Opening prescription pad', 'info')}
+                >
+                  <span style={styles.toolIcon}>💊</span>
+                  <span>Prescription</span>
+                </button>
+                
+                <button 
+                  style={styles.toolButton}
+                  onClick={() => {
+                    if (setActivePage) {
+                      setActivePage('messages');
+                    }
+                    showNotification('Opening chat with patient', 'info');
+                  }}
+                >
+                  <span style={styles.toolIcon}>💬</span>
+                  <span>Chat</span>
+                </button>
+                
+                <button 
+                  style={styles.toolButton}
+                  onClick={() => showNotification('Opening medical history', 'info')}
+                >
+                  <span style={styles.toolIcon}>📋</span>
+                  <span>History</span>
+                </button>
+              </div>
+              
+              <div style={styles.consultationNotes}>
+                <h4 style={styles.notesTitle}>Consultation Notes</h4>
+                <textarea 
+                  style={styles.notesTextarea}
+                  placeholder="Add notes about symptoms, observations, recommendations..."
+                  value={notes}
+                  onChange={handleNotesChange}
+                  rows="4"
+                />
+                <button 
+                  style={styles.saveNotesButton}
+                  onClick={handleSaveNotes}
+                >
+                  Save Notes
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.videoFooter}>
+            <div style={styles.appointmentInfo}>
+              <strong>Patient:</strong> {consultation.patientName}
+            </div>
+            <div style={styles.consultationType}>
+              <strong>Issue:</strong> {consultation.issue} • {consultation.duration}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // AppointmentCard Component (Updated - removed cancel button from upcoming section)
+  const AppointmentCard = React.memo(({ appointment, filter, onApprove, onRejectReschedule, onStartConsultation, onSendReminder, loading }) => {
+    const isLoading = loading[appointment.id];
+
+    return (
+      <div style={styles.appointmentCard}>
         <div style={styles.appointmentHeader}>
           <div style={styles.appointmentPatient}>
-            <div style={{
-              ...styles.profileIcon,
-              backgroundColor: '#E0F2F1'
-            }}>
+            <div style={styles.profileIcon}>
               <span>👤</span>
             </div>
             <div style={styles.patientInfo}>
               <h3 style={styles.appointmentName}>
                 {appointment.patientName}
+                {appointment.priority === 'high' && (
+                  <span style={styles.priorityBadge}>High Priority</span>
+                )}
               </h3>
               <p style={styles.appointmentMeta}>
                 Age: {appointment.age} • {appointment.type || 'Consultation'}
+                {appointment.fee && appointment.fee !== 'Free' && (
+                  <span style={styles.feeBadge}>💰 {appointment.fee}</span>
+                )}
               </p>
             </div>
           </div>
           <div style={styles.appointmentTime}>
             <strong>{appointment.time}</strong>
             <span>{appointment.date}</span>
-            {appointment.fee && (
-              <span style={styles.feeBadge}>
-                {appointment.fee === 'Free' ? '🆓 Free' : `💰 ${appointment.fee}`}
-              </span>
-            )}
-            {appointmentFilter === 'pending' && appointment.requestedDate && (
-              <span style={styles.requestedDate}>Requested: {appointment.requestedDate}</span>
+            {appointment.fee && appointment.fee === 'Free' && (
+              <span style={styles.freeBadge}>🆓 Free</span>
             )}
           </div>
         </div>
         
         <div style={styles.appointmentDetails}>
-          <p style={styles.appointmentIssue}><strong>Reason:</strong> {appointment.issue}</p>
-          <p style={styles.appointmentDuration}><strong>Duration:</strong> {appointment.duration}</p>
-          {appointment.priority && (
-            <span style={{
-              ...styles.priorityBadge,
-              ...(appointment.priority === 'high' && styles.highPriorityBadge)
-            }}>
-              {appointment.priority} priority
-            </span>
+          <p><strong>Reason:</strong> {appointment.issue}</p>
+          <p><strong>Duration:</strong> {appointment.duration}</p>
+          {appointment.location && (
+            <p><strong>Location:</strong> {appointment.location}</p>
           )}
         </div>
 
         <div style={styles.appointmentActions}>
-          {appointmentFilter === 'pending' ? (
+          {filter === 'pending' && (
             <>
               <button 
                 style={styles.successButton}
-                onClick={() => handleApproveAppointmentClick(appointment.id)}
+                onClick={() => onApprove(appointment)}
                 disabled={isLoading}
               >
                 {isLoading ? 'Approving...' : 'Approve'}
               </button>
               <button 
-                style={styles.dangerButton}
-                onClick={() => handleRejectAppointmentClick(appointment.id)}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Rejecting...' : 'Reject'}
-              </button>
-              <button 
                 style={styles.secondaryButton}
-                onClick={() => handleAddNotesClick(appointment.patientName)}
+                onClick={() => onRejectReschedule(appointment)}
                 disabled={isLoading}
               >
-                Add Notes
+                {isLoading ? 'Processing...' : 'Reject/Reschedule'}
               </button>
             </>
-          ) : appointmentFilter === 'upcoming' ? (
+          )}
+          
+          {filter === 'upcoming' && (
             <>
               <button 
                 style={styles.primaryButton}
-                onClick={() => handleStartVideoConsultation(appointment)}
+                onClick={() => onStartConsultation(appointment)}
                 disabled={isLoading}
               >
-                {isLoading ? 'Starting...' : 'Start Consultation'}
+                Start Consultation
               </button>
-              
-              <button 
-                style={styles.dangerButton}
-                onClick={() => handleCancelAppointmentClick(appointment.id)}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Cancelling...' : 'Cancel'}
-              </button>
-              
               <button 
                 style={styles.secondaryButton}
-                onClick={() => handleAddNotesClick(appointment.patientName)}
+                onClick={() => onSendReminder(appointment)}
                 disabled={isLoading}
               >
-                Add Notes
+                Send Reminder
               </button>
             </>
-          ) : (
-            <>
-              {/* Cancelled Appointments Section */}
-              <div style={styles.cancelledDetails}>
-                <div style={styles.cancelledDetailRow}>
-                  <strong style={styles.cancelledLabel}>Cancelled Date:</strong>
-                  <span style={styles.cancelledValue}>{appointment.cancelledDate || 'N/A'}</span>
-                </div>
-                <div style={styles.cancelledDetailRow}>
-                  <strong style={styles.cancelledLabel}>Cancelled Time:</strong>
-                  <span style={styles.cancelledValue}>{appointment.cancelledTime || 'N/A'}</span>
-                </div>
-                <div style={styles.cancelledDetailRow}>
-                  <strong style={styles.cancelledLabel}>Reason:</strong>
-                  <span style={styles.cancelledReasonText}>{appointment.reason || 'Not specified'}</span>
-                </div>
-              </div>
-              <button 
-                style={styles.secondaryButton}
-                onClick={() => handleAddNotesClick(appointment.patientName)}
-                disabled={isLoading}
-              >
-                Add Notes
-              </button>
-            </>
+          )}
+          
+          {filter === 'cancelled' && (
+            <div style={styles.cancelledInfo}>
+              <p><strong>Cancelled Date:</strong> {appointment.cancelledDate || 'N/A'}</p>
+              <p><strong>Cancelled Time:</strong> {appointment.cancelledTime || 'N/A'}</p>
+              <p><strong>Reason:</strong> {appointment.reason || 'Not specified'}</p>
+            </div>
           )}
         </div>
       </div>
     );
-  }, [
-    appointmentFilter, 
-    loadingStates, 
-    handleApproveAppointmentClick, 
-    handleRejectAppointmentClick, 
-    handleAddNotesClick, 
-    handleStartVideoConsultation, 
-    handleCancelAppointmentClick,
-    showNotification,
-    setActivePage
-  ]);
+  });
 
-  // Memoized filtered appointments
+  // Notifications Component
+  const Notifications = React.memo(() => (
+    <div style={styles.notificationsContainer}>
+      {notifications.map(notification => (
+        <div
+          key={notification.id}
+          style={{
+            ...styles.notification,
+            backgroundColor: notification.type === 'success' ? '#4CAF50' :
+                           notification.type === 'error' ? '#F44336' : '#009688'
+          }}
+        >
+          {notification.message}
+        </div>
+      ))}
+    </div>
+  ));
+
   const filteredAppointments = useMemo(() => getFilteredAppointments(), [getFilteredAppointments]);
 
   return (
     <div style={styles.mainContent}>
-      {Notification}
-      {videoCallActive && <VideoConsultation />}
-      {AddNotesModal}
+      <Notifications />
+      <RejectRescheduleModal 
+        show={showRejectModal}
+        appointment={selectedAppointment}
+        onClose={() => {
+          setShowRejectModal(false);
+          setSelectedAppointment(null);
+        }}
+        onReject={handleRejectAppointment}
+        onReschedule={handleRescheduleAppointment}
+        loading={selectedAppointment ? loadingAppointments[selectedAppointment.id] : false}
+      />
+      <ReminderModal 
+        show={showReminderModal}
+        appointment={selectedAppointment}
+        onClose={() => {
+          setShowReminderModal(false);
+          setSelectedAppointment(null);
+        }}
+        onSendReminder={handleSendReminder}
+        loading={selectedAppointment ? loadingAppointments[selectedAppointment.id] : false}
+      />
+      <VideoConsultationModal 
+        show={showVideoConsultation}
+        consultation={currentConsultation}
+        callTime={callTime}
+        isRecording={isRecording}
+        isScreenSharing={isScreenSharing}
+        onEndCall={handleEndConsultation}
+        onToggleRecording={handleToggleRecording}
+        onToggleScreenShare={handleToggleScreenShare}
+        onClose={() => {
+          setShowVideoConsultation(false);
+          setCurrentConsultation(null);
+        }}
+      />
       
       <div style={styles.header}>
         <div style={styles.headerLeft}>
@@ -541,13 +933,26 @@ const AppointmentsContent = ({ dashboardData, state, actions }) => {
       )}
 
       <div style={styles.appointmentsContainer}>
-        {/* Show regular appointments */}
-        {filteredAppointments.map(appointment => (
-          <AppointmentCard key={appointment.id} appointment={appointment} />
-        ))}
-
-        {/* Empty State for General Appointments */}
-        {filteredAppointments.length === 0 && (
+        {filteredAppointments.length > 0 ? (
+          filteredAppointments.map(appointment => (
+            <AppointmentCard 
+              key={appointment.id} 
+              appointment={appointment} 
+              filter={appointmentFilter}
+              onApprove={handleApproveAppointment}
+              onRejectReschedule={(appt) => {
+                setSelectedAppointment(appt);
+                setShowRejectModal(true);
+              }}
+              onStartConsultation={handleStartConsultation}
+              onSendReminder={(appt) => {
+                setSelectedAppointment(appt);
+                setShowReminderModal(true);
+              }}
+              loading={loadingAppointments}
+            />
+          ))
+        ) : (
           <div style={styles.emptyState}>
             <div style={styles.emptyIcon}>📅</div>
             <h4 style={styles.emptyTitle}>No Appointments</h4>
@@ -563,158 +968,34 @@ const AppointmentsContent = ({ dashboardData, state, actions }) => {
   );
 };
 
-// Video Consultation Component
-const VideoConsultation = React.memo(({ 
-  videoCallActive, 
-  currentConsultation, 
-  callStatus, 
-  setVideoCallActive, 
-  setCurrentConsultation, 
-  setCallStatus,
-  showNotification,
-  handleViewHistory,
-  handleAddNotesClick,
-  setActivePage
-}) => {
-  if (!videoCallActive) return null;
-
-  const handleEndCall = () => {
-    setVideoCallActive(false);
-    setCurrentConsultation(null);
-    setCallStatus('disconnected');
-    showNotification('success', `Consultation completed with ${currentConsultation?.patientName}`);
-  };
-
-  const handleToggleVideo = () => {
-    showNotification('info', 'Video camera ' + (Math.random() > 0.5 ? 'enabled' : 'disabled'));
-  };
-
-  const handleToggleAudio = () => {
-    showNotification('info', 'Audio ' + (Math.random() > 0.5 ? 'enabled' : 'disabled'));
-  };
-
-  return (
-    <div style={styles.videoCallOverlay}>
-      <div style={styles.videoCallContainer}>
-        <div style={styles.videoCallHeader}>
-          <div style={styles.callInfo}>
-            <h3 style={styles.callTitle}>
-              Video Consultation with {currentConsultation?.patientName}
-            </h3>
-            <p style={styles.callStatus}>
-              Status: <span style={{
-                color: callStatus === 'connected' ? '#10B981' : 
-                       callStatus === 'connecting' ? '#F59E0B' : '#EF4444'
-              }}>{callStatus}</span>
-            </p>
-          </div>
-          <button style={styles.endCallButton} onClick={handleEndCall}>
-            📞 End Call
-          </button>
-        </div>
-
-        <div style={styles.videoGrid}>
-          {/* Patient Video */}
-          <div style={styles.videoFeed}>
-            <div style={styles.videoPlaceholder}>
-              <div style={styles.videoIcon}>
-                👤
-              </div>
-              <p style={styles.videoLabel}>{currentConsultation?.patientName}</p>
-              <p style={styles.videoStatus}>Live Video Feed</p>
-            </div>
-          </div>
-
-          {/* Doctor Video (Self View) */}
-          <div style={styles.selfView}>
-            <div style={styles.selfViewPlaceholder}>
-              <div style={styles.videoIcon}>👨‍⚕️</div>
-              <p style={styles.videoLabel}>You</p>
-              <p style={styles.videoStatus}>Self View</p>
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.callControls}>
-          <button style={styles.controlButton} onClick={handleToggleVideo}>
-            🎥 Video
-          </button>
-          <button style={styles.controlButton} onClick={handleToggleAudio}>
-            🎤 Audio
-          </button>
-          <button style={styles.controlButton} onClick={() => showNotification('info', 'Screen sharing started')}>
-            📺 Share Screen
-          </button>
-          <button style={styles.controlButton} onClick={() => {
-            if (setActivePage) {
-              setActivePage('messages');
-            }
-            showNotification('info', 'Opening chat with patient');
-          }}>
-            💬 Chat
-          </button>
-          <button style={styles.recordButton} onClick={() => showNotification('warning', 'Recording started - Patient consent required')}>
-            🔴 Record
-          </button>
-        </div>
-
-        {/* Consultation Tools during call */}
-        <div style={styles.callTools}>
-          <h4 style={styles.toolsTitle}>Quick Tools</h4>
-          <div style={styles.quickTools}>
-            <button style={styles.toolButton} onClick={() => {
-              showNotification('info', 'Prescription editor opened');
-            }}>
-              💊 Prescription
-            </button>
-            <button style={styles.toolButton} onClick={() => {
-              handleViewHistory(currentConsultation?.patientName);
-            }}>
-              📋 Medical History
-            </button>
-            <button style={styles.toolButton} onClick={() => {
-              handleAddNotesClick(currentConsultation?.patientName);
-            }}>
-              📝 Notes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-// Styles with updated color codes
+// Styles
 const styles = {
   mainContent: {
     padding: 'clamp(15px, 3vw, 30px)',
-    textAlign: 'left'
+    backgroundColor: '#E0F2F1',
+    minHeight: '100vh'
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: '30px',
-    textAlign: 'left',
     flexWrap: 'wrap',
     gap: '20px'
   },
   headerLeft: {
-    textAlign: 'left',
     flex: 1
   },
   greeting: {
     fontSize: 'clamp(20px, 4vw, 28px)',
     fontWeight: '700',
     color: '#124441',
-    margin: '0 0 8px 0',
-    textAlign: 'left'
+    margin: '0 0 8px 0'
   },
   subtitle: {
     fontSize: 'clamp(14px, 2vw, 16px)',
     color: '#4F6F6B',
-    margin: 0,
-    textAlign: 'left'
+    margin: 0
   },
   filterTabs: {
     display: 'flex',
@@ -722,7 +1003,7 @@ const styles = {
     backgroundColor: '#FFFFFF',
     padding: '4px',
     borderRadius: '8px',
-    border: '1px solid #E0F2F1',
+    border: '1px solid #B2DFDB',
     flexWrap: 'wrap'
   },
   mobileFilterTabs: {
@@ -731,7 +1012,7 @@ const styles = {
   mobileFilterSelect: {
     width: '100%',
     padding: '12px',
-    border: '1px solid #E0F2F1',
+    border: '1px solid #B2DFDB',
     borderRadius: '8px',
     fontSize: '16px',
     backgroundColor: '#FFFFFF'
@@ -754,16 +1035,188 @@ const styles = {
   appointmentsContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
-    textAlign: 'left'
+    gap: '20px'
+  },
+  appointmentCard: {
+    backgroundColor: '#FFFFFF',
+    padding: '25px',
+    borderRadius: '12px',
+    boxShadow: '0 4px 6px rgba(0, 150, 136, 0.1)',
+    border: '1px solid #B2DFDB',
+    transition: 'transform 0.2s, box-shadow 0.2s'
+  },
+  appointmentCardHover: {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 12px rgba(0, 150, 136, 0.15)'
+  },
+  appointmentHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '20px'
+  },
+  appointmentPatient: {
+    display: 'flex',
+    gap: '15px',
+    alignItems: 'center'
+  },
+  profileIcon: {
+    width: '50px',
+    height: '50px',
+    background: 'linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%)',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '22px',
+    color: '#124441',
+    flexShrink: 0
+  },
+  patientInfo: {
+    flex: 1
+  },
+  appointmentName: {
+    fontSize: '18px',
+    fontWeight: '600',
+    marginBottom: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    flexWrap: 'wrap',
+    color: '#124441'
+  },
+  priorityBadge: {
+    background: '#FEE2E2',
+    color: '#DC2626',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '500',
+    border: '1px solid #FCA5A5'
+  },
+  appointmentMeta: {
+    fontSize: '14px',
+    color: '#4F6F6B',
+    marginBottom: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    flexWrap: 'wrap'
+  },
+  feeBadge: {
+    background: '#E0F2F1',
+    color: '#009688',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '500',
+    border: '1px solid #4DB6AC'
+  },
+  freeBadge: {
+    background: '#10B981',
+    color: '#FFFFFF',
+    padding: '3px 8px',
+    borderRadius: '6px',
+    fontSize: '12px',
+    border: '1px solid #10B981'
+  },
+  appointmentTime: {
+    textAlign: 'right',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    color: '#124441',
+    minWidth: '180px'
+  },
+  appointmentDetails: {
+    marginBottom: '20px',
+    fontSize: '14px',
+    color: '#4F6F6B'
+  },
+  appointmentActions: {
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap'
+  },
+  cancelledInfo: {
+    width: '100%',
+    padding: '15px',
+    background: '#FFEBEE',
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: '#C62828',
+    border: '1px solid #FFCDD2'
+  },
+  primaryButton: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #009688 0%, #00796B 100%)',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    minWidth: '160px',
+    transition: 'all 0.3s ease'
+  },
+  primaryButtonHover: {
+    opacity: 0.9,
+    transform: 'translateY(-2px)'
+  },
+  secondaryButton: {
+    padding: '10px 20px',
+    background: 'transparent',
+    color: '#009688',
+    border: '2px solid #009688',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '500',
+    transition: 'all 0.3s ease'
+  },
+  secondaryButtonHover: {
+    background: 'rgba(0, 150, 136, 0.1)'
+  },
+  successButton: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease'
+  },
+  successButtonHover: {
+    opacity: 0.9,
+    transform: 'translateY(-2px)'
+  },
+  dangerButton: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #F44336 0%, #D32F2F 100%)',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease'
+  },
+  dangerButtonHover: {
+    opacity: 0.9,
+    transform: 'translateY(-2px)'
   },
   emptyState: {
-    backgroundColor: '#FFFFFF',
-    padding: '40px 20px',
+    textAlign: 'center',
+    padding: '60px 40px',
+    color: '#4F6F6B',
+    background: '#FFFFFF',
     borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #E0F2F1',
-    textAlign: 'center'
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    border: '2px dashed #BDBDBD'
   },
   emptyIcon: {
     fontSize: '48px',
@@ -781,366 +1234,298 @@ const styles = {
     color: '#4F6F6B',
     margin: '0 0 20px 0'
   },
-  appointmentCard: {
-    backgroundColor: '#FFFFFF',
-    padding: '20px',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #E0F2F1',
-    textAlign: 'left',
-    transition: 'all 0.3s ease'
-  },
-  appointmentHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '16px',
-    textAlign: 'left',
-    flexWrap: 'wrap',
-    gap: '15px'
-  },
-  appointmentPatient: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    textAlign: 'left',
-    flex: 1
-  },
-  patientInfo: {
-    textAlign: 'left',
-    flex: 1
-  },
-  profileIcon: {
-    position: 'relative',
-    width: '50px',
-    height: '50px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '20px',
-    flexShrink: 0
-  },
-  appointmentName: {
-    fontSize: 'clamp(16px, 2.5vw, 18px)',
-    fontWeight: '600',
-    color: '#124441',
-    margin: '0 0 8px 0',
-    textAlign: 'left',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    flexWrap: 'wrap'
-  },
-  appointmentMeta: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    margin: '0 0 8px 0',
-    textAlign: 'left',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    flexWrap: 'wrap'
-  },
-  appointmentTime: {
-    textAlign: 'right',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    flexShrink: 0
-  },
-  feeBadge: {
-    backgroundColor: '#E0F2F1',
-    color: '#009688',
-    padding: '4px 8px',
-    borderRadius: '8px',
-    fontSize: '12px',
-    fontWeight: '600'
-  },
-  requestedDate: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    fontStyle: 'italic'
-  },
-  appointmentDetails: {
-    marginBottom: '16px',
-    textAlign: 'left'
-  },
-  appointmentIssue: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    margin: '0 0 8px 0',
-    textAlign: 'left'
-  },
-  appointmentDuration: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    margin: '0 0 8px 0',
-    textAlign: 'left'
-  },
-  priorityBadge: {
-    backgroundColor: '#F59E0B',
-    color: 'white',
-    padding: '4px 8px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '500',
-    display: 'inline-block'
-  },
-  highPriorityBadge: {
-    backgroundColor: '#EF4444'
-  },
-  appointmentActions: {
-    display: 'flex',
-    gap: '8px',
-    flexWrap: 'wrap',
-    textAlign: 'left'
-  },
-  cancelledDetails: {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: '#FEF2F2',
-    borderRadius: '8px',
-    marginBottom: '12px',
-    border: '1px solid #FECACA'
-  },
-  cancelledDetailRow: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    marginBottom: '8px',
-    fontSize: '14px'
-  },
-  cancelledLabel: {
-    color: '#009688',
-    minWidth: '120px',
-    fontWeight: '600'
-  },
-  cancelledValue: {
-    color: '#124441',
-    flex: 1
-  },
-  cancelledReasonText: {
-    color: '#EF4444',
-    flex: 1,
-    fontStyle: 'italic'
-  },
-  primaryButton: {
-    backgroundColor: '#009688',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '8px 12px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    minWidth: '120px',
-    transition: 'all 0.3s ease',
-    opacity: 1
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    color: '#009688',
-    border: '2px solid #009688',
-    padding: '6px 10px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    minWidth: '90px',
-    transition: 'all 0.3s ease'
-  },
-  successButton: {
-    backgroundColor: '#10B981',
-    color: 'white',
-    border: 'none',
-    padding: '8px 12px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    minWidth: '80px',
-    transition: 'all 0.3s ease'
-  },
-  dangerButton: {
-    backgroundColor: '#EF4444',
-    color: 'white',
-    border: 'none',
-    padding: '8px 12px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    minWidth: '80px',
-    transition: 'all 0.3s ease'
-  },
   // Video Consultation Styles
-  videoCallOverlay: {
+  videoModalOverlay: {
     position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.95)',
-    zIndex: 10000,
+    background: 'rgba(18, 68, 65, 0.5)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    animation: 'fadeIn 0.3s ease'
+    zIndex: 2000
   },
-  videoCallContainer: {
-    backgroundColor: '#1f2937',
-    color: 'white',
+  videoModal: {
+    background: '#FFFFFF',
     borderRadius: '12px',
-    padding: '20px',
     width: '95%',
-    maxWidth: '1400px',
-    height: '95%',
-    maxHeight: '900px',
+    maxWidth: '1200px',
+    height: '80vh',
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)',
-    animation: 'slideUp 0.3s ease'
+    overflow: 'hidden'
   },
-  videoCallHeader: {
+  videoHeader: {
+    background: '#009688',
+    color: '#FFFFFF',
+    padding: '15px 25px',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-    paddingBottom: '15px',
-    borderBottom: '1px solid #374151'
+    alignItems: 'center'
   },
-  callInfo: {
-    flex: 1
-  },
-  callTitle: {
-    fontSize: '20px',
-    fontWeight: '600',
-    margin: '0 0 8px 0',
+  videoHeaderInfo: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px'
-  },
-  callStatus: {
-    fontSize: '14px',
-    color: '#9CA3AF',
-    margin: 0,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    flexWrap: 'wrap'
-  },
-  endCallButton: {
-    backgroundColor: '#EF4444',
-    color: 'white',
-    border: 'none',
-    padding: '12px 20px',
-    borderRadius: '8px',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease'
-  },
-  videoGrid: {
-    flex: 1,
-    display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
-    gap: '20px',
-    marginBottom: '20px'
-  },
-  videoFeed: {
-    backgroundColor: '#374151',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden'
-  },
-  selfView: {
-    backgroundColor: '#374151',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden'
-  },
-  videoPlaceholder: {
-    textAlign: 'center',
-    padding: '40px'
-  },
-  selfViewPlaceholder: {
-    textAlign: 'center',
-    padding: '20px'
-  },
-  videoIcon: {
-    fontSize: '64px',
-    marginBottom: '16px'
-  },
-  videoLabel: {
-    fontSize: '18px',
-    fontWeight: '600',
-    marginBottom: '8px'
+    gap: '20px'
   },
   videoStatus: {
-    fontSize: '14px',
-    color: '#9CA3AF'
-  },
-  callControls: {
     display: 'flex',
-    justifyContent: 'center',
-    gap: '15px',
-    padding: '20px 0',
-    borderTop: '1px solid #374151',
-    flexWrap: 'wrap'
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '14px'
   },
-  controlButton: {
-    backgroundColor: '#374151',
-    color: 'white',
-    border: 'none',
-    padding: '12px 20px',
-    borderRadius: '8px',
+  connectedDot: {
+    color: '#4CAF50',
+    fontSize: '12px'
+  },
+  callTimer: {
+    background: 'rgba(255, 255, 255, 0.1)',
+    padding: '5px 12px',
+    borderRadius: '20px',
     fontSize: '14px',
-    cursor: 'pointer',
-    minWidth: '100px',
-    transition: 'all 0.3s ease'
+    fontWeight: '600'
   },
-  recordButton: {
-    backgroundColor: '#EF4444',
-    color: 'white',
+  endCallButton: {
+    background: '#F44336',
+    color: '#FFFFFF',
     border: 'none',
-    padding: '12px 20px',
-    borderRadius: '8px',
-    fontSize: '14px',
+    padding: '8px 20px',
+    borderRadius: '6px',
     cursor: 'pointer',
-    minWidth: '100px',
-    transition: 'all 0.3s ease'
-  },
-  callTools: {
-    padding: '20px',
-    backgroundColor: '#374151',
-    borderRadius: '8px',
-    marginTop: '10px'
-  },
-  toolsTitle: {
-    fontSize: '16px',
     fontWeight: '600',
-    margin: '0 0 12px 0'
+    transition: 'all 0.3s ease'
+  },
+  endCallButtonHover: {
+    background: '#D32F2F',
+    transform: 'translateY(-2px)'
+  },
+  videoMainArea: {
+    flex: 1,
+    display: 'flex',
+    overflow: 'hidden'
+  },
+  patientVideoContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    background: '#E0F2F1'
+  },
+  patientVideoHeader: {
+    padding: '15px 25px',
+    borderBottom: '1px solid #B2DFDB',
+    background: '#FFFFFF'
+  },
+  patientVideoInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  patientVideoName: {
+    margin: 0,
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#124441'
+  },
+  appointmentInfo: {
+    background: '#E0F2F1',
+    color: '#124441',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontSize: '14px',
+    border: '1px solid #B2DFDB'
+  },
+  videoFeed: {
+    flex: 1,
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    position: 'relative'
+  },
+  videoMock: {
+    flex: 1,
+    background: 'linear-gradient(135deg, #009688 0%, #00796B 100%)',
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  videoMockContent: {
+    textAlign: 'center',
+    color: '#FFFFFF'
+  },
+  videoMockAvatar: {
+    fontSize: '80px',
+    marginBottom: '20px'
+  },
+  avatarEmoji: {
+    fontSize: '80px'
+  },
+  videoMockText: {
+    fontSize: '24px',
+    fontWeight: '600',
+    margin: 0,
+    marginBottom: '5px'
+  },
+  videoMockSubtext: {
+    fontSize: '16px',
+    opacity: 0.9,
+    margin: 0
+  },
+  selfView: {
+    width: '200px',
+    background: '#FFFFFF',
+    borderRadius: '12px',
+    border: '2px solid #B2DFDB',
+    position: 'absolute',
+    bottom: '20px',
+    right: '20px',
+    overflow: 'hidden'
+  },
+  selfViewHeader: {
+    background: '#E0F2F1',
+    padding: '8px 12px',
+    borderBottom: '1px solid #B2DFDB'
+  },
+  selfViewLabel: {
+    fontSize: '12px',
+    fontWeight: '600',
+    color: '#124441'
+  },
+  selfViewVideo: {
+    padding: '15px',
+    textAlign: 'center'
+  },
+  selfViewMock: {
+    background: '#E0F2F1',
+    borderRadius: '8px',
+    padding: '15px'
+  },
+  selfViewEmoji: {
+    fontSize: '40px',
+    marginBottom: '5px'
+  },
+  selfViewText: {
+    fontSize: '12px',
+    color: '#124441',
+    margin: 0
   },
   quickTools: {
+    width: '300px',
+    background: '#FFFFFF',
+    borderLeft: '1px solid #B2DFDB',
     display: 'flex',
-    gap: '10px',
-    flexWrap: 'wrap'
+    flexDirection: 'column'
+  },
+  quickToolsHeader: {
+    padding: '20px',
+    borderBottom: '1px solid #B2DFDB'
+  },
+  quickToolsTitle: {
+    margin: 0,
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#124441'
+  },
+  toolButtons: {
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px'
   },
   toolButton: {
-    backgroundColor: '#4B5563',
-    color: 'white',
-    border: 'none',
-    padding: '10px 16px',
-    borderRadius: '6px',
-    fontSize: '14px',
+    background: '#FFFFFF',
+    border: '1px solid #B2DFDB',
+    padding: '12px 16px',
+    borderRadius: '8px',
     cursor: 'pointer',
-    minWidth: '120px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '14px',
+    color: '#124441',
+    transition: 'all 0.2s'
+  },
+  toolButtonHover: {
+    background: '#E0F2F1',
+    borderColor: '#009688'
+  },
+  activeToolButton: {
+    background: '#E0F2F1',
+    border: '1px solid #009688',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '14px',
+    color: '#009688',
+    fontWeight: '500'
+  },
+  recordingButton: {
+    background: '#FFEBEE',
+    border: '1px solid #F44336',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '14px',
+    color: '#F44336',
+    fontWeight: '500'
+  },
+  toolIcon: {
+    fontSize: '18px'
+  },
+  consultationNotes: {
+    flex: 1,
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  notesTitle: {
+    margin: '0 0 15px 0',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#124441'
+  },
+  notesTextarea: {
+    flex: 1,
+    border: '1px solid #B2DFDB',
+    borderRadius: '8px',
+    padding: '12px',
+    fontSize: '14px',
+    fontFamily: 'inherit',
+    resize: 'none',
+    marginBottom: '15px'
+  },
+  saveNotesButton: {
+    background: '#009688',
+    color: '#FFFFFF',
+    border: 'none',
+    padding: '10px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: '500',
+    fontSize: '14px',
     transition: 'all 0.3s ease'
+  },
+  saveNotesButtonHover: {
+    background: '#00796B',
+    transform: 'translateY(-2px)'
+  },
+  videoFooter: {
+    background: '#E0F2F1',
+    padding: '12px 25px',
+    borderTop: '1px solid #B2DFDB',
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontSize: '14px',
+    color: '#124441'
   },
   // Modal Styles
   modalOverlay: {
@@ -1149,29 +1534,31 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    zIndex: 10002,
+    background: 'rgba(18, 68, 65, 0.5)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 1000,
     padding: '20px'
   },
   modal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '12px',
+    background: '#FFFFFF',
+    borderRadius: '16px',
+    maxWidth: '600px',
     width: '100%',
-    maxWidth: '500px',
     maxHeight: '90vh',
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+    overflow: 'auto',
+    boxShadow: '0 20px 60px rgba(0, 150, 136, 0.3)'
   },
   modalHeader: {
-    padding: '20px',
-    borderBottom: '1px solid #E0F2F1',
+    padding: '25px',
+    borderBottom: '1px solid #E0E0E0',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    background: '#F8FAFC',
+    borderTopLeftRadius: '16px',
+    borderTopRightRadius: '16px'
   },
   modalTitle: {
     fontSize: '18px',
@@ -1180,115 +1567,321 @@ const styles = {
     margin: 0
   },
   closeButton: {
-    backgroundColor: 'transparent',
+    background: 'none',
     border: 'none',
-    fontSize: '20px',
+    fontSize: '24px',
     cursor: 'pointer',
     color: '#4F6F6B',
-    padding: '0',
-    width: '30px',
-    height: '30px',
+    padding: 0,
+    width: '32px',
+    height: '32px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '4px'
+    borderRadius: '4px',
+    transition: 'all 0.2s'
+  },
+  closeButtonHover: {
+    background: '#E0E0E0'
   },
   modalContent: {
-    padding: '20px',
-    flex: 1,
-    overflow: 'auto'
+    padding: '25px'
   },
-  notesForm: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  label: {
+  appointmentInfoCard: {
+    background: '#E0F2F1',
+    padding: '15px',
+    borderRadius: '8px',
+    marginBottom: '25px',
+    border: '1px solid #B2DFDB',
     fontSize: '14px',
-    fontWeight: '600',
     color: '#124441'
   },
-  required: {
-    color: '#EF4444'
+  section: {
+    marginBottom: '25px'
   },
-  readOnlyInput: {
-    padding: '10px',
-    border: '1px solid #E0F2F1',
+  sectionTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    marginBottom: '15px',
+    color: '#124441',
+    paddingBottom: '10px',
+    borderBottom: '2px solid #E0E0E0'
+  },
+  inputGroup: {
+    marginBottom: '20px'
+  },
+  label: {
+    display: 'block',
+    marginBottom: '8px',
+    fontSize: '14px',
+    color: '#4F6F6B',
+    fontWeight: '500'
+  },
+  input: {
+    width: '100%',
+    padding: '12px 15px',
+    border: '1px solid #B2DFDB',
     borderRadius: '8px',
     fontSize: '14px',
-    backgroundColor: '#E0F2F1',
-    color: '#4F6F6B'
-  },
-  notesTextarea: {
-    padding: '12px',
-    border: '1px solid #E0F2F1',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontFamily: 'inherit',
-    resize: 'vertical',
-    minHeight: '120px',
-    outline: 'none',
+    color: '#124441',
     boxSizing: 'border-box'
   },
-  charCount: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    textAlign: 'right',
-    marginTop: '4px'
+  inputFocus: {
+    outline: 'none',
+    borderColor: '#009688',
+    boxShadow: '0 0 0 3px rgba(0, 150, 136, 0.1)'
   },
-  notesTips: {
-    padding: '12px',
-    backgroundColor: '#E0F2F1',
-    borderRadius: '8px'
-  },
-  tipsTitle: {
+  textarea: {
+    width: '100%',
+    padding: '12px 15px',
+    border: '1px solid #B2DFDB',
+    borderRadius: '8px',
     fontSize: '14px',
-    fontWeight: '600',
-    color: '#009688',
-    margin: '0 0 8px 0'
+    color: '#124441',
+    boxSizing: 'border-box',
+    fontFamily: 'inherit',
+    resize: 'vertical'
   },
-  tipsList: {
-    margin: 0,
-    paddingLeft: '20px',
-    fontSize: '13px',
-    color: '#009688'
+  textareaFocus: {
+    outline: 'none',
+    borderColor: '#009688',
+    boxShadow: '0 0 0 3px rgba(0, 150, 136, 0.1)'
   },
-  modalFooter: {
-    padding: '20px',
-    borderTop: '1px solid #E0F2F1',
+  divider: {
     display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '12px'
+    alignItems: 'center',
+    margin: '30px 0',
+    color: '#4F6F6B'
   },
-  cancelButton: {
-    backgroundColor: 'transparent',
+  dividerText: {
+    padding: '0 15px',
+    fontSize: '14px',
+    fontWeight: '500',
+    color: '#4F6F6B'
+  },
+  methodOptions: {
+    display: 'flex',
+    gap: '15px',
+    marginBottom: '20px'
+  },
+  methodOption: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+    padding: '10px 15px',
+    background: '#F5F5F5',
+    borderRadius: '8px',
+    border: '1px solid #E0E0E0',
+    flex: 1,
+    justifyContent: 'center',
+    transition: 'all 0.3s ease'
+  },
+  methodOptionHover: {
+    background: '#E0E0E0'
+  },
+  activeMethodOption: {
+    background: '#E0F2F1',
+    borderColor: '#009688',
+    borderWidth: '2px'
+  },
+  radioInput: {
+    margin: 0
+  },
+  methodLabel: {
+    fontSize: '14px',
+    color: '#124441'
+  },
+  messagePreview: {
+    marginTop: '15px',
+    padding: '15px',
+    background: '#F5F5F5',
+    borderRadius: '8px',
+    border: '1px solid #E0E0E0'
+  },
+  previewText: {
+    fontSize: '13px',
     color: '#4F6F6B',
-    border: '2px solid #E0F2F1',
-    padding: '10px 20px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
+    marginTop: '8px',
+    fontStyle: 'italic'
+  },
+  timeOptions: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '20px',
+    flexWrap: 'wrap'
+  },
+  timeOption: {
+    padding: '10px 15px',
+    background: 'transparent',
+    color: '#009688',
+    border: '1px solid #009688',
+    borderRadius: '6px',
     cursor: 'pointer',
-    minWidth: '100px',
+    fontSize: '13px',
+    fontWeight: '500',
     transition: 'all 0.3s ease'
   },
-  saveButton: {
-    backgroundColor: '#009688',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '10px 20px',
+  timeOptionHover: {
+    background: 'rgba(0, 150, 136, 0.1)'
+  },
+  // Notifications Styles
+  notificationsContainer: {
+    position: 'fixed',
+    top: '20px',
+    right: '20px',
+    zIndex: 1001,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px'
+  },
+  notification: {
+    padding: '15px 25px',
     borderRadius: '8px',
+    color: '#FFFFFF',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
     fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    minWidth: '120px',
-    transition: 'all 0.3s ease'
+    fontWeight: '500',
+    maxWidth: '400px',
+    wordBreak: 'break-word',
+    animation: 'slideIn 0.3s ease'
+  },
+  // Animations
+  slideIn: {
+    from: {
+      transform: 'translateX(100%)',
+      opacity: 0
+    },
+    to: {
+      transform: 'translateX(0)',
+      opacity: 1
+    }
   }
+};
+
+// Add hover effects
+const addHoverEffects = () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .appointmentCard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 150, 136, 0.15);
+    }
+    
+    .primaryButton:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .secondaryButton:hover {
+      background: rgba(0, 150, 136, 0.1);
+    }
+    
+    .successButton:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .dangerButton:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .endCallButton:hover {
+      background: #D32F2F;
+      transform: translateY(-2px);
+    }
+    
+    .toolButton:hover {
+      background: #E0F2F1;
+      border-color: #009688;
+    }
+    
+    .saveNotesButton:hover {
+      background: #00796B;
+      transform: translateY(-2px);
+    }
+    
+    .closeButton:hover {
+      background: #E0E0E0;
+    }
+    
+    .methodOption:hover {
+      background: #E0E0E0;
+    }
+    
+    .timeOption:hover {
+      background: rgba(0, 150, 136, 0.1);
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #009688;
+      box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1);
+    }
+    
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    
+    .modal::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .modal::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    .modal::-webkit-scrollbar-thumb {
+      background: #B2DFDB;
+      border-radius: 3px;
+    }
+    
+    .modal::-webkit-scrollbar-thumb:hover {
+      background: #009688;
+    }
+  `;
+  document.head.appendChild(style);
+};
+
+// Initialize hover effects
+if (typeof window !== 'undefined') {
+  addHoverEffects();
+}
+
+// Button States
+const buttonDisabled = {
+  opacity: 0.6,
+  cursor: 'not-allowed',
+  transform: 'none !important'
 };
 
 export default AppointmentsContent;

@@ -255,7 +255,7 @@ const LEGAL_CONTENT = {
     content: [
       { 
         h: "1. Data Collection & Use", 
-        t: "We collect personal information (name, contact details), medical history, consultation records, prescription data, and device information. This data is used to provide personalized healthcare services, improve platform functionality, and comply with legal requirements under the Digital Personal Data Protection Act, 2023." 
+        t: "We collect personal information (name, contact details), medical history, consultation records, prescription data, and device information. This data is used to provide personalized healthcare services, improve platform functionality, and comply with legal requirements under the Digital Personal Data Protection Act, 2025." 
       },
       { 
         h: "2. Health Data Protection", 
@@ -816,7 +816,7 @@ export default function Footer() {
             <p>© 2025 QuickMed — All rights reserved.</p>
             <p>Your trusted partner for modern, connected healthcare.</p>
             <p style={{ fontSize: "0.8rem", marginTop: "0.5rem" }}>
-              Registered under Indian Medical Council Act | License No: MED/TELE/2023/456
+              Registered under Indian Medical Council Act | License No: MED/TELE/2025/456
             </p>
           </div>
         </div>
@@ -863,7 +863,7 @@ export default function Footer() {
               fontSize: "0.9rem",
               color: palette.softtext
             }}>
-              <p>Last updated: December 5, 2023</p>
+              <p>Last updated: December 5, 2025</p>
               <p>For queries: legal@quickmed.com | +91-9392416962</p>
             </div>
           </div>

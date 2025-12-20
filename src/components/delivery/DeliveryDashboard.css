@@ -174,7 +174,7 @@
   background-color: #4F6F6B;
 }
 
-.notification-btn {
+/* .notification-btn {
   position: relative;
   background: none;
   border: 1px solid #4DB6AC;
@@ -208,7 +208,7 @@
   font-weight: bold;
 }
 
-.ai-assistant-btn {
+.-assistant-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -221,12 +221,12 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
-}
+}ai
 
 .ai-assistant-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 150, 136, 0.4);
-}
+} */
 
 /* Mobile specific button styles */
 @media (max-width: 768px) {

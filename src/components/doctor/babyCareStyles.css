@@ -1,0 +1,1549 @@
+/* Baby Care Styles - External CSS */
+.baby-care-container {
+  padding: 20px;
+  background-color: #E0F2F1;
+  min-height: 100vh;
+}
+
+.baby-care-header {
+  margin-bottom: 25px;
+}
+
+.baby-care-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #124441;
+}
+
+.baby-care-subtitle {
+  color: #4F6F6B;
+  margin-bottom: 0;
+  font-size: 16px;
+}
+
+/* Tabs */
+.baby-care-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  padding: 5px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  border: 1px solid #B2DFDB;
+  max-width: 600px;
+}
+
+.baby-care-tab {
+  flex: 1;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #124441;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.baby-care-tab:hover {
+  background: #e0f2f1;
+}
+
+.baby-care-tab-active {
+  background: #009688;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 150, 136, 0.3);
+}
+
+/* Filter Tabs */
+.baby-care-filter-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.baby-care-filter-tab {
+  padding: 10px 20px;
+  background: #FFFFFF;
+  border: 1px solid #B2DFDB;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #124441;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.baby-care-filter-tab:hover {
+  background: #e0f2f1;
+  border-color: #009688;
+}
+
+.baby-care-filter-tab-active {
+  background: #009688;
+  color: #FFFFFF;
+  border-color: #009688;
+}
+
+/* Appointments */
+.baby-care-appointments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.baby-care-appointment-card {
+  background: #FFFFFF;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 150, 136, 0.1);
+  border: 1px solid #B2DFDB;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.baby-care-appointment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 150, 136, 0.15);
+}
+
+.baby-care-appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.baby-care-appointment-patient {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.baby-care-profile-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #124441;
+}
+
+.baby-care-patient-info {
+  flex: 1;
+}
+
+.baby-care-appointment-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: #124441;
+}
+
+.baby-care-plan-badge {
+  background: #009688;
+  color: #FFFFFF;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.baby-care-appointment-meta {
+  font-size: 14px;
+  color: #4F6F6B;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.baby-care-vaccine-badge {
+  background: #FFF3E0;
+  color: #E65100;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: 1px solid #FFE0B2;
+}
+
+.baby-care-consultation-type {
+  font-size: 14px;
+  color: #009688;
+  font-weight: 500;
+}
+
+.baby-care-appointment-time {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #124441;
+  min-width: 180px;
+}
+
+.baby-care-caregiver-info {
+  font-size: 13px;
+  color: #4F6F6B;
+  background: #E0F2F1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #B2DFDB;
+}
+
+.baby-care-appointment-details {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #4F6F6B;
+}
+
+.baby-care-appointment-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.baby-care-button-primary {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #009688 0%, #00796B 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 160px;
+  transition: all 0.3s ease;
+}
+
+.baby-care-button-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.baby-care-button-secondary {
+  padding: 10px 20px;
+  background: transparent;
+  color: #009688;
+  border: 2px solid #009688;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.baby-care-button-secondary:hover {
+  background: rgba(0, 150, 136, 0.1);
+}
+
+.baby-care-button-success {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.baby-care-button-success:hover {
+  opacity: 0.9;
+}
+
+.baby-care-button-danger {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.baby-care-button-danger:hover {
+  opacity: 0.9;
+}
+
+.baby-care-button-small {
+  padding: 6px 12px;
+  background: transparent;
+  color: #009688;
+  border: 1px solid #009688;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.baby-care-button-small:hover {
+  background: rgba(0, 150, 136, 0.1);
+}
+
+.baby-care-cancelled-info {
+  width: 100%;
+  padding: 15px;
+  background: #FFEBEE;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #C62828;
+  border: 1px solid #FFCDD2;
+}
+
+/* Patients */
+.baby-care-patients-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.baby-care-patients-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.baby-care-patients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.baby-care-patient-card {
+  background: #FFFFFF;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 150, 136, 0.1);
+  border: 1px solid #B2DFDB;
+  transition: transform 0.2s;
+}
+
+.baby-care-patient-card:hover {
+  transform: translateY(-2px);
+}
+
+.baby-care-patient-header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.baby-care-profile-icon-large {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #124441;
+}
+
+.baby-care-patient-basic-info {
+  flex: 1;
+}
+
+.baby-care-patient-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #124441;
+}
+
+.baby-care-patient-contact {
+  font-size: 14px;
+  color: #4F6F6B;
+  margin-bottom: 3px;
+}
+
+.baby-care-plan-indicator {
+  background: #F8FAFC;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #E0E0E0;
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+.baby-care-plan-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.baby-care-plan-icon {
+  font-size: 20px;
+}
+
+.baby-care-plan-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #124441;
+}
+
+.baby-care-plan-coverage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.baby-care-coverage-text {
+  font-size: 13px;
+  color: #4F6F6B;
+  background: #F1F5F9;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.baby-care-baby-details {
+  background: #E0F2F1;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #B2DFDB;
+}
+
+.baby-care-detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #4F6F6B;
+}
+
+.baby-care-due-text {
+  color: #D32F2F;
+  font-weight: 600;
+}
+
+.baby-care-reports-summary {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #E0E0E0;
+  color: #124441;
+}
+
+.baby-care-report-count {
+  color: #009688;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.baby-care-patient-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+/* Plans Tab */
+.baby-care-plans-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.baby-care-plans-header {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.baby-care-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.baby-care-plan-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #E0E0E0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.baby-care-plan-card:hover {
+  transform: translateY(-5px);
+}
+
+.baby-care-plan-card-header {
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 2px solid;
+}
+
+.baby-care-plan-card-icon {
+  font-size: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baby-care-plan-card-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: #124441;
+}
+
+.baby-care-plan-card-price {
+  font-size: 22px;
+  font-weight: bold;
+  color: #124441;
+}
+
+.baby-care-plan-card-body {
+  padding: 25px;
+}
+
+.baby-care-plan-card-coverage {
+  background: #F5F5F5;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #4F6F6B;
+}
+
+.baby-care-coverage-icon {
+  font-size: 18px;
+}
+
+.baby-care-plan-card-features {
+  margin-bottom: 25px;
+}
+
+.baby-care-features-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #124441;
+}
+
+.baby-care-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.baby-care-feature-list-item {
+  font-size: 14px;
+  color: #4F6F6B;
+  padding-left: 20px;
+  position: relative;
+}
+
+.baby-care-feature-list-item:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4CAF50;
+}
+
+.baby-care-plan-card-stats {
+  padding-top: 15px;
+  border-top: 1px solid #E0E0E0;
+}
+
+.baby-care-stat-item {
+  font-size: 14px;
+  color: #4F6F6B;
+}
+
+.baby-care-plan-card-actions {
+  padding: 0 25px 25px 25px;
+  display: flex;
+  gap: 12px;
+}
+
+.baby-care-details-button {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  color: #124441;
+  border: 2px solid #009688;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.baby-care-details-button:hover {
+  background: rgba(0, 150, 136, 0.1);
+}
+
+.baby-care-plans-comparison {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 30px;
+  border: 1px solid #B2DFDB;
+}
+
+.baby-care-comparison-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #124441;
+  text-align: center;
+}
+
+.baby-care-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.baby-care-table-header {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 2px solid #E0E0E0;
+  font-weight: 600;
+  font-size: 14px;
+  color: #124441;
+}
+
+.baby-care-table-cell {
+  padding: 15px;
+  border-bottom: 1px solid #E0E0E0;
+  font-size: 14px;
+  color: #4F6F6B;
+}
+
+/* Video Consultation */
+.baby-care-video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(18, 68, 65, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.baby-care-video-modal {
+  background: #FFFFFF;
+  border-radius: 12px;
+  width: 95%;
+  max-width: 1200px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.baby-care-video-header {
+  background: #009688;
+  color: #FFFFFF;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.baby-care-video-header-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.baby-care-video-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.baby-care-connected-dot {
+  color: #4CAF50;
+  font-size: 12px;
+}
+
+.baby-care-call-timer {
+  background: rgba(255,255,255,0.1);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.baby-care-end-call-button {
+  background: #F44336;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.baby-care-end-call-button:hover {
+  opacity: 0.9;
+}
+
+.baby-care-video-main-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.baby-care-patient-video-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #E0F2F1;
+}
+
+.baby-care-patient-video-header {
+  padding: 15px 25px;
+  border-bottom: 1px solid #B2DFDB;
+  background: #FFFFFF;
+}
+
+.baby-care-patient-video-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.baby-care-patient-video-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #124441;
+}
+
+.baby-care-baby-info-indicator {
+  background: #E0F2F1;
+  color: #124441;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  border: 1px solid #B2DFDB;
+}
+
+.baby-care-video-feed {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.baby-care-video-mock {
+  flex: 1;
+  background: linear-gradient(135deg, #009688 0%, #00796B 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baby-care-video-mock-content {
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.baby-care-video-mock-avatar {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.baby-care-video-mock-text {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+.baby-care-video-mock-subtext {
+  font-size: 16px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.baby-care-self-view {
+  width: 200px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 2px solid #B2DFDB;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  overflow: hidden;
+}
+
+.baby-care-self-view-header {
+  background: #E0F2F1;
+  padding: 8px 12px;
+  border-bottom: 1px solid #B2DFDB;
+}
+
+.baby-care-self-view-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #124441;
+}
+
+.baby-care-self-view-video {
+  padding: 15px;
+  text-align: center;
+}
+
+.baby-care-self-view-mock {
+  background: #E0F2F1;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.baby-care-self-view-emoji {
+  font-size: 40px;
+  margin-bottom: 5px;
+}
+
+.baby-care-self-view-text {
+  font-size: 12px;
+  color: #124441;
+  margin: 0;
+}
+
+.baby-care-quick-tools {
+  width: 300px;
+  background: #FFFFFF;
+  border-left: 1px solid #B2DFDB;
+  display: flex;
+  flexDirection: column;
+}
+
+.baby-care-quick-tools-header {
+  padding: 20px;
+  border-bottom: 1px solid #B2DFDB;
+}
+
+.baby-care-quick-tools-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #124441;
+}
+
+.baby-care-tool-buttons {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.baby-care-tool-button {
+  background: #FFFFFF;
+  border: 1px solid #B2DFDB;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #124441;
+  transition: all 0.2s;
+}
+
+.baby-care-tool-button:hover {
+  background: #E0F2F1;
+  border-color: #009688;
+}
+
+.baby-care-recording-button {
+  background: #FFEBEE;
+  border: 1px solid #F44336;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #F44336;
+  font-weight: 500;
+}
+
+.baby-care-tool-icon {
+  font-size: 18px;
+}
+
+.baby-care-consultation-notes {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.baby-care-notes-title {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #124441;
+}
+
+.baby-care-notes-textarea {
+  flex: 1;
+  border: 1px solid #B2DFDB;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  margin-bottom: 15px;
+}
+
+.baby-care-save-notes-button {
+  background: #009688;
+  color: #FFFFFF;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.baby-care-save-notes-button:hover {
+  opacity: 0.9;
+}
+
+.baby-care-video-footer {
+  background: #E0F2F1;
+  padding: 12px 25px;
+  border-top: 1px solid #B2DFDB;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #124441;
+}
+
+/* Modals */
+.baby-care-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(18, 68, 65, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.baby-care-modal {
+  background: #FFFFFF;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 150, 136, 0.3);
+}
+
+.baby-care-modal-header {
+  padding: 25px;
+  border-bottom: 1px solid #E0E0E0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #F8FAFC;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.baby-care-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #124441;
+  margin: 0;
+}
+
+.baby-care-close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #4F6F6B;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.baby-care-close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.baby-care-modal-content {
+  padding: 25px;
+}
+
+.baby-care-appointment-info-card {
+  background: #E0F2F1;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border: 1px solid #B2DFDB;
+  font-size: 14px;
+  color: #124441;
+}
+
+.baby-care-section {
+  margin-bottom: 25px;
+}
+
+.baby-care-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #124441;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #E0E0E0;
+}
+
+.baby-care-input-group {
+  margin-bottom: 20px;
+}
+
+.baby-care-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #4F6F6B;
+  font-weight: 500;
+}
+
+.baby-care-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #B2DFDB;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #124441;
+  box-sizing: border-box;
+}
+
+.baby-care-textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #B2DFDB;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #124441;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.baby-care-divider {
+  display: flex;
+  align-items: center;
+  margin: 30px 0;
+  color: #4F6F6B;
+}
+
+.baby-care-divider-text {
+  padding: 0 15px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4F6F6B;
+}
+
+.baby-care-plan-header-card {
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.baby-care-plan-header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.baby-care-plan-icon-large {
+  font-size: 48px;
+  background: rgba(255, 255, 255, 0.9);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baby-care-plan-header-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: #124441;
+}
+
+.baby-care-plan-header-price {
+  font-size: 24px;
+  font-weight: bold;
+  color: #124441;
+  margin: 0 0 5px 0;
+}
+
+.baby-care-plan-header-duration {
+  font-size: 14px;
+  color: #4F6F6B;
+  margin: 0;
+}
+
+.baby-care-ideal-for {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: #E0F2F1;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #124441;
+  border: 1px solid #B2DFDB;
+}
+
+.baby-care-ideal-for-icon {
+  font-size: 20px;
+}
+
+.baby-care-coverage-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #4F6F6B;
+  border: 1px solid #E0E0E0;
+}
+
+.baby-care-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.baby-care-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: #4F6F6B;
+  padding: 10px;
+  border-radius: 6px;
+  background: #F5F5F5;
+}
+
+.baby-care-check-icon {
+  color: #4CAF50;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.baby-care-recommendation {
+  background: #E0F2F1;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #124441;
+  border: 1px solid #B2DFDB;
+  line-height: 1.6;
+}
+
+/* Upload Section */
+.baby-care-upload-section {
+  margin-bottom: 30px;
+}
+
+.baby-care-upload-area {
+  border: 2px dashed #009688;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #E0F2F1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.baby-care-upload-area:hover {
+  border-color: #00796B;
+  background: #e0f7fa;
+}
+
+.baby-care-file-input {
+  display: none;
+}
+
+.baby-care-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+}
+
+.baby-care-upload-icon {
+  font-size: 48px;
+  color: #009688;
+}
+
+.baby-care-upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Reports List */
+.baby-care-reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.baby-care-report-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+}
+
+.baby-care-report-icon {
+  font-size: 24px;
+  color: #009688;
+}
+
+.baby-care-report-info {
+  flex: 1;
+}
+
+.baby-care-report-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #124441;
+  margin-bottom: 4px;
+}
+
+.baby-care-report-meta {
+  font-size: 12px;
+  color: #4F6F6B;
+}
+
+.baby-care-report-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.baby-care-empty-reports {
+  text-align: center;
+  padding: 40px 20px;
+  color: #4F6F6B;
+}
+
+.baby-care-empty-reports-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.baby-care-empty-subtext {
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Reminder Modal */
+.baby-care-method-options {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.baby-care-method-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 10px 15px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+  flex: 1;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.baby-care-method-option:hover {
+  background: #E0F2F1;
+}
+
+.baby-care-active-method-option {
+  background: #E0F2F1;
+  border-color: #009688;
+  border-width: 2px;
+}
+
+.baby-care-radio-input {
+  margin: 0;
+  accent-color: #009688;
+}
+
+.baby-care-method-label {
+  font-size: 14px;
+  color: #124441;
+}
+
+.baby-care-message-preview {
+  margin-top: 15px;
+  padding: 15px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+}
+
+.baby-care-preview-text {
+  font-size: 13px;
+  color: #4F6F6B;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.baby-care-time-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.baby-care-time-option {
+  padding: 10px 15px;
+  background: transparent;
+  color: #009688;
+  border: 1px solid #009688;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.baby-care-time-option:hover {
+  background: rgba(0, 150, 136, 0.1);
+}
+
+/* Notifications */
+.baby-care-notifications-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.baby-care-notification {
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 400px;
+  word-break: break-word;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Empty State */
+.baby-care-empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  color: #4F6F6B;
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: 2px dashed #BDBDBD;
+}
+
+.baby-care-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* Utility Classes */
+.baby-care-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baby-care-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.baby-care-flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.baby-care-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.baby-care-gap-10 {
+  gap: 10px;
+}
+
+.baby-care-gap-15 {
+  gap: 15px;
+}
+
+.baby-care-gap-20 {
+  gap: 20px;
+}
+
+.baby-care-mb-10 {
+  margin-bottom: 10px;
+}
+
+.baby-care-mb-15 {
+  margin-bottom: 15px;
+}
+
+.baby-care-mb-20 {
+  margin-bottom: 20px;
+}
+
+.baby-care-mb-25 {
+  margin-bottom: 25px;
+}
+
+.baby-care-text-center {
+  text-align: center;
+}
+
+.baby-care-text-left {
+  text-align: left;
+}
+
+.baby-care-text-right {
+  text-align: right;
+}
+
+.baby-care-bold {
+  font-weight: bold;
+}
+
+.baby-care-semibold {
+  font-weight: 600;
+}
+
+.baby-care-color-primary {
+  color: #124441;
+}
+
+.baby-care-color-secondary {
+  color: #4F6F6B;
+}
+
+.baby-care-color-accent {
+  color: #009688;
+}
+
+.baby-care-bg-light {
+  background-color: #E0F2F1;
+}
+
+.baby-care-bg-white {
+  background-color: #FFFFFF;
+}
+
+.baby-care-border {
+  border: 1px solid #B2DFDB;
+}
+
+.baby-care-border-radius {
+  border-radius: 8px;
+}
+
+.baby-care-shadow {
+  box-shadow: 0 4px 6px rgba(0, 150, 136, 0.1);
+}

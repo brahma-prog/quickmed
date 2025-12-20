@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const ProfileContext = createContext();
 
-// Default profile structure
+// Default profile structure - UPDATED to match ProfileView fields
 const defaultProfile = {
   fullName: '',
   email: '',
@@ -12,37 +12,20 @@ const defaultProfile = {
   city: '',
   state: '',
   pincode: '',
+  district: '',
   country: 'India',
   dateOfBirth: '',
   age: '',
   gender: '',
-  profilePhoto: '',
-  userType: 'user',
+  profilePhoto: null,
+  emergencyContact: '',
   linkedAccounts: [],
   lastUpdated: '',
-  // Enhanced health profile fields
-  bloodGroup: 'Not specified',
-  emergencyContact: '',
-  healthMetrics: {
-    height: '',
-    weight: '',
-    bmi: '',
-    bloodPressure: '',
-    lastCheckup: ''
-  },
-  medicalHistory: {
-    conditions: [],
-    allergies: [],
-    medications: [],
-    surgeries: []
-  },
-  insurance: {
-    provider: '',
-    policyNumber: '',
-    validity: ''
-  },
-  isActive: true,
-  createdAt: ''
+  // Additional fields for better parsing
+  firstName: '',
+  lastName: '',
+  streetAddress: '',
+  apartment: ''
 };
 
 export const ProfileProvider = ({ children, user }) => {
@@ -51,7 +34,7 @@ export const ProfileProvider = ({ children, user }) => {
       // Load from localStorage first
       const saved = localStorage.getItem('userProfile');
       if (saved) {
-        console.log('Initializing profile from localStorage');
+        console.log('Initializing profile from localStorage:', saved);
         const parsed = JSON.parse(saved);
         return { ...defaultProfile, ...parsed };
       }
@@ -68,40 +51,19 @@ export const ProfileProvider = ({ children, user }) => {
           city: user.city || '',
           state: user.state || '',
           pincode: user.pincode || '',
+          district: user.district || '',
           country: user.country || 'India',
           dateOfBirth: user.dateOfBirth || '',
-          age: user.age || calculateAge(user.dateOfBirth) || '',
+          age: user.age || '',
           gender: user.gender || '',
-          profilePhoto: user.profilePhoto || '',
-          userType: user.userType || 'user',
-          linkedAccounts: user.linkedAccounts || [],
-          lastUpdated: user.lastUpdated || new Date().toISOString(),
-          // Enhanced health fields - SAFE ACCESS
-          bloodGroup: user.bloodGroup || defaultProfile.bloodGroup,
+          profilePhoto: user.profilePhoto || null,
           emergencyContact: user.emergencyContact || '',
-          healthMetrics: {
-            ...defaultProfile.healthMetrics,
-            ...(user.healthMetrics || {})
-          },
-          medicalHistory: {
-            ...defaultProfile.medicalHistory,
-            ...(user.medicalHistory || {})
-          },
-          insurance: {
-            ...defaultProfile.insurance,
-            ...(user.insurance || {})
-          },
-          isActive: user.isActive !== undefined ? user.isActive : true,
-          createdAt: user.createdAt || new Date().toISOString()
+          linkedAccounts: user.linkedAccounts || [],
+          lastUpdated: user.lastUpdated || new Date().toISOString()
         };
         
         // Save to localStorage
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
-        // Also save a copy to user-specific storage
-        if (user.phone) {
-          localStorage.setItem(`userProfile_${user.phone}`, JSON.stringify(userProfile));
-        }
-        
         return userProfile;
       }
       
@@ -114,30 +76,17 @@ export const ProfileProvider = ({ children, user }) => {
     }
   });
 
-  // Enhanced health data management
-  const [healthData, setHealthData] = useState({
-    vitalHistory: [],
-    medicationAdherence: {},
-    labResults: [],
-    appointmentHistory: []
-  });
-
   // Sync profile to localStorage whenever it changes
   useEffect(() => {
     try {
       console.log('Saving profile to localStorage:', profile);
       localStorage.setItem('userProfile', JSON.stringify(profile));
-      
-      // Also save a copy to user-specific storage
-      if (profile?.phone) {
-        localStorage.setItem(`userProfile_${profile.phone}`, JSON.stringify(profile));
-      }
     } catch (error) {
       console.error('Error saving profile to localStorage:', error);
     }
   }, [profile]);
 
-  // Update profile when user prop changes (login/logout) - FIXED
+  // Update profile when user prop changes (login/logout)
   useEffect(() => {
     if (user && user.email) {
       console.log('User data received in ProfileProvider - UPDATING PROFILE:', user);
@@ -154,127 +103,48 @@ export const ProfileProvider = ({ children, user }) => {
     }
   }, [user]);
 
-  // Helper function to calculate age from date of birth
-  const calculateAge = (birthDate) => {
-    if (!birthDate) return '';
-    
-    try {
-      const dob = new Date(birthDate);
-      const today = new Date();
-      
-      // Set both dates to midnight to compare only dates
-      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const dobMidnight = new Date(dob.getFullYear(), dob.getMonth(), dob.getDate());
-      
-      if (dobMidnight > todayMidnight) {
-        return "0";
-      }
-
-      let age = today.getFullYear() - dob.getFullYear();
-      const monthDiff = today.getMonth() - dob.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-        age--;
-      }
-      
-      return age > 0 ? age.toString() : "0";
-    } catch (error) {
-      console.error('Error calculating age:', error);
-      return '';
-    }
-  };
-
-  // NEW: Function to set profile from signup data
-  const setProfileFromSignup = (signupData) => {
-    console.log('Setting profile from signup data:', signupData);
-    
-    // Parse the address from signup data
-    const address = signupData.address || '';
-    let city = '';
-    let state = '';
-    let pincode = '';
-    
-    // Try to extract city, state, pincode from address if possible
-    if (address) {
-      const addressParts = address.split(',');
-      if (addressParts.length >= 3) {
-        city = addressParts[addressParts.length - 3]?.trim() || '';
-        state = addressParts[addressParts.length - 2]?.trim() || '';
-        pincode = addressParts[addressParts.length - 1]?.trim() || '';
-      }
-    }
-    
-    const newProfile = {
-      ...defaultProfile,
-      fullName: signupData.fullName || '',
-      email: signupData.email || '',
-      phone: signupData.phone || '',
-      address: address,
-      city: signupData.city || city,
-      state: signupData.state || state,
-      pincode: signupData.pincode || pincode,
-      country: signupData.country || 'India',
-      dateOfBirth: signupData.dateOfBirth || '',
-      age: calculateAge(signupData.dateOfBirth) || '',
-      gender: signupData.gender || '',
-      profilePhoto: signupData.profilePhoto || '',
-      userType: signupData.userType || 'user',
-      linkedAccounts: signupData.linkedAccounts || [],
-      emergencyContact: signupData.emergencyContact || '',
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-      // Enhanced health fields
-      bloodGroup: signupData.bloodGroup || defaultProfile.bloodGroup,
-      healthMetrics: {
-        ...defaultProfile.healthMetrics,
-        ...(signupData.healthMetrics || {})
-      },
-      medicalHistory: {
-        ...defaultProfile.medicalHistory,
-        ...(signupData.medicalHistory || {})
-      },
-      insurance: {
-        ...defaultProfile.insurance,
-        ...(signupData.insurance || {})
-      }
-    };
-    
-    console.log('New profile created from signup:', newProfile);
-    
-    // Save to state
-    setProfile(newProfile);
-    
-    // Save to localStorage
-    localStorage.setItem('userProfile', JSON.stringify(newProfile));
-    
-    // Also save a copy to user-specific storage
-    if (signupData.phone) {
-      localStorage.setItem(`userProfile_${signupData.phone}`, JSON.stringify(newProfile));
-    }
-    
-    return newProfile;
-  };
-
-  // Enhanced updateProfile function - FIXED: Merge properly with existing profile
+  // CRITICAL FIX: Enhanced updateProfile function that properly merges ALL fields
   const updateProfile = (newProfileData) => {
     console.log('Updating profile with new data:', newProfileData);
+    
     setProfile(prevProfile => {
+      // Create a properly merged profile with ALL fields
       const updatedProfile = {
         ...prevProfile,
         ...newProfileData,
         lastUpdated: new Date().toISOString()
       };
       
-      // Auto-calculate age if dateOfBirth is provided and changed
-      if (newProfileData.dateOfBirth && newProfileData.dateOfBirth !== prevProfile.dateOfBirth) {
-        const calculatedAge = calculateAge(newProfileData.dateOfBirth);
-        updatedProfile.age = calculatedAge;
-      }
+      // Ensure we have all default fields
+      Object.keys(defaultProfile).forEach(key => {
+        if (updatedProfile[key] === undefined) {
+          updatedProfile[key] = defaultProfile[key];
+        }
+      });
       
-      console.log('Final updated profile:', updatedProfile);
+      console.log('Final updated profile for storage:', updatedProfile);
       return updatedProfile;
     });
+    
+    return Promise.resolve();
+  };
+
+  // Helper function to update both local and context state together
+  const updateProfileWithLocalState = async (formData) => {
+    console.log('Updating profile with form data:', formData);
+    
+    // Prepare the data for context
+    const profileData = {
+      ...formData,
+      fullName: `${formData.firstName} ${formData.lastName}`.trim(),
+      address: `${formData.streetAddress}${formData.apartment ? ', ' + formData.apartment : ''}`,
+      lastUpdated: new Date().toISOString()
+    };
+    
+    console.log('Processed profile data for context:', profileData);
+    
+    await updateProfile(profileData);
+    return Promise.resolve();
   };
 
   const updateProfilePhoto = (photoUrl) => {
@@ -284,37 +154,32 @@ export const ProfileProvider = ({ children, user }) => {
       profilePhoto: photoUrl,
       lastUpdated: new Date().toISOString()
     }));
+    
+    return Promise.resolve();
   };
 
   const removeProfilePhoto = () => {
     console.log('Removing profile photo');
     setProfile(prevProfile => ({
       ...prevProfile,
-      profilePhoto: '',
+      profilePhoto: null,
       lastUpdated: new Date().toISOString()
     }));
+    
+    return Promise.resolve();
   };
 
-  // Clear profile (for logout)
   const clearProfile = () => {
     console.log('Clearing profile data');
     localStorage.removeItem('userProfile');
     setProfile(defaultProfile);
-    setHealthData({
-      vitalHistory: [],
-      medicationAdherence: {},
-      labResults: [],
-      appointmentHistory: []
-    });
   };
 
-  // Check if profile is complete
   const isProfileComplete = () => {
-    const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'pincode', 'dateOfBirth', 'gender'];
+    const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'pincode', 'district', 'dateOfBirth', 'gender'];
     return requiredFields.every(field => profile[field] && profile[field].toString().trim() !== '');
   };
 
-  // Force immediate profile sync (useful after login)
   const forceProfileUpdate = (userData) => {
     console.log('Force updating profile:', userData);
     if (userData) {
@@ -322,66 +187,27 @@ export const ProfileProvider = ({ children, user }) => {
     }
   };
 
-  // Load profile by phone number (useful for switching accounts)
-  const loadProfileByPhone = (phone) => {
-    try {
-      const savedProfile = localStorage.getItem(`userProfile_${phone}`);
-      if (savedProfile) {
-        const parsedProfile = JSON.parse(savedProfile);
-        setProfile(parsedProfile);
-        localStorage.setItem('userProfile', JSON.stringify(parsedProfile));
-        console.log('Profile loaded by phone:', phone);
-        return parsedProfile;
-      }
-      return null;
-    } catch (error) {
-      console.error('Error loading profile by phone:', error);
-      return null;
-    }
-  };
-
   const value = {
     profile,
     updateProfile,
+    updateProfileWithLocalState, // New function
     updateProfilePhoto,
     removeProfilePhoto,
     clearProfile,
     isProfileComplete,
     forceProfileUpdate,
-    setProfileFromSignup, // NEW: Added signup function
-    loadProfileByPhone,   // NEW: Added load by phone function
-    // Health data functions
-    healthData,
-    setHealthData,
-    // Additional utility functions
     getProfileCompletion: () => {
-      const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'pincode', 'dateOfBirth', 'gender'];
+      const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'pincode', 'district', 'dateOfBirth', 'gender'];
       const completedFields = requiredFields.filter(field => 
         profile[field] && profile[field].toString().trim() !== ''
       ).length;
       return Math.round((completedFields / requiredFields.length) * 100);
     },
     getMissingFields: () => {
-      const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'pincode', 'dateOfBirth', 'gender'];
+      const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'pincode', 'district', 'dateOfBirth', 'gender'];
       return requiredFields.filter(field => 
         !profile[field] || profile[field].toString().trim() === ''
       );
-    },
-    getAllProfiles: () => {
-      // Get all saved profiles from localStorage
-      const profiles = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('userProfile_')) {
-          try {
-            const profileData = JSON.parse(localStorage.getItem(key));
-            profiles.push(profileData);
-          } catch (error) {
-            console.error(`Error parsing profile from key ${key}:`, error);
-          }
-        }
-      }
-      return profiles;
     }
   };
 
@@ -400,7 +226,6 @@ export const useProfile = () => {
   return context;
 };
 
-// PropTypes for better development experience
 ProfileProvider.propTypes = {
   children: PropTypes.node.isRequired,
   user: PropTypes.shape({
@@ -412,21 +237,15 @@ ProfileProvider.propTypes = {
     city: PropTypes.string,
     state: PropTypes.string,
     pincode: PropTypes.string,
+    district: PropTypes.string,
     country: PropTypes.string,
     dateOfBirth: PropTypes.string,
     age: PropTypes.string,
     gender: PropTypes.string,
     profilePhoto: PropTypes.string,
-    userType: PropTypes.string,
-    linkedAccounts: PropTypes.array,
     lastUpdated: PropTypes.string,
-    bloodGroup: PropTypes.string,
     emergencyContact: PropTypes.string,
-    healthMetrics: PropTypes.object,
-    medicalHistory: PropTypes.object,
-    insurance: PropTypes.object,
-    isActive: PropTypes.bool,
-    createdAt: PropTypes.string
+    linkedAccounts: PropTypes.array
   })
 };
 

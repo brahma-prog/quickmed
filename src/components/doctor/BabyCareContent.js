@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import './babyCareStyles.css';
 
 const BabyCareContent = ({ dashboardData, state, actions }) => {
   const { babyCareFilter } = state;
@@ -7,7 +8,6 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
   const [activeTab, setActiveTab] = useState('appointments');
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showReportViewer, setShowReportViewer] = useState(false);
-  const [showPackageModal, setShowPackageModal] = useState(false);
   const [showVideoConsultation, setShowVideoConsultation] = useState(false);
   const [currentConsultation, setCurrentConsultation] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -15,9 +15,13 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
   const [loadingAppointments, setLoadingAppointments] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [patientReports, setPatientReports] = useState({});
-  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState('basic');
   const [showPlanDetails, setShowPlanDetails] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  
+  // Removed uploadedFiles state as it's causing duplicates
   
   // Local state for appointments
   const [appointments, setAppointments] = useState({
@@ -117,7 +121,20 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
     
     const reportsState = {};
     babyCarePatients.forEach(patient => {
-      reportsState[patient.id] = patient.babyCareDetails?.reports || [];
+      const reports = patient.babyCareDetails?.reports || [];
+      reportsState[patient.id] = reports.map(report => ({
+        ...report,
+        id: report.id || `report_${patient.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: report.name || `Report_${Date.now()}`,
+        type: report.type || 'pdf',
+        date: report.date || new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        }),
+        size: report.size || 'N/A',
+        url: report.url || '#'
+      }));
     });
     setPatientReports(reportsState);
   }, [dashboardData]);
@@ -133,17 +150,17 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
   };
 
   // Show simple notification
-  const showNotification = (message, type = 'info') => {
+  const showNotification = useCallback((message, type = 'info') => {
     const id = Date.now();
     setNotifications(prev => [...prev, { id, message, type }]);
     
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
     }, 3000);
-  };
+  }, []);
 
   // Handle appointment approval
-  const handleApproveAppointment = (appointment) => {
+  const handleApproveAppointment = useCallback((appointment) => {
     setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
 
     setTimeout(() => {
@@ -165,78 +182,18 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
       showNotification(`Appointment approved for ${appointment.patientName}`, 'success');
       setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
     }, 1000);
-  };
-
-  // Handle appointment rejection
-  const handleRejectAppointment = (appointment) => {
-    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
-
-    setTimeout(() => {
-      setAppointments(prev => {
-        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
-        if (pendingIndex === -1) return prev;
-
-        const rejectedAppointment = prev.pending[pendingIndex];
-        const newPending = [...prev.pending];
-        newPending.splice(pendingIndex, 1);
-        
-        return {
-          ...prev,
-          pending: newPending,
-          cancelled: [...prev.cancelled, { 
-            ...rejectedAppointment, 
-            status: 'cancelled',
-            cancelledDate: new Date().toLocaleDateString(),
-            reason: 'Rejected by doctor'
-          }]
-        };
-      });
-      
-      showNotification(`Appointment rejected for ${appointment.patientName}`, 'info');
-      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
-    }, 1000);
-  };
-
-  // Handle appointment cancellation
-  const handleCancelAppointment = (appointment) => {
-    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
-
-    setTimeout(() => {
-      setAppointments(prev => {
-        const upcomingIndex = prev.upcoming.findIndex(a => a.id === appointment.id);
-        if (upcomingIndex === -1) return prev;
-
-        const cancelledAppointment = prev.upcoming[upcomingIndex];
-        const newUpcoming = [...prev.upcoming];
-        newUpcoming.splice(upcomingIndex, 1);
-        
-        return {
-          ...prev,
-          upcoming: newUpcoming,
-          cancelled: [...prev.cancelled, { 
-            ...cancelledAppointment, 
-            status: 'cancelled',
-            cancelledDate: new Date().toLocaleDateString(),
-            reason: 'Cancelled by doctor'
-          }]
-        };
-      });
-      
-      showNotification(`Appointment cancelled for ${appointment.patientName}`, 'info');
-      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
-    }, 1000);
-  };
+  }, [showNotification]);
 
   // Start video consultation
-  const handleStartConsultation = (appointment) => {
+  const handleStartConsultation = useCallback((appointment) => {
     setCurrentConsultation(appointment);
     setShowVideoConsultation(true);
     setCallTime(0);
     showNotification(`Starting video consultation with ${appointment.parentName}`, 'info');
-  };
+  }, [showNotification]);
 
   // End video consultation
-  const handleEndConsultation = () => {
+  const handleEndConsultation = useCallback(() => {
     setShowVideoConsultation(false);
     setIsRecording(false);
     showNotification(`Video consultation ended with ${currentConsultation?.parentName}`, 'info');
@@ -258,195 +215,639 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
     }
     
     setCurrentConsultation(null);
-  };
+  }, [currentConsultation, showNotification]);
 
   // Toggle recording
-  const handleToggleRecording = () => {
+  const handleToggleRecording = useCallback(() => {
     setIsRecording(!isRecording);
     showNotification(isRecording ? 'Recording stopped' : 'Recording started', 'info');
-  };
+  }, [isRecording, showNotification]);
 
-  // Handle file upload
-  const handleFileUpload = (patientId, patientName, file) => {
-    if (!file) return;
+  // Handle file upload - FIXED: Remove duplicate handling
+  const handleFileUpload = useCallback((patientId, patientName, files) => {
+    if (!files || files.length === 0) return;
     
-    if (file.type !== 'application/pdf') {
-      showNotification('Please upload PDF files only', 'error');
+    const validFiles = Array.from(files).filter(file => 
+      file.type === 'application/pdf' || 
+      file.type.startsWith('image/') ||
+      file.name.toLowerCase().endsWith('.pdf') ||
+      file.name.toLowerCase().endsWith('.jpg') ||
+      file.name.toLowerCase().endsWith('.jpeg') ||
+      file.name.toLowerCase().endsWith('.png')
+    );
+
+    if (validFiles.length === 0) {
+      showNotification('Please upload PDF or image files only (PDF, JPG, PNG)', 'error');
       return;
     }
+
+    showNotification(`Uploading ${validFiles.length} file(s) to ${patientName}'s reports...`, 'info');
     
-    showNotification(`Uploading ${file.name} to ${patientName}'s locker...`, 'info');
+    const newReports = validFiles.map((file, index) => {
+      const fileId = `uploaded_${patientId}_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`;
+      return {
+        id: fileId,
+        name: file.name.replace(/\.[^/.]+$/, "").replace(/_/g, ' ').toUpperCase(),
+        date: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        }),
+        time: new Date().toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }),
+        type: file.type.startsWith('image/') ? 'image' : 'pdf',
+        file: file,
+        url: URL.createObjectURL(file),
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        uploaded: true // Flag to identify uploaded files
+      };
+    });
     
-    const newReport = {
-      id: Date.now(),
-      name: file.name.replace('.pdf', '').replace(/_/g, ' ').toUpperCase(),
-      date: new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-      }),
-      type: 'pdf',
-      file: file,
-      url: URL.createObjectURL(file)
-    };
-    
-    setUploadedFiles(prev => [...prev, newReport]);
-    
+    // Add directly to patientReports only - no separate uploadedFiles state
     setPatientReports(prev => ({
       ...prev,
-      [patientId]: [...(prev[patientId] || []), newReport]
+      [patientId]: [...(prev[patientId] || []), ...newReports]
     }));
     
-    showNotification(`${file.name} uploaded successfully`, 'success');
-  };
-
-  // Handle package selection
-  const handleSelectPackage = (patientId, patientName, packageName) => {
-    setPatients(prev => 
-      prev.map(patient => 
-        patient.id === patientId 
-          ? {
-              ...patient,
-              babyCareDetails: {
-                ...patient.babyCareDetails,
-                package: packageName
-              }
-            }
-          : patient
-      )
-    );
-    
-    showNotification(`Plan updated to ${packageName} for ${patientName}`, 'success');
-    setShowPackageModal(false);
-  };
+    showNotification(`${validFiles.length} file(s) uploaded successfully to ${patientName}'s reports`, 'success');
+  }, [showNotification]);
 
   // Format call time
-  const formatCallTime = (seconds) => {
+  const formatCallTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  // Video Consultation Modal
-  const VideoConsultationModal = () => {
-    if (!showVideoConsultation || !currentConsultation) return null;
+  // Get current date for date input
+  const getCurrentDate = useCallback(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }, []);
+
+  // Handle remove report - FIXED: Remove from patientReports only
+  const handleRemoveReport = useCallback((patientId, reportId) => {
+    setPatientReports(prev => ({
+      ...prev,
+      [patientId]: prev[patientId]?.filter(r => r.id !== reportId) || []
+    }));
+    showNotification('Report removed successfully', 'success');
+  }, [showNotification]);
+
+  // Reject/Reschedule Modal Component
+  const RejectRescheduleModal = React.memo(({ 
+    show, 
+    appointment, 
+    onClose, 
+    onReject, 
+    onReschedule,
+    loading 
+  }) => {
+    const [rejectReason, setRejectReason] = useState('');
+    const [rescheduleDate, setRescheduleDate] = useState('');
+    const [rescheduleTime, setRescheduleTime] = useState('');
+
+    const handleRejectReasonChange = (e) => {
+      setRejectReason(e.target.value);
+    };
+
+    const handleRescheduleDateChange = (e) => {
+      setRescheduleDate(e.target.value);
+    };
+
+    const handleRescheduleTimeChange = (e) => {
+      setRescheduleTime(e.target.value);
+    };
+
+    const handleRejectSubmit = () => {
+      if (rejectReason.trim()) {
+        onReject(appointment, rejectReason);
+      }
+    };
+
+    const handleRescheduleSubmit = () => {
+      if (rescheduleDate && rescheduleTime) {
+        onReschedule(appointment, rescheduleDate, rescheduleTime);
+      }
+    };
+
+    if (!show || !appointment) return null;
 
     return (
-      <div style={styles.videoModalOverlay}>
-        <div style={styles.videoModal}>
-          <div style={styles.videoHeader}>
-            <div style={styles.videoHeaderInfo}>
-              <div style={styles.videoStatus}>
-                <span style={styles.connectedDot}>●</span>
+      <div className="baby-care-modal-overlay">
+        <div className="baby-care-modal">
+          <div className="baby-care-modal-header">
+            <h3 className="baby-care-modal-title">
+              Manage Appointment - {appointment.parentName}
+            </h3>
+            <button 
+              className="baby-care-close-button"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="baby-care-modal-content">
+            <div className="baby-care-appointment-info-card">
+              <p><strong>Baby:</strong> {appointment.babyName} ({appointment.babyAge})</p>
+              <p><strong>Scheduled:</strong> {appointment.date} at {appointment.time}</p>
+              <p><strong>Issue:</strong> {appointment.issue}</p>
+            </div>
+
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">Reject Appointment</h4>
+              <div className="baby-care-input-group">
+                <label className="baby-care-label">Reason for rejection:</label>
+                <textarea 
+                  className="baby-care-textarea"
+                  placeholder="Provide reason for rejecting this appointment..."
+                  value={rejectReason}
+                  onChange={handleRejectReasonChange}
+                  rows="3"
+                />
+              </div>
+              <button 
+                className="baby-care-button-danger"
+                onClick={handleRejectSubmit}
+                disabled={!rejectReason.trim() || loading}
+              >
+                {loading ? 'Processing...' : 'Reject Appointment'}
+              </button>
+            </div>
+
+            <div className="baby-care-divider">
+              <span className="baby-care-divider-text">OR</span>
+            </div>
+
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">Reschedule Appointment</h4>
+              <div className="baby-care-input-group">
+                <label className="baby-care-label">New Date:</label>
+                <input 
+                  type="date" 
+                  className="baby-care-input"
+                  min={getCurrentDate()}
+                  value={rescheduleDate}
+                  onChange={handleRescheduleDateChange}
+                />
+              </div>
+              <div className="baby-care-input-group">
+                <label className="baby-care-label">New Time:</label>
+                <input 
+                  type="time" 
+                  className="baby-care-input"
+                  value={rescheduleTime}
+                  onChange={handleRescheduleTimeChange}
+                />
+              </div>
+              <button 
+                className="baby-care-button-success"
+                onClick={handleRescheduleSubmit}
+                disabled={!rescheduleDate || !rescheduleTime || loading}
+              >
+                {loading ? 'Processing...' : 'Reschedule Appointment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Reminder Modal Component
+  const ReminderModal = React.memo(({ 
+    show, 
+    appointment, 
+    onClose, 
+    onSendReminder,
+    loading 
+  }) => {
+    const [reminderMessage, setReminderMessage] = useState('');
+    const [reminderMethod, setReminderMethod] = useState('sms');
+
+    const handleReminderMessageChange = (e) => {
+      setReminderMessage(e.target.value);
+    };
+
+    const handleMethodChange = (method) => {
+      setReminderMethod(method);
+    };
+
+    const handleTimeOptionClick = (option) => {
+      let message = '';
+      switch(option) {
+        case '24h':
+          message = `Reminder: Your baby care appointment with Dr. is scheduled for tomorrow at ${appointment.time}. Please be on time.`;
+          break;
+        case '1h':
+          message = `Reminder: Your appointment is in 1 hour. Please join the video call or arrive at the clinic for ${appointment.babyName}'s checkup.`;
+          break;
+        case 'now':
+          message = `Final reminder: Your appointment starts now. ${appointment.consultationType === 'online' ? 'Please join the video consultation.' : 'Please proceed to the reception.'}`;
+          break;
+        default:
+          message = '';
+      }
+      setReminderMessage(message);
+    };
+
+    const handleSubmit = () => {
+      if (reminderMessage.trim()) {
+        onSendReminder(appointment, reminderMessage, reminderMethod);
+      }
+    };
+
+    if (!show || !appointment) return null;
+
+    return (
+      <div className="baby-care-modal-overlay">
+        <div className="baby-care-modal">
+          <div className="baby-care-modal-header">
+            <h3 className="baby-care-modal-title">
+              Send Reminder - {appointment.parentName}
+            </h3>
+            <button 
+              className="baby-care-close-button"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="baby-care-modal-content">
+            <div className="baby-care-appointment-info-card">
+              <p><strong>Baby:</strong> {appointment.babyName} ({appointment.babyAge})</p>
+              <p><strong>Scheduled:</strong> {appointment.date} at {appointment.time}</p>
+              <p><strong>Appointment Type:</strong> {appointment.consultationType === 'offline' ? '🏥 Hospital' : 
+                 appointment.consultationType === 'home_visit' ? '🏠 Home Visit' : '💻 Online'}</p>
+            </div>
+
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">Reminder Details</h4>
+              
+              <div className="baby-care-input-group">
+                <label className="baby-care-label">Select Method:</label>
+                <div className="baby-care-method-options">
+                  <label className={`baby-care-method-option ${reminderMethod === 'sms' ? 'baby-care-active-method-option' : ''}`}>
+                    <input
+                      type="radio"
+                      value="sms"
+                      checked={reminderMethod === 'sms'}
+                      onChange={() => handleMethodChange('sms')}
+                      className="baby-care-radio-input"
+                    />
+                    <span className="baby-care-method-label">📱 SMS</span>
+                  </label>
+                  <label className={`baby-care-method-option ${reminderMethod === 'email' ? 'baby-care-active-method-option' : ''}`}>
+                    <input
+                      type="radio"
+                      value="email"
+                      checked={reminderMethod === 'email'}
+                      onChange={() => handleMethodChange('email')}
+                      className="baby-care-radio-input"
+                    />
+                    <span className="baby-care-method-label">📧 Email</span>
+                  </label>
+                  <label className={`baby-care-method-option ${reminderMethod === 'whatsapp' ? 'baby-care-active-method-option' : ''}`}>
+                    <input
+                      type="radio"
+                      value="whatsapp"
+                      checked={reminderMethod === 'whatsapp'}
+                      onChange={() => handleMethodChange('whatsapp')}
+                      className="baby-care-radio-input"
+                    />
+                    <span className="baby-care-method-label">💬 WhatsApp</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="baby-care-input-group">
+                <label className="baby-care-label">Reminder Message:</label>
+                <textarea 
+                  className="baby-care-textarea"
+                  placeholder={`Reminder for ${appointment.parentName}'s appointment on ${appointment.date} at ${appointment.time}. Baby: ${appointment.babyName}`}
+                  value={reminderMessage}
+                  onChange={handleReminderMessageChange}
+                  rows="4"
+                />
+                <div className="baby-care-message-preview">
+                  <strong>Preview:</strong>
+                  <div className="baby-care-preview-text">
+                    {reminderMessage || 'Your reminder message will appear here...'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="baby-care-input-group">
+                <label className="baby-care-label">Quick Templates:</label>
+                <div className="baby-care-time-options">
+                  <button 
+                    type="button"
+                    className="baby-care-time-option"
+                    onClick={() => handleTimeOptionClick('24h')}
+                  >
+                    24 hours before
+                  </button>
+                  <button 
+                    type="button"
+                    className="baby-care-time-option"
+                    onClick={() => handleTimeOptionClick('1h')}
+                  >
+                    1 hour before
+                  </button>
+                  <button 
+                    type="button"
+                    className="baby-care-time-option"
+                    onClick={() => handleTimeOptionClick('now')}
+                  >
+                    At appointment time
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                className="baby-care-button-primary"
+                onClick={handleSubmit}
+                disabled={!reminderMessage.trim() || loading}
+              >
+                {loading ? 'Sending...' : `Send ${reminderMethod.toUpperCase()} Reminder`}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Report Viewer Modal Component - FIXED: Remove duplicate handling
+  const ReportViewerModal = React.memo(({ 
+    show, 
+    patient, 
+    patientReports, 
+    onClose, 
+    onFileUpload,
+    onRemoveReport 
+  }) => {
+    const fileInputRef = useRef(null);
+
+    if (!show || !patient) return null;
+
+    const patientReportsList = patientReports[patient.id] || [];
+
+    const handleFileSelect = (e) => {
+      onFileUpload(patient.id, patient.name, e.target.files);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+
+    const handleRemoveClick = (reportId) => {
+      if (window.confirm('Are you sure you want to remove this report?')) {
+        onRemoveReport(patient.id, reportId);
+      }
+    };
+
+    return (
+      <div className="baby-care-modal-overlay">
+        <div className="baby-care-modal">
+          <div className="baby-care-modal-header">
+            <h3 className="baby-care-modal-title">
+              Reports - {patient.name}
+            </h3>
+            <button 
+              className="baby-care-close-button"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="baby-care-modal-content">
+            <div className="baby-care-upload-section">
+              <h4 className="baby-care-section-title">Upload New Report</h4>
+              <div className="baby-care-upload-area">
+                <input 
+                  ref={fileInputRef}
+                  type="file"
+                  id="report-upload"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="baby-care-file-input"
+                  onChange={handleFileSelect}
+                />
+                <label htmlFor="report-upload" className="baby-care-upload-label">
+                  <div className="baby-care-upload-icon">📁</div>
+                  <div className="baby-care-upload-text">
+                    <strong>Click to upload reports</strong>
+                    <span>Supports PDF, JPG, PNG files</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">All Reports ({patientReportsList.length})</h4>
+              {patientReportsList.length > 0 ? (
+                <div className="baby-care-reports-list">
+                  {patientReportsList.map((report) => (
+                    <div key={report.id} className="baby-care-report-item">
+                      <div className="baby-care-report-icon">
+                        {report.type === 'pdf' ? '📄' : '🖼️'}
+                      </div>
+                      <div className="baby-care-report-info">
+                        <div className="baby-care-report-name">{report.name}</div>
+                        <div className="baby-care-report-meta">
+                          {report.date} • {report.type ? report.type.toUpperCase() : 'FILE'} • {report.size}
+                          {report.uploaded && <span style={{ marginLeft: '10px', color: '#4CAF50' }}>🆕 Uploaded</span>}
+                        </div>
+                      </div>
+                      <div className="baby-care-report-actions">
+                        <button 
+                          className="baby-care-button-small"
+                          onClick={() => {
+                            if (report.url && report.url !== '#') {
+                              window.open(report.url, '_blank');
+                            } else {
+                              showNotification('File preview not available', 'info');
+                            }
+                          }}
+                        >
+                          View
+                        </button>
+                        <button 
+                          className="baby-care-button-small baby-care-button-danger"
+                          onClick={() => handleRemoveClick(report.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="baby-care-empty-reports">
+                  <div className="baby-care-empty-reports-icon">📄</div>
+                  <p>No reports available yet</p>
+                  <p className="baby-care-empty-subtext">Upload reports using the upload section above</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Video Consultation Modal Component
+  const VideoConsultationModal = React.memo(({ 
+    show, 
+    consultation, 
+    callTime,
+    isRecording,
+    onEndCall,
+    onToggleRecording,
+    onClose 
+  }) => {
+    const [notes, setNotes] = useState('');
+
+    const handleNotesChange = (e) => {
+      setNotes(e.target.value);
+    };
+
+    const handleSaveNotes = () => {
+      if (notes.trim()) {
+        showNotification('Consultation notes saved', 'success');
+      } else {
+        showNotification('Please add some notes before saving', 'error');
+      }
+    };
+
+    if (!show || !consultation) return null;
+
+    return (
+      <div className="baby-care-video-modal-overlay">
+        <div className="baby-care-video-modal">
+          <div className="baby-care-video-header">
+            <div className="baby-care-video-header-info">
+              <div className="baby-care-video-status">
+                <span className="baby-care-connected-dot">●</span>
                 <span>Status: connected</span>
               </div>
-              <div style={styles.callTimer}>
+              <div className="baby-care-call-timer">
                 <span>{formatCallTime(callTime)}</span>
               </div>
             </div>
             <button 
-              style={styles.endCallButton}
-              onClick={handleEndConsultation}
+              className="baby-care-end-call-button"
+              onClick={onEndCall}
             >
               End Call
             </button>
           </div>
 
-          <div style={styles.videoMainArea}>
-            <div style={styles.patientVideoContainer}>
-              <div style={styles.patientVideoHeader}>
-                <div style={styles.patientVideoInfo}>
-                  <h3 style={styles.patientVideoName}>{currentConsultation.parentName}</h3>
-                  <div style={styles.babyInfoIndicator}>
-                    👶 Baby: {currentConsultation.babyName} • {currentConsultation.babyAge}
+          <div className="baby-care-video-main-area">
+            <div className="baby-care-patient-video-container">
+              <div className="baby-care-patient-video-header">
+                <div className="baby-care-patient-video-info">
+                  <h3 className="baby-care-patient-video-name">{consultation.parentName}</h3>
+                  <div className="baby-care-baby-info-indicator">
+                    👶 Baby: {consultation.babyName} • {consultation.babyAge}
                   </div>
                 </div>
               </div>
               
-              <div style={styles.videoFeed}>
-                <div style={styles.videoMock}>
-                  <div style={styles.videoMockContent}>
-                    <div style={styles.videoMockAvatar}>
-                      <span style={styles.avatarEmoji}>👶</span>
+              <div className="baby-care-video-feed">
+                <div className="baby-care-video-mock">
+                  <div className="baby-care-video-mock-content">
+                    <div className="baby-care-video-mock-avatar">
+                      <span className="avatar-emoji">👶</span>
                     </div>
-                    <div style={styles.videoMockInfo}>
-                      <p style={styles.videoMockText}>Baby Care Consultation</p>
-                      <p style={styles.videoMockSubtext}>{currentConsultation.parentName}</p>
+                    <div className="baby-care-video-mock-info">
+                      <p className="baby-care-video-mock-text">Baby Care Consultation</p>
+                      <p className="baby-care-video-mock-subtext">{consultation.parentName}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div style={styles.selfView}>
-                  <div style={styles.selfViewHeader}>
-                    <span style={styles.selfViewLabel}>You</span>
+                <div className="baby-care-self-view">
+                  <div className="baby-care-self-view-header">
+                    <span className="baby-care-self-view-label">You</span>
                   </div>
-                  <div style={styles.selfViewVideo}>
-                    <div style={styles.selfViewMock}>
-                      <span style={styles.selfViewEmoji}>👨‍⚕️</span>
-                      <p style={styles.selfViewText}>Dr. View</p>
+                  <div className="baby-care-self-view-video">
+                    <div className="baby-care-self-view-mock">
+                      <span className="baby-care-self-view-emoji">👨‍⚕️</span>
+                      <p className="baby-care-self-view-text">Dr. View</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={styles.quickTools}>
-              <div style={styles.quickToolsHeader}>
-                <h4 style={styles.quickToolsTitle}>Baby Care Tools</h4>
+            <div className="baby-care-quick-tools">
+              <div className="baby-care-quick-tools-header">
+                <h4 className="baby-care-quick-tools-title">Baby Care Tools</h4>
               </div>
               
-              <div style={styles.toolButtons}>
+              <div className="baby-care-tool-buttons">
                 <button 
-                  style={isRecording ? styles.recordingButton : styles.toolButton}
-                  onClick={handleToggleRecording}
+                  className={isRecording ? "baby-care-recording-button" : "baby-care-tool-button"}
+                  onClick={onToggleRecording}
                 >
-                  <span style={styles.toolIcon}>⏺️</span>
+                  <span className="baby-care-tool-icon">⏺️</span>
                   <span>{isRecording ? 'Recording...' : 'Record'}</span>
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
+                  className="baby-care-tool-button"
                   onClick={() => showNotification('Opening feeding guide', 'info')}
                 >
-                  <span style={styles.toolIcon}>🍼</span>
+                  <span className="baby-care-tool-icon">🍼</span>
                   <span>Feeding Guide</span>
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
+                  className="baby-care-tool-button"
                   onClick={() => showNotification('Opening growth chart', 'info')}
                 >
-                  <span style={styles.toolIcon}>📈</span>
+                  <span className="baby-care-tool-icon">📈</span>
                   <span>Growth Chart</span>
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
+                  className="baby-care-tool-button"
                   onClick={() => showNotification('Opening vaccination schedule', 'info')}
                 >
-                  <span style={styles.toolIcon}>💉</span>
+                  <span className="baby-care-tool-icon">💉</span>
                   <span>Vaccination</span>
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
+                  className="baby-care-tool-button"
                   onClick={() => showNotification('Opening sleep schedule', 'info')}
                 >
-                  <span style={styles.toolIcon}>😴</span>
+                  <span className="baby-care-tool-icon">😴</span>
                   <span>Sleep Guide</span>
                 </button>
               </div>
               
-              <div style={styles.consultationNotes}>
-                <h4 style={styles.notesTitle}>Consultation Notes</h4>
+              <div className="baby-care-consultation-notes">
+                <h4 className="baby-care-notes-title">Consultation Notes</h4>
                 <textarea 
-                  style={styles.notesTextarea}
+                  className="baby-care-notes-textarea"
                   placeholder="Add notes about baby's health, feeding, sleep, recommendations..."
+                  value={notes}
+                  onChange={handleNotesChange}
                   rows="4"
                 />
                 <button 
-                  style={styles.saveNotesButton}
-                  onClick={() => showNotification('Notes saved', 'success')}
+                  className="baby-care-save-notes-button"
+                  onClick={handleSaveNotes}
                 >
                   Save Notes
                 </button>
@@ -454,345 +855,408 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
             </div>
           </div>
 
-          <div style={styles.videoFooter}>
-            <div style={styles.appointmentInfo}>
-              <strong>Baby:</strong> {currentConsultation.babyName} ({currentConsultation.babyAge})
+          <div className="baby-care-video-footer">
+            <div className="baby-care-appointment-info">
+              <strong>Baby:</strong> {consultation.babyName} ({consultation.babyAge})
             </div>
-            <div style={styles.consultationType}>
-              <strong>Plan:</strong> {currentConsultation.plan || 'Basic Plan'}
+            <div className="baby-care-consultation-type">
+              <strong>Plan:</strong> {consultation.plan || 'Basic Plan'}
             </div>
           </div>
         </div>
       </div>
     );
-  };
+  });
 
-  // Baby Care Appointment Card Component
-  const BabyCareAppointmentCard = ({ appointment }) => {
-    const isLoading = loadingAppointments[appointment.id];
-
-    return (
-      <div style={styles.appointmentCard}>
-        <div style={styles.appointmentHeader}>
-          <div style={styles.appointmentPatient}>
-            <div style={styles.profileIcon}>
-              <span>👶</span>
-            </div>
-            <div style={styles.patientInfo}>
-              <h3 style={styles.appointmentName}>
-                {appointment.parentName}
-                <span style={{
-                  ...styles.planBadge,
-                  backgroundColor: babyCarePlans.find(p => p.id === appointment.plan)?.color || '#009688'
-                }}>
-                  {appointment.plan?.toUpperCase() || 'BASIC'} PLAN
-                </span>
-              </h3>
-              <p style={styles.appointmentMeta}>
-                Baby: {appointment.babyName} • Age: {appointment.babyAge}
-                {appointment.vaccinationDue && (
-                  <span style={styles.vaccineBadge}> 💉 Vaccine Due</span>
-                )}
-              </p>
-              <div style={styles.consultationType}>
-                {appointment.consultationType === 'offline' ? '🏥 Hospital' : 
-                 appointment.consultationType === 'home_visit' ? '🏠 Home Visit' : '💻 Online'}
-              </div>
-            </div>
-          </div>
-          <div style={styles.appointmentTime}>
-            <strong>{appointment.time}</strong>
-            <span>{appointment.date}</span>
-            <div style={styles.caregiverInfo}>
-              👩‍🍼 {appointment.caregiverHours || '8 hours'} caregiver support
-            </div>
-          </div>
-        </div>
-        
-        <div style={styles.appointmentDetails}>
-          <p><strong>Concern:</strong> {appointment.issue}</p>
-          <p><strong>Feeding:</strong> {appointment.feedingType}</p>
-          <p><strong>Caregiver Notes:</strong> {appointment.caregiverNotes || 'No notes'}</p>
-        </div>
-
-        <div style={styles.appointmentActions}>
-          {babyCareFilter === 'pending' && (
-            <>
-              <button 
-                style={styles.successButton}
-                onClick={() => handleApproveAppointment(appointment)}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Approving...' : 'Approve'}
-              </button>
-              <button 
-                style={styles.dangerButton}
-                onClick={() => handleRejectAppointment(appointment)}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Rejecting...' : 'Reject'}
-              </button>
-            </>
-          )}
-          
-          {babyCareFilter === 'upcoming' && (
-            <>
-              <button 
-                style={styles.primaryButton}
-                onClick={() => handleStartConsultation(appointment)}
-                disabled={isLoading}
-              >
-                Start Consultation
-              </button>
-              <button 
-                style={styles.secondaryButton}
-                onClick={() => showNotification(`Sending reminders to ${appointment.parentName}`, 'info')}
-              >
-                Send Reminder
-              </button>
-              <button 
-                style={styles.dangerButton}
-                onClick={() => handleCancelAppointment(appointment)}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Cancelling...' : 'Cancel'}
-              </button>
-            </>
-          )}
-          
-          {babyCareFilter === 'cancelled' && (
-            <div style={styles.cancelledInfo}>
-              <p><strong>Cancelled Date:</strong> {appointment.cancelledDate || 'N/A'}</p>
-              <p><strong>Reason:</strong> {appointment.reason || 'Not specified'}</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // Baby Care Patient Card Component
-  const BabyCarePatientCard = ({ patient }) => {
-    const patientReportsList = patientReports[patient.id] || [];
-    const uploadedPatientFiles = uploadedFiles.filter(file => 
-      patientReportsList.some(report => report.id === file.id)
-    );
-    const allReports = [...patientReportsList, ...uploadedPatientFiles];
-    const plan = patient.babyCareDetails?.package || 'basic';
-    const currentPlan = babyCarePlans.find(p => p.id === plan);
-
-    return (
-      <div style={styles.patientCard}>
-        <div style={styles.patientHeader}>
-          <div style={styles.profileIconLarge}>
-            <span>👶</span>
-          </div>
-          <div style={styles.patientBasicInfo}>
-            <h3 style={styles.patientName}>{patient.babyCareDetails?.parentName || patient.name}</h3>
-            <p style={styles.patientContact}>Baby: {patient.name}</p>
-            <p style={styles.patientContact}>Phone: {patient.babyCareDetails?.parentPhone || patient.phone}</p>
-          </div>
-        </div>
-
-        <div style={{
-          ...styles.planIndicator,
-          borderLeft: `4px solid ${currentPlan.color}`
-        }}>
-          <div style={styles.planHeader}>
-            <span style={styles.planIcon}>{currentPlan.icon}</span>
-            <span style={styles.planName}>{currentPlan.name}</span>
-          </div>
-          <div style={styles.planCoverage}>
-            <span style={styles.coverageText}>{currentPlan.coverage}</span>
-          </div>
-        </div>
-
-        <div style={styles.babyDetails}>
-          <div style={styles.detailRow}>
-            <span>Baby Age:</span>
-            <strong>{patient.babyCareDetails?.age || 'N/A'}</strong>
-          </div>
-          <div style={styles.detailRow}>
-            <span>Weight:</span>
-            <strong>{patient.babyCareDetails?.weight || 'N/A'} kg</strong>
-          </div>
-          <div style={styles.detailRow}>
-            <span>Feeding:</span>
-            <strong>{patient.babyCareDetails?.feedingType || 'N/A'}</strong>
-          </div>
-          <div style={styles.detailRow}>
-            <span>Next Vaccination:</span>
-            <strong style={patient.babyCareDetails?.vaccinationDue ? styles.dueText : {}}>
-              {patient.babyCareDetails?.nextVaccination || 'Not scheduled'}
-            </strong>
-          </div>
-        </div>
-
-        <div style={styles.reportsSummary}>
-          <strong>Reports:</strong>
-          <span style={styles.reportCount}>
-            {allReports.length} files
-          </span>
-        </div>
-
-        <div style={styles.patientActions}>
-          <button 
-            style={styles.primaryButton}
-            onClick={() => {
-              setSelectedPatient({ ...patient, reports: allReports });
-              setShowReportViewer(true);
-            }}
-          >
-            View Reports
-          </button>
-          <button 
-            style={{
-              ...styles.secondaryButton,
-              borderColor: currentPlan.color,
-              color: currentPlan.color
-            }}
-            onClick={() => {
-              setSelectedPatient({ ...patient, reports: allReports });
-              setShowPackageModal(true);
-            }}
-          >
-            Change Plan
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // Plan Details Modal
-  const PlanDetailsModal = () => {
-    if (!showPlanDetails) return null;
+  // Plan Details Modal Component
+  const PlanDetailsModal = React.memo(({ show, planId, plans, onClose }) => {
+    if (!show) return null;
     
-    const plan = babyCarePlans.find(p => p.id === selectedPlan);
+    const plan = plans.find(p => p.id === planId);
 
     return (
-      <div style={styles.modalOverlay}>
-        <div style={styles.modal}>
-          <div style={styles.modalHeader}>
+      <div className="baby-care-modal-overlay">
+        <div className="baby-care-modal">
+          <div className="baby-care-modal-header">
             <h3>{plan.name} - Complete Details</h3>
             <button 
-              style={styles.closeButton}
-              onClick={() => setShowPlanDetails(false)}
+              className="baby-care-close-button"
+              onClick={onClose}
             >
               ✕
             </button>
           </div>
           
-          <div style={styles.modalContent}>
-            <div style={{
-              ...styles.planHeaderCard,
-              backgroundColor: `${plan.color}20`,
-              borderColor: plan.color
-            }}>
-              <div style={styles.planHeaderContent}>
-                <div style={styles.planIconLarge}>{plan.icon}</div>
+          <div className="baby-care-modal-content">
+            <div 
+              className="baby-care-plan-header-card"
+              style={{
+                backgroundColor: `${plan.color}20`,
+                borderColor: plan.color
+              }}
+            >
+              <div className="baby-care-plan-header-content">
+                <div className="baby-care-plan-icon-large">{plan.icon}</div>
                 <div>
-                  <h4 style={styles.planTitle}>{plan.name}</h4>
-                  <p style={styles.planPrice}>{plan.price}</p>
-                  <p style={styles.planDuration}>{plan.duration} • {plan.patients}</p>
+                  <h4 className="baby-care-plan-header-title">{plan.name}</h4>
+                  <p className="baby-care-plan-header-price">{plan.price}</p>
+                  <p className="baby-care-plan-header-duration">{plan.duration} • {plan.patients}</p>
                 </div>
               </div>
             </div>
             
-            <div style={styles.section}>
-              <h4 style={styles.sectionTitle}>Perfect For</h4>
-              <div style={styles.idealFor}>
-                <span style={styles.idealForIcon}>🎯</span>
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">Perfect For</h4>
+              <div className="baby-care-ideal-for">
+                <span className="baby-care-ideal-for-icon">🎯</span>
                 <span>{plan.idealFor}</span>
               </div>
             </div>
             
-            <div style={styles.section}>
-              <h4 style={styles.sectionTitle}>Care Coverage</h4>
-              <div style={styles.coverageCard}>
-                <span style={styles.coverageIcon}>⏰</span>
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">Care Coverage</h4>
+              <div className="baby-care-coverage-card">
+                <span className="baby-care-coverage-icon">⏰</span>
                 <span>{plan.coverage}</span>
               </div>
             </div>
             
-            <div style={styles.section}>
-              <h4 style={styles.sectionTitle}>All Features</h4>
-              <div style={styles.featuresList}>
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">All Features</h4>
+              <div className="baby-care-features-list">
                 {plan.features.map((feature, index) => (
-                  <div key={index} style={styles.featureItem}>
-                    <span style={styles.checkIcon}>✓</span>
+                  <div key={index} className="baby-care-feature-item">
+                    <span className="baby-care-check-icon">✓</span>
                     <span>{feature}</span>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div style={styles.section}>
-              <h4 style={styles.sectionTitle}>Doctor's Recommendation</h4>
-              <div style={styles.recommendation}>
+            <div className="baby-care-section">
+              <h4 className="baby-care-section-title">Doctor's Recommendation</h4>
+              <div className="baby-care-recommendation">
                 <p>This plan is ideal for babies who need {plan.id === 'basic' ? 'basic care and support' : 
                   plan.id === 'premium' ? 'comprehensive daily care with developmental support' : 
                   'full-time professional care with medical guidance'}.</p>
               </div>
             </div>
-            
-            
           </div>
         </div>
       </div>
     );
-  };
+  });
+
+  // Handle appointment rejection
+  const handleRejectAppointment = useCallback((appointment, reason) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
+
+    setTimeout(() => {
+      setAppointments(prev => {
+        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
+        if (pendingIndex === -1) return prev;
+
+        const rejectedAppointment = prev.pending[pendingIndex];
+        const newPending = [...prev.pending];
+        newPending.splice(pendingIndex, 1);
+        
+        return {
+          ...prev,
+          pending: newPending,
+          cancelled: [...prev.cancelled, { 
+            ...rejectedAppointment, 
+            status: 'cancelled',
+            cancelledDate: new Date().toLocaleDateString(),
+            reason: reason,
+            rejectedBy: 'doctor'
+          }]
+        };
+      });
+      
+      showNotification(`Appointment rejected for ${appointment.patientName}`, 'info');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowRejectModal(false);
+      setSelectedAppointment(null);
+    }, 1000);
+  }, [showNotification]);
+
+  // Handle appointment rescheduling
+  const handleRescheduleAppointment = useCallback((appointment, newDate, newTime) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
+
+    setTimeout(() => {
+      setAppointments(prev => {
+        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
+        if (pendingIndex === -1) return prev;
+
+        const rescheduledAppointment = prev.pending[pendingIndex];
+        const newPending = [...prev.pending];
+        newPending.splice(pendingIndex, 1);
+        
+        // Add to upcoming with new date/time
+        return {
+          ...prev,
+          pending: newPending,
+          upcoming: [...prev.upcoming, { 
+            ...rescheduledAppointment, 
+            status: 'upcoming',
+            date: newDate,
+            time: newTime,
+            originalDate: rescheduledAppointment.date,
+            originalTime: rescheduledAppointment.time,
+            rescheduledBy: 'doctor',
+            rescheduledDate: new Date().toLocaleDateString()
+          }]
+        };
+      });
+      
+      showNotification(`Appointment rescheduled for ${appointment.parentName}`, 'success');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowRejectModal(false);
+      setSelectedAppointment(null);
+    }, 1000);
+  }, [showNotification]);
+
+  // Handle send reminder
+  const handleSendReminder = useCallback((appointment, message, method) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
+    
+    setTimeout(() => {
+      showNotification(`Reminder sent via ${method.toUpperCase()} to ${appointment.parentName}`, 'success');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowReminderModal(false);
+      setSelectedAppointment(null);
+    }, 1000);
+  }, [showNotification]);
+
+  // Baby Care Appointment Card Component
+  const BabyCareAppointmentCard = React.memo(({ appointment, filter, onApprove, onRejectReschedule, onStartConsultation, onSendReminder, loading }) => {
+    const isLoading = loading[appointment.id];
+
+    return (
+      <div className="baby-care-appointment-card">
+        <div className="baby-care-appointment-header">
+          <div className="baby-care-appointment-patient">
+            <div className="baby-care-profile-icon">
+              <span>👶</span>
+            </div>
+            <div className="baby-care-patient-info">
+              <h3 className="baby-care-appointment-name">
+                {appointment.parentName}
+                <span 
+                  className="baby-care-plan-badge"
+                  style={{
+                    backgroundColor: babyCarePlans.find(p => p.id === appointment.plan)?.color || '#009688'
+                  }}
+                >
+                  {appointment.plan?.toUpperCase() || 'BASIC'} PLAN
+                </span>
+              </h3>
+              <p className="baby-care-appointment-meta">
+                Baby: {appointment.babyName} • Age: {appointment.babyAge}
+                {appointment.vaccinationDue && (
+                  <span className="baby-care-vaccine-badge"> 💉 Vaccine Due</span>
+                )}
+              </p>
+              <div className="baby-care-consultation-type">
+                {appointment.consultationType === 'offline' ? '🏥 Hospital' : 
+                 appointment.consultationType === 'home_visit' ? '🏠 Home Visit' : '💻 Online'}
+              </div>
+            </div>
+          </div>
+          <div className="baby-care-appointment-time">
+            <strong>{appointment.time}</strong>
+            <span>{appointment.date}</span>
+            <div className="baby-care-caregiver-info">
+              👩‍🍼 {appointment.caregiverHours || '8 hours'} caregiver support
+            </div>
+          </div>
+        </div>
+        
+        <div className="baby-care-appointment-details">
+          <p><strong>Concern:</strong> {appointment.issue}</p>
+          <p><strong>Feeding:</strong> {appointment.feedingType}</p>
+          <p><strong>Caregiver Notes:</strong> {appointment.caregiverNotes || 'No notes'}</p>
+        </div>
+
+        <div className="baby-care-appointment-actions">
+          {filter === 'pending' && (
+            <>
+              <button 
+                className="baby-care-button-success"
+                onClick={() => onApprove(appointment)}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Approving...' : 'Approve'}
+              </button>
+              <button 
+                className="baby-care-button-secondary"
+                onClick={() => onRejectReschedule(appointment)}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : 'Reject/Reschedule'}
+              </button>
+            </>
+          )}
+          
+          {filter === 'upcoming' && (
+            <>
+              <button 
+                className="baby-care-button-primary"
+                onClick={() => onStartConsultation(appointment)}
+                disabled={isLoading}
+              >
+                Start Consultation
+              </button>
+              <button 
+                className="baby-care-button-secondary"
+                onClick={() => onSendReminder(appointment)}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : 'Send Reminder'}
+              </button>
+            </>
+          )}
+          
+          {filter === 'cancelled' && (
+            <div className="baby-care-cancelled-info">
+              <p><strong>Cancelled Date:</strong> {appointment.cancelledDate || 'N/A'}</p>
+              <p><strong>Reason:</strong> {appointment.reason || 'Not specified'}</p>
+              {appointment.rejectedBy && (
+                <p><strong>Action By:</strong> {appointment.rejectedBy}</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  });
+
+  // Baby Care Patient Card Component - FIXED: Use patientReports only
+  const BabyCarePatientCard = React.memo(({ patient, patientReports, onViewReports }) => {
+    const patientReportsList = patientReports[patient.id] || [];
+    const plan = patient.babyCareDetails?.package || 'basic';
+    const currentPlan = babyCarePlans.find(p => p.id === plan);
+
+    return (
+      <div className="baby-care-patient-card">
+        <div className="baby-care-patient-header">
+          <div className="baby-care-profile-icon-large">
+            <span>👶</span>
+          </div>
+          <div className="baby-care-patient-basic-info">
+            <h3 className="baby-care-patient-name">{patient.babyCareDetails?.parentName || patient.name}</h3>
+            <p className="baby-care-patient-contact">Baby: {patient.name}</p>
+            <p className="baby-care-patient-contact">Phone: {patient.babyCareDetails?.parentPhone || patient.phone}</p>
+          </div>
+        </div>
+
+        <div 
+          className="baby-care-plan-indicator"
+          style={{ borderLeftColor: currentPlan.color }}
+        >
+          <div className="baby-care-plan-header">
+            <span className="baby-care-plan-icon">{currentPlan.icon}</span>
+            <span className="baby-care-plan-name">{currentPlan.name}</span>
+          </div>
+          <div className="baby-care-plan-coverage">
+            <span className="baby-care-coverage-text">{currentPlan.coverage}</span>
+          </div>
+        </div>
+
+        <div className="baby-care-baby-details">
+          <div className="baby-care-detail-row">
+            <span>Baby Age:</span>
+            <strong>{patient.babyCareDetails?.age || 'N/A'}</strong>
+          </div>
+          <div className="baby-care-detail-row">
+            <span>Weight:</span>
+            <strong>{patient.babyCareDetails?.weight || 'N/A'} kg</strong>
+          </div>
+          <div className="baby-care-detail-row">
+            <span>Feeding:</span>
+            <strong>{patient.babyCareDetails?.feedingType || 'N/A'}</strong>
+          </div>
+          <div className="baby-care-detail-row">
+            <span>Next Vaccination:</span>
+            <strong className={patient.babyCareDetails?.vaccinationDue ? "baby-care-due-text" : ""}>
+              {patient.babyCareDetails?.nextVaccination || 'Not scheduled'}
+            </strong>
+          </div>
+        </div>
+
+        <div className="baby-care-reports-summary">
+          <strong>Reports:</strong>
+          <span className="baby-care-report-count">
+            {patientReportsList.length} files
+          </span>
+        </div>
+
+        <div className="baby-care-patient-actions">
+          <button 
+            className="baby-care-button-primary"
+            onClick={() => onViewReports(patient)}
+          >
+            View/Upload Reports
+          </button>
+        </div>
+      </div>
+    );
+  });
 
   // Plans Tab Component
-  const PlansTab = () => (
-    <div style={styles.plansContainer}>
-      <div style={styles.plansHeader}>
+  const PlansTab = React.memo(() => (
+    <div className="baby-care-plans-container">
+      <div className="baby-care-plans-header">
         <h3>Baby Care Subscription Plans</h3>
         <p>Three comprehensive plans for different baby care needs</p>
       </div>
       
-      <div style={styles.plansGrid}>
+      <div className="baby-care-plans-grid">
         {babyCarePlans.map(plan => (
-          <div key={plan.id} style={styles.planCard}>
-            <div style={{
-              ...styles.planCardHeader,
-              backgroundColor: `${plan.color}20`,
-              borderBottom: `2px solid ${plan.color}`
-            }}>
-              <div style={styles.planCardIcon}>{plan.icon}</div>
+          <div key={plan.id} className="baby-care-plan-card">
+            <div 
+              className="baby-care-plan-card-header"
+              style={{
+                backgroundColor: `${plan.color}20`,
+                borderBottomColor: plan.color
+              }}
+            >
+              <div className="baby-care-plan-card-icon">{plan.icon}</div>
               <div>
-                <h4 style={styles.planCardName}>{plan.name}</h4>
-                <div style={styles.planCardPrice}>{plan.price}</div>
+                <h4 className="baby-care-plan-card-name">{plan.name}</h4>
+                <div className="baby-care-plan-card-price">{plan.price}</div>
               </div>
             </div>
             
-            <div style={styles.planCardBody}>
-              <div style={styles.planCardCoverage}>
-                <span style={styles.coverageIcon}>⏰</span>
+            <div className="baby-care-plan-card-body">
+              <div className="baby-care-plan-card-coverage">
+                <span className="baby-care-coverage-icon">⏰</span>
                 <span>{plan.coverage}</span>
               </div>
               
-              <div style={styles.planCardFeatures}>
-                <h5 style={styles.featuresTitle}>Key Features:</h5>
-                <ul style={styles.featuresList}>
+              <div className="baby-care-plan-card-features">
+                <h5 className="baby-care-features-title">Key Features:</h5>
+                <ul className="baby-care-features-list">
                   {plan.features.slice(0, 4).map((feature, index) => (
-                    <li key={index} style={styles.featureListItem}>
+                    <li key={index} className="baby-care-feature-list-item">
                       {feature}
                     </li>
                   ))}
                 </ul>
               </div>
               
-              <div style={styles.planCardStats}>
-                <span style={styles.statItem}>
+              <div className="baby-care-plan-card-stats">
+                <span className="baby-care-stat-item">
                   <strong>{plan.patients.split(' ')[0]}</strong> babies enrolled
                 </span>
               </div>
             </div>
             
-            <div style={styles.planCardActions}>
+            <div className="baby-care-plan-card-actions">
               <button 
+                className="baby-care-details-button"
                 style={{
-                  ...styles.detailsButton,
                   borderColor: plan.color,
                   color: plan.color
                 }}
@@ -803,20 +1267,19 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
               >
                 View Details
               </button>
-              
             </div>
           </div>
         ))}
       </div>
       
-      <div style={styles.plansComparison}>
-        <h4 style={styles.comparisonTitle}>Plan Comparison</h4>
-        <table style={styles.comparisonTable}>
+      <div className="baby-care-plans-comparison">
+        <h4 className="baby-care-comparison-title">Plan Comparison</h4>
+        <table className="baby-care-comparison-table">
           <thead>
             <tr>
-              <th style={styles.tableHeader}>Features</th>
+              <th className="baby-care-table-header">Features</th>
               {babyCarePlans.map(plan => (
-                <th key={plan.id} style={{...styles.tableHeader, color: plan.color}}>
+                <th key={plan.id} className="baby-care-table-header" style={{ color: plan.color }}>
                   {plan.name}
                 </th>
               ))}
@@ -824,43 +1287,43 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
           </thead>
           <tbody>
             <tr>
-              <td style={styles.tableCell}>Caregiver Hours</td>
-              <td style={styles.tableCell}>8 hrs/day</td>
-              <td style={styles.tableCell}>12 hrs/day</td>
-              <td style={styles.tableCell}>24×7</td>
+              <td className="baby-care-table-cell">Caregiver Hours</td>
+              <td className="baby-care-table-cell">8 hrs/day</td>
+              <td className="baby-care-table-cell">12 hrs/day</td>
+              <td className="baby-care-table-cell">24×7</td>
             </tr>
             <tr>
-              <td style={styles.tableCell}>Supplies</td>
-              <td style={styles.tableCell}>Basic</td>
-              <td style={styles.tableCell}>Enhanced</td>
-              <td style={styles.tableCell}>Premium Organic</td>
+              <td className="baby-care-table-cell">Supplies</td>
+              <td className="baby-care-table-cell">Basic</td>
+              <td className="baby-care-table-cell">Enhanced</td>
+              <td className="baby-care-table-cell">Premium Organic</td>
             </tr>
             <tr>
-              <td style={styles.tableCell}>Medical Guidance</td>
-              <td style={styles.tableCell}>Basic</td>
-              <td style={styles.tableCell}>Health Monitoring</td>
-              <td style={styles.tableCell}>Pediatrician Access</td>
+              <td className="baby-care-table-cell">Medical Guidance</td>
+              <td className="baby-care-table-cell">Basic</td>
+              <td className="baby-care-table-cell">Health Monitoring</td>
+              <td className="baby-care-table-cell">Pediatrician Access</td>
             </tr>
             <tr>
-              <td style={styles.tableCell}>Parent Reports</td>
-              <td style={styles.tableCell}>Monthly</td>
-              <td style={styles.tableCell}>Daily/Weekly</td>
-              <td style={styles.tableCell}>Real-time</td>
+              <td className="baby-care-table-cell">Parent Reports</td>
+              <td className="baby-care-table-cell">Monthly</td>
+              <td className="baby-care-table-cell">Daily/Weekly</td>
+              <td className="baby-care-table-cell">Real-time</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-  );
+  ));
 
   // Notifications Component
-  const Notifications = () => (
-    <div style={styles.notificationsContainer}>
+  const Notifications = React.memo(() => (
+    <div className="baby-care-notifications-container">
       {notifications.map(notification => (
         <div
           key={notification.id}
+          className="baby-care-notification"
           style={{
-            ...styles.notification,
             backgroundColor: notification.type === 'success' ? '#4CAF50' :
                            notification.type === 'error' ? '#F44336' : '#009688'
           }}
@@ -869,45 +1332,84 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
         </div>
       ))}
     </div>
-  );
+  ));
 
   return (
-    <div style={styles.mainContent}>
+    <div className="baby-care-container">
       <Notifications />
-      <VideoConsultationModal />
-      <PlanDetailsModal />
+      <RejectRescheduleModal 
+        show={showRejectModal}
+        appointment={selectedAppointment}
+        onClose={() => {
+          setShowRejectModal(false);
+          setSelectedAppointment(null);
+        }}
+        onReject={handleRejectAppointment}
+        onReschedule={handleRescheduleAppointment}
+        loading={selectedAppointment ? loadingAppointments[selectedAppointment.id] : false}
+      />
+      <ReminderModal 
+        show={showReminderModal}
+        appointment={selectedAppointment}
+        onClose={() => {
+          setShowReminderModal(false);
+          setSelectedAppointment(null);
+        }}
+        onSendReminder={handleSendReminder}
+        loading={selectedAppointment ? loadingAppointments[selectedAppointment.id] : false}
+      />
+      <ReportViewerModal 
+        show={showReportViewer}
+        patient={selectedPatient}
+        patientReports={patientReports}
+        onClose={() => {
+          setShowReportViewer(false);
+          setSelectedPatient(null);
+        }}
+        onFileUpload={handleFileUpload}
+        onRemoveReport={handleRemoveReport}
+      />
+      <VideoConsultationModal 
+        show={showVideoConsultation}
+        consultation={currentConsultation}
+        callTime={callTime}
+        isRecording={isRecording}
+        onEndCall={handleEndConsultation}
+        onToggleRecording={handleToggleRecording}
+        onClose={() => {
+          setShowVideoConsultation(false);
+          setCurrentConsultation(null);
+        }}
+      />
+      <PlanDetailsModal 
+        show={showPlanDetails}
+        planId={selectedPlan}
+        plans={babyCarePlans}
+        onClose={() => setShowPlanDetails(false)}
+      />
       
-      <div style={styles.header}>
+      <div className="baby-care-header">
         <div>
-          <h1 style={styles.title}>Baby Care</h1>
-          <p style={styles.subtitle}>Manage baby care appointments and subscription plans</p>
+          <h1 className="baby-care-title">Baby Care</h1>
+          <p className="baby-care-subtitle">Manage baby care appointments and subscription plans</p>
         </div>
       </div>
 
-      <div style={styles.tabs}>
+      <div className="baby-care-tabs">
         <button
-          style={{
-            ...styles.tab,
-            ...(activeTab === 'appointments' && styles.activeTab)
-          }}
+          className={`baby-care-tab ${activeTab === 'appointments' ? 'baby-care-tab-active' : ''}`}
           onClick={() => setActiveTab('appointments')}
         >
           Appointments ({appointments.upcoming.length + appointments.pending.length})
         </button>
         <button
-          style={{
-            ...styles.tab,
-            ...(activeTab === 'patients' && styles.activeTab)
-          }}
+          className={`baby-care-tab ${activeTab === 'patients' ? 'baby-care-tab-active' : ''}`}
           onClick={() => setActiveTab('patients')}
         >
           Patients ({patients.length})
         </button>
         <button
-          style={{
-            ...styles.tab,
-            ...(activeTab === 'plans' && styles.activeTab)
-          }}
+          className={`baby-care-tab ${activeTab === 'plans' ? 'baby-care-tab-active' : ''}`}
           onClick={() => setActiveTab('plans')}
         >
           Care Plans
@@ -916,43 +1418,49 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
 
       {activeTab === 'appointments' && (
         <>
-          <div style={styles.filterTabs}>
+          <div className="baby-care-filter-tabs">
             <button
-              style={{
-                ...styles.filterTab,
-                ...(babyCareFilter === 'pending' && styles.activeFilterTab)
-              }}
+              className={`baby-care-filter-tab ${babyCareFilter === 'pending' ? 'baby-care-filter-tab-active' : ''}`}
               onClick={() => setBabyCareFilter('pending')}
             >
               Pending ({appointments.pending.length})
             </button>
             <button
-              style={{
-                ...styles.filterTab,
-                ...(babyCareFilter === 'upcoming' && styles.activeFilterTab)
-              }}
+              className={`baby-care-filter-tab ${babyCareFilter === 'upcoming' ? 'baby-care-filter-tab-active' : ''}`}
               onClick={() => setBabyCareFilter('upcoming')}
             >
               Upcoming ({appointments.upcoming.length})
             </button>
             <button
-              style={{
-                ...styles.filterTab,
-                ...(babyCareFilter === 'cancelled' && styles.activeFilterTab)
-              }}
+              className={`baby-care-filter-tab ${babyCareFilter === 'cancelled' ? 'baby-care-filter-tab-active' : ''}`}
               onClick={() => setBabyCareFilter('cancelled')}
             >
               Cancelled ({appointments.cancelled.length})
             </button>
           </div>
 
-          <div style={styles.appointmentsContainer}>
+          <div className="baby-care-appointments-container">
             {getFilteredBabyCareAppointments().length > 0 ? (
               getFilteredBabyCareAppointments().map(appointment => (
-                <BabyCareAppointmentCard key={appointment.id} appointment={appointment} />
+                <BabyCareAppointmentCard 
+                  key={appointment.id} 
+                  appointment={appointment} 
+                  filter={babyCareFilter}
+                  onApprove={handleApproveAppointment}
+                  onRejectReschedule={(appt) => {
+                    setSelectedAppointment(appt);
+                    setShowRejectModal(true);
+                  }}
+                  onStartConsultation={handleStartConsultation}
+                  onSendReminder={(appt) => {
+                    setSelectedAppointment(appt);
+                    setShowReminderModal(true);
+                  }}
+                  loading={loadingAppointments}
+                />
               ))
             ) : (
-              <div style={styles.emptyState}>
+              <div className="baby-care-empty-state">
                 <p>No {babyCareFilter} appointments found</p>
               </div>
             )}
@@ -961,20 +1469,28 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
       )}
 
       {activeTab === 'patients' && (
-        <div style={styles.patientsContainer}>
-          <div style={styles.patientsHeader}>
+        <div className="baby-care-patients-container">
+          <div className="baby-care-patients-header">
             <h3>Baby Care Patients ({patients.length})</h3>
           </div>
           
           {patients.length > 0 ? (
-            <div style={styles.patientsGrid}>
+            <div className="baby-care-patients-grid">
               {patients.map(patient => (
-                <BabyCarePatientCard key={patient.id} patient={patient} />
+                <BabyCarePatientCard 
+                  key={patient.id} 
+                  patient={patient} 
+                  patientReports={patientReports}
+                  onViewReports={(patient) => {
+                    setSelectedPatient(patient);
+                    setShowReportViewer(true);
+                  }}
+                />
               ))}
             </div>
           ) : (
-            <div style={styles.emptyState}>
-              <div style={styles.emptyStateIcon}>👶</div>
+            <div className="baby-care-empty-state">
+              <div className="baby-care-empty-state-icon">👶</div>
               <h4>No babies in care yet</h4>
               <p>No baby patients are currently enrolled in care plans</p>
             </div>
@@ -989,986 +1505,4 @@ const BabyCareContent = ({ dashboardData, state, actions }) => {
   );
 };
 
-const styles = {
-  mainContent: {
-    padding: '20px',
-    backgroundColor: '#E0F2F1',
-    minHeight: '100vh'
-  },
-  header: {
-    marginBottom: '25px'
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    marginBottom: '8px',
-    color: '#124441'
-  },
-  subtitle: {
-    color: '#4F6F6B',
-    marginBottom: '0',
-    fontSize: '16px'
-  },
-  tabs: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '25px',
-    padding: '5px',
-    background: '#FFFFFF',
-    borderRadius: '10px',
-    border: '1px solid #B2DFDB',
-    maxWidth: '600px'
-  },
-  tab: {
-    flex: 1,
-    padding: '12px 20px',
-    background: 'transparent',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    color: '#124441',
-    fontWeight: '500',
-    fontSize: '14px',
-    transition: 'all 0.3s ease'
-  },
-  activeTab: {
-    background: '#009688',
-    color: '#FFFFFF',
-    boxShadow: '0 2px 8px rgba(0, 150, 136, 0.3)'
-  },
-  filterTabs: {
-    display: 'flex',
-    gap: '12px',
-    marginBottom: '25px',
-    flexWrap: 'wrap'
-  },
-  filterTab: {
-    padding: '10px 20px',
-    background: '#FFFFFF',
-    border: '1px solid #B2DFDB',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    color: '#124441',
-    fontWeight: '500',
-    fontSize: '14px',
-    transition: 'all 0.2s'
-  },
-  activeFilterTab: {
-    background: '#009688',
-    color: '#FFFFFF',
-    borderColor: '#009688'
-  },
-  appointmentsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  appointmentCard: {
-    background: '#FFFFFF',
-    padding: '25px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 150, 136, 0.1)',
-    border: '1px solid #B2DFDB',
-    transition: 'transform 0.2s, box-shadow 0.2s'
-  },
-  appointmentHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-    gap: '20px'
-  },
-  appointmentPatient: {
-    display: 'flex',
-    gap: '15px',
-    alignItems: 'center'
-  },
-  profileIcon: {
-    width: '50px',
-    height: '50px',
-    background: 'linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%)',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '22px',
-    color: '#124441'
-  },
-  patientInfo: {
-    flex: 1
-  },
-  appointmentName: {
-    fontSize: '18px',
-    fontWeight: '600',
-    marginBottom: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    flexWrap: 'wrap',
-    color: '#124441'
-  },
-  planBadge: {
-    background: '#009688',
-    color: '#FFFFFF',
-    padding: '4px 12px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '600'
-  },
-  appointmentMeta: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    marginBottom: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    flexWrap: 'wrap'
-  },
-  vaccineBadge: {
-    background: '#FFF3E0',
-    color: '#E65100',
-    padding: '3px 8px',
-    borderRadius: '6px',
-    fontSize: '12px',
-    border: '1px solid #FFE0B2'
-  },
-  consultationType: {
-    fontSize: '14px',
-    color: '#009688',
-    fontWeight: '500'
-  },
-  appointmentTime: {
-    textAlign: 'right',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    color: '#124441',
-    minWidth: '180px'
-  },
-  caregiverInfo: {
-    fontSize: '13px',
-    color: '#4F6F6B',
-    background: '#E0F2F1',
-    padding: '6px 10px',
-    borderRadius: '6px',
-    border: '1px solid #B2DFDB'
-  },
-  appointmentDetails: {
-    marginBottom: '20px',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  appointmentActions: {
-    display: 'flex',
-    gap: '12px',
-    flexWrap: 'wrap'
-  },
-  primaryButton: {
-    padding: '10px 20px',
-    background: 'linear-gradient(135deg, #009688 0%, #00796B 100%)',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    minWidth: '160px',
-    transition: 'all 0.3s ease'
-  },
-  secondaryButton: {
-    padding: '10px 20px',
-    background: 'transparent',
-    color: '#009688',
-    border: '2px solid #009688',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500',
-    transition: 'all 0.3s ease'
-  },
-  successButton: {
-    padding: '10px 20px',
-    background: 'linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    transition: 'all 0.3s ease'
-  },
-  dangerButton: {
-    padding: '10px 20px',
-    background: 'linear-gradient(135deg, #F44336 0%, #D32F2F 100%)',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    transition: 'all 0.3s ease'
-  },
-  cancelledInfo: {
-    width: '100%',
-    padding: '15px',
-    background: '#FFEBEE',
-    borderRadius: '8px',
-    fontSize: '14px',
-    color: '#C62828',
-    border: '1px solid #FFCDD2'
-  },
-  patientsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '25px'
-  },
-  patientsHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '20px'
-  },
-  patientsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-    gap: '25px'
-  },
-  patientCard: {
-    background: '#FFFFFF',
-    padding: '25px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 150, 136, 0.1)',
-    border: '1px solid #B2DFDB',
-    transition: 'transform 0.2s'
-  },
-  patientHeader: {
-    display: 'flex',
-    gap: '20px',
-    alignItems: 'center',
-    marginBottom: '20px'
-  },
-  profileIconLarge: {
-    width: '60px',
-    height: '60px',
-    background: 'linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%)',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '24px',
-    color: '#124441'
-  },
-  patientBasicInfo: {
-    flex: 1
-  },
-  patientName: {
-    fontSize: '18px',
-    fontWeight: '600',
-    marginBottom: '6px',
-    color: '#124441'
-  },
-  patientContact: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    marginBottom: '3px'
-  },
-  planIndicator: {
-    background: '#F8FAFC',
-    padding: '15px',
-    borderRadius: '8px',
-    marginBottom: '20px',
-    border: '1px solid #E0E0E0'
-  },
-  planHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    marginBottom: '8px'
-  },
-  planIcon: {
-    fontSize: '20px'
-  },
-  planName: {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  planCoverage: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  coverageText: {
-    fontSize: '13px',
-    color: '#4F6F6B',
-    background: '#F1F5F9',
-    padding: '4px 10px',
-    borderRadius: '12px'
-  },
-  babyDetails: {
-    background: '#E0F2F1',
-    padding: '20px',
-    borderRadius: '8px',
-    marginBottom: '20px',
-    border: '1px solid #B2DFDB'
-  },
-  detailRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  dueText: {
-    color: '#D32F2F',
-    fontWeight: '600'
-  },
-  reportsSummary: {
-    marginBottom: '20px',
-    padding: '15px',
-    background: '#FFFFFF',
-    borderRadius: '8px',
-    fontSize: '14px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    border: '1px solid #E0E0E0',
-    color: '#124441'
-  },
-  reportCount: {
-    color: '#009688',
-    fontWeight: '600',
-    fontSize: '15px'
-  },
-  patientActions: {
-    display: 'flex',
-    gap: '12px',
-    marginTop: '15px'
-  },
-  // Plans Tab Styles
-  plansContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '30px'
-  },
-  plansHeader: {
-    marginBottom: '10px',
-    textAlign: 'center'
-  },
-  plansGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-    gap: '25px',
-    marginTop: '20px'
-  },
-  planCard: {
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    border: '1px solid #E0E0E0',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-    transition: 'transform 0.3s ease'
-  },
-  planCardHeader: {
-    padding: '25px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px'
-  },
-  planCardIcon: {
-    fontSize: '32px',
-    background: 'rgba(255, 255, 255, 0.9)',
-    width: '60px',
-    height: '60px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  planCardName: {
-    fontSize: '20px',
-    fontWeight: '600',
-    margin: '0 0 5px 0',
-    color: '#124441'
-  },
-  planCardPrice: {
-    fontSize: '22px',
-    fontWeight: 'bold',
-    color: '#124441'
-  },
-  planCardBody: {
-    padding: '25px'
-  },
-  planCardCoverage: {
-    background: '#F5F5F5',
-    padding: '12px 15px',
-    borderRadius: '8px',
-    marginBottom: '20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  coverageIcon: {
-    fontSize: '18px'
-  },
-  planCardFeatures: {
-    marginBottom: '25px'
-  },
-  featuresTitle: {
-    fontSize: '16px',
-    fontWeight: '600',
-    marginBottom: '15px',
-    color: '#124441'
-  },
-  featuresList: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  featureListItem: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    paddingLeft: '20px',
-    position: 'relative'
-  },
-  planCardStats: {
-    paddingTop: '15px',
-    borderTop: '1px solid #E0E0E0'
-  },
-  statItem: {
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  planCardActions: {
-    padding: '0 25px 25px 25px',
-    display: 'flex',
-    gap: '12px'
-  },
-  detailsButton: {
-    flex: 1,
-    padding: '12px',
-    background: 'transparent',
-    color: '#124441',
-    border: '2px solid #009688',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500',
-    transition: 'all 0.3s ease'
-  },
-  recommendButton: {
-    flex: 1,
-    padding: '12px',
-    background: '#009688',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    transition: 'all 0.3s ease'
-  },
-  plansComparison: {
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    padding: '30px',
-    border: '1px solid #B2DFDB'
-  },
-  comparisonTitle: {
-    fontSize: '20px',
-    fontWeight: '600',
-    marginBottom: '20px',
-    color: '#124441',
-    textAlign: 'center'
-  },
-  comparisonTable: {
-    width: '100%',
-    borderCollapse: 'collapse'
-  },
-  tableHeader: {
-    padding: '15px',
-    textAlign: 'left',
-    borderBottom: '2px solid #E0E0E0',
-    fontWeight: '600',
-    fontSize: '14px',
-    color: '#124441'
-  },
-  tableCell: {
-    padding: '15px',
-    borderBottom: '1px solid #E0E0E0',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  // Video Consultation Styles
-  videoModalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(18, 68, 65, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2000
-  },
-  videoModal: {
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    width: '95%',
-    maxWidth: '1200px',
-    height: '80vh',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden'
-  },
-  videoHeader: {
-    background: '#009688',
-    color: '#FFFFFF',
-    padding: '15px 25px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  videoHeaderInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px'
-  },
-  videoStatus: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px'
-  },
-  connectedDot: {
-    color: '#4CAF50',
-    fontSize: '12px'
-  },
-  callTimer: {
-    background: 'rgba(255,255,255,0.1)',
-    padding: '5px 12px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    fontWeight: '600'
-  },
-  endCallButton: {
-    background: '#F44336',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '8px 20px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: '600'
-  },
-  videoMainArea: {
-    flex: 1,
-    display: 'flex',
-    overflow: 'hidden'
-  },
-  patientVideoContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    background: '#E0F2F1'
-  },
-  patientVideoHeader: {
-    padding: '15px 25px',
-    borderBottom: '1px solid #B2DFDB',
-    background: '#FFFFFF'
-  },
-  patientVideoInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  patientVideoName: {
-    margin: 0,
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  babyInfoIndicator: {
-    background: '#E0F2F1',
-    color: '#124441',
-    padding: '4px 12px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    border: '1px solid #B2DFDB'
-  },
-  videoFeed: {
-    flex: 1,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    position: 'relative'
-  },
-  videoMock: {
-    flex: 1,
-    background: 'linear-gradient(135deg, #009688 0%, #00796B 100%)',
-    borderRadius: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  videoMockContent: {
-    textAlign: 'center',
-    color: '#FFFFFF'
-  },
-  videoMockAvatar: {
-    fontSize: '80px',
-    marginBottom: '20px'
-  },
-  videoMockText: {
-    fontSize: '24px',
-    fontWeight: '600',
-    margin: 0,
-    marginBottom: '5px'
-  },
-  videoMockSubtext: {
-    fontSize: '16px',
-    opacity: 0.9,
-    margin: 0
-  },
-  selfView: {
-    width: '200px',
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    border: '2px solid #B2DFDB',
-    position: 'absolute',
-    bottom: '20px',
-    right: '20px',
-    overflow: 'hidden'
-  },
-  selfViewHeader: {
-    background: '#E0F2F1',
-    padding: '8px 12px',
-    borderBottom: '1px solid #B2DFDB'
-  },
-  selfViewLabel: {
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  selfViewVideo: {
-    padding: '15px',
-    textAlign: 'center'
-  },
-  selfViewMock: {
-    background: '#E0F2F1',
-    borderRadius: '8px',
-    padding: '15px'
-  },
-  selfViewEmoji: {
-    fontSize: '40px',
-    marginBottom: '5px'
-  },
-  selfViewText: {
-    fontSize: '12px',
-    color: '#124441',
-    margin: 0
-  },
-  quickTools: {
-    width: '300px',
-    background: '#FFFFFF',
-    borderLeft: '1px solid #B2DFDB',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  quickToolsHeader: {
-    padding: '20px',
-    borderBottom: '1px solid #B2DFDB'
-  },
-  quickToolsTitle: {
-    margin: 0,
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  toolButtons: {
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  toolButton: {
-    background: '#FFFFFF',
-    border: '1px solid #B2DFDB',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#124441',
-    transition: 'all 0.2s'
-  },
-  recordingButton: {
-    background: '#FFEBEE',
-    border: '1px solid #F44336',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#F44336',
-    fontWeight: '500'
-  },
-  toolIcon: {
-    fontSize: '18px'
-  },
-  consultationNotes: {
-    flex: 1,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  notesTitle: {
-    margin: '0 0 15px 0',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  notesTextarea: {
-    flex: 1,
-    border: '1px solid #B2DFDB',
-    borderRadius: '8px',
-    padding: '12px',
-    fontSize: '14px',
-    fontFamily: 'inherit',
-    resize: 'none',
-    marginBottom: '15px'
-  },
-  saveNotesButton: {
-    background: '#009688',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '10px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: '500',
-    fontSize: '14px'
-  },
-  videoFooter: {
-    background: '#E0F2F1',
-    padding: '12px 25px',
-    borderTop: '1px solid #B2DFDB',
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '14px',
-    color: '#124441'
-  },
-  appointmentInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  // Modal Styles
-  modalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(18, 68, 65, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    padding: '20px'
-  },
-  modal: {
-    background: '#FFFFFF',
-    borderRadius: '16px',
-    maxWidth: '500px',
-    width: '100%',
-    maxHeight: '90vh',
-    overflow: 'auto',
-    boxShadow: '0 20px 60px rgba(0, 150, 136, 0.3)'
-  },
-  modalHeader: {
-    padding: '25px',
-    borderBottom: '1px solid #E0E0E0',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    background: '#F8FAFC',
-    borderTopLeftRadius: '16px',
-    borderTopRightRadius: '16px'
-  },
-  modalTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#124441',
-    margin: 0
-  },
-  closeButton: {
-    background: 'none',
-    border: 'none',
-    fontSize: '24px',
-    cursor: 'pointer',
-    color: '#4F6F6B'
-  },
-  modalContent: {
-    padding: '25px'
-  },
-  planHeaderCard: {
-    padding: '25px',
-    borderRadius: '12px',
-    marginBottom: '25px'
-  },
-  planHeaderContent: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px'
-  },
-  planIconLarge: {
-    fontSize: '48px',
-    background: 'rgba(255, 255, 255, 0.9)',
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  planTitle: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    margin: '0 0 8px 0',
-    color: '#124441'
-  },
-  planPrice: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#124441',
-    margin: '0 0 5px 0'
-  },
-  planDuration: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    margin: 0
-  },
-  section: {
-    marginBottom: '25px'
-  },
-  sectionTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    marginBottom: '15px',
-    color: '#124441',
-    paddingBottom: '10px',
-    borderBottom: '2px solid #E0E0E0'
-  },
-  idealFor: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '15px',
-    background: '#E0F2F1',
-    borderRadius: '8px',
-    fontSize: '15px',
-    color: '#124441',
-    border: '1px solid #B2DFDB'
-  },
-  idealForIcon: {
-    fontSize: '20px'
-  },
-  coverageCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '15px',
-    background: '#F5F5F5',
-    borderRadius: '8px',
-    fontSize: '15px',
-    color: '#4F6F6B',
-    border: '1px solid #E0E0E0'
-  },
-  featuresList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  featureItem: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-    fontSize: '14px',
-    color: '#4F6F6B',
-    padding: '10px',
-    borderRadius: '6px',
-    background: '#F5F5F5'
-  },
-  checkIcon: {
-    color: '#4CAF50',
-    fontSize: '16px',
-    flexShrink: 0
-  },
-  recommendation: {
-    background: '#E0F2F1',
-    padding: '20px',
-    borderRadius: '8px',
-    fontSize: '15px',
-    color: '#124441',
-    border: '1px solid #B2DFDB',
-    lineHeight: '1.6'
-  },
-  selectPlanButton: {
-    width: '100%',
-    padding: '16px',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: '600',
-    marginTop: '20px'
-  },
-  // Notifications
-  notificationsContainer: {
-    position: 'fixed',
-    top: '20px',
-    right: '20px',
-    zIndex: 1001,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  notification: {
-    padding: '15px 25px',
-    borderRadius: '8px',
-    color: '#FFFFFF',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-    fontSize: '14px',
-    fontWeight: '500'
-  },
-  // Empty State
-  emptyState: {
-    textAlign: 'center',
-    padding: '60px 40px',
-    color: '#4F6F6B',
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    border: '2px dashed #BDBDBD'
-  },
-  emptyStateIcon: {
-    fontSize: '48px',
-    marginBottom: '16px',
-    opacity: 0.5
-  }
-};
-
-export default BabyCareContent;
+export default BabyCareContent;  

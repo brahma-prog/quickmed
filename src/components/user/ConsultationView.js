@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Doctors Data with priority indicators
 const pediatricDoctors = [
@@ -93,8 +93,8 @@ const generalDoctors = [
   }
 ];
 
-// Memoized Priority Badge Component
-const PriorityBadge = memo(({ priority }) => {
+// Priority Badge Component
+const PriorityBadge = ({ priority }) => {
   const priorityConfig = {
     'L1': { label: 'High Priority', color: '#DC2626', bg: '#FEE2E2', icon: '⚠️' },
     'L2': { label: 'Medium Priority', color: '#D97706', bg: '#FEF3C7', icon: '⏰' },
@@ -121,12 +121,10 @@ const PriorityBadge = memo(({ priority }) => {
       {config.label}
     </div>
   );
-});
+};
 
-PriorityBadge.displayName = 'PriorityBadge';
-
-// Memoized Doctor Card Component
-const DoctorCard = memo(({ 
+// Doctor Card Component
+const DoctorCard = ({ 
   doctor, 
   getAppointmentDetails, 
   handleBookAppointmentClick, 
@@ -295,539 +293,7 @@ const DoctorCard = memo(({
       )}
     </div>
   );
-});
-
-DoctorCard.displayName = 'DoctorCard';
-
-// Memoized helper components for TimeSlotsModal
-const DateButton = memo(({ day, isSelected, onSelect }) => (
-  <button
-    onClick={() => onSelect(day.date)}
-    style={dateButtonStyle(isSelected)}
-    type="button"
-  >
-    <div style={dateDayStyle}>{day.day}</div>
-    <div style={dateNumStyle}>{day.dateNum}</div>
-    <div style={dateMonthStyle}>{day.month}</div>
-  </button>
-));
-DateButton.displayName = 'DateButton';
-
-const TimeSlotButton = memo(({ time, isSelected, onSelect }) => (
-  <button
-    onClick={() => onSelect(time)}
-    style={timeSlotButtonStyle(isSelected)}
-    type="button"
-  >
-    {time}
-  </button>
-));
-TimeSlotButton.displayName = 'TimeSlotButton';
-
-const PriorityButton = memo(({ priority, isSelected, onSelect }) => (
-  <button
-    onClick={() => onSelect(priority)}
-    style={priorityButtonStyle(isSelected)}
-    type="button"
-  >
-    <PriorityBadge priority={priority} />
-  </button>
-));
-PriorityButton.displayName = 'PriorityButton';
-
-// Memoized Time Slots Modal Component
-const TimeSlotsModal = memo(({
-  showTimeSlotsModal,
-  selectedDoctor,
-  appointmentType,
-  selectedPriority,
-  selectedAppointmentDate,
-  selectedAppointmentTime,
-  bookedAppointments,
-  onClose,
-  onDateSelect,
-  onTimeSelect,
-  onPrioritySelect,
-  onConfirm,
-  onCancel
-}) => {
-  // Generate next 7 days (stable reference) - moved hooks to top
-  const next7Days = useMemo(() => 
-    Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() + i);
-      return {
-        date: date.toISOString().split('T')[0],
-        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-        dateNum: date.getDate(),
-        month: date.toLocaleDateString('en-US', { month: 'short' })
-      };
-    }), []
-  );
-
-  const convertTo24Hour = useCallback((time12h) => {
-    if (!time12h) return '';
-    const [time, modifier] = time12h.split(' ');
-    let [hours, minutes] = time.split(':');
-    
-    if (hours === '12') {
-      hours = '00';
-    }
-    
-    if (modifier === 'PM') {
-      hours = parseInt(hours, 10) + 12;
-    }
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes}`;
-  }, []);
-
-  const isTimeSlotAvailable = useCallback((doctorId, date, time, type) => {
-    const appointmentDateTime = new Date(date + 'T' + convertTo24Hour(time));
-    
-    const existingAppointment = bookedAppointments.find(appt => 
-      appt.doctorId === doctorId && 
-      appt.type === type &&
-      new Date(appt.appointmentDateTime).getTime() === appointmentDateTime.getTime() &&
-      appt.status === 'confirmed'
-    );
-    
-    return !existingAppointment;
-  }, [bookedAppointments, convertTo24Hour]);
-
-  const getAvailableTimeSlots = useCallback(() => {
-    if (!selectedDoctor || !selectedDoctor.availableSlots) return [];
-    return selectedDoctor.availableSlots.filter(time => 
-      isTimeSlotAvailable(selectedDoctor.id, selectedAppointmentDate, time, appointmentType)
-    );
-  }, [selectedDoctor, selectedAppointmentDate, appointmentType, isTimeSlotAvailable]);
-
-  // Early return must be after all hooks
-  if (!showTimeSlotsModal || !selectedDoctor) return null;
-
-  const availableTimeSlots = selectedAppointmentDate ? getAvailableTimeSlots() : [];
-
-  const fee = appointmentType === 'home' 
-    ? selectedDoctor.homeConsultFee 
-    : appointmentType === 'video'
-    ? selectedDoctor.videoConsultFee
-    : selectedDoctor.consultationFee;
-
-  return (
-    <div style={modalOverlayStyle} onClick={(e) => {
-      if (e.target === e.currentTarget) {
-        onClose();
-      }
-    }}>
-      <div style={timeSlotsModalStyle} onClick={(e) => e.stopPropagation()}>
-        <div style={modalHeaderStyle}>
-          <h3 style={{ color: '#124441', margin: 0, fontSize: '1.3rem' }}>
-            Book {appointmentType === 'home' ? 'Home Consultation' : 
-                  appointmentType === 'video' ? 'Video Consultation' : 'Appointment'}
-          </h3>
-          <button 
-            onClick={onClose} 
-            style={closeModalButtonStyle} 
-            type="button"
-          >
-            ×
-          </button>
-        </div>
-
-        <div style={modalContentStyle}>
-          {/* Doctor Info */}
-          <div style={doctorModalInfoStyle}>
-            <div style={doctorModalHeaderStyle}>
-              <h4 style={{ color: '#124441', margin: '0 0 0.5rem 0' }}>
-                Dr. {selectedDoctor.name}
-              </h4>
-              <p style={{ color: '#4F6F6B', margin: 0, fontSize: '0.9rem' }}>
-                {selectedDoctor.specialty} • {selectedDoctor.experience} experience
-              </p>
-              <div style={{ marginTop: '0.5rem' }}>
-                <span style={consultationFeeStyle}>
-                  Fee: ₹{fee}
-                  {appointmentType === 'home' && ' (Home Consultation)'}
-                  {appointmentType === 'video' && ' (Video Consultation)'}
-                </span>
-              </div>
-            </div>
-
-            {/* Priority Selection */}
-            <div style={prioritySelectionStyle}>
-              <label style={{ color: '#4F6F6B', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
-                Select Priority Level:
-              </label>
-              <div style={priorityButtonsStyle}>
-                {['L1', 'L2', 'L3'].map((priority) => (
-                  <PriorityButton
-                    key={priority}
-                    priority={priority}
-                    isSelected={priority === selectedPriority}
-                    onSelect={onPrioritySelect}
-                  />
-                ))}
-              </div>
-              <p style={{ color: '#4F6F6B', fontSize: '0.8rem', marginTop: '0.5rem', fontStyle: 'italic' }}>
-                {selectedPriority === 'L1' && 'High priority for emergency/urgent cases'}
-                {selectedPriority === 'L2' && 'Medium priority for routine consultations'}
-                {selectedPriority === 'L3' && 'Low priority for regular checkups'}
-              </p>
-            </div>
-
-            {/* Date Selection */}
-            <div style={dateSelectionStyle}>
-              <label style={{ color: '#4F6F6B', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
-                Select Date:
-              </label>
-              <div style={dateButtonsStyle}>
-                {next7Days.map((day) => (
-                  <DateButton
-                    key={day.date}
-                    day={day}
-                    isSelected={day.date === selectedAppointmentDate}
-                    onSelect={onDateSelect}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Time Selection */}
-            {selectedAppointmentDate && (
-              <div style={timeSelectionStyle}>
-                <label style={{ color: '#4F6F6B', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
-                  Select Time Slot:
-                </label>
-                {availableTimeSlots.length === 0 ? (
-                  <div style={noSlotsStyle}>
-                    <p style={{ color: '#DC2626', margin: 0 }}>
-                      No available slots for {appointmentType} consultation on this date. Please select another date.
-                    </p>
-                  </div>
-                ) : (
-                  <div style={timeSlotsGridStyle}>
-                    {availableTimeSlots.map((time) => (
-                      <TimeSlotButton
-                        key={time}
-                        time={time}
-                        isSelected={time === selectedAppointmentTime}
-                        onSelect={onTimeSelect}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Selected Details */}
-            {(selectedAppointmentDate || selectedAppointmentTime) && (
-              <div style={selectedDetailsStyle}>
-                <h4 style={{ color: '#124441', margin: '0 0 0.75rem 0', fontSize: '1.1rem' }}>
-                  Appointment Details
-                </h4>
-                
-                {selectedAppointmentDate && (
-                  <div style={detailRowStyle}>
-                    <span style={detailLabelStyle}>Date:</span>
-                    <span style={detailValueStyle}>
-                      {new Date(selectedAppointmentDate).toLocaleDateString('en-US', { 
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-                      })}
-                    </span>
-                  </div>
-                )}
-                
-                {selectedAppointmentTime && (
-                  <div style={detailRowStyle}>
-                    <span style={detailLabelStyle}>Time:</span>
-                    <span style={detailValueStyle}>{selectedAppointmentTime}</span>
-                  </div>
-                )}
-                
-                {selectedPriority && (
-                  <div style={detailRowStyle}>
-                    <span style={detailLabelStyle}>Priority:</span>
-                    <span style={detailValueStyle}>
-                      <PriorityBadge priority={selectedPriority} />
-                    </span>
-                  </div>
-                )}
-                
-                <div style={detailRowStyle}>
-                  <span style={detailLabelStyle}>Type:</span>
-                  <span style={detailValueStyle}>
-                    {appointmentType === 'home' ? 'Home Consultation' : 
-                     appointmentType === 'video' ? 'Video Consultation' : 'Clinic Visit'}
-                  </span>
-                </div>
-                
-                <div style={detailRowStyle}>
-                  <span style={detailLabelStyle}>Fee:</span>
-                  <span style={feeAmountStyle}>₹{fee}</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Confirmation Buttons Section */}
-        <div style={modalButtonsStyle}>
-          <button 
-            onClick={onCancel} 
-            style={cancelButtonStyle} 
-            type="button"
-          >
-            Cancel
-          </button>
-          <button 
-            onClick={onConfirm} 
-            disabled={!selectedAppointmentDate || !selectedAppointmentTime || availableTimeSlots.length === 0}
-            style={confirmAppointmentButtonStyle} 
-            type="button"
-          >
-            {appointmentType === 'home' ? 'Book Home Consultation' : 
-             appointmentType === 'video' ? 'Book Video Consultation' : 'Book Appointment'}
-            <div style={{ fontSize: '0.9rem', marginTop: '0.25rem', fontWeight: 'normal' }}>
-              Pay ₹{fee} to confirm
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-TimeSlotsModal.displayName = 'TimeSlotsModal';
-
-// Memoized Payment Modal Component
-const PaymentModal = memo(({
-  showPaymentModal,
-  selectedDoctor,
-  appointmentType,
-  selectedPriority,
-  selectedAppointmentDate,
-  selectedAppointmentTime,
-  paymentAmount,
-  paymentStatus,
-  paymentLoading,
-  razorpayLoaded,
-  pendingAppointment,
-  onClose,
-  onBack,
-  onProcessPayment,
-  onRetry,
-  onDone
-}) => {
-  // Early return must be at the beginning
-  if (!showPaymentModal || !selectedDoctor || !pendingAppointment) return null;
-
-  // FIXED: Only show failed/cancelled messages when status is actually 'failed' or 'cancelled'
-  const showFailedMessage = paymentStatus === 'failed';
-  const showCancelledMessage = paymentStatus === 'cancelled';
-
-  return (
-    <div style={modalOverlayStyle} onClick={(e) => {
-      if (e.target === e.currentTarget && paymentStatus !== 'processing') {
-        onClose();
-      }
-    }}>
-      <div style={paymentModalStyle} onClick={(e) => e.stopPropagation()}>
-        <div style={paymentModalHeaderStyle}>
-          <h3 style={{ color: '#124441', margin: 0, fontSize: '1.3rem' }}>
-            Complete Payment
-          </h3>
-          {paymentStatus !== 'processing' && (
-            <button 
-              onClick={onClose} 
-              style={closeModalButtonStyle} 
-              type="button"
-            >
-              ×
-            </button>
-          )}
-        </div>
-
-        <div style={paymentContentStyle}>
-          {/* Payment Header */}
-          <div style={paymentHeaderStyle}>
-            <div style={paymentDoctorInfoStyle}>
-              <h4 style={{ color: '#124441', margin: '0 0 0.5rem 0' }}>
-                Dr. {selectedDoctor.name}
-              </h4>
-              <p style={{ color: '#4F6F6B', margin: 0, fontSize: '0.9rem' }}>
-                {selectedDoctor.specialty}
-              </p>
-              <div style={appointmentDetailsStyle}>
-                <span style={{ color: '#124441', fontWeight: '600' }}>
-                  {new Date(selectedAppointmentDate).toLocaleDateString('en-US', { 
-                    weekday: 'short', month: 'short', day: 'numeric' 
-                  })}
-                </span>
-                <span style={{ color: '#4F6F6B' }}> at </span>
-                <span style={{ color: '#124441', fontWeight: '600' }}>
-                  {selectedAppointmentTime}
-                </span>
-              </div>
-              <div style={{ marginTop: '0.25rem' }}>
-                <span style={{ 
-                  backgroundColor: '#E0F2F1', 
-                  color: '#124441',
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '4px',
-                  fontSize: '0.8rem'
-                }}>
-                  {appointmentType === 'home' ? 'Home Consultation' : 
-                   appointmentType === 'video' ? 'Video Consultation' : 'Clinic Appointment'}
-                </span>
-              </div>
-              {selectedPriority && (
-                <div style={{ marginTop: '0.5rem' }}>
-                  <PriorityBadge priority={selectedPriority} />
-                </div>
-              )}
-            </div>
-            
-            <div style={paymentAmountStyle}>
-              <div style={amountLabelStyle}>Total Amount</div>
-              <div style={amountValueStyle}>₹{paymentAmount}</div>
-            </div>
-          </div>
-
-          {/* Payment Status */}
-          {paymentStatus === 'processing' && (
-            <div style={processingContainerStyle}>
-              <div style={loadingSpinnerStyle}></div>
-              <p style={{ color: '#124441', margin: '1rem 0 0 0', fontWeight: '600' }}>
-                Processing payment...
-              </p>
-            </div>
-          )}
-
-          {paymentStatus === 'success' && (
-            <div style={successContainerStyle}>
-              <div style={successIconStyle}>✓</div>
-              <h4 style={{ color: '#059669', margin: '1rem 0 0.5rem 0', fontWeight: '600' }}>
-                Payment Successful!
-              </h4>
-              <p style={{ color: '#4F6F6B', fontSize: '0.9rem' }}>
-                Your appointment has been confirmed and is being processed.
-              </p>
-            </div>
-          )}
-
-          {showFailedMessage && (
-            <div style={failedContainerStyle}>
-              <div style={failedIconStyle}>✕</div>
-              <h4 style={{ color: '#DC2626', margin: '1rem 0 0.5rem 0', fontWeight: '600' }}>
-                Payment Failed
-              </h4>
-              <p style={{ color: '#4F6F6B', fontSize: '0.9rem' }}>
-                Please try again or use a different payment method.
-              </p>
-            </div>
-          )}
-
-          {showCancelledMessage && (
-            <div style={failedContainerStyle}>
-              <div style={failedIconStyle}>✕</div>
-              <h4 style={{ color: '#DC2626', margin: '1rem 0 0.5rem 0', fontWeight: '600' }}>
-                Payment Cancelled
-              </h4>
-              <p style={{ color: '#4F6F6B', fontSize: '0.9rem' }}>
-                You cancelled the payment. Please try again to complete your booking.
-              </p>
-            </div>
-          )}
-
-          {/* Payment Options - Only show when status is 'pending' */}
-          {paymentStatus === 'pending' && (
-            <>
-              <div style={paymentOptionsStyle}>
-                <h4 style={{ color: '#124441', margin: '0 0 1rem 0', fontSize: '1.1rem' }}>
-                  Choose Payment Method
-                </h4>
-                
-                <button 
-                  onClick={onProcessPayment}
-                  disabled={paymentLoading}
-                  style={razorpayButtonStyle}
-                  type="button"
-                >
-                  <div style={paymentMethodIconStyle}>💳</div>
-                  <div>
-                    <div style={paymentMethodNameStyle}>Credit/Debit Card</div>
-                    <div style={paymentMethodDescStyle}>Pay with Razorpay</div>
-                  </div>
-                </button>
-              </div>
-
-              <div style={securityInfoStyle}>
-                <div style={secureBadgeStyle}>🔒</div>
-                <span style={{ fontSize: '0.85rem', color: '#4F6F6B' }}>
-                  Secure payment powered by Razorpay
-                </span>
-              </div>
-            </>
-          )}
-
-          {/* Action Buttons */}
-          <div style={paymentButtonsStyle}>
-            {paymentStatus === 'pending' && (
-              <>
-                <button 
-                  onClick={onBack}
-                  style={paymentCancelButtonStyle}
-                  type="button"
-                  disabled={paymentLoading}
-                >
-                  Back
-                </button>
-                <button 
-                  onClick={onProcessPayment}
-                  style={paymentConfirmButtonStyle(paymentLoading)}
-                  type="button"
-                  disabled={paymentLoading}
-                >
-                  {paymentLoading ? 'Processing...' : `Pay ₹${paymentAmount}`}
-                </button>
-              </>
-            )}
-
-            {paymentStatus === 'success' && (
-              <button 
-                onClick={onDone}
-                style={paymentDoneButtonStyle}
-                type="button"
-              >
-                Done
-              </button>
-            )}
-
-            {(showFailedMessage || showCancelledMessage) && (
-              <>
-                <button 
-                  onClick={onBack}
-                  style={paymentCancelButtonStyle}
-                  type="button"
-                >
-                  Back
-                </button>
-                <button 
-                  onClick={onRetry}
-                  style={paymentRetryButtonStyle}
-                  type="button"
-                >
-                  Try Again
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-PaymentModal.displayName = 'PaymentModal';
+};
 
 const ConsultationView = ({
   doctorSearchQuery,
@@ -844,10 +310,11 @@ const ConsultationView = ({
   const [selectedAppointmentTime, setSelectedAppointmentTime] = useState('');
   const [selectedAppointmentDate, setSelectedAppointmentDate] = useState('');
   const [selectedPriority, setSelectedPriority] = useState('');
+  const [showCalendar, setShowCalendar] = useState(false);
   const [appointmentType, setAppointmentType] = useState('clinic');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
-  const [paymentStatus, setPaymentStatus] = useState('pending'); // Always start with 'pending'
+  const [paymentStatus, setPaymentStatus] = useState('pending');
   const [paymentId, setPaymentId] = useState('');
   const [pendingAppointment, setPendingAppointment] = useState(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -875,7 +342,7 @@ const ConsultationView = ({
   }, [addNotification]);
 
   // Load Razorpay Script
-  const loadRazorpayScript = useCallback(() => {
+  const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       if (window.Razorpay) {
         resolve(true);
@@ -887,65 +354,19 @@ const ConsultationView = ({
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
-  }, []);
+  };
 
-  // Search functionality
-  const filterDoctorsBySearch = useCallback((doctors) => {
-    if (!doctorSearchQuery.trim()) return doctors;
-    
-    const query = doctorSearchQuery.toLowerCase().trim();
-    
-    return doctors.filter(doctor => {
-      return (
-        doctor.name.toLowerCase().includes(query) ||
-        doctor.specialty.toLowerCase().includes(query) ||
-        doctor.hospital.toLowerCase().includes(query) ||
-        (doctor.description && doctor.description.toLowerCase().includes(query)) ||
-        (doctor.keywords && doctor.keywords.some(keyword => keyword.toLowerCase().includes(query)))
-      );
-    });
-  }, [doctorSearchQuery]);
-
-  // Filtered doctor lists
-  const pediatricDoctorsFiltered = useMemo(() => 
-    filterDoctorsBySearch(pediatricDoctors), 
-    [filterDoctorsBySearch]
-  );
-
-  const pregnancyDoctorsFiltered = useMemo(() => 
-    filterDoctorsBySearch(pregnancyDoctors), 
-    [filterDoctorsBySearch]
-  );
-
-  const generalDoctorsFiltered = useMemo(() => 
-    filterDoctorsBySearch(generalDoctors), 
-    [filterDoctorsBySearch]
-  );
-
-  // Check if any search results exist
-  const hasSearchResults = useMemo(() => {
-    if (!doctorSearchQuery.trim()) return false;
-    
-    const allDoctors = [
-      ...pediatricDoctorsFiltered,
-      ...pregnancyDoctorsFiltered,
-      ...generalDoctorsFiltered
-    ];
-    
-    return allDoctors.length > 0;
-  }, [doctorSearchQuery, pediatricDoctorsFiltered, pregnancyDoctorsFiltered, generalDoctorsFiltered]);
-
-  // Helper Functions - memoized
-  const getAppointmentDetails = useCallback((doctorId, type) => {
+  // Helper Functions
+  const getAppointmentDetails = (doctorId, type) => {
     return bookedAppointments.find(appt => 
       appt.doctorId === doctorId && 
       appt.status === 'confirmed' && 
       appt.type === type &&
       new Date(appt.appointmentDateTime) > new Date()
     );
-  }, [bookedAppointments]);
+  };
 
-  const convertTo24Hour = useCallback((time12h) => {
+  const convertTo24Hour = (time12h) => {
     if (!time12h) return '';
     const [time, modifier] = time12h.split(' ');
     let [hours, minutes] = time.split(':');
@@ -959,47 +380,52 @@ const ConsultationView = ({
     }
     
     return `${hours.toString().padStart(2, '0')}:${minutes}`;
-  }, []);
+  };
 
-  // FIXED: Reset payment status when starting new booking
-  const handleBookAppointmentClick = useCallback((doctor, type = 'clinic') => {
-    // Reset all payment-related states to ensure fresh start
-    setPaymentStatus('pending');
-    setPaymentAmount(0);
-    setPaymentId('');
-    setPendingAppointment(null);
-    setPaymentLoading(false);
+  const isTimeSlotAvailable = (doctorId, date, time, type) => {
+    const appointmentDateTime = new Date(date + 'T' + convertTo24Hour(time));
     
-    // Set new booking states
+    const existingAppointment = bookedAppointments.find(appt => 
+      appt.doctorId === doctorId && 
+      appt.type === type &&
+      new Date(appt.appointmentDateTime).getTime() === appointmentDateTime.getTime() &&
+      appt.status === 'confirmed'
+    );
+    
+    return !existingAppointment;
+  };
+
+  const handleBookAppointmentClick = (doctor, type = 'clinic') => {
     setSelectedDoctor(doctor);
     setAppointmentType(type);
     setSelectedPriority('');
     setSelectedAppointmentDate('');
     setSelectedAppointmentTime('');
     setShowTimeSlotsModal(true);
-  }, []);
+  };
 
-  const handleBookHomeConsultationClick = useCallback((doctor) => {
+  const handleBookHomeConsultationClick = (doctor) => {
     if (!doctor.homeConsultation) {
       alert(`Dr. ${doctor.name} does not offer home consultation services. Please book a clinic appointment.`);
       handleBookAppointmentClick(doctor, 'clinic');
       return;
     }
     handleBookAppointmentClick(doctor, 'home');
-  }, [handleBookAppointmentClick]);
+  };
 
-  const handleBookVideoConsultationClick = useCallback((doctor) => {
+  const handleBookVideoConsultationClick = (doctor) => {
     handleBookAppointmentClick(doctor, 'video');
-  }, [handleBookAppointmentClick]);
+  };
 
-  const handleStartVideoCallClick = useCallback((doctor) => {
-    alert(`Starting video call with Dr. ${doctor.name}...\n\nVideo call functionality would be implemented here.`);
-  }, []);
-
-  // FIXED: Reset payment status when confirming appointment
-  const handleConfirmAppointment = useCallback(() => {
+  const handleConfirmAppointment = () => {
     if (!selectedDoctor || !selectedAppointmentDate || !selectedAppointmentTime) {
       alert('Please select date and time');
+      return;
+    }
+
+    // Check if time slot is available
+    if (!isTimeSlotAvailable(selectedDoctor.id, selectedAppointmentDate, selectedAppointmentTime, appointmentType)) {
+      alert('This time slot is already booked. Please choose another time.');
       return;
     }
 
@@ -1018,7 +444,6 @@ const ConsultationView = ({
       status: 'pending',
       priority: selectedPriority || selectedDoctor.priority || 'L2',
       type: appointmentType,
-      consultationType: appointmentType,
       fee: fee,
       id: `appt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       category: selectedDoctor.isPediatric ? 'Pediatric' : 
@@ -1031,18 +456,13 @@ const ConsultationView = ({
       createdAt: new Date().toISOString()
     };
 
-    // Reset payment state before starting new payment flow
-    setPaymentStatus('pending');
-    setPaymentId('');
-    setPaymentLoading(false);
-    
     setPaymentAmount(fee);
     setPendingAppointment(newAppointment);
     setShowTimeSlotsModal(false);
     setShowPaymentModal(true);
-  }, [selectedDoctor, selectedAppointmentDate, selectedAppointmentTime, appointmentType, selectedPriority, convertTo24Hour]);
+  };
 
-  const processPayment = useCallback(async (appointmentDetails) => {
+  const processPayment = async (appointmentDetails) => {
     if (!razorpayLoaded) {
       alert('Payment system is loading, please try again in a moment.');
       return false;
@@ -1068,12 +488,9 @@ const ConsultationView = ({
         modal: {
           ondismiss: () => {
             setPaymentLoading(false);
-            setPaymentStatus('cancelled');
-            // Only show alert if payment was actually cancelled from Razorpay modal
+            setPaymentStatus('failed');
             setTimeout(() => {
-              if (paymentStatus === 'processing') {
-                alert('Payment was cancelled. Please try again.');
-              }
+              alert('Payment was cancelled. Please try again.');
             }, 500);
           }
         }
@@ -1089,9 +506,9 @@ const ConsultationView = ({
       alert('Payment failed to initialize. Please try again.');
       return false;
     }
-  }, [razorpayLoaded, paymentAmount, appointmentType, selectedDoctor, profile, paymentStatus]);
+  };
 
-  const handlePaymentSuccess = useCallback(async (paymentResponse, appointmentDetails) => {
+  const handlePaymentSuccess = async (paymentResponse, appointmentDetails) => {
     try {
       setPaymentId(paymentResponse.razorpay_payment_id);
       setPaymentStatus('success');
@@ -1106,22 +523,20 @@ const ConsultationView = ({
       setPaymentStatus('failed');
       alert('Payment verification failed. Please contact support.');
     }
-  }, []);
+  };
 
-  const verifyPayment = useCallback(() => {
+  const verifyPayment = () => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({ success: true });
       }, 2000);
     });
-  }, []);
+  };
 
-  const completeAppointmentBooking = useCallback((appointmentDetails) => {
+  const completeAppointmentBooking = (appointmentDetails) => {
     const appointmentWithPayment = {
       ...appointmentDetails,
       status: 'confirmed',
-      consultationType: appointmentType,
-      type: appointmentType,
       payment: {
         status: 'completed',
         amount: paymentAmount,
@@ -1141,93 +556,447 @@ const ConsultationView = ({
     setSelectedDoctor(null);
     
     setTimeout(() => {
-      const appointmentTypeText = appointmentType === 'video' 
-        ? 'Video Consultation' 
-        : appointmentType === 'home' 
-        ? 'Home Consultation' 
-        : 'Clinic Appointment';
+      const appointmentTypeText = 
+        appointmentType === 'home' ? 'Home Consultation' : 
+        appointmentType === 'video' ? 'Video Consultation' : 'Clinic Appointment';
       
       alert(`✅ Payment Successful!\n\n${appointmentTypeText} booked successfully with Dr. ${appointmentWithPayment.doctorName}!\n\nPayment Amount: ₹${paymentAmount}\nDate: ${new Date(appointmentWithPayment.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\nTime: ${appointmentWithPayment.time}\n\nYour appointment has been confirmed!`);
       
       if (addNotification) {
         addNotification(
           'Appointment Confirmed',
-          `Your ${appointmentTypeText} with Dr. ${appointmentWithPayment.doctorName} has been confirmed.`,
+          `Your ${appointmentType} appointment with Dr. ${appointmentWithPayment.doctorName} has been confirmed.`,
           'appointment'
         );
       }
     }, 100);
-  }, [appointmentType, paymentAmount, paymentId, handleBookAppointment, addNotification]);
+  };
 
-  // FIXED: Modal handlers - clear all states when closing modals
-  const handleModalClose = useCallback(() => {
-    setShowTimeSlotsModal(false);
-    // Reset all booking states when closing modal
-    setSelectedDoctor(null);
-    setSelectedPriority('');
-    setSelectedAppointmentDate('');
-    setSelectedAppointmentTime('');
-    setAppointmentType('clinic');
-  }, []);
+  // Appointment Booking Modal
+  const TimeSlotsModal = () => {
+    if (!showTimeSlotsModal || !selectedDoctor) return null;
 
-  const handleModalCancel = useCallback(() => {
-    setShowTimeSlotsModal(false);
-    // Reset all booking states when cancelling
-    setSelectedDoctor(null);
-    setSelectedPriority('');
-    setSelectedAppointmentDate('');
-    setSelectedAppointmentTime('');
-    setAppointmentType('clinic');
-  }, []);
+    const fee = appointmentType === 'home' 
+      ? selectedDoctor.homeConsultFee 
+      : appointmentType === 'video'
+      ? selectedDoctor.videoConsultFee
+      : selectedDoctor.consultationFee;
 
-  const handleDateSelect = useCallback((date) => {
-    setSelectedAppointmentDate(date);
-    setSelectedAppointmentTime(''); // Reset time when date changes
-  }, []);
+    // Generate next 7 days
+    const next7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      return {
+        date: date.toISOString().split('T')[0],
+        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        dateNum: date.getDate(),
+        month: date.toLocaleDateString('en-US', { month: 'short' })
+      };
+    });
 
-  const handleTimeSelect = useCallback((time) => {
-    setSelectedAppointmentTime(time);
-  }, []);
+    const getAvailableTimeSlots = () => {
+      return selectedDoctor.availableSlots.filter(time => 
+        isTimeSlotAvailable(selectedDoctor.id, selectedAppointmentDate, time, appointmentType)
+      );
+    };
 
-  const handlePrioritySelect = useCallback((priority) => {
-    setSelectedPriority(priority);
-  }, []);
+    const availableTimeSlots = selectedAppointmentDate ? getAvailableTimeSlots() : [];
 
-  // FIXED: Reset payment status when going back from payment modal
-  const handlePaymentBack = useCallback(() => {
-    setShowPaymentModal(false);
-    setPaymentStatus('pending'); // Reset payment status
-    setPaymentLoading(false);
-    setShowTimeSlotsModal(true);
-  }, []);
+    return (
+      <div style={modalOverlayStyle} onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setShowTimeSlotsModal(false);
+        }
+      }}>
+        <div style={timeSlotsModalStyle} onClick={(e) => e.stopPropagation()}>
+          <div style={modalHeaderStyle}>
+            <h3 style={{ color: '#124441', margin: 0, fontSize: '1.3rem' }}>
+              Book {appointmentType === 'home' ? 'Home Consultation' : 
+                    appointmentType === 'video' ? 'Video Consultation' : 'Appointment'}
+            </h3>
+            <button 
+              onClick={() => setShowTimeSlotsModal(false)} 
+              style={closeModalButtonStyle} 
+              type="button"
+            >
+              ×
+            </button>
+          </div>
 
-  // FIXED: Clear all payment states when closing payment modal
-  const handlePaymentClose = useCallback(() => {
-    setShowPaymentModal(false);
-    // Reset all payment-related states
-    setPaymentStatus('pending');
-    setPaymentAmount(0);
-    setPaymentId('');
-    setPendingAppointment(null);
-    setPaymentLoading(false);
-  }, []);
+          <div style={modalContentStyle}>
+            {/* Doctor Info */}
+            <div style={doctorModalInfoStyle}>
+              <div style={doctorModalHeaderStyle}>
+                <h4 style={{ color: '#124441', margin: '0 0 0.5rem 0' }}>
+                  Dr. {selectedDoctor.name}
+                </h4>
+                <p style={{ color: '#4F6F6B', margin: 0, fontSize: '0.9rem' }}>
+                  {selectedDoctor.specialty} • {selectedDoctor.experience} experience
+                </p>
+                <div style={{ marginTop: '0.5rem' }}>
+                  <span style={consultationFeeStyle}>
+                    Fee: ₹{fee}
+                    {appointmentType === 'home' && ' (Home Consultation)'}
+                    {appointmentType === 'video' && ' (Video Consultation)'}
+                  </span>
+                </div>
+              </div>
 
-  const handlePaymentDone = useCallback(() => {
-    setShowPaymentModal(false);
-    // Clear payment states after successful payment
-    setPaymentStatus('pending');
-    setPaymentAmount(0);
-    setPaymentId('');
-    setPendingAppointment(null);
-    setPaymentLoading(false);
-  }, []);
+              {/* Priority Selection */}
+              <div style={prioritySelectionStyle}>
+                <label style={{ color: '#4F6F6B', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+                  Select Priority Level:
+                </label>
+                <div style={priorityButtonsStyle}>
+                  {['L1', 'L2', 'L3'].map((priority) => (
+                    <button
+                      key={priority}
+                      onClick={() => setSelectedPriority(priority)}
+                      style={priorityButtonStyle(priority === selectedPriority)}
+                      type="button"
+                    >
+                      <PriorityBadge priority={priority} />
+                    </button>
+                  ))}
+                </div>
+                <p style={{ color: '#4F6F6B', fontSize: '0.8rem', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                  {selectedPriority === 'L1' && 'High priority for emergency/urgent cases'}
+                  {selectedPriority === 'L2' && 'Medium priority for routine consultations'}
+                  {selectedPriority === 'L3' && 'Low priority for regular checkups'}
+                </p>
+              </div>
 
-  const handlePaymentRetry = useCallback(() => {
-    // Reset to pending and retry payment
-    setPaymentStatus('pending');
-    setPaymentLoading(false);
-    processPayment(pendingAppointment);
-  }, [pendingAppointment, processPayment]);
+              {/* Date Selection */}
+              <div style={dateSelectionStyle}>
+                <label style={{ color: '#4F6F6B', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+                  Select Date:
+                </label>
+                <div style={dateButtonsStyle}>
+                  {next7Days.map((day) => (
+                    <button
+                      key={day.date}
+                      onClick={() => setSelectedAppointmentDate(day.date)}
+                      style={dateButtonStyle(day.date === selectedAppointmentDate)}
+                      type="button"
+                    >
+                      <div style={dateDayStyle}>{day.day}</div>
+                      <div style={dateNumStyle}>{day.dateNum}</div>
+                      <div style={dateMonthStyle}>{day.month}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Time Selection */}
+              {selectedAppointmentDate && (
+                <div style={timeSelectionStyle}>
+                  <label style={{ color: '#4F6F6B', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+                    Select Time Slot:
+                  </label>
+                  {availableTimeSlots.length === 0 ? (
+                    <div style={noSlotsStyle}>
+                      <p style={{ color: '#DC2626', margin: 0 }}>
+                        No available slots for {appointmentType} consultation on this date. Please select another date.
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={timeSlotsGridStyle}>
+                      {availableTimeSlots.map((time) => (
+                        <button
+                          key={time}
+                          onClick={() => setSelectedAppointmentTime(time)}
+                          style={timeSlotButtonStyle(time === selectedAppointmentTime)}
+                          type="button"
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Selected Details */}
+              {(selectedAppointmentDate || selectedAppointmentTime) && (
+                <div style={selectedDetailsStyle}>
+                  <h4 style={{ color: '#124441', margin: '0 0 0.75rem 0', fontSize: '1.1rem' }}>
+                    Appointment Details
+                  </h4>
+                  
+                  {selectedAppointmentDate && (
+                    <div style={detailRowStyle}>
+                      <span style={detailLabelStyle}>Date:</span>
+                      <span style={detailValueStyle}>
+                        {new Date(selectedAppointmentDate).toLocaleDateString('en-US', { 
+                          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {selectedAppointmentTime && (
+                    <div style={detailRowStyle}>
+                      <span style={detailLabelStyle}>Time:</span>
+                      <span style={detailValueStyle}>{selectedAppointmentTime}</span>
+                    </div>
+                  )}
+                  
+                  {selectedPriority && (
+                    <div style={detailRowStyle}>
+                      <span style={detailLabelStyle}>Priority:</span>
+                      <span style={detailValueStyle}>
+                        <PriorityBadge priority={selectedPriority} />
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div style={detailRowStyle}>
+                    <span style={detailLabelStyle}>Type:</span>
+                    <span style={detailValueStyle}>
+                      {appointmentType === 'home' ? 'Home Consultation' : 
+                       appointmentType === 'video' ? 'Video Consultation' : 'Clinic Visit'}
+                    </span>
+                  </div>
+                  
+                  <div style={detailRowStyle}>
+                    <span style={detailLabelStyle}>Fee:</span>
+                    <span style={feeAmountStyle}>₹{fee}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Confirmation Buttons Section */}
+          <div style={modalButtonsStyle}>
+            <button 
+              onClick={() => setShowTimeSlotsModal(false)} 
+              style={cancelButtonStyle} 
+              type="button"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleConfirmAppointment} 
+              disabled={!selectedAppointmentDate || !selectedAppointmentTime || availableTimeSlots.length === 0}
+              style={confirmAppointmentButtonStyle} 
+              type="button"
+            >
+              {appointmentType === 'home' ? 'Book Home Consultation' : 
+               appointmentType === 'video' ? 'Book Video Consultation' : 'Book Appointment'}
+              <div style={{ fontSize: '0.9rem', marginTop: '0.25rem', fontWeight: 'normal' }}>
+                Pay ₹{fee} to confirm
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Payment Modal
+  const PaymentModal = () => {
+    if (!showPaymentModal || !selectedDoctor || !pendingAppointment) return null;
+
+    return (
+      <div style={modalOverlayStyle} onClick={(e) => {
+        if (e.target === e.currentTarget && paymentStatus !== 'processing') {
+          setShowPaymentModal(false);
+        }
+      }}>
+        <div style={paymentModalStyle} onClick={(e) => e.stopPropagation()}>
+          <div style={paymentModalHeaderStyle}>
+            <h3 style={{ color: '#124441', margin: 0, fontSize: '1.3rem' }}>
+              Complete Payment
+            </h3>
+            {paymentStatus !== 'processing' && (
+              <button 
+                onClick={() => setShowPaymentModal(false)} 
+                style={closeModalButtonStyle} 
+                type="button"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          <div style={paymentContentStyle}>
+            {/* Payment Header */}
+            <div style={paymentHeaderStyle}>
+              <div style={paymentDoctorInfoStyle}>
+                <h4 style={{ color: '#124441', margin: '0 0 0.5rem 0' }}>
+                  Dr. {selectedDoctor.name}
+                </h4>
+                <p style={{ color: '#4F6F6B', margin: 0, fontSize: '0.9rem' }}>
+                  {selectedDoctor.specialty}
+                </p>
+                <div style={appointmentDetailsStyle}>
+                  <span style={{ color: '#124441', fontWeight: '600' }}>
+                    {new Date(selectedAppointmentDate).toLocaleDateString('en-US', { 
+                      weekday: 'short', month: 'short', day: 'numeric' 
+                    })}
+                  </span>
+                  <span style={{ color: '#4F6F6B' }}> at </span>
+                  <span style={{ color: '#124441', fontWeight: '600' }}>
+                    {selectedAppointmentTime}
+                  </span>
+                </div>
+                <div style={{ marginTop: '0.25rem' }}>
+                  <span style={{ 
+                    backgroundColor: '#E0F2F1', 
+                    color: '#124441',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem'
+                  }}>
+                    {appointmentType === 'home' ? 'Home Consultation' : 
+                     appointmentType === 'video' ? 'Video Consultation' : 'Clinic Appointment'}
+                  </span>
+                </div>
+                {selectedPriority && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <PriorityBadge priority={selectedPriority} />
+                  </div>
+                )}
+              </div>
+              
+              <div style={paymentAmountStyle}>
+                <div style={amountLabelStyle}>Total Amount</div>
+                <div style={amountValueStyle}>₹{paymentAmount}</div>
+              </div>
+            </div>
+
+            {/* Payment Status */}
+            {paymentStatus === 'processing' && (
+              <div style={processingContainerStyle}>
+                <div style={loadingSpinnerStyle}></div>
+                <p style={{ color: '#124441', margin: '1rem 0 0 0', fontWeight: '600' }}>
+                  Processing payment...
+                </p>
+              </div>
+            )}
+
+            {paymentStatus === 'success' && (
+              <div style={successContainerStyle}>
+                <div style={successIconStyle}>✓</div>
+                <h4 style={{ color: '#059669', margin: '1rem 0 0.5rem 0', fontWeight: '600' }}>
+                  Payment Successful!
+                </h4>
+                <p style={{ color: '#4F6F6B', fontSize: '0.9rem' }}>
+                  Your appointment has been confirmed and is being processed.
+                </p>
+              </div>
+            )}
+
+            {paymentStatus === 'failed' && (
+              <div style={failedContainerStyle}>
+                <div style={failedIconStyle}>✕</div>
+                <h4 style={{ color: '#DC2626', margin: '1rem 0 0.5rem 0', fontWeight: '600' }}>
+                  Payment Failed
+                </h4>
+                <p style={{ color: '#4F6F6B', fontSize: '0.9rem' }}>
+                  Please try again or use a different payment method.
+                </p>
+              </div>
+            )}
+
+            {/* Payment Options */}
+            {paymentStatus === 'pending' && (
+              <>
+                <div style={paymentOptionsStyle}>
+                  <h4 style={{ color: '#124441', margin: '0 0 1rem 0', fontSize: '1.1rem' }}>
+                    Choose Payment Method
+                  </h4>
+                  
+                  <button 
+                    onClick={() => processPayment(pendingAppointment)}
+                    disabled={paymentLoading}
+                    style={razorpayButtonStyle}
+                    type="button"
+                  >
+                    <div style={paymentMethodIconStyle}>💳</div>
+                    <div>
+                      <div style={paymentMethodNameStyle}>Credit/Debit Card</div>
+                      <div style={paymentMethodDescStyle}>Pay with Razorpay</div>
+                    </div>
+                  </button>
+                </div>
+
+                <div style={securityInfoStyle}>
+                  <div style={secureBadgeStyle}>🔒</div>
+                  <span style={{ fontSize: '0.85rem', color: '#4F6F6B' }}>
+                    Secure payment powered by Razorpay
+                  </span>
+                </div>
+              </>
+            )}
+
+            {/* Action Buttons */}
+            <div style={paymentButtonsStyle}>
+              {paymentStatus === 'pending' && (
+                <>
+                  <button 
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setShowTimeSlotsModal(true);
+                    }}
+                    style={paymentCancelButtonStyle}
+                    type="button"
+                    disabled={paymentLoading}
+                  >
+                    Back
+                  </button>
+                  <button 
+                    onClick={() => processPayment(pendingAppointment)}
+                    style={paymentConfirmButtonStyle(paymentLoading)}
+                    type="button"
+                    disabled={paymentLoading}
+                  >
+                    {paymentLoading ? 'Processing...' : `Pay ₹${paymentAmount}`}
+                  </button>
+                </>
+              )}
+
+              {paymentStatus === 'success' && (
+                <button 
+                  onClick={() => setShowPaymentModal(false)}
+                  style={paymentDoneButtonStyle}
+                  type="button"
+                >
+                  Done
+                </button>
+              )}
+
+              {paymentStatus === 'failed' && (
+                <>
+                  <button 
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setShowTimeSlotsModal(true);
+                    }}
+                    style={paymentCancelButtonStyle}
+                    type="button"
+                  >
+                    Back
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setPaymentStatus('pending');
+                      processPayment(pendingAppointment);
+                    }}
+                    style={paymentRetryButtonStyle}
+                    type="button"
+                  >
+                    Try Again
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Main render
   return (
@@ -1302,23 +1071,7 @@ const ConsultationView = ({
 
       {/* Doctors List */}
       <div style={doctorsListStyle}>
-        {/* Show search results header if searching */}
-        {doctorSearchQuery.trim() && (
-          <div style={searchResultsHeaderStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
-              Search Results for "{doctorSearchQuery}"
-            </h3>
-            {!hasSearchResults && !showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && (
-              <div style={noResultsStyle}>
-                <p style={{ color: '#4F6F6B', marginBottom: '1rem' }}>
-                  No doctors found matching "{doctorSearchQuery}". Try a different search or browse categories below.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {!showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && !doctorSearchQuery.trim() && (
+        {!showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && (
           <div style={categorySectionStyle}>
             <h3 style={{ color: '#124441', marginBottom: '1rem' }}>All Specialists</h3>
             <p style={{ color: '#4F6F6B', marginBottom: '1rem' }}>
@@ -1327,148 +1080,61 @@ const ConsultationView = ({
           </div>
         )}
 
-        {/* Show pediatric doctors when category selected OR when searching */}
-        {(showPediatricDoctors || (doctorSearchQuery.trim() && pediatricDoctorsFiltered.length > 0)) && (
+        {showPediatricDoctors && (
           <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
-              👶 Pediatric Specialists
-              {pediatricDoctorsFiltered.length > 0 && (
-                <span style={{ fontSize: '0.9rem', color: '#4F6F6B', marginLeft: '0.5rem', fontWeight: 'normal' }}>
-                  ({pediatricDoctorsFiltered.length} found)
-                </span>
-              )}
-            </h3>
-            
-            {pediatricDoctorsFiltered.length > 0 ? (
-              pediatricDoctorsFiltered.map((doctor) => (
-                <DoctorCard 
-                  key={doctor.id}
-                  doctor={doctor}
-                  getAppointmentDetails={getAppointmentDetails}
-                  handleBookAppointmentClick={handleBookAppointmentClick}
-                  handleBookHomeConsultationClick={handleBookHomeConsultationClick}
-                  handleBookVideoConsultationClick={handleBookVideoConsultationClick}
-                  handleStartVideoCallClick={handleStartVideoCallClick}
-                />
-              ))
-            ) : showPediatricDoctors ? (
-              <p style={{ color: '#4F6F6B', fontStyle: 'italic' }}>
-                No pediatric doctors found.
-              </p>
-            ) : null}
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>👶 Pediatric Specialists</h3>
+            {pediatricDoctors.map((doctor) => (
+              <DoctorCard 
+                key={doctor.id}
+                doctor={doctor}
+                getAppointmentDetails={getAppointmentDetails}
+                handleBookAppointmentClick={handleBookAppointmentClick}
+                handleBookHomeConsultationClick={handleBookHomeConsultationClick}
+                handleBookVideoConsultationClick={handleBookVideoConsultationClick}
+                handleStartVideoCallClick={() => {}}
+              />
+            ))}
           </div>
         )}
 
-        {/* Show pregnancy doctors when category selected OR when searching */}
-        {(showPregnancyDoctors || (doctorSearchQuery.trim() && pregnancyDoctorsFiltered.length > 0)) && (
+        {showPregnancyDoctors && (
           <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
-              🤰 Pregnancy Specialists
-              {pregnancyDoctorsFiltered.length > 0 && (
-                <span style={{ fontSize: '0.9rem', color: '#4F6F6B', marginLeft: '0.5rem', fontWeight: 'normal' }}>
-                  ({pregnancyDoctorsFiltered.length} found)
-                </span>
-              )}
-            </h3>
-            
-            {pregnancyDoctorsFiltered.length > 0 ? (
-              pregnancyDoctorsFiltered.map((doctor) => (
-                <DoctorCard 
-                  key={doctor.id}
-                  doctor={doctor}
-                  getAppointmentDetails={getAppointmentDetails}
-                  handleBookAppointmentClick={handleBookAppointmentClick}
-                  handleBookHomeConsultationClick={handleBookHomeConsultationClick}
-                  handleBookVideoConsultationClick={handleBookVideoConsultationClick}
-                  handleStartVideoCallClick={handleStartVideoCallClick}
-                />
-              ))
-            ) : showPregnancyDoctors ? (
-              <p style={{ color: '#4F6F6B', fontStyle: 'italic' }}>
-                No pregnancy doctors found.
-              </p>
-            ) : null}
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>🤰 Pregnancy Specialists</h3>
+            {pregnancyDoctors.map((doctor) => (
+              <DoctorCard 
+                key={doctor.id}
+                doctor={doctor}
+                getAppointmentDetails={getAppointmentDetails}
+                handleBookAppointmentClick={handleBookAppointmentClick}
+                handleBookHomeConsultationClick={handleBookHomeConsultationClick}
+                handleBookVideoConsultationClick={handleBookVideoConsultationClick}
+                handleStartVideoCallClick={() => {}}
+              />
+            ))}
           </div>
         )}
 
-        {/* Show general doctors when category selected OR when searching */}
-        {(showGeneralDoctors || (doctorSearchQuery.trim() && generalDoctorsFiltered.length > 0)) && (
+        {showGeneralDoctors && (
           <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>
-              🏥 General Doctors
-              {generalDoctorsFiltered.length > 0 && (
-                <span style={{ fontSize: '0.9rem', color: '#4F6F6B', marginLeft: '0.5rem', fontWeight: 'normal' }}>
-                  ({generalDoctorsFiltered.length} found)
-                </span>
-              )}
-            </h3>
-            
-            {generalDoctorsFiltered.length > 0 ? (
-              generalDoctorsFiltered.map((doctor) => (
-                <DoctorCard 
-                  key={doctor.id}
-                  doctor={doctor}
-                  getAppointmentDetails={getAppointmentDetails}
-                  handleBookAppointmentClick={handleBookAppointmentClick}
-                  handleBookHomeConsultationClick={handleBookHomeConsultationClick}
-                  handleBookVideoConsultationClick={handleBookVideoConsultationClick}
-                  handleStartVideoCallClick={handleStartVideoCallClick}
-                />
-              ))
-            ) : showGeneralDoctors ? (
-              <p style={{ color: '#4F6F6B', fontStyle: 'italic' }}>
-                No general doctors found.
-              </p>
-            ) : null}
-          </div>
-        )}
-
-        {/* Show all categories option when searching */}
-        {doctorSearchQuery.trim() && !showPediatricDoctors && !showPregnancyDoctors && !showGeneralDoctors && (
-          <div style={categorySectionStyle}>
-            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>Browse All Categories</h3>
-            <p style={{ color: '#4F6F6B', marginBottom: '1rem' }}>
-              Select a category above to view all doctors in that specialty
-            </p>
+            <h3 style={{ color: '#124441', marginBottom: '1rem' }}>🏥 General Doctors</h3>
+            {generalDoctors.map((doctor) => (
+              <DoctorCard 
+                key={doctor.id}
+                doctor={doctor}
+                getAppointmentDetails={getAppointmentDetails}
+                handleBookAppointmentClick={handleBookAppointmentClick}
+                handleBookHomeConsultationClick={handleBookHomeConsultationClick}
+                handleBookVideoConsultationClick={handleBookVideoConsultationClick}
+                handleStartVideoCallClick={() => {}}
+              />
+            ))}
           </div>
         )}
       </div>
 
       {/* Modals */}
-      <TimeSlotsModal
-        showTimeSlotsModal={showTimeSlotsModal}
-        selectedDoctor={selectedDoctor}
-        appointmentType={appointmentType}
-        selectedPriority={selectedPriority}
-        selectedAppointmentDate={selectedAppointmentDate}
-        selectedAppointmentTime={selectedAppointmentTime}
-        bookedAppointments={bookedAppointments}
-        onClose={handleModalClose}
-        onDateSelect={handleDateSelect}
-        onTimeSelect={handleTimeSelect}
-        onPrioritySelect={handlePrioritySelect}
-        onConfirm={handleConfirmAppointment}
-        onCancel={handleModalCancel}
-      />
-
-      <PaymentModal
-        showPaymentModal={showPaymentModal}
-        selectedDoctor={selectedDoctor}
-        appointmentType={appointmentType}
-        selectedPriority={selectedPriority}
-        selectedAppointmentDate={selectedAppointmentDate}
-        selectedAppointmentTime={selectedAppointmentTime}
-        paymentAmount={paymentAmount}
-        paymentStatus={paymentStatus}
-        paymentLoading={paymentLoading}
-        razorpayLoaded={razorpayLoaded}
-        pendingAppointment={pendingAppointment}
-        onClose={handlePaymentClose}
-        onBack={handlePaymentBack}
-        onProcessPayment={() => processPayment(pendingAppointment)}
-        onRetry={handlePaymentRetry}
-        onDone={handlePaymentDone}
-      />
+      <TimeSlotsModal />
+      <PaymentModal />
 
       <style>{`
         @keyframes fadeIn {
@@ -1485,7 +1151,7 @@ const ConsultationView = ({
   );
 };
 
-// All styles remain exactly the same as in your original code
+// Styles
 const containerStyle = {
   maxWidth: '1200px',
   margin: '0 auto',
@@ -1499,7 +1165,7 @@ const headerStyle = {
   justifyContent: 'space-between',
   alignItems: 'center',
   marginBottom: '2rem',
-  marginTop: '140px',
+  marginTop: '125px',
   paddingBottom: '1rem',
   borderBottom: '1px solid #E0F2F1'
 };
@@ -1581,24 +1247,6 @@ const categorySectionStyle = {
   borderRadius: '12px',
   boxShadow: '0 2px 8px rgba(18, 68, 65, 0.08)',
   border: '1px solid #E0F2F1'
-};
-
-// New styles for search functionality
-const searchResultsHeaderStyle = {
-  backgroundColor: '#E0F2F1',
-  padding: '1.5rem',
-  borderRadius: '12px',
-  marginBottom: '1rem',
-  border: '1px solid #B2DFDB'
-};
-
-const noResultsStyle = {
-  backgroundColor: '#FEE2E2',
-  padding: '1.5rem',
-  borderRadius: '12px',
-  textAlign: 'center',
-  border: '1px solid #FECACA',
-  marginBottom: '1rem'
 };
 
 // Doctor Card Styles
@@ -2277,5 +1925,4 @@ const paymentRetryButtonStyle = {
     transform: 'translateY(-2px)'
   }
 };
-
 export default ConsultationView;

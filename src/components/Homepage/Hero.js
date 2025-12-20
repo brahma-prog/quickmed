@@ -300,7 +300,7 @@ export default function Home() {
       ],
     },
     medicalRecords: {
-      title: "📁 Digital Medical Records",
+      title: "Digital Medical Records",
       description:
         "Store and access all your medical records securely in one place. Share with doctors easily and maintain a complete health history.",
       features: [
@@ -431,42 +431,42 @@ export default function Home() {
   const services = [
     {
       name: "Medicine Delivery",
-      icon: "",
+      
       description:
         "Prescription and OTC medicines delivered to your doorstep within 30–40 minutes.",
       onClick: handleMedicineDeliveryClick,
     },
     {
       name: "Doctor Consultation",
-      icon: "",
+      
       description:
         "Video consultations with specialist doctors for comprehensive medical advice.",
       onClick: handleDoctorConsultationClick,
     },
     {
       name: "Live Tracking",
-      icon: "",
+      
       description:
         "Track your medical orders in real-time from dispatch to delivery.",
       onClick: handleLiveTrackingClick,
     },
     {
       name: "Health Packages",
-      icon: "🩺",
+      
       description:
         "Comprehensive health checkup packages for preventive care.",
       onClick: handleHealthPackagesClick,
     },
     {
       name: "Pregnancy Care",
-      icon: "",
+      
       description:
         "Specialized maternity care with expert gynecologists & 24/7 support.",
       onClick: handlePregnancyCareClick,
     },
     {
       name: "Medical Records",
-      icon: "📁",
+      
       description:
         "Digital storage and management of all your medical documents.",
       onClick: handleMedicalRecordsClick,
@@ -482,19 +482,19 @@ export default function Home() {
     },
     {
       title: "100% Safe & Genuine",
-      icon: "",
+      
       description:
         "All medicines are sourced directly from licensed pharmacies with proper verification.",
     },
     {
       title: "Best Prices",
-      icon: "",
+     
       description:
         "Competitive pricing with regular discounts and offers on medicines and consultations.",
     },
     {
       title: "Expert Doctors",
-      icon: "",
+     
       description:
         "Consult experienced doctors from top hospitals across multiple specialties.",
     },

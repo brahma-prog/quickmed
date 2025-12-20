@@ -1,3 +1,5 @@
+
+// VendorDeliveryAgents.js - Separate file for delivery agents component
 import React, { useState } from 'react';
 import { deliveryAgents } from './VendorData';
 
@@ -25,7 +27,7 @@ const VendorDeliveryAgents = ({
   const mainContentStyle = {
     padding: '24px',
     minHeight: '100vh',
-    backgroundColor: '#E0F2F1' // softbg
+    backgroundColor: '#E0F2F1'
   };
 
   const headerStyle = {
@@ -43,14 +45,14 @@ const VendorDeliveryAgents = ({
 
   const notificationBellStyle = {
     position: 'relative',
-    backgroundColor: '#FFFFFF', // white
-    border: '1px solid #4DB6AC', // mint border
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     padding: '10px 12px',
     fontSize: '18px',
     cursor: 'pointer',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    color: '#009688' // primary
+    color: '#009688'
   };
 
   const notificationBadgeStyle = {
@@ -72,13 +74,13 @@ const VendorDeliveryAgents = ({
   const greetingStyle = {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#124441', // darktext
+    color: '#124441',
     margin: '0 0 8px 0'
   };
 
   const subtitleStyle = {
     fontSize: '16px',
-    color: '#4F6F6B', // softtext
+    color: '#4F6F6B',
     margin: 0
   };
 
@@ -90,8 +92,8 @@ const VendorDeliveryAgents = ({
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF', // white
-    border: '1px solid #4DB6AC', // mint
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #4DB6AC',
     borderRadius: '8px',
     padding: '8px 12px'
   };
@@ -102,15 +104,15 @@ const VendorDeliveryAgents = ({
     outline: 'none',
     fontSize: '14px',
     padding: '4px 0',
-    color: '#124441' // darktext
+    color: '#124441'
   };
 
   const sectionStyle = {
-    backgroundColor: '#FFFFFF', // white
+    backgroundColor: '#FFFFFF',
     borderRadius: '12px',
     padding: '24px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: '1px solid #4DB6AC' // mint
+    border: '1px solid #4DB6AC'
   };
 
   const sectionHeaderStyle = {
@@ -123,13 +125,13 @@ const VendorDeliveryAgents = ({
   const sectionTitleStyle = {
     fontSize: '20px',
     fontWeight: '600',
-    color: '#124441', // darktext
+    color: '#124441',
     margin: 0
   };
 
   const viewAllStyle = {
     fontSize: '14px',
-    color: '#009688', // primary
+    color: '#009688',
     fontWeight: '500'
   };
 
@@ -141,9 +143,9 @@ const VendorDeliveryAgents = ({
 
   const agentCardStyle = {
     padding: '20px',
-    border: '1px solid #4DB6AC', // mint
+    border: '1px solid #4DB6AC',
     borderRadius: '12px',
-    backgroundColor: '#E0F2F1' // softbg
+    backgroundColor: '#E0F2F1'
   };
 
   const agentHeaderStyle = {
@@ -160,7 +162,7 @@ const VendorDeliveryAgents = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#009688', // primary
+    backgroundColor: '#009688',
     color: 'white',
     borderRadius: '50%'
   };
@@ -172,20 +174,20 @@ const VendorDeliveryAgents = ({
   const agentNameStyle = {
     fontSize: '18px',
     fontWeight: '600',
-    color: '#124441', // darktext
+    color: '#124441',
     margin: '0 0 4px 0'
   };
 
   const agentVehicleStyle = {
     fontSize: '14px',
-    color: '#4F6F6B', // softtext
+    color: '#4F6F6B',
     margin: 0
   };
 
   const agentPhoneStyle = {
     fontSize: '16px',
     fontWeight: '500',
-    color: '#124441', // darktext
+    color: '#124441',
     margin: '0 0 16px 0'
   };
 
@@ -300,7 +302,7 @@ const VendorDeliveryAgents = ({
         </div>
 
         {filteredAgents.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#4F6F6B' }}> {/* softtext */}
+          <div style={{ textAlign: 'center', padding: '40px', color: '#4F6F6B' }}>
             <p>No delivery agents found matching your search.</p>
           </div>
         )}
@@ -314,8 +316,8 @@ const VendorDeliveryAgents = ({
           <button 
             style={{
               padding: '16px',
-              backgroundColor: '#E0F2F1', // softbg
-              border: '1px solid #009688', // primary
+              backgroundColor: '#E0F2F1',
+              border: '1px solid #009688',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '500',
@@ -324,7 +326,7 @@ const VendorDeliveryAgents = ({
               flexDirection: 'column',
               alignItems: 'center',
               gap: '8px',
-              color: '#124441' // darktext
+              color: '#124441'
             }}
             onClick={() => {
               if (deliveryAgents.length > 0) {
@@ -339,8 +341,8 @@ const VendorDeliveryAgents = ({
           <button 
             style={{
               padding: '16px',
-              backgroundColor: '#E0F2F1', // softbg
-              border: '1px solid #009688', // primary
+              backgroundColor: '#E0F2F1',
+              border: '1px solid #009688',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '500',
@@ -349,7 +351,7 @@ const VendorDeliveryAgents = ({
               flexDirection: 'column',
               alignItems: 'center',
               gap: '8px',
-              color: '#124441' // darktext
+              color: '#124441'
             }}
             onClick={() => {
               const message = `Medicines ready for pickup at pharmacy.`;

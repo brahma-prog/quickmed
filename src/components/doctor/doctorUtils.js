@@ -666,7 +666,7 @@ export const useWindowSize = () => {
   return windowSize;
 };
 
-// Custom Hook for State Management
+// Custom Hook for State Management - UPDATED with localStorage persistence
 export const useDoctorState = (user) => {
   const [activePage, setActivePage] = useState('dashboard');
   const [timeRange, setTimeRange] = useState('today');
@@ -681,11 +681,19 @@ export const useDoctorState = (user) => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [timeslots, setTimeslots] = useState([]);
+  const [timeslots, setTimeslots] = useState(() => {
+    const savedTimeslots = localStorage.getItem('doctorTimeslots');
+    return savedTimeslots ? JSON.parse(savedTimeslots) : [];
+  });
   const [pregnancyFilter, setPregnancyFilter] = useState('upcoming');
-  const [babyCareFilter, setBabyCareFilter] = useState('upcoming'); // New state for baby care filter
+  const [babyCareFilter, setBabyCareFilter] = useState('upcoming');
 
   const windowSize = useWindowSize();
+
+  // Save timeslots to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('doctorTimeslots', JSON.stringify(timeslots));
+  }, [timeslots]);
 
   // Auto-close sidebar when switching to mobile
   useEffect(() => {
@@ -694,75 +702,118 @@ export const useDoctorState = (user) => {
     }
   }, [windowSize.width, isSidebarOpen]);
 
-  const [userProfile, setUserProfile] = useState({
-    fullName: user?.fullName || 'Dr. John Doe',
-    email: user?.email || 'doctor@example.com',
-    phone: user?.phone || '+91 98765 43210',
-    specialization: user?.specialization || 'Gynecologist & Pediatrician',
-    licenseNumber: user?.licenseNumber || 'GYN-PED-2024-12345',
-    experience: user?.experience || '15 years',
-    hospital: user?.hospital || 'City General Hospital',
-    address: user?.address || 'Medical Complex, Sector 15, Noida',
-    city: user?.city || 'Noida',
-    state: user?.state || 'Uttar Pradesh',
-    pincode: user?.pincode || '201301'
+  // Load profile from localStorage on initial render - UPDATED
+  const [userProfile, setUserProfile] = useState(() => {
+    // Try to load from localStorage first
+    const savedProfile = localStorage.getItem('doctorProfile');
+    if (savedProfile) {
+      try {
+        return JSON.parse(savedProfile);
+      } catch (error) {
+        console.error('Error parsing saved profile:', error);
+        localStorage.removeItem('doctorProfile'); // Clear corrupted data
+      }
+    }
+    
+    // Fallback to initial user data
+    return {
+      fullName: user?.fullName || 'Dr. John Doe',
+      email: user?.email || 'doctor@example.com',
+      phone: user?.phone || '+91 98765 43210',
+      specialization: user?.specialization || 'Gynecologist & Pediatrician',
+      licenseNumber: user?.licenseNumber || 'GYN-PED-2024-12345',
+      experience: user?.experience || '15 years',
+      hospital: user?.hospital || 'City General Hospital',
+      address: user?.address || 'Medical Complex, Sector 15, Noida',
+      city: user?.city || 'Noida',
+      state: user?.state || 'Uttar Pradesh',
+      pincode: user?.pincode || '201301'
+    };
   });
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'appointment',
-      title: 'New Pregnancy Appointment Request',
-      message: 'Priya Sharma requested first pregnancy consultation',
-      time: '10 minutes ago',
-      read: false,
-      priority: 'high',
-      category: 'pregnancy'
-    },
-    {
-      id: 2,
-      type: 'reminder',
-      title: 'Baby Care Home Visit',
-      message: 'Baby Aryan vaccination follow-up tomorrow at 2 PM',
-      time: '1 hour ago',
-      read: true,
-      priority: 'medium',
-      category: 'baby'
-    },
-    {
-      id: 3,
-      type: 'message',
-      title: 'New Message from Parent',
-      message: 'Mrs. Sharma sent baby feeding update',
-      time: '2 hours ago',
-      read: false,
-      priority: 'medium',
-      category: 'baby'
+  // Save profile to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('doctorProfile', JSON.stringify(userProfile));
+  }, [userProfile]);
+
+  const [notifications, setNotifications] = useState(() => {
+    const savedNotifications = localStorage.getItem('doctorNotifications');
+    if (savedNotifications) {
+      try {
+        return JSON.parse(savedNotifications);
+      } catch (error) {
+        console.error('Error parsing saved notifications:', error);
+        localStorage.removeItem('doctorNotifications');
+      }
     }
-  ]);
+    return [
+      {
+        id: 1,
+        type: 'appointment',
+        title: 'New Pregnancy Appointment Request',
+        message: 'Priya Sharma requested first pregnancy consultation',
+        time: '10 minutes ago',
+        read: false,
+        priority: 'high',
+        category: 'pregnancy'
+      },
+      {
+        id: 2,
+        type: 'reminder',
+        title: 'Baby Care Home Visit',
+        message: 'Baby Aryan vaccination follow-up tomorrow at 2 PM',
+        time: '1 hour ago',
+        read: true,
+        priority: 'medium',
+        category: 'baby'
+      },
+      {
+        id: 3,
+        type: 'message',
+        title: 'New Message from Parent',
+        message: 'Mrs. Sharma sent baby feeding update',
+        time: '2 hours ago',
+        read: false,
+        priority: 'medium',
+        category: 'baby'
+      }
+    ];
+  });
+
+  // Save notifications to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('doctorNotifications', JSON.stringify(notifications));
+  }, [notifications]);
 
   const [appointments, setAppointments] = useState({
-    upcoming: [],
-    rescheduled: [],
-    cancelled: [],
-    pending: []
+    upcoming: dashboardData.upcomingAppointments,
+    rescheduled: dashboardData.rescheduledAppointments,
+    cancelled: dashboardData.cancelledAppointments,
+    pending: dashboardData.pendingAppointments
   });
 
-  const [patientNotes, setPatientNotes] = useState({});
-  const [patientMessages, setPatientMessages] = useState({});
-  const [formErrors, setFormErrors] = useState({});
+  const [patientNotes, setPatientNotes] = useState(() => {
+    const savedNotes = localStorage.getItem('doctorPatientNotes');
+    return savedNotes ? JSON.parse(savedNotes) : {};
+  });
 
+  // Save patient notes to localStorage when they change
   useEffect(() => {
-    // Initialize appointments
-    setAppointments({
-      upcoming: dashboardData.upcomingAppointments,
-      rescheduled: dashboardData.rescheduledAppointments,
-      cancelled: dashboardData.cancelledAppointments,
-      pending: dashboardData.pendingAppointments
-    });
+    localStorage.setItem('doctorPatientNotes', JSON.stringify(patientNotes));
+  }, [patientNotes]);
 
-    // Initialize messages
-    const initialMessages = {
+  const [patientMessages, setPatientMessages] = useState(() => {
+    const savedMessages = localStorage.getItem('doctorMessages');
+    if (savedMessages) {
+      try {
+        return JSON.parse(savedMessages);
+      } catch (error) {
+        console.error('Error parsing saved messages:', error);
+        localStorage.removeItem('doctorMessages');
+      }
+    }
+    // Initialize with default messages
+    return {
       'Priya Sharma': [
         {
           id: 1,
@@ -802,9 +853,14 @@ export const useDoctorState = (user) => {
         }
       ]
     };
+  });
 
-    setPatientMessages(initialMessages);
-  }, []);
+  // Save messages to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('doctorMessages', JSON.stringify(patientMessages));
+  }, [patientMessages]);
+
+  const [formErrors, setFormErrors] = useState({});
 
   return {
     activePage,
@@ -851,11 +907,11 @@ export const useDoctorState = (user) => {
     pregnancyFilter,
     setPregnancyFilter,
     babyCareFilter,
-    setBabyCareFilter // New state for baby care
+    setBabyCareFilter
   };
 };
 
-// Custom Hook for Actions
+// Custom Hook for Actions - UPDATED with handleResetProfile
 export const useDoctorActions = (state) => {
   const {
     userProfile,
@@ -1308,16 +1364,50 @@ export const useDoctorActions = (state) => {
     }
   };
 
+  // UPDATED: handleProfileUpdate with localStorage persistence
   const handleProfileUpdate = (updatedProfile) => {
     if (validateForm(updatedProfile)) {
+      // Update state
       setUserProfile(updatedProfile);
+      
+      // Force save to localStorage immediately
+      localStorage.setItem('doctorProfile', JSON.stringify(updatedProfile));
+      
       setShowProfileModal(false);
       setFormErrors({});
       
+      // Show success notification
       if (windowSize && windowSize.width <= 768) {
         showNotification('Profile Updated', 'Your profile has been updated successfully');
+      } else {
+        showNotification('Profile Saved', 'Your changes have been saved and will persist across sessions');
       }
+      
+      return true;
     }
+    return false;
+  };
+
+  // NEW: handleResetProfile function
+  const handleResetProfile = () => {
+    const defaultProfile = {
+      fullName: 'Dr. John Doe',
+      email: 'doctor@example.com',
+      phone: '+91 98765 43210',
+      specialization: 'Gynecologist & Pediatrician',
+      licenseNumber: 'GYN-PED-2024-12345',
+      experience: '15 years',
+      hospital: 'City General Hospital',
+      address: 'Medical Complex, Sector 15, Noida',
+      city: 'Noida',
+      state: 'Uttar Pradesh',
+      pincode: '201301'
+    };
+    
+    setUserProfile(defaultProfile);
+    localStorage.setItem('doctorProfile', JSON.stringify(defaultProfile));
+    
+    showNotification('Profile Reset', 'Profile has been reset to default values');
   };
 
   const handleMarkNotificationAsRead = (notificationId) => {
@@ -1474,6 +1564,7 @@ export const useDoctorActions = (state) => {
     handleAddNotes,
     handleViewFullHistory,
     handleProfileUpdate,
+    handleResetProfile, // NEW: Added reset profile function
     handleMarkNotificationAsRead,
     handleMarkAllNotificationsAsRead,
     handleClearAllNotifications,

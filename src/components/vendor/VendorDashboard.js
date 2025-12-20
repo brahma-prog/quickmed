@@ -13,7 +13,6 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Derive activePage from route
   const getActivePageFromRoute = () => {
     const path = location.pathname;
     if (path.includes('/stock')) return 'stock';
@@ -21,7 +20,7 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
     if (path.includes('/prescriptions')) return 'prescriptions';
     if (path.includes('/analytics')) return 'analytics';
     if (path.includes('/profile')) return 'profile';
-    return 'stock'; // Default
+    return 'stock';
   };
 
   const [activePage, setActivePage] = useState(getActivePageFromRoute());
@@ -62,7 +61,8 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
     expiryDate: '',
     prescriptionRequired: false,
     supplier: '',
-    batchNo: ''
+    batchNo: '',
+    description: ''
   });
 
   // User profile state
@@ -133,7 +133,6 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
   // Navigation handler
   const handleNavigation = (page) => {
     setActivePage(page);
-    // Navigate to corresponding route
     switch (page) {
       case 'stock':
         navigate('/vendor/dashboard/stock');
@@ -153,7 +152,6 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
       default:
         navigate('/vendor/dashboard/stock');
     }
-    // Close mobile menu on navigation
     setShowMobileMenu(false);
   };
 
@@ -352,17 +350,24 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
     return 'Good Evening';
   };
 
-  const isLowStock = (medicine) => medicine.quantity <= medicine.minStock;
+  const isLowStock = (medicine) => {
+    // Ensure medicine has minStock property
+    const hasMinStock = medicine.minStock !== undefined && medicine.minStock !== null;
+    if (!hasMinStock) return false;
+    return medicine.quantity <= medicine.minStock;
+  };
   
   const isExpiringSoon = (medicine) => {
+    if (!medicine.expiryDate || medicine.expiryDate === 'N/A') return false;
     const expiryDate = new Date(medicine.expiryDate);
     const today = new Date();
     const diffTime = expiryDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 30;
+    return diffDays <= 30 && diffDays > 0;
   };
 
   const isExpired = (medicine) => {
+    if (!medicine.expiryDate || medicine.expiryDate === 'N/A') return false;
     const expiryDate = new Date(medicine.expiryDate);
     const today = new Date();
     return expiryDate < today;
@@ -405,7 +410,6 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
       setChatMessages(prev => [...prev, userMessage]);
       setNewMessage('');
       
-      // Simulate bot response
       setTimeout(() => {
         const botResponse = { 
           id: chatMessages.length + 2, 
@@ -419,7 +423,6 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
 
   const showNotification = (title, message) => {
     console.log(`Notification: ${title} - ${message}`);
-    // Add to notifications list
     const newNotification = {
       id: notifications.length + 1,
       type: getNotificationType(title),
@@ -459,30 +462,35 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
       expiryDate: '',
       prescriptionRequired: false,
       supplier: '',
-      batchNo: ''
+      batchNo: '',
+      description: ''
     });
     
     showNotification('Medicine Added', `${medicine.name} has been added to inventory`);
   };
 
-  const handleEditMedicine = (medicine) => {
-    setEditingMedicine({...medicine});
-    setShowEditStockModal(true);
+  // NEW: Update stock function
+  const handleUpdateStock = (updatedMedicine) => {
+    setStock(prev => prev.map(med => 
+      med.id === updatedMedicine.id ? updatedMedicine : med
+    ));
+    showNotification('Stock Updated', `${updatedMedicine.name} stock has been updated`);
   };
 
-  const handleUpdateStock = () => {
-    if (editingMedicine) {
-      setStock(prev => prev.map(med => 
-        med.id === editingMedicine.id ? {
-          ...editingMedicine,
-          quantity: parseInt(editingMedicine.quantity) || 0,
-          minStock: parseInt(editingMedicine.minStock) || 0,
-          price: parseFloat(editingMedicine.price) || 0
-        } : med
-      ));
-      setShowEditStockModal(false);
-      setEditingMedicine(null);
-      showNotification('Stock Updated', `${editingMedicine.name} stock has been updated`);
+  // NEW: Edit medicine function
+  const handleEditMedicine = (updatedMedicine) => {
+    setStock(prev => prev.map(med => 
+      med.id === updatedMedicine.id ? updatedMedicine : med
+    ));
+    showNotification('Medicine Updated', `${updatedMedicine.name} details have been updated`);
+  };
+
+  // NEW: Delete medicine function
+  const handleDeleteMedicine = (medicineId) => {
+    const medicine = stock.find(m => m.id === medicineId);
+    if (medicine) {
+      setStock(prev => prev.filter(m => m.id !== medicineId));
+      showNotification('Medicine Deleted', `${medicine.name} has been removed from inventory`);
     }
   };
 
@@ -601,7 +609,7 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
     setShowLogoutModal(false);
     if (onLogout) {
       onLogout();
-      navigate('/'); // Navigate to home or login page after logout
+      navigate('/');
     }
   };
 
@@ -685,7 +693,7 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
     formErrors,
     validateField,
     handleAddMedicine,
-    handleUpdateStock,
+    handleUpdateStock: handleUpdateStock, // Pass the function
     handleProfileUpdate,
     handleSaveNotificationSettings,
     handleClearAllNotifications,
@@ -838,6 +846,8 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
               setShowNotificationsBellModal={setShowNotificationsBellModal}
               notifications={notifications}
               setStockFilter={setStockFilter}
+              deleteMedicine={handleDeleteMedicine}
+              updateStock={handleUpdateStock} // Pass update function
             />
           } />
           <Route path="/orders" element={
@@ -888,7 +898,6 @@ const VendorDashboard = ({ user = defaultUser, onLogout }) => {
               notifications={notifications}
             />
           } />
-          {/* Catch-all route - redirect to stock */}
           <Route path="*" element={<Navigate to="/vendor/dashboard/stock" replace />} />
         </Routes>
       </div>

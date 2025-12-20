@@ -8,17 +8,14 @@ const CartView = ({
   removeFromCart,
   getTotalPrice,
   handleCheckoutConfirmation,
-  paymentLoading
+  paymentLoading,
+  addToOrderHistory
 }) => {
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [address, setAddress] = useState({
-    fullName: '',
-    phone: '',
-    street: '',
-    city: '',
-    state: '',
-    pincode: '',
-    landmark: ''
+  // Current date and time state
+  const [currentDateTime, setCurrentDateTime] = useState({
+    date: '',
+    time: '',
+    timestamp: ''
   });
   
   // Saved addresses state
@@ -32,9 +29,24 @@ const CartView = ({
     }
   });
   
+  // Address state
+  const [address, setAddress] = useState({
+    fullName: '',
+    phone: '',
+    street: '',
+    city: '',
+    state: '',
+    pincode: '',
+    landmark: ''
+  });
+  
   // Address selection state
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [addressMode, setAddressMode] = useState('select');
+  
+  // Modal states
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState({});
@@ -48,6 +60,18 @@ const CartView = ({
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   
+  // Processing state
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  
+  // Payment states
+  const [paymentStatus, setPaymentStatus] = useState(''); // 'success', 'failed', 'pending'
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [razorpayOrderId, setRazorpayOrderId] = useState('');
+  
+  // Tax rate (5% GST)
+  const TAX_RATE = 0.05;
+  
   const tipOptions = [
     { amount: 10, label: '₹10' },
     { amount: 20, label: '₹20' },
@@ -58,44 +82,243 @@ const CartView = ({
   ];
 
   const modalRef = useRef(null);
+  const paymentModalRef = useRef(null);
 
-  // Scroll to top when component mounts
+  // 🔧 **RAZORPAY CONFIGURATION**
+  // Replace with your actual Razorpay credentials
+  const RAZORPAY_CONFIG = {
+    key_id: 'rzp_test_YOUR_KEY_ID', // Replace with your test/live key
+    currency: 'INR',
+    name: 'Medicines Delivery App',
+    description: 'Medicines Purchase',
+    prefill: {
+      name: '',
+      email: '',
+      contact: ''
+    },
+    theme: {
+      color: '#4DB6AC' // Mint color from your theme
+    }
+  };
+
+  // ========== RAZORPAY PAYMENT FUNCTIONS ==========
+
+  // Load Razorpay script dynamically
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const loadRazorpayScript = () => {
+      if (window.Razorpay) {
+        console.log('Razorpay already loaded');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      
+      script.onload = () => {
+        console.log('Razorpay SDK loaded successfully');
+      };
+      
+      script.onerror = () => {
+        console.error('Failed to load Razorpay SDK');
+      };
+      
+      document.body.appendChild(script);
+    };
+
+    loadRazorpayScript();
   }, []);
 
-  // Initialize with empty selection when component mounts
-  useEffect(() => {
-    if (cart.length > 0) {
-      setSelectedItems([]);
-      setSelectAll(false);
-    }
-  }, []); // Only run once on mount
+  // Simulate server-side order creation (In production, call your backend API)
+  const createRazorpayOrder = async (amount) => {
+    try {
+      // In a real app, call your backend API:
+      // const response = await fetch('/api/create-razorpay-order', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ amount: amount * 100 }) // Amount in paise
+      // });
+      // const data = await response.json();
+      // return data.orderId;
 
-  // Handle cart changes - FIXED: No infinite loop
-  useEffect(() => {
-    if (cart.length === 0) {
-      setSelectedItems([]);
-      setSelectAll(false);
+      // For demo: Generate a mock order ID
+      const mockOrderId = 'order_' + Date.now();
+      console.log('Created Razorpay order:', mockOrderId, 'for amount:', amount);
+      return mockOrderId;
+    } catch (error) {
+      console.error('Error creating Razorpay order:', error);
+      throw error;
+    }
+  };
+
+  // Main payment initialization function
+  const initializeRazorpayPayment = async (paymentData) => {
+    if (!window.Razorpay) {
+      console.error('Razorpay SDK not loaded');
+      alert('Payment system not ready. Please refresh and try again.');
       return;
     }
 
-    // Filter out items that no longer exist in cart
-    const validSelectedItems = selectedItems.filter(itemId => 
-      cart.some(item => item.id === itemId)
-    );
+    setIsProcessingPayment(true);
 
-    // Only update if there's actually a difference
-    if (validSelectedItems.length !== selectedItems.length) {
-      setSelectedItems(validSelectedItems);
-    }
+    try {
+      const amountInPaise = Math.round(paymentData.totalAmount * 100); // Razorpay expects amount in paise
+      
+      // Create order on server
+      const orderId = await createRazorpayOrder(paymentData.totalAmount);
+      setRazorpayOrderId(orderId);
 
-    // Update selectAll based on valid selected items
-    const shouldBeSelectAll = validSelectedItems.length === cart.length && cart.length > 0;
-    if (shouldBeSelectAll !== selectAll) {
-      setSelectAll(shouldBeSelectAll);
+      // Configure Razorpay options
+      const options = {
+        key: RAZORPAY_CONFIG.key_id,
+        amount: amountInPaise,
+        currency: RAZORPAY_CONFIG.currency,
+        name: RAZORPAY_CONFIG.name,
+        description: `Medicines Order - ${paymentData.selectedItems.length} item(s)`,
+        order_id: orderId,
+        handler: async (response) => {
+          console.log('Payment success response:', response);
+          
+          // Verify payment on your backend (in production)
+          // const verification = await verifyPayment(response);
+          
+          // For demo, assume payment is successful
+          await handlePaymentSuccess(response, paymentData);
+        },
+        prefill: {
+          name: paymentData.address.fullName || 'Customer',
+          email: 'customer@example.com',
+          contact: paymentData.address.phone || '9999999999'
+        },
+        notes: {
+          order_type: 'medicines',
+          item_count: paymentData.selectedItems.length.toString(),
+          delivery_address: `${paymentData.address.city}, ${paymentData.address.state}`
+        },
+        theme: RAZORPAY_CONFIG.theme,
+        modal: {
+          ondismiss: () => {
+            console.log('Payment modal dismissed');
+            setIsProcessingPayment(false);
+            setPaymentStatus('failed');
+            setTimeout(() => {
+              setShowPaymentModal(false);
+              setPaymentStatus('');
+            }, 2000);
+          }
+        }
+      };
+
+      // Initialize Razorpay
+      const razorpayInstance = new window.Razorpay(options);
+      
+      // Open payment modal
+      razorpayInstance.open();
+      
+      razorpayInstance.on('payment.failed', (response) => {
+        console.error('Payment failed:', response.error);
+        handlePaymentFailure(response.error, paymentData);
+      });
+
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      setIsProcessingPayment(false);
+      alert(`Payment setup failed: ${error.message}`);
     }
-  }, [cart]); // Only depend on cart
+  };
+
+  // Handle successful payment
+  const handlePaymentSuccess = async (razorpayResponse, paymentData) => {
+    setPaymentStatus('success');
+    setIsProcessingPayment(false);
+    
+    // Store order details
+    const orderDetails = {
+      ...paymentData,
+      paymentId: razorpayResponse.razorpay_payment_id,
+      orderId: razorpayResponse.razorpay_order_id,
+      signature: razorpayResponse.razorpay_signature,
+      paymentTimestamp: new Date().toISOString(),
+      status: 'paid'
+    };
+    
+    setOrderDetails(orderDetails);
+    
+    // Add to order history
+    if (addToOrderHistory) {
+      addToOrderHistory(orderDetails);
+    }
+    
+    // Remove purchased items from cart
+    paymentData.selectedItems.forEach(itemId => {
+      removeFromCart(itemId);
+    });
+    
+    // Reset selections
+    setSelectedItems([]);
+    setSelectAll(false);
+    setSelectedTip(0);
+    setCustomTip('');
+    setTipAmount(0);
+    
+    // Show success modal
+    setShowPaymentModal(true);
+    
+    // Close address modal
+    closeAddressModal();
+  };
+
+  // Handle payment failure
+  const handlePaymentFailure = (error, paymentData) => {
+    console.error('Payment failed:', error);
+    setPaymentStatus('failed');
+    setIsProcessingPayment(false);
+    
+    // Store failed order details
+    const failedOrder = {
+      ...paymentData,
+      error: error,
+      status: 'failed',
+      paymentTimestamp: new Date().toISOString()
+    };
+    
+    setOrderDetails(failedOrder);
+    setShowPaymentModal(true);
+  };
+
+  // ========== EXISTING FUNCTIONS (Updated) ==========
+
+  // Update current date and time every second
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const timeStr = now.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      
+      setCurrentDateTime({
+        date: dateStr,
+        time: timeStr,
+        timestamp: now.toISOString(),
+        displayTime: `${timeStr}`,
+        orderDate: now.toISOString()
+      });
+    };
+    
+    updateDateTime();
+    const intervalId = setInterval(updateDateTime, 1000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Calculate tip amount
   useEffect(() => {
@@ -110,7 +333,7 @@ const CartView = ({
     setTipAmount(calculatedTip);
   }, [selectedTip, customTip]);
 
-  // Save addresses to localStorage whenever they change
+  // Save addresses to localStorage
   useEffect(() => {
     try {
       localStorage.setItem('med_app_saved_addresses', JSON.stringify(savedAddresses));
@@ -119,192 +342,37 @@ const CartView = ({
     }
   }, [savedAddresses]);
 
-  // Back button handler - SIMPLIFIED AND WORKING
-  const handleBackToMedicines = useCallback(() => {
-    console.log('Back to Medicines button clicked');
+  // Helper functions
+  const getSelectedCartItems = useCallback(() => {
+    return cart.filter(item => selectedItems.includes(item.id));
+  }, [cart, selectedItems]);
+
+  const getSelectedTotalPrice = useCallback(() => {
+    const selected = getSelectedCartItems();
+    return selected.reduce((total, item) => total + (item.price * item.quantity), 0);
+  }, [getSelectedCartItems]);
+
+  const calculateTaxAmount = useCallback((subtotal) => {
+    return subtotal * TAX_RATE;
+  }, [TAX_RATE]);
+
+  const getTotalWithTaxAndTip = useCallback(() => {
+    const subtotal = getSelectedTotalPrice();
+    const tax = calculateTaxAmount(subtotal);
+    const tip = tipAmount;
+    const total = subtotal + tax + tip;
     
-    // Direct approach - works in most cases
-    if (setActiveView && typeof setActiveView === 'function') {
-      console.log('Calling setActiveView("medicine")');
-      setActiveView('medicine');
-    } else {
-      console.log('setActiveView not available, using fallback');
-      // Simple fallback
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        // If no history, try to redirect
-        window.location.href = window.location.origin;
-      }
-    }
-  }, [setActiveView]);
-
-  // Modal handlers
-  const openAddressModal = useCallback(() => {
-    if (selectedItems.length === 0) {
-      alert('Please select at least one item to checkout');
-      return;
-    }
-    
-    let currentTip = 0;
-    if (selectedTip > 0) {
-      currentTip = selectedTip;
-    } else if (customTip) {
-      currentTip = parseInt(customTip) || 0;
-    }
-    setTipAmount(currentTip);
-    
-    setAddressMode('select');
-    setSelectedAddressId(null);
-    
-    if (savedAddresses.length > 0) {
-      setSelectedAddressId(savedAddresses[0].id);
-      setAddress(savedAddresses[0]);
-    } else {
-      setAddressMode('new');
-      resetAddressForm();
-    }
-    
-    setShowAddressModal(true);
-    document.body.style.overflow = 'hidden';
-  }, [selectedItems.length, selectedTip, customTip, savedAddresses]);
-
-  const closeAddressModal = useCallback(() => {
-    setShowAddressModal(false);
-    setValidationErrors({});
-    setAddressMode('select');
-    setSelectedAddressId(null);
-    document.body.style.overflow = 'auto';
-  }, []);
-
-  // Handle click outside modal
-  const handleOverlayClick = useCallback((e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      closeAddressModal();
-    }
-  }, [closeAddressModal]);
-
-  // Simple BackButton component
-  const BackButton = React.memo(({ onClick, text = 'Back' }) => (
-    <button 
-      className="back-button"
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log(`BackButton "${text}" clicked`);
-        if (onClick && typeof onClick === 'function') {
-          onClick();
-        }
-      }}
-      type="button"
-      style={{ cursor: 'pointer' }}
-    >
-      ← {text}
-    </button>
-  ));
-
-  // Format numbers with commas
-  const formatIndianNumber = useCallback((number) => {
-    return new Intl.NumberFormat('en-IN').format(number);
-  }, []);
-
-  // Address management functions
-  const resetAddressForm = useCallback(() => {
-    setAddress({
-      fullName: '',
-      phone: '',
-      street: '',
-      city: '',
-      state: '',
-      pincode: '',
-      landmark: ''
-    });
-    setValidationErrors({});
-  }, []);
-
-  const saveCurrentAddress = useCallback(() => {
-    if (!validateAddress()) {
-      return;
-    }
-
-    const newAddress = {
-      ...address,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+    return {
+      subtotal,
+      tax,
+      tip,
+      total,
+      formattedTax: Math.round(tax)
     };
+  }, [getSelectedTotalPrice, tipAmount, calculateTaxAmount]);
 
-    const isDuplicate = savedAddresses.some(saved => 
-      saved.fullName === newAddress.fullName &&
-      saved.phone === newAddress.phone &&
-      saved.street === newAddress.street &&
-      saved.pincode === newAddress.pincode
-    );
-
-    if (isDuplicate) {
-      alert('This address is already saved!');
-      return;
-    }
-
-    setSavedAddresses(prev => [newAddress, ...prev]);
-    setSelectedAddressId(newAddress.id);
-    setAddressMode('select');
-    
-    alert('Address saved successfully!');
-  }, [address, savedAddresses]);
-
-  const deleteAddress = useCallback((id, e) => {
-    e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      setSavedAddresses(prev => prev.filter(addr => addr.id !== id));
-      if (selectedAddressId === id) {
-        setSelectedAddressId(null);
-        resetAddressForm();
-      }
-    }
-  }, [selectedAddressId, resetAddressForm]);
-
-  const handleAddressSelect = useCallback((selectedAddress) => {
-    setSelectedAddressId(selectedAddress.id);
-    setAddress(selectedAddress);
-  }, []);
-
-  const switchToNewAddressMode = useCallback(() => {
-    setAddressMode('new');
-    resetAddressForm();
-    setSelectedAddressId(null);
-  }, [resetAddressForm]);
-
-  // Input validation functions
-  const validateFullName = useCallback((value) => {
-    return value.replace(/[^a-zA-Z\s]/g, '');
-  }, []);
-
-  const validatePhone = useCallback((value) => {
-    const numbersOnly = value.replace(/[^0-9]/g, '');
-    const validNumbers = numbersOnly.split('').filter((char, index) => {
-      if (index === 0) {
-        return ['6','7','8','9'].includes(char);
-      }
-      return true;
-    }).join('');
-    
-    return validNumbers.slice(0, 10);
-  }, []);
-
-  const validateCity = useCallback((value) => {
-    return value.replace(/[^a-zA-Z\s]/g, '');
-  }, []);
-
-  const validateState = useCallback((value) => {
-    return value.replace(/[^a-zA-Z\s]/g, '');
-  }, []);
-
-  const validatePincode = useCallback((value) => {
-    return value.replace(/[^0-9]/g, '').slice(0, 6);
-  }, []);
-
-  const validateCustomTip = useCallback((value) => {
-    return value.replace(/[^0-9]/g, '');
+  const formatIndianNumber = useCallback((number) => {
+    return new Intl.NumberFormat('en-IN').format(Math.round(number));
   }, []);
 
   // Item selection functions
@@ -351,83 +419,36 @@ const CartView = ({
     });
   }, [removeFromCart, cart.length]);
 
-  const getSelectedCartItems = useCallback(() => {
-    return cart.filter(item => selectedItems.includes(item.id));
-  }, [cart, selectedItems]);
-
-  const getSelectedTotalPrice = useCallback(() => {
-    const selected = getSelectedCartItems();
-    return selected.reduce((total, item) => total + (item.price * item.quantity), 0);
-  }, [getSelectedCartItems]);
-
-  const getTotalWithTip = useCallback(() => {
-    const subtotal = getSelectedTotalPrice();
-    
-    return {
-      subtotal,
-      tip: tipAmount,
-      total: subtotal + tipAmount
-    };
-  }, [getSelectedTotalPrice, tipAmount]);
-
-  const handleTipSelect = useCallback((amount) => {
-    setSelectedTip(amount);
-    if (amount !== 0) {
-      setCustomTip('');
-      setTipAmount(amount);
+  // Back button handler
+  const handleBackToMedicines = useCallback(() => {
+    if (setActiveView && typeof setActiveView === 'function') {
+      setActiveView('medicines');
+    } else if (window.history.length > 1) {
+      window.history.back();
     } else {
-      setTipAmount(0);
+      window.location.href = window.location.origin;
     }
+  }, [setActiveView]);
+
+  // Address management functions
+  const resetAddressForm = useCallback(() => {
+    setAddress({
+      fullName: '',
+      phone: '',
+      street: '',
+      city: '',
+      state: '',
+      pincode: '',
+      landmark: ''
+    });
+    setValidationErrors({});
   }, []);
 
-  const handleCustomTipChange = useCallback((value) => {
-    const validatedValue = validateCustomTip(value);
-    setCustomTip(validatedValue);
-    
-    if (validatedValue) {
-      setSelectedTip(0);
-      setTipAmount(parseInt(validatedValue) || 0);
-    } else {
-      setTipAmount(0);
-    }
-  }, [validateCustomTip]);
-
-  const handleAddressChange = useCallback((field, value) => {
-    let validatedValue = value;
-
-    switch (field) {
-      case 'fullName':
-        validatedValue = validateFullName(value);
-        break;
-      case 'phone':
-        validatedValue = validatePhone(value);
-        break;
-      case 'city':
-        validatedValue = validateCity(value);
-        break;
-      case 'state':
-        validatedValue = validateState(value);
-        break;
-      case 'pincode':
-        validatedValue = validatePincode(value);
-        break;
-      default:
-        validatedValue = value;
-    }
-
-    if (validationErrors[field]) {
-      setValidationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-
-    setAddress(prev => ({
-      ...prev,
-      [field]: validatedValue
-    }));
-  }, [validateFullName, validatePhone, validateCity, validateState, validatePincode, validationErrors]);
+  // Validation functions (keep your existing validation code)
+  const validateFullName = useCallback((value) => value.replace(/[^a-zA-Z\s]/g, ''), []);
+  const validatePhone = useCallback((value) => value.replace(/[^0-9]/g, '').slice(0, 10), []);
+  const validatePincode = useCallback((value) => value.replace(/[^0-9]/g, '').slice(0, 6), []);
+  const validateCustomTip = useCallback((value) => value.replace(/[^0-9]/g, ''), []);
 
   const validateField = useCallback((field, value) => {
     switch (field) {
@@ -485,23 +506,218 @@ const CartView = ({
     return isValid;
   }, [address, validateField]);
 
-  const handleCheckout = useCallback(async () => {
+  // Modal handlers
+  const openAddressModal = useCallback(() => {
     if (selectedItems.length === 0) {
       alert('Please select at least one item to checkout');
       return;
     }
     
+    let currentTip = 0;
+    if (selectedTip > 0) {
+      currentTip = selectedTip;
+    } else if (customTip) {
+      currentTip = parseInt(customTip) || 0;
+    }
+    setTipAmount(currentTip);
+    
+    setAddressMode('select');
+    setSelectedAddressId(null);
+    
+    if (savedAddresses.length > 0) {
+      setSelectedAddressId(savedAddresses[0].id);
+      setAddress(savedAddresses[0]);
+    } else {
+      setAddressMode('new');
+      resetAddressForm();
+    }
+    
+    setShowAddressModal(true);
+    document.body.style.overflow = 'hidden';
+  }, [selectedItems.length, selectedTip, customTip, savedAddresses, resetAddressForm]);
+
+  const closeAddressModal = useCallback(() => {
+    setShowAddressModal(false);
+    setValidationErrors({});
+    setAddressMode('select');
+    setSelectedAddressId(null);
+    document.body.style.overflow = 'auto';
+  }, []);
+
+  const closePaymentModal = useCallback(() => {
+    setShowPaymentModal(false);
+    setPaymentStatus('');
+    setOrderDetails(null);
+    setIsProcessingPayment(false);
+  }, []);
+
+  // Handle click outside modal
+  const handleOverlayClick = useCallback((e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      closeAddressModal();
+    }
+    if (paymentModalRef.current && !paymentModalRef.current.contains(e.target)) {
+      closePaymentModal();
+    }
+  }, [closeAddressModal, closePaymentModal]);
+
+  // BackButton component
+  const BackButton = React.memo(({ onClick, text = 'Back' }) => {
+    const handleClick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (onClick && typeof onClick === 'function') {
+        onClick();
+      } else if (window.history.length > 1) {
+        window.history.back();
+      }
+    };
+    
+    return (
+      <button 
+        className="back-button"
+        onClick={handleClick}
+        type="button"
+        style={{ cursor: 'pointer' }}
+      >
+        ← {text}
+      </button>
+    );
+  });
+
+  const saveCurrentAddress = useCallback(() => {
+    if (!validateAddress()) {
+      return;
+    }
+
+    const newAddress = {
+      ...address,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
+    };
+
+    const isDuplicate = savedAddresses.some(saved => 
+      saved.fullName === newAddress.fullName &&
+      saved.phone === newAddress.phone &&
+      saved.street === newAddress.street &&
+      saved.pincode === newAddress.pincode
+    );
+
+    if (isDuplicate) {
+      alert('This address is already saved!');
+      return;
+    }
+
+    setSavedAddresses(prev => [newAddress, ...prev]);
+    setSelectedAddressId(newAddress.id);
+    setAddressMode('select');
+    
+    alert('Address saved successfully!');
+  }, [address, savedAddresses, validateAddress]);
+
+  const deleteAddress = useCallback((id, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this address?')) {
+      setSavedAddresses(prev => prev.filter(addr => addr.id !== id));
+      if (selectedAddressId === id) {
+        setSelectedAddressId(null);
+        resetAddressForm();
+      }
+    }
+  }, [selectedAddressId, resetAddressForm]);
+
+  const handleAddressSelect = useCallback((selectedAddress) => {
+    setSelectedAddressId(selectedAddress.id);
+    setAddress(selectedAddress);
+  }, []);
+
+  const switchToNewAddressMode = useCallback(() => {
+    setAddressMode('new');
+    resetAddressForm();
+    setSelectedAddressId(null);
+  }, [resetAddressForm]);
+
+  const handleTipSelect = useCallback((amount) => {
+    setSelectedTip(amount);
+    if (amount !== 0) {
+      setCustomTip('');
+      setTipAmount(amount);
+    } else {
+      setTipAmount(0);
+    }
+  }, []);
+
+  const handleCustomTipChange = useCallback((value) => {
+    const validatedValue = validateCustomTip(value);
+    setCustomTip(validatedValue);
+    
+    if (validatedValue) {
+      setSelectedTip(0);
+      setTipAmount(parseInt(validatedValue) || 0);
+    } else {
+      setTipAmount(0);
+    }
+  }, [validateCustomTip]);
+
+  const handleAddressChange = useCallback((field, value) => {
+    let validatedValue = value;
+
+    switch (field) {
+      case 'fullName':
+        validatedValue = validateFullName(value);
+        break;
+      case 'phone':
+        validatedValue = validatePhone(value);
+        break;
+      case 'city':
+        validatedValue = value; // No special validation
+        break;
+      case 'state':
+        validatedValue = value; // No special validation
+        break;
+      case 'pincode':
+        validatedValue = validatePincode(value);
+        break;
+      default:
+        validatedValue = value;
+    }
+
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+
+    setAddress(prev => ({
+      ...prev,
+      [field]: validatedValue
+    }));
+  }, [validateFullName, validatePhone, validatePincode, validationErrors]);
+
+  // Updated checkout handler
+  const handleCheckout = useCallback(() => {
+    if (selectedItems.length === 0) {
+      alert('Please select at least one item to checkout');
+      return;
+    }
+    
+    // Update tip amount
     let currentTip = tipAmount;
     if (selectedTip === 0 && customTip) {
       currentTip = parseInt(customTip) || 0;
     }
     setTipAmount(currentTip);
     
+    // Open address modal
     openAddressModal();
   }, [selectedItems.length, tipAmount, selectedTip, customTip, openAddressModal]);
 
+  // Updated payment submission handler
   const handlePaymentSubmit = useCallback(async () => {
-    // Validate if an address is selected or new address is valid
+    // Validate address
     if (addressMode === 'select' && !selectedAddressId) {
       alert('Please select a delivery address');
       return;
@@ -519,48 +735,64 @@ const CartView = ({
       return;
     }
 
-    const totals = getTotalWithTip();
+    const totals = getTotalWithTaxAndTip();
     const selectedCartItems = getSelectedCartItems();
+    const selectedItemIds = [...selectedItems];
     
-    const checkoutData = {
-      address: addressMode === 'new' ? address : savedAddresses.find(addr => addr.id === selectedAddressId),
+    // Get selected or new address
+    const deliveryAddress = addressMode === 'new' 
+      ? address 
+      : savedAddresses.find(addr => addr.id === selectedAddressId);
+
+    // Prepare payment data
+    const paymentData = {
+      address: deliveryAddress,
       tip: totals.tip,
       subtotal: totals.subtotal,
+      tax: totals.tax,
       totalAmount: totals.total,
-      selectedItems: selectedItems,
+      selectedItems: selectedItemIds,
       cartItems: selectedCartItems,
       tipDetails: {
         selectedTip,
         customTip,
         tipAmount: totals.tip
+      },
+      orderDateTime: {
+        date: currentDateTime.date,
+        time: currentDateTime.time,
+        timestamp: currentDateTime.timestamp,
+        orderDate: currentDateTime.orderDate
+      },
+      taxDetails: {
+        rate: TAX_RATE * 100,
+        amount: totals.tax
       }
     };
 
-    console.log('Checkout data:', checkoutData);
+    console.log('Initiating payment for:', paymentData);
 
+    // Close address modal
     closeAddressModal();
-
-    try {
-      // Call handleCheckoutConfirmation and wait for it to complete
-      const success = await handleCheckoutConfirmation(checkoutData);
-      
-      // If payment was successful, CartView doesn't need to clear cart anymore
-      // The UserDashboard will handle it via handlePaymentSuccess
-      if (success) {
-        // Just reset local states for tip and selection
-        setSelectedItems([]);
-        setSelectAll(false);
-        setSelectedTip(0);
-        setCustomTip('');
-        setTipAmount(0);
-        
-        // The navigation will happen in UserDashboard
-      }
-    } catch (error) {
-      console.log('Payment was cancelled or failed:', error);
-      alert('Payment failed. Please try again.');
-    }
-  }, [addressMode, selectedAddressId, validateAddress, validationErrors, getTotalWithTip, getSelectedCartItems, address, savedAddresses, selectedItems, selectedTip, customTip, closeAddressModal, handleCheckoutConfirmation]);
+    
+    // Initialize Razorpay payment
+    await initializeRazorpayPayment(paymentData);
+  }, [
+    addressMode, 
+    selectedAddressId, 
+    validateAddress, 
+    validationErrors, 
+    getTotalWithTaxAndTip, 
+    getSelectedCartItems, 
+    address, 
+    savedAddresses, 
+    selectedItems, 
+    selectedTip, 
+    customTip, 
+    closeAddressModal,
+    currentDateTime,
+    TAX_RATE
+  ]);
 
   const renderErrorMessage = useCallback((field) => {
     if (validationErrors[field]) {
@@ -578,16 +810,200 @@ const CartView = ({
     const selectedCount = selectedItems.length;
     const totalCount = cart.length;
     const selectedTotal = getSelectedTotalPrice();
+    const tax = calculateTaxAmount(selectedTotal);
     
     return {
       selectedCount,
       totalCount,
-      selectedTotal
+      selectedTotal,
+      tax
     };
-  }, [selectedItems.length, cart.length, getSelectedTotalPrice]);
+  }, [selectedItems.length, cart.length, getSelectedTotalPrice, calculateTaxAmount]);
+
+  // ========== RENDER FUNCTIONS ==========
 
   const stats = getSelectionStats();
-  const totals = getTotalWithTip();
+  const totals = getTotalWithTaxAndTip();
+
+  // Render Payment Status Modal
+  const renderPaymentModal = () => {
+    if (!showPaymentModal) return null;
+
+    const isSuccess = paymentStatus === 'success';
+    const isFailed = paymentStatus === 'failed';
+
+    return (
+      <div className="modal-overlay" onClick={handleOverlayClick}>
+        <div 
+          ref={paymentModalRef}
+          className="modal-container"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="modal-header">
+            <h2 className="modal-title">
+              <span className="modal-icon">
+                {isSuccess ? '✅' : isFailed ? '❌' : '⏳'}
+              </span>
+              {isSuccess ? 'Payment Successful!' : isFailed ? 'Payment Failed' : 'Processing Payment'}
+            </h2>
+            <button
+              onClick={closePaymentModal}
+              className="modal-close-btn"
+              type="button"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="modal-body">
+            {isSuccess && orderDetails && (
+              <>
+                <div className="order-time-display-modal" style={{ background: '#E8F5E9', borderColor: '#4CAF50' }}>
+                  <div className="order-time-modal-icon">🎉</div>
+                  <div className="order-time-modal-details">
+                    <div className="order-time-modal-label">Order Confirmed!</div>
+                    <div className="order-time-modal-value">Payment ID: {orderDetails.paymentId?.substring(0, 12)}...</div>
+                    <div className="order-date-modal-value">Order placed at: {currentDateTime.time}</div>
+                  </div>
+                </div>
+
+                <div className="checkout-summary-modal">
+                  <h4 className="checkout-summary-title">📦 Order Details</h4>
+                  
+                  <div className="checkout-items-list">
+                    {orderDetails.cartItems.map(item => (
+                      <div key={item.id} className="checkout-item">
+                        <span className="checkout-item-name">{item.name}</span>
+                        <span className="checkout-item-details">
+                          {item.quantity} × ₹{formatIndianNumber(item.price)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="checkout-total">
+                    <span>Subtotal:</span>
+                    <span>₹{formatIndianNumber(orderDetails.subtotal)}</span>
+                  </div>
+                  <div className="checkout-total">
+                    <span>Tax (GST 5%):</span>
+                    <span>₹{formatIndianNumber(orderDetails.tax)}</span>
+                  </div>
+                  {orderDetails.tip > 0 && (
+                    <div className="checkout-total">
+                      <span>Delivery Tip:</span>
+                      <span>₹{formatIndianNumber(orderDetails.tip)}</span>
+                    </div>
+                  )}
+                  <div className="checkout-total" style={{ borderTop: '2px solid #4CAF50', fontWeight: '700' }}>
+                    <span>Total Paid:</span>
+                    <span style={{ color: '#4CAF50' }}>₹{formatIndianNumber(orderDetails.totalAmount)}</span>
+                  </div>
+                  
+                  <div className="selected-address-preview">
+                    <h5 className="address-preview-title">📍 Delivery To:</h5>
+                    <div className="address-preview-content">
+                      <div className="address-preview-name-phone">
+                        <strong>{orderDetails.address.fullName}</strong>
+                        <span>📱 {orderDetails.address.phone}</span>
+                      </div>
+                      <p>{orderDetails.address.street}</p>
+                      {orderDetails.address.landmark && (
+                        <p><em>Near: {orderDetails.address.landmark}</em></p>
+                      )}
+                      <p>{orderDetails.address.city}, {orderDetails.address.state} - {orderDetails.address.pincode}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="success-message" style={{ 
+                  background: '#E8F5E9', 
+                  padding: '20px', 
+                  borderRadius: '12px', 
+                  textAlign: 'center',
+                  marginTop: '20px',
+                  border: '2px solid #4CAF50'
+                }}>
+                  <h3 style={{ color: '#2E7D32', marginBottom: '10px' }}>🎉 Thank You for Your Order!</h3>
+                  <p style={{ color: '#4F6F6B' }}>
+                    Your order has been confirmed and will be delivered soon.
+                    You can track your order in the "Orders" section.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {isFailed && orderDetails && (
+              <div className="error-message-container" style={{ 
+                background: '#FFEBEE', 
+                padding: '30px', 
+                borderRadius: '12px', 
+                textAlign: 'center',
+                border: '2px solid #FF4444'
+              }}>
+                <h3 style={{ color: '#C62828', marginBottom: '15px' }}>❌ Payment Failed</h3>
+                <p style={{ color: '#4F6F6B', marginBottom: '20px' }}>
+                  We couldn't process your payment. Please try again or use a different payment method.
+                </p>
+                <div style={{ marginTop: '20px' }}>
+                  <button
+                    onClick={() => {
+                      closePaymentModal();
+                      openAddressModal();
+                    }}
+                    className="modal-submit-btn"
+                    style={{ background: '#4DB6AC' }}
+                    type="button"
+                  >
+                    🔄 Try Again
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {isProcessingPayment && (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div className="loading-spinner" style={{ 
+                  width: '50px', 
+                  height: '50px', 
+                  border: '5px solid #E0F2F1',
+                  borderTop: '5px solid #4DB6AC',
+                  borderRadius: '50%',
+                  margin: '0 auto 20px',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+                <h3 style={{ color: '#124441' }}>Processing Payment...</h3>
+                <p style={{ color: '#4F6F6B' }}>Please wait while we connect to payment gateway</p>
+              </div>
+            )}
+          </div>
+
+          <div className="modal-footer">
+            <button
+              onClick={closePaymentModal}
+              className="modal-cancel-btn"
+              type="button"
+            >
+              {isSuccess ? 'Continue Shopping' : 'Close'}
+            </button>
+            
+            {isSuccess && (
+              <button
+                onClick={() => {
+                  closePaymentModal();
+                  if (setActiveView) setActiveView('orders');
+                }}
+                className="modal-submit-btn"
+                type="button"
+              >
+                📋 View My Orders
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="cart-container">
@@ -599,12 +1015,10 @@ const CartView = ({
             text="Back to Medicines" 
           />
           
-          {/* Add button to view orders */}
           {cart.length > 0 && (
             <button 
               className="view-orders-btn"
               onClick={() => {
-                console.log('View Orders clicked');
                 if (typeof setActiveView === 'function') {
                   setActiveView('orders');
                 }
@@ -618,6 +1032,11 @@ const CartView = ({
         
         <div className="header-title-container">
           <h2 className="cart-title">Your Shopping Cart</h2>
+          <div className="current-time-display">
+            <span className="time-icon">🕒</span>
+            <span className="current-date">{currentDateTime.date}</span>
+            <span className="current-time">{currentDateTime.time}</span>
+          </div>
         </div>
         
         {cart.length > 0 && (
@@ -630,6 +1049,11 @@ const CartView = ({
             <div className="stat-box">
               <div className="stat-value">₹{formatIndianNumber(stats.selectedTotal)}</div>
               <div className="stat-label">💰 Selected Total</div>
+            </div>
+
+            <div className="stat-box">
+              <div className="stat-value">₹{formatIndianNumber(stats.tax)}</div>
+              <div className="stat-label">🧾 Tax (5% GST)</div>
             </div>
           </div>
         )}
@@ -653,7 +1077,9 @@ const CartView = ({
           </div>
         ) : (
           <>
+            {/* Cart Items Container (keep your existing JSX here) */}
             <div className="cart-items-container">
+              {/* ... Your existing cart items JSX ... */}
               <div className="cart-items-header">
                 <div className="selection-header">
                   <h3 className="cart-items-title">🛒 Cart Items ({cart.length})</h3>
@@ -740,9 +1166,19 @@ const CartView = ({
               </div>
             </div>
 
+            {/* Order Summary (keep your existing JSX here) */}
             <div className="order-summary">
               <div className="summary-content">
                 <h3 className="summary-title">💰 Order Summary</h3>
+                
+                <div className="order-time-info">
+                  <div className="order-time-icon">🕒</div>
+                  <div className="order-time-details">
+                    <div className="order-time-label">Order will be placed at:</div>
+                    <div className="order-time-value">{currentDateTime.time}</div>
+                    <div className="order-date-value">{currentDateTime.date}</div>
+                  </div>
+                </div>
                 
                 <div className="selection-summary">
                   <div className="selection-summary-header">
@@ -825,8 +1261,8 @@ const CartView = ({
                   </div>
                   
                   <div className="price-row">
-                    <span className="price-label">Tax (GST):</span>
-                    <span className="price-tax">₹0</span>
+                    <span className="price-label">Tax (GST 5%):</span>
+                    <span className="price-tax">₹{formatIndianNumber(totals.tax)}</span>
                   </div>
                   
                   <div className="price-row">
@@ -862,16 +1298,16 @@ const CartView = ({
                 </div>
                 
                 <button 
-                  className={`checkout-btn ${paymentLoading ? 'loading' : ''} ${stats.selectedCount === 0 ? 'disabled' : ''}`}
+                  className={`checkout-btn ${isProcessingPayment ? 'loading' : ''} ${stats.selectedCount === 0 ? 'disabled' : ''}`}
                   onClick={handleCheckout}
-                  disabled={paymentLoading || stats.selectedCount === 0}
+                  disabled={isProcessingPayment || stats.selectedCount === 0}
                   type="button"
                 >
-                  {paymentLoading 
+                  {isProcessingPayment 
                     ? '⏳ Processing Payment...' 
                     : stats.selectedCount === 0
                     ? '⚠️ Select Items to Checkout'
-                    : `🚀 Checkout ${stats.selectedCount} Item(s)`}
+                    : `💳 Checkout ${stats.selectedCount} Item(s) - ₹${formatIndianNumber(totals.total)}`}
                 </button>
               </div>
             </div>
@@ -879,22 +1315,24 @@ const CartView = ({
         )}
       </div>
 
-      {/* Enhanced Address Modal with Saved Addresses */}
+      {/* Address Modal (keep your existing modal JSX) */}
       {showAddressModal && (
-        <div 
-          className="modal-overlay"
-          onClick={handleOverlayClick}
-        >
+        <div className="modal-overlay" onClick={handleOverlayClick}>
           <div 
             ref={modalRef}
             className="modal-container"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* ... Your existing address modal JSX ... */}
             <div className="modal-header">
               <h2 className="modal-title">
                 <span className="modal-icon">📍</span>
                 Delivery Address
               </h2>
+              <div className="modal-time-info">
+                <span className="modal-time-icon">🕒</span>
+                <span className="modal-time">{currentDateTime.time}</span>
+              </div>
               <button
                 onClick={closeAddressModal}
                 className="modal-close-btn"
@@ -905,6 +1343,16 @@ const CartView = ({
             </div>
 
             <div className="modal-body">
+              {/* Order Time Display */}
+              <div className="order-time-display-modal">
+                <div className="order-time-modal-icon">📅</div>
+                <div className="order-time-modal-details">
+                  <div className="order-time-modal-label">Order will be placed at:</div>
+                  <div className="order-time-modal-value">{currentDateTime.time}</div>
+                  <div className="order-date-modal-value">{currentDateTime.date}</div>
+                </div>
+              </div>
+
               {/* Address Mode Tabs */}
               <div className="address-mode-tabs">
                 <button
@@ -1173,6 +1621,10 @@ const CartView = ({
                     <span>₹{formatIndianNumber(totals.subtotal)}</span>
                   </div>
                   <div className="checkout-total">
+                    <span>Tax (GST 5%):</span>
+                    <span>₹{formatIndianNumber(totals.tax)}</span>
+                  </div>
+                  <div className="checkout-total">
                     <span>Delivery Tip:</span>
                     <span>₹{formatIndianNumber(totals.tip)}</span>
                   </div>
@@ -1223,12 +1675,12 @@ const CartView = ({
               {addressMode === 'select' ? (
                 <button
                   onClick={handlePaymentSubmit}
-                  disabled={paymentLoading || !selectedAddressId}
-                  className={`modal-submit-btn ${paymentLoading ? 'loading' : ''} ${!selectedAddressId ? 'disabled' : ''}`}
+                  disabled={isProcessingPayment || !selectedAddressId}
+                  className={`modal-submit-btn ${isProcessingPayment ? 'loading' : ''} ${!selectedAddressId ? 'disabled' : ''}`}
                   type="button"
                 >
-                  {paymentLoading 
-                    ? '⏳ Processing...' 
+                  {isProcessingPayment
+                    ? '⏳ Initializing Payment...' 
                     : !selectedAddressId
                     ? '📋 Select an Address'
                     : `💳 Pay ₹${formatIndianNumber(totals.total)}`}
@@ -1236,12 +1688,12 @@ const CartView = ({
               ) : (
                 <button
                   onClick={handlePaymentSubmit}
-                  disabled={paymentLoading}
-                  className={`modal-submit-btn ${paymentLoading ? 'loading' : ''}`}
+                  disabled={isProcessingPayment}
+                  className={`modal-submit-btn ${isProcessingPayment ? 'loading' : ''}`}
                   type="button"
                 >
-                  {paymentLoading 
-                    ? '⏳ Processing...' 
+                  {isProcessingPayment
+                    ? '⏳ Initializing Payment...' 
                     : `💳 Pay ₹${formatIndianNumber(totals.total)}`}
                 </button>
               )}
@@ -1249,6 +1701,21 @@ const CartView = ({
           </div>
         </div>
       )}
+
+      {/* Payment Status Modal */}
+      {renderPaymentModal()}
+
+      {/* Add CSS animation */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        .loading-spinner {
+          animation: spin 1s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };

@@ -48,11 +48,30 @@ const DATE_FILTERS = [
 
 // Helper functions
 const formatTime = (date) => {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString('en-IN', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  });
 };
 
 const formatDate = (date) => {
-  return date.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return date.toLocaleDateString('en-IN', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+};
+
+const formatDateTime = (date) => {
+  const timeStr = formatTime(date);
+  const dateStr = date.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+  return `${dateStr} at ${timeStr}`;
 };
 
 // Calculate estimated delivery based on 20-30 minute window from order time
@@ -341,20 +360,38 @@ const OrderDetailsModal = React.memo(({ order, onClose, startLiveTracking, showR
   const vendor = VENDORS[order.vendorId] || VENDORS[Object.keys(VENDORS)[0]];
   const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG['Pending'];
   
+  // Get order date - prioritize orderDateTime
+  const getOrderDate = () => {
+    if (order.orderDateTime?.timestamp) {
+      return new Date(order.orderDateTime.timestamp);
+    }
+    if (order.orderDateTime?.orderDate) {
+      return new Date(order.orderDateTime.orderDate);
+    }
+    if (order.date) {
+      return new Date(order.date);
+    }
+    return new Date(); // Fallback to current time
+  };
+  
+  const orderDate = getOrderDate();
+  
   // Generate or use existing status timeline
-  const statusTimeline = order.statusTimeline || generateStatusTimeline(order.date, order.status);
+  const statusTimeline = order.statusTimeline || generateStatusTimeline(orderDate, order.status);
   
   // Calculate estimated delivery
-  const estimatedDelivery = calculateEstimatedDelivery(order.date);
+  const estimatedDelivery = calculateEstimatedDelivery(orderDate);
   
   // Get delivery partner for delivered orders
   const deliveryPartner = order.status === 'Delivered' ? 
-    Object.values(DELIVERY_PARTNERS).find(dp => dp.name === order.deliveryPartner) || 
+    Object.values(DELIVERY_PARTNERS).find(dp => dp.name === order.deliveryPartner?.name) || 
     Object.values(DELIVERY_PARTNERS)[0] : null;
 
-  const totalAmount = order.items?.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0) || 0;
-  const tax = totalAmount * 0.05;
-  const grandTotal = totalAmount + tax;
+  // Calculate totals including tax
+  const totalAmount = order.subtotal || order.items?.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0) || 0;
+  const tax = order.tax || totalAmount * 0.05;
+  const tip = order.tip || 0;
+  const grandTotal = order.totalAmount || (totalAmount + tax + tip);
 
   const getTimeCardStyle = () => ({
     backgroundColor: '#FFFFFF',
@@ -370,7 +407,7 @@ const OrderDetailsModal = React.memo(({ order, onClose, startLiveTracking, showR
           <div>
             <h3 style={{ margin: 0, color: '#009688' }}>Order #{order.id} Details</h3>
             <p style={{ margin: '0.3rem 0 0 0', color: '#4F6F6B', fontSize: '0.9rem' }}>
-              Placed on {formatDate(new Date(order.date))}
+              Placed on {formatDate(orderDate)}
             </p>
           </div>
           <button style={modalStyles.closeButton} onClick={onClose}>✕</button>
@@ -418,14 +455,15 @@ const OrderDetailsModal = React.memo(({ order, onClose, startLiveTracking, showR
                   </div>
                 </div>
               )}
-              {['Delivered', 'Cancelled', 'Returned'].includes(order.status) && (
-                <div style={getTimeCardStyle()}>
-                  <div style={{ fontSize: '0.8rem', color: '#4F6F6B', marginBottom: '0.3rem' }}>⏰ Completed at:</div>
-                  <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#4CAF50' }}>
-                    {formatTime(estimatedDelivery)}
-                  </div>
+              <div style={getTimeCardStyle()}>
+                <div style={{ fontSize: '0.8rem', color: '#4F6F6B', marginBottom: '0.3rem' }}>⏰ Order Time:</div>
+                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#2196F3' }}>
+                  {formatTime(orderDate)}
                 </div>
-              )}
+                <div style={{ fontSize: '0.75rem', color: '#4F6F6B', marginTop: '0.2rem' }}>
+                  {formatDate(orderDate)}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -508,9 +546,15 @@ const OrderDetailsModal = React.memo(({ order, onClose, startLiveTracking, showR
                   <span style={{ fontWeight: '600', color: '#4CAF50' }}>FREE</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ color: '#4F6F6B' }}>Tax (5%):</span>
+                  <span style={{ color: '#4F6F6B' }}>Tax (5% GST):</span>
                   <span style={{ fontWeight: '600' }}>₹{tax.toFixed(2)}</span>
                 </div>
+                {tip > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ color: '#4F6F6B' }}>Delivery Tip:</span>
+                    <span style={{ fontWeight: '600', color: '#FF9800' }}>₹{tip.toFixed(2)}</span>
+                  </div>
+                )}
                 <div style={modalStyles.grandTotal}>
                   <span>Total Amount:</span>
                   <span>₹{grandTotal.toFixed(2)}</span>
@@ -521,7 +565,7 @@ const OrderDetailsModal = React.memo(({ order, onClose, startLiveTracking, showR
 
           <div style={modalStyles.infoCard}>
             <h4 style={{ margin: '0 0 1rem 0', color: '#009688' }}>📍 Delivery Information</h4>
-            <p style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}><strong>Address:</strong> {order.deliveryAddress || 'Not specified'}</p>
+            <p style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}><strong>Address:</strong> {order.address?.street || order.deliveryAddress || 'Not specified'}</p>
             <p style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}><strong>Payment:</strong> {order.paymentMethod || 'Online'}</p>
             <p style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}><strong>Delivery Speed:</strong> {vendor.deliveryTime}</p>
           </div>
@@ -553,12 +597,28 @@ const OrderCard = React.memo(({ order, onViewDetails, startLiveTracking, showRat
   const vendor = VENDORS[order.vendorId] || VENDORS[Object.keys(VENDORS)[0]];
   const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG['Pending'];
   
+  // Get order time - prioritize orderDateTime, then date
+  const getOrderDate = () => {
+    if (order.orderDateTime?.timestamp) {
+      return new Date(order.orderDateTime.timestamp);
+    }
+    if (order.orderDateTime?.orderDate) {
+      return new Date(order.orderDateTime.orderDate);
+    }
+    if (order.date) {
+      return new Date(order.date);
+    }
+    return new Date(); // Fallback to current time
+  };
+  
+  const orderDate = getOrderDate();
+  
   // Calculate estimated delivery
-  const estimatedDelivery = calculateEstimatedDelivery(order.date);
+  const estimatedDelivery = calculateEstimatedDelivery(orderDate);
   
   // Get delivery partner for delivered orders
   const deliveryPartner = order.status === 'Delivered' ? 
-    Object.values(DELIVERY_PARTNERS).find(dp => dp.name === order.deliveryPartner) || 
+    Object.values(DELIVERY_PARTNERS).find(dp => dp.name === order.deliveryPartner?.name) || 
     Object.values(DELIVERY_PARTNERS)[0] : null;
 
   return (
@@ -629,10 +689,10 @@ const OrderCard = React.memo(({ order, onViewDetails, startLiveTracking, showRat
       <div style={cardStyles.footer}>
         <div style={{ flex: 1, minWidth: '200px' }}>
           <div style={{ color: '#4F6F6B', fontSize: '0.75rem', marginBottom: '0.3rem' }}>
-            <strong>📍 Delivery:</strong> {order.deliveryAddress || 'Address not specified'}
+            <strong>📍 Delivery:</strong> {order.address?.street || order.deliveryAddress || 'Address not specified'}
           </div>
           <div style={{ color: '#4F6F6B', fontSize: '0.75rem' }}>
-            <strong>📅 Ordered:</strong> {new Date(order.date).toLocaleDateString()} at {new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <strong>📅 Ordered:</strong> {formatDateTime(orderDate)}
           </div>
         </div>
         <div style={cardStyles.actionButtons}>
@@ -660,15 +720,69 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
   const [showRating, setShowRating] = useState(false);
   const [ratingOrder, setRatingOrder] = useState(null);
   const [ratingDeliveryPartner, setRatingDeliveryPartner] = useState(null);
-  const [orders, setOrders] = useState(initialOrders || []);
+  const [orders, setOrders] = useState(() => {
+    try {
+      // Load orders from localStorage on component mount
+      const savedOrders = localStorage.getItem('quickmed_orders');
+      if (savedOrders) {
+        const parsed = JSON.parse(savedOrders);
+        // Ensure orders have proper timestamp
+        return parsed.map(order => {
+          // If order has orderDateTime object, use it, otherwise create from date
+          if (!order.orderDateTime && order.date) {
+            return {
+              ...order,
+              orderDateTime: {
+                timestamp: order.date,
+                date: new Date(order.date).toLocaleDateString('en-IN', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                }),
+                time: new Date(order.date).toLocaleTimeString('en-IN', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true
+                })
+              }
+            };
+          }
+          return order;
+        });
+      }
+      // If no saved orders, use initialOrders
+      return initialOrders || [];
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      return initialOrders || [];
+    }
+  });
 
   useEffect(() => { 
     const timer = setInterval(() => setCurrentTime(new Date()), 1000); 
     return () => clearInterval(timer); 
   }, []);
   
-  useEffect(() => { 
-    setOrders(initialOrders || []); 
+  // Sync with parent orders when they change
+  useEffect(() => {
+    if (initialOrders && initialOrders.length > 0) {
+      setOrders(prev => {
+        // Merge initialOrders with existing orders, avoiding duplicates
+        const merged = [...prev];
+        initialOrders.forEach(order => {
+          if (!merged.some(o => o.id === order.id)) {
+            merged.push(order);
+          }
+        });
+        return merged.sort((a, b) => {
+          const dateA = a.orderDateTime?.timestamp ? new Date(a.orderDateTime.timestamp) : new Date(a.date);
+          const dateB = b.orderDateTime?.timestamp ? new Date(b.orderDateTime.timestamp) : new Date(b.date);
+          return dateB - dateA;
+        });
+      });
+    }
   }, [initialOrders]);
   
   useEffect(() => { 
@@ -676,12 +790,22 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
     return () => { document.body.style.overflow = 'auto'; }; 
   }, [selectedOrder, showRating]);
 
+  // Save orders to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('quickmed_orders', JSON.stringify(orders));
+    } catch (error) {
+      console.error('Error saving orders:', error);
+    }
+  }, [orders]);
+
   // Default live tracking function if not provided
   const defaultStartLiveTracking = useCallback((order) => {
-    const estimatedTime = calculateEstimatedDelivery(order.date);
+    const orderDate = order.orderDateTime?.timestamp ? new Date(order.orderDateTime.timestamp) : new Date(order.date);
+    const estimatedTime = calculateEstimatedDelivery(orderDate);
     const vendor = VENDORS[order.vendorId] || VENDORS[Object.keys(VENDORS)[0]];
     
-    alert(`🚚 Live Tracking Started for Order #${order.id}\n\n📊 Order Details:\n• Status: ${order.status}\n• Pharmacy: ${vendor.name}\n• Estimated Delivery: ${formatTime(estimatedTime)}\n• Delivery Time: ${vendor.deliveryTime}\n\n📍 Tracking Features:\n• Real-time GPS location of delivery partner\n• Live route visualization on map\n• Estimated arrival time updates\n• Delivery progress tracking\n• Traffic and route optimization\n\nThis would normally show an interactive map with live tracking.`);
+    alert(`🚚 Live Tracking Started for Order #${order.id}\n\n📊 Order Details:\n• Status: ${order.status}\n• Pharmacy: ${vendor.name}\n• Ordered at: ${formatTime(orderDate)}\n• Estimated Delivery: ${formatTime(estimatedTime)}\n• Delivery Time: ${vendor.deliveryTime}\n\n📍 Tracking Features:\n• Real-time GPS location of delivery partner\n• Live route visualization on map\n• Estimated arrival time updates\n• Delivery progress tracking\n• Traffic and route optimization\n\nThis would normally show an interactive map with live tracking.`);
   }, []);
 
   // Safe function that checks if startLiveTracking exists and is callable
@@ -724,10 +848,17 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
     };
     if (dateRanges[dateFilter]) {
       const startDate = dateRanges[dateFilter]();
-      filtered = filtered.filter(order => new Date(order.date) >= startDate && new Date(order.date) <= now);
+      filtered = filtered.filter(order => {
+        const orderDate = order.orderDateTime?.timestamp ? new Date(order.orderDateTime.timestamp) : new Date(order.date);
+        return orderDate >= startDate && orderDate <= now;
+      });
     }
 
-    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return filtered.sort((a, b) => {
+      const dateA = a.orderDateTime?.timestamp ? new Date(a.orderDateTime.timestamp) : new Date(a.date);
+      const dateB = b.orderDateTime?.timestamp ? new Date(b.orderDateTime.timestamp) : new Date(b.date);
+      return dateB - dateA;
+    });
   }, [orders, statusFilter, dateFilter]);
 
   const openOrderDetails = useCallback((order) => setSelectedOrder(order), []);
@@ -774,7 +905,7 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
             <h2 style={styles.title}>Order History & Tracking</h2>
             <p style={styles.subtitle}>Track your medicine orders with real-time updates and 20-30 mins delivery</p>
           </div>
-          <div style={styles.timeDisplay}>🕒 {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          <div style={styles.timeDisplay}>🕒 {currentTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false })}</div>
         </div>
 
         <div style={styles.mainSection}>
@@ -815,7 +946,7 @@ const OrdersView = ({ orders: initialOrders, setActiveView, startLiveTracking })
                   <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.8rem', color: '#4F6F6B' }}>
                     {statusFilter === 'all' ? 'All orders' : statusFilter} • 
                     {dateFilter === 'recent' ? ' Last 7 days' : dateFilter === 'last30days' ? ' Last 30 days' : dateFilter === 'last6months' ? ' Last 6 months' : ' Last 1 year'} • 
-                    Updated: {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    Updated: {currentTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

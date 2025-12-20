@@ -403,7 +403,7 @@ const Products = ({
       padding: '20px',
       maxWidth: '1400px',
       margin: '0 auto',
-      marginTop: '140px',
+      marginTop: '130px',
       minHeight: 'calc(100vh - 120px)',
       width: '100%',
       boxSizing: 'border-box',

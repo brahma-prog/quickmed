@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const NotificationPanel = ({ 
   showNotifications, 
@@ -10,7 +10,16 @@ const NotificationPanel = ({
   deleteNotification,
   deleteAllNotifications,
   loadMoreNotifications,
-  isFullPage = false
+  isFullPage = false,
+  // New props for real-time functionality
+  realTimeEnabled = false,
+  websocketUrl = null,
+  onNewNotification = null,
+  onNotificationUpdate = null,
+  pollInterval = 30000, // 30 seconds for fallback polling
+  autoMarkAsRead = false,
+  soundEnabled = false,
+  notificationSound = null
 }) => {
   const [localNotifications, setLocalNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,8 +28,342 @@ const NotificationPanel = ({
   const [deletedIds, setDeletedIds] = useState(new Set());
   const [deletedAll, setDeletedAll] = useState(false);
   const [hoverStates, setHoverStates] = useState({});
+  
+  // New states for real-time functionality
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  const [newNotificationsCount, setNewNotificationsCount] = useState(0);
+  const [lastUpdateTime, setLastUpdateTime] = useState(null);
+  const [websocket, setWebsocket] = useState(null);
+  
   const notificationsRef = useRef(null);
+  const audioRef = useRef(null);
+  const pollIntervalRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
+  // Initialize audio for notification sound
+  useEffect(() => {
+    if (soundEnabled && notificationSound) {
+      audioRef.current = new Audio(notificationSound);
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [soundEnabled, notificationSound]);
+
+  // Initialize WebSocket connection
+  useEffect(() => {
+    if (!realTimeEnabled || !websocketUrl || !showNotifications) return;
+
+    const connectWebSocket = () => {
+      try {
+        const ws = new WebSocket(websocketUrl);
+        
+        ws.onopen = () => {
+          setIsConnected(true);
+          setConnectionStatus('connected');
+          console.log('WebSocket connected for real-time notifications');
+          
+          // Send authentication if needed
+          const token = localStorage.getItem('authToken');
+          if (token) {
+            ws.send(JSON.stringify({
+              type: 'auth',
+              token: token
+            }));
+          }
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleRealTimeMessage(data);
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
+        };
+
+        ws.onclose = (event) => {
+          setIsConnected(false);
+          setConnectionStatus('disconnected');
+          console.log('WebSocket disconnected:', event.code, event.reason);
+          
+          // Attempt reconnection after delay
+          if (event.code !== 1000) { // Don't reconnect if normal closure
+            reconnectTimeoutRef.current = setTimeout(() => {
+              setConnectionStatus('reconnecting');
+              connectWebSocket();
+            }, 5000);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          setConnectionStatus('error');
+        };
+
+        setWebsocket(ws);
+      } catch (error) {
+        console.error('Error connecting WebSocket:', error);
+        setConnectionStatus('error');
+      }
+    };
+
+    connectWebSocket();
+
+    return () => {
+      if (websocket) {
+        websocket.close(1000, 'Component unmounting');
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+    };
+  }, [realTimeEnabled, websocketUrl, showNotifications]);
+
+  // Fallback polling for real-time updates if WebSocket fails
+  useEffect(() => {
+    if (!realTimeEnabled || isConnected || !showNotifications) return;
+
+    const pollForUpdates = async () => {
+      try {
+        const response = await fetch('/api/notifications/check-updates', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'If-Modified-Since': lastUpdateTime || new Date(0).toUTCString()
+          }
+        });
+
+        if (response.status === 200) {
+          const data = await response.json();
+          if (data.newNotifications > 0) {
+            handleNewNotifications(data.notifications);
+          }
+          setLastUpdateTime(new Date().toUTCString());
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    };
+
+    // Initial poll
+    pollForUpdates();
+
+    // Set up polling interval
+    pollIntervalRef.current = setInterval(pollForUpdates, pollInterval);
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, [realTimeEnabled, isConnected, showNotifications, pollInterval, lastUpdateTime]);
+
+  // Handle real-time WebSocket messages
+  const handleRealTimeMessage = useCallback((data) => {
+    switch (data.type) {
+      case 'new_notification':
+        handleNewNotifications([data.notification]);
+        break;
+      
+      case 'notification_update':
+        if (onNotificationUpdate) {
+          onNotificationUpdate(data.notification);
+        } else {
+          updateLocalNotification(data.notification);
+        }
+        break;
+      
+      case 'notification_deleted':
+        setDeletedIds(prev => new Set(prev).add(data.notificationId));
+        break;
+      
+      case 'all_notifications_deleted':
+        setDeletedAll(true);
+        break;
+      
+      case 'connection_info':
+        console.log('Connected to notification service:', data.info);
+        break;
+      
+      default:
+        console.log('Unknown message type:', data.type);
+    }
+  }, [onNotificationUpdate]);
+
+  // Handle incoming new notifications
+  const handleNewNotifications = useCallback((newNotifications) => {
+    if (!newNotifications || newNotifications.length === 0) return;
+
+    // Filter out duplicates
+    setLocalNotifications(prev => {
+      const existingIds = new Set(prev.map(n => n.id));
+      const filteredNew = newNotifications.filter(n => 
+        !existingIds.has(n.id) && !deletedIds.has(n.id)
+      );
+      
+      if (filteredNew.length === 0) return prev;
+      
+      // Play sound if enabled
+      if (soundEnabled && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+      }
+      
+      // Update new notifications count
+      setNewNotificationsCount(prevCount => prevCount + filteredNew.length);
+      
+      // Notify parent component
+      if (onNewNotification) {
+        filteredNew.forEach(notification => onNewNotification(notification));
+      }
+      
+      // Add new notifications to the top
+      return [...filteredNew, ...prev];
+    });
+  }, [deletedIds, soundEnabled, onNewNotification]);
+
+  // Update existing notification
+  const updateLocalNotification = useCallback((updatedNotification) => {
+    setLocalNotifications(prev =>
+      prev.map(notif =>
+        notif.id === updatedNotification.id 
+          ? { ...notif, ...updatedNotification }
+          : notif
+      )
+    );
+  }, []);
+
+  // Send real-time event when marking as read
+  const sendRealTimeEvent = useCallback((eventType, data) => {
+    if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
+    
+    try {
+      websocket.send(JSON.stringify({
+        type: eventType,
+        ...data,
+        timestamp: new Date().toISOString()
+      }));
+    } catch (error) {
+      console.error('Error sending WebSocket message:', error);
+    }
+  }, [websocket]);
+
+  // Enhanced mark as read with real-time
+  const handleMarkAsRead = (notificationId) => {
+    const notification = localNotifications.find(n => n.id === notificationId);
+    
+    // Add to deleted set immediately for instant UI feedback
+    setDeletedIds(prev => new Set(prev).add(notificationId));
+    
+    // Send real-time event
+    if (realTimeEnabled && websocket) {
+      sendRealTimeEvent('mark_as_read', { notificationId });
+    }
+    
+    // Update new notifications count
+    if (notification && !notification.read) {
+      setNewNotificationsCount(prev => Math.max(0, prev - 1));
+    }
+    
+    if (deleteNotification) {
+      deleteNotification(notificationId);
+    } else {
+      setLocalNotifications(prev =>
+        prev.filter(notif => notif.id !== notificationId)
+      );
+    }
+  };
+
+  // Enhanced mark all as read with real-time
+  const handleMarkAllAsRead = () => {
+    // Send real-time event
+    if (realTimeEnabled && websocket) {
+      sendRealTimeEvent('mark_all_as_read', {});
+    }
+    
+    // Reset new notifications count
+    setNewNotificationsCount(0);
+    
+    if (markAllAsRead) {
+      markAllAsRead();
+    } else {
+      setLocalNotifications(prev =>
+        prev.map(notif => ({ ...notif, read: true }))
+      );
+    }
+  };
+
+  // Enhanced delete with real-time
+  const handleDeleteNotification = (notificationId) => {
+    // Send real-time event
+    if (realTimeEnabled && websocket) {
+      sendRealTimeEvent('delete_notification', { notificationId });
+    }
+    
+    // Add to deleted set for persistent tracking
+    setDeletedIds(prev => new Set(prev).add(notificationId));
+    
+    if (deleteNotification) {
+      deleteNotification(notificationId);
+    } else {
+      setLocalNotifications(prev =>
+        prev.filter(notif => notif.id !== notificationId)
+      );
+    }
+  };
+
+  // Enhanced delete all with real-time
+  const handleDeleteAll = () => {
+    if (window.confirm('Are you sure you want to delete all notifications? This action cannot be undone.')) {
+      // Send real-time event
+      if (realTimeEnabled && websocket) {
+        sendRealTimeEvent('delete_all_notifications', {});
+      }
+      
+      setDeletedAll(true);
+      setNewNotificationsCount(0);
+      
+      if (deleteAllNotifications) {
+        deleteAllNotifications();
+      } else {
+        setLocalNotifications([]);
+      }
+    }
+  };
+
+  // Sync with server when panel opens
+  useEffect(() => {
+    if (showNotifications && realTimeEnabled) {
+      fetchLatestNotifications();
+    }
+  }, [showNotifications, realTimeEnabled]);
+
+  const fetchLatestNotifications = async () => {
+    try {
+      const response = await fetch('/api/notifications/latest', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.notifications) {
+          setLocalNotifications(data.notifications);
+          setNewNotificationsCount(data.unreadCount || 0);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching latest notifications:', error);
+    }
+  };
+
+  // Update local notifications when prop changes
   useEffect(() => {
     if (notifications && Array.isArray(notifications)) {
       // Filter out notifications that have been deleted
@@ -28,105 +371,70 @@ const NotificationPanel = ({
         notif => !deletedIds.has(notif.id) && !deletedAll
       );
       setLocalNotifications(filteredNotifications);
+      
+      // Calculate new notifications count
+      const unread = filteredNotifications.filter(notif => !notif.read).length;
+      setNewNotificationsCount(unread);
     }
   }, [notifications, deletedIds, deletedAll]);
 
-  useEffect(() => {
-    if (!showNotifications || isFullPage) return;
+  // Add connection status indicator styles
+  const connectionStatusStyles = {
+    connected: {
+      backgroundColor: '#4CAF50',
+      color: 'white'
+    },
+    disconnected: {
+      backgroundColor: '#f44336',
+      color: 'white'
+    },
+    reconnecting: {
+      backgroundColor: '#FF9800',
+      color: 'white'
+    },
+    error: {
+      backgroundColor: '#9E9E9E',
+      color: 'white'
+    }
+  };
 
-    const handleClickOutside = (event) => {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
+  // Add connection status indicator to header
+  const renderConnectionStatus = () => {
+    if (!realTimeEnabled) return null;
+    
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '12px',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        ...connectionStatusStyles[connectionStatus]
+      }}>
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: connectionStatus === 'connected' ? '#4CAF50' : 
+                         connectionStatus === 'reconnecting' ? '#FF9800' : '#f44336'
+        }} />
+        {connectionStatus === 'connected' ? 'Live' : 
+         connectionStatus === 'reconnecting' ? 'Reconnecting...' : 'Offline'}
+      </div>
+    );
+  };
 
-    const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showNotifications, onClose, isFullPage]);
-
-  const handleLoadMore = async () => {
-    if (isLoading || !hasMore) return;
-
+  // Add refresh button
+  const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      if (loadMoreNotifications) {
-        const nextPage = currentPage + 1;
-        const newNotifications = await loadMoreNotifications(nextPage);
-        
-        if (newNotifications && newNotifications.length > 0) {
-          // Filter out any notifications that were previously deleted
-          const filteredNewNotifications = newNotifications.filter(
-            notif => !deletedIds.has(notif.id)
-          );
-          setLocalNotifications(prev => [...prev, ...filteredNewNotifications]);
-          setCurrentPage(nextPage);
-        } else {
-          setHasMore(false);
-        }
-      }
+      await fetchLatestNotifications();
+      setLastUpdateTime(new Date().toUTCString());
     } catch (error) {
-      console.error('Error loading more notifications:', error);
+      console.error('Error refreshing notifications:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleMarkAsRead = (notificationId) => {
-    // Add to deleted set immediately for instant UI feedback
-    setDeletedIds(prev => new Set(prev).add(notificationId));
-    
-    if (deleteNotification) {
-      deleteNotification(notificationId);
-    } else {
-      // If no callback provided, just remove from local state
-      setLocalNotifications(prev =>
-        prev.filter(notif => notif.id !== notificationId)
-      );
-    }
-  };
-
-  const handleMarkAllAsRead = () => {
-    if (markAllAsRead) {
-      markAllAsRead();
-    } else {
-      // Mark all as read in local state
-      setLocalNotifications(prev =>
-        prev.map(notif => ({ ...notif, read: true }))
-      );
-    }
-  };
-
-  const handleDeleteNotification = (notificationId) => {
-    // Add to deleted set for persistent tracking
-    setDeletedIds(prev => new Set(prev).add(notificationId));
-    
-    if (deleteNotification) {
-      deleteNotification(notificationId);
-    } else {
-      // Immediate removal from UI
-      setLocalNotifications(prev =>
-        prev.filter(notif => notif.id !== notificationId)
-      );
-    }
-  };
-
-  const handleDeleteAll = () => {
-    // Show confirmation dialog before deleting all
-    if (window.confirm('Are you sure you want to delete all notifications? This action cannot be undone.')) {
-      setDeletedAll(true);
-      
-      if (deleteAllNotifications) {
-        deleteAllNotifications();
-      } else {
-        // Clear all notifications from local state
-        setLocalNotifications([]);
-      }
     }
   };
 
@@ -137,6 +445,11 @@ const NotificationPanel = ({
       newSet.delete(notificationId);
       return newSet;
     });
+    
+    // Send real-time event for undo
+    if (realTimeEnabled && websocket) {
+      sendRealTimeEvent('undo_delete', { notificationId });
+    }
     
     // Restore the notification
     const originalNotification = notifications.find(n => n.id === notificationId);
@@ -176,7 +489,10 @@ const NotificationPanel = ({
     return notificationTime.toLocaleDateString();
   };
 
-  const unreadCount = localNotifications.filter(notif => !notif.read).length;
+  const unreadCount = Math.max(
+    localNotifications.filter(notif => !notif.read).length,
+    newNotificationsCount
+  );
 
   const styles = {
     overlay: {
@@ -290,6 +606,16 @@ const NotificationPanel = ({
       borderRadius: '6px',
       transition: 'all 0.2s ease',
       border: '1px solid #f44336'
+    },
+    refreshButton: {
+      backgroundColor: 'transparent',
+      border: 'none',
+      fontSize: '18px',
+      cursor: 'pointer',
+      color: '#4F6F6B',
+      padding: '4px 8px',
+      borderRadius: '4px',
+      transition: 'all 0.2s ease'
     },
     notificationsList: {
       flex: 1,
@@ -424,6 +750,52 @@ const NotificationPanel = ({
     }
   };
 
+  useEffect(() => {
+    if (!showNotifications || isFullPage) return;
+
+    const handleClickOutside = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications, onClose, isFullPage]);
+
+  const handleLoadMore = async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+    try {
+      if (loadMoreNotifications) {
+        const nextPage = currentPage + 1;
+        const newNotifications = await loadMoreNotifications(nextPage);
+        
+        if (newNotifications && newNotifications.length > 0) {
+          // Filter out any notifications that were previously deleted
+          const filteredNewNotifications = newNotifications.filter(
+            notif => !deletedIds.has(notif.id)
+          );
+          setLocalNotifications(prev => [...prev, ...filteredNewNotifications]);
+          setCurrentPage(nextPage);
+        } else {
+          setHasMore(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading more notifications:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!showNotifications && !isFullPage) {
     return null;
   }
@@ -456,6 +828,19 @@ const NotificationPanel = ({
             </div>
             
             <div style={styles.headerActions}>
+              {renderConnectionStatus()}
+              {realTimeEnabled && (
+                <button
+                  style={styles.refreshButton}
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                  onMouseEnter={(e) => e.target.style.color = '#124441'}
+                  onMouseLeave={(e) => e.target.style.color = '#4F6F6B'}
+                  aria-label="Refresh notifications"
+                >
+                  {isLoading ? '⟳' : '↻'}
+                </button>
+              )}
               {unreadCount > 0 && localNotifications.length > 0 && (
                 <button
                   style={styles.actionButton}
@@ -649,6 +1034,19 @@ const NotificationPanel = ({
             )}
           </div>
           <div style={styles.headerActions}>
+            {renderConnectionStatus()}
+            {realTimeEnabled && (
+              <button
+                style={styles.refreshButton}
+                onClick={handleRefresh}
+                disabled={isLoading}
+                onMouseEnter={(e) => e.target.style.color = '#124441'}
+                onMouseLeave={(e) => e.target.style.color = '#4F6F6B'}
+                aria-label="Refresh notifications"
+              >
+                {isLoading ? '⟳' : '↻'}
+              </button>
+            )}
             {unreadCount > 0 && localNotifications.length > 0 && (
               <button
                 style={styles.actionButton}

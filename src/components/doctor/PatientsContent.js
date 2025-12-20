@@ -1145,7 +1145,6 @@ const PatientsContent = ({ dashboardData, state, actions }) => {
       fontSize: '13px',
       fontWeight: '600',
       cursor: 'pointer',
-      flex: 1,
       minWidth: '80px'
     },
     primaryButton: {

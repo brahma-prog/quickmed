@@ -34,7 +34,8 @@ const DoctorModals = ({ state, actions, onLogout, dashboardData }) => {
     handleViewFullHistory,
     handleAddNotes,
     validateForm,
-    handleStartConversation
+    handleStartConversation,
+    handleResetProfile
   } = actions;
 
   const isMobile = windowSize ? windowSize.width <= 768 : window.innerWidth <= 768;
@@ -79,6 +80,7 @@ const DoctorModals = ({ state, actions, onLogout, dashboardData }) => {
           setFormErrors={setFormErrors}
           validateForm={validateForm}
           isMobile={isMobile}
+          handleResetProfile={handleResetProfile}
         />
       )}
 
@@ -428,7 +430,7 @@ const ChatbotModal = ({ setShowChatbotModal, isMobile }) => {
   );
 };
 
-// Profile Modal Component
+// Profile Modal Component - UPDATED with Reset Button
 const ProfileModal = ({ 
   userProfile, 
   setUserProfile, 
@@ -437,7 +439,8 @@ const ProfileModal = ({
   formErrors,
   setFormErrors,
   validateForm,
-  isMobile
+  isMobile,
+  handleResetProfile
 }) => {
   const [formData, setFormData] = useState({...userProfile});
   const [isEditing, setIsEditing] = useState(false);
@@ -567,10 +570,16 @@ const ProfileModal = ({
                 <span style={modalStyles.detailLabel}>Address:</span>
                 <span style={modalStyles.detailValue}>{userProfile.address}</span>
               </div>
+              <div style={modalStyles.detailItem}>
+                <span style={modalStyles.detailLabel}>Location:</span>
+                <span style={modalStyles.detailValue}>
+                  {userProfile.city}, {userProfile.state} - {userProfile.pincode}
+                </span>
+              </div>
             </div>
           </div>
         ) : (
-          // Edit Mode
+          // Edit Mode with Reset Button
           <form onSubmit={handleSubmit}>
             <div style={modalStyles.content}>
               <div style={{
@@ -740,31 +749,57 @@ const ProfileModal = ({
             </div>
             <div style={{
               ...modalStyles.actions,
-              flexDirection: isMobile ? 'column' : 'row'
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'space-between'
             }}>
-              <button 
-                type="button"
-                style={{
-                  ...modalStyles.secondaryButton,
-                  ...(isMobile && { width: '100%' })
-                }}
-                onClick={() => {
-                  setIsEditing(false);
-                  setFormData({...userProfile});
-                  setFormErrors({});
-                }}
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                style={{
-                  ...modalStyles.primaryButton,
-                  ...(isMobile && { width: '100%' })
-                }}
-              >
-                Update Profile
-              </button>
+              {handleResetProfile && (
+                <button 
+                  type="button"
+                  style={{
+                    ...modalStyles.dangerButton,
+                    ...(isMobile && { width: '100%', marginBottom: '10px' }),
+                    backgroundColor: '#dc2626'
+                  }}
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to reset your profile to default values? This action cannot be undone.')) {
+                      handleResetProfile();
+                      setIsEditing(false);
+                    }
+                  }}
+                >
+                  🔄 Reset Profile
+                </button>
+              )}
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                flexDirection: isMobile ? 'column' : 'row',
+                flex: 1
+              }}>
+                <button 
+                  type="button"
+                  style={{
+                    ...modalStyles.secondaryButton,
+                    ...(isMobile && { width: '100%' })
+                  }}
+                  onClick={() => {
+                    setIsEditing(false);
+                    setFormData({...userProfile});
+                    setFormErrors({});
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  style={{
+                    ...modalStyles.primaryButton,
+                    ...(isMobile && { width: '100%' })
+                  }}
+                >
+                  💾 Save Profile
+                </button>
+              </div>
             </div>
           </form>
         )}
@@ -1005,46 +1040,63 @@ const MessagesModal = ({
   );
 };
 
-// Logout Modal Component
-const LogoutModal = ({ setShowLogoutConfirm, onLogout, isMobile }) => (
-  <div style={modalStyles.overlay}>
-    <div style={{
-      ...modalStyles.confirmModal,
-      width: isMobile ? '90%' : '400px'
-    }}>
-      <div style={modalStyles.confirmHeader}>
-        <div style={modalStyles.confirmIcon}>🚪</div>
-        <h3 style={modalStyles.title}>Confirm Logout</h3>
-      </div>
-      <div style={modalStyles.confirmContent}>
-        <p>Are you sure you want to logout from your account?</p>
-      </div>
+// Logout Modal Component - UPDATED with localStorage cleanup
+const LogoutModal = ({ setShowLogoutConfirm, onLogout, isMobile }) => {
+  const handleLogout = () => {
+    // Clear all doctor-specific localStorage items
+    localStorage.removeItem('doctorProfile');
+    localStorage.removeItem('doctorNotifications');
+    localStorage.removeItem('doctorTimeslots');
+    localStorage.removeItem('doctorMessages');
+    localStorage.removeItem('doctorAppointments');
+    
+    // Call the original logout function
+    onLogout();
+  };
+
+  return (
+    <div style={modalStyles.overlay}>
       <div style={{
-        ...modalStyles.confirmActions,
-        flexDirection: isMobile ? 'column' : 'row'
+        ...modalStyles.confirmModal,
+        width: isMobile ? '90%' : '400px'
       }}>
-        <button 
-          style={{
-            ...modalStyles.secondaryButton,
-            ...(isMobile && { width: '100%' })
-          }}
-          onClick={() => setShowLogoutConfirm(false)}
-        >
-          Cancel
-        </button>
-        <button 
-          style={{
-            ...modalStyles.dangerButton,
-            ...(isMobile && { width: '100%' })
-          }}
-          onClick={onLogout}
-        >
-          Logout
-        </button>
+        <div style={modalStyles.confirmHeader}>
+          <div style={modalStyles.confirmIcon}>🚪</div>
+          <h3 style={modalStyles.title}>Confirm Logout</h3>
+        </div>
+        <div style={modalStyles.confirmContent}>
+          <p>Are you sure you want to logout from your account?</p>
+          <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+            <strong>Note:</strong> Your profile data will be cleared from this browser.
+          </p>
+        </div>
+        <div style={{
+          ...modalStyles.confirmActions,
+          flexDirection: isMobile ? 'column' : 'row'
+        }}>
+          <button 
+            style={{
+              ...modalStyles.secondaryButton,
+              ...(isMobile && { width: '100%' })
+            }}
+            onClick={() => setShowLogoutConfirm(false)}
+          >
+            Cancel
+          </button>
+          <button 
+            style={{
+              ...modalStyles.dangerButton,
+              ...(isMobile && { width: '100%' })
+            }}
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Consultation Modal Component
 const ConsultationModal = ({
@@ -1136,7 +1188,7 @@ const ConsultationModal = ({
   );
 };
 
-// Modal styles
+// Modal styles (same as before)
 const modalStyles = {
   overlay: {
     position: 'fixed',

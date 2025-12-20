@@ -19,7 +19,7 @@ const MedicineCard = ({ medicine, cart, addToCart, updateQuantity }) => {
       borderRadius: '12px',
       padding: '1.5rem',
       display: 'flex',
-      marginTop: '80px',
+      marginTop: '60px',
       flexDirection: 'column',
       transition: 'all 0.3s ease',
       backgroundColor: 'white',

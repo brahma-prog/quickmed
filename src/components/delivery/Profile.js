@@ -1,5 +1,60 @@
 import React, { useState } from 'react';
 
+// SVG Icons
+const UserIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+  </svg>
+);
+
+const EmailIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+  </svg>
+);
+
+const LocationIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+  </svg>
+);
+
+const VehicleIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H15V3H9v2H6.5c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
+  </svg>
+);
+
+const EmergencyIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" />
+  </svg>
+);
+
+const BankIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M5 14h14v1H5zM12 3L4 9v2h16V9l-8-6zm4 8H8v1h8v-1z" />
+  </svg>
+);
+
+const StatsIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z" />
+  </svg>
+);
+
+const CameraIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 14.5c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm7-6h-1.2l-1.2-3H9.4L8.2 8.5H7c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm-7 9.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+  </svg>
+);
+
 const Profile = ({ profileData, setShowProfileImageUpload }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
@@ -120,7 +175,10 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       fontSize: '16px',
       color: '#4F6F6B',
       margin: '0 0 10px 0',
-      fontWeight: '500'
+      fontWeight: '500',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
     },
     formSection: {
       marginBottom: '40px'
@@ -131,13 +189,19 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       color: '#124441',
       margin: '0 0 20px 0',
       paddingBottom: '10px',
-      borderBottom: '2px solid #009688'
+      borderBottom: '2px solid #009688',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
     },
     sectionSubtitle: {
       fontSize: '14px',
       color: '#4F6F6B',
       margin: '0 0 15px 0',
-      fontStyle: 'italic'
+      fontStyle: 'italic',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
     },
     formGrid: {
       display: 'grid',
@@ -175,7 +239,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       marginBottom: '6px',
       display: 'flex',
       alignItems: 'center',
-      gap: '5px'
+      gap: '8px'
     },
     labelDisabled: {
       fontSize: '14px',
@@ -184,7 +248,7 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       marginBottom: '6px',
       display: 'flex',
       alignItems: 'center',
-      gap: '5px'
+      gap: '8px'
     },
     required: {
       color: '#FF6B6B'
@@ -202,7 +266,8 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       backgroundColor: '#FFFFFF',
       transition: 'all 0.2s ease',
       outline: 'none',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      fontFamily: 'inherit'
     },
     inputEditing: {
       borderColor: '#009688',
@@ -231,24 +296,64 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       fontSize: '14px',
       backgroundColor: '#FFFFFF',
       outline: 'none',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      fontFamily: 'inherit'
     },
     selectDisabled: {
       backgroundColor: '#F0F7F6',
       color: '#4F6F6B',
       cursor: 'not-allowed'
     },
+    phoneContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      width: '100%',
+      height: '40px'
+    },
     phonePrefix: {
-      position: 'absolute',
-      left: '12px',
-      top: '50%',
-      transform: 'translateY(-50%)',
+      backgroundColor: '#F0F7F6',
       color: '#4F6F6B',
       fontWeight: '500',
-      fontSize: '14px'
+      fontSize: '14px',
+      padding: '0 12px',
+      border: '1px solid #4DB6AC',
+      borderRight: 'none',
+      borderRadius: '6px 0 0 6px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: '55px',
+      whiteSpace: 'nowrap',
+      fontFamily: 'inherit',
+      height: '100%',
+      boxSizing: 'border-box'
+    },
+    phoneInputContainer: {
+      flex: 1,
+      position: 'relative',
+      height: '100%'
     },
     phoneInput: {
-      paddingLeft: '40px'
+      width: '100%',
+      padding: '0 12px',
+      border: '1px solid #4DB6AC',
+      borderLeft: 'none',
+      borderRadius: '0 6px 6px 0',
+      fontSize: '14px',
+      backgroundColor: '#FFFFFF',
+      transition: 'all 0.2s ease',
+      outline: 'none',
+      boxSizing: 'border-box',
+      fontFamily: 'inherit',
+      height: '100%'
+    },
+    phoneInputError: {
+      borderColor: '#FF6B6B',
+      backgroundColor: '#FFF5F5'
+    },
+    phoneInputReadOnly: {
+      backgroundColor: '#F0F7F6',
+      color: '#124441'
     },
     errorText: {
       color: '#FF6B6B',
@@ -257,7 +362,8 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       fontWeight: '500',
       display: 'flex',
       alignItems: 'center',
-      gap: '4px'
+      gap: '4px',
+      fontFamily: 'inherit'
     },
     fieldValue: {
       padding: '10px 12px',
@@ -269,14 +375,16 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       border: '1px solid #4DB6AC',
       minHeight: '40px',
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      fontFamily: 'inherit'
     },
     sensitiveData: {
       color: '#009688',
       fontWeight: '600',
       backgroundColor: '#E0F2F1',
       padding: '2px 6px',
-      borderRadius: '4px'
+      borderRadius: '4px',
+      fontFamily: 'inherit'
     },
     statsGrid: {
       display: 'grid',
@@ -286,25 +394,28 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     },
     statItem: {
       padding: '15px',
-      backgroundColor: '#E0F2F1',
+      backgroundColor: '#E0F7F6',
       borderRadius: '8px',
       border: '1px solid #4DB6AC',
-      textAlign: 'center'
+      textAlign: 'center',
+      fontFamily: 'inherit'
     },
     statLabel: {
       fontSize: '12px',
       color: '#4F6F6B',
       fontWeight: '600',
       textTransform: 'uppercase',
-      marginBottom: '5px'
+      marginBottom: '5px',
+      fontFamily: 'inherit'
     },
     statValue: {
       fontSize: '16px',
       color: '#124441',
-      fontWeight: '600'
+      fontWeight: '600',
+      fontFamily: 'inherit'
     },
     emergencyContactSection: {
-      backgroundColor: '#E0F2F1',
+      backgroundColor: '#E0F7F6',
       padding: '20px',
       borderRadius: '8px',
       border: '1px solid #4DB6AC',
@@ -317,7 +428,8 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       marginBottom: '15px',
       display: 'flex',
       alignItems: 'center',
-      gap: '8px'
+      gap: '8px',
+      fontFamily: 'inherit'
     },
     emergencyContactGrid: {
       display: 'grid',
@@ -345,7 +457,12 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       cursor: 'pointer',
       transition: 'all 0.2s ease',
       minWidth: '140px',
-      boxShadow: '0 2px 4px rgba(0, 150, 136, 0.2)'
+      boxShadow: '0 2px 4px rgba(0, 150, 136, 0.2)',
+      fontFamily: 'inherit',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px'
     },
     saveButtonDisabled: {
       backgroundColor: '#4DB6AC',
@@ -369,7 +486,12 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
       transition: 'all 0.2s ease',
       minWidth: '140px',
       marginTop: '10px',
-      boxShadow: '0 2px 4px rgba(18, 68, 65, 0.2)'
+      boxShadow: '0 2px 4px rgba(18, 68, 65, 0.2)',
+      fontFamily: 'inherit',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px'
     },
     editButtonHover: {
       backgroundColor: '#0A2D2A',
@@ -378,24 +500,55 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     }
   };
 
+  // Handle input change with alphabetic validation for name fields
   const handleInputChange = (field, value) => {
     // Prevent editing of name, email, and phone fields
     if (['fullName', 'email', 'phone'].includes(field) && !isEditing) {
       return;
     }
     
+    let processedValue = value;
+    
+    // Apply alphabetic validation for name fields
+    if (field.includes('Name') || field === 'fullName' || field === 'bankAccountHolder') {
+      // Allow only alphabets and spaces
+      processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+    }
+    
+    // Apply alphabetic validation for location and bank name
+    if (field === 'currentLocation' || field === 'bankName') {
+      // Allow alphabets, spaces, and common punctuation
+      processedValue = value.replace(/[^a-zA-Z\s.,-]/g, '');
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: processedValue
     }));
     
     // Real-time validation
-    validateField(field, value);
+    validateField(field, processedValue);
   };
 
+  // Handle phone number input with validation for starting digit (6-9)
   const handlePhoneChange = (value) => {
     const cleanValue = value.replace(/\D/g, '');
     const limitedValue = cleanValue.slice(0, 10);
+    
+    // If the first digit is entered and it's not 6-9, show error
+    if (limitedValue.length > 0 && !/^[6-9]/.test(limitedValue)) {
+      setFieldErrors(prev => ({
+        ...prev,
+        phone: 'Phone number must start with 6, 7, 8, or 9'
+      }));
+    } else if (fieldErrors.phone && limitedValue.length > 0 && /^[6-9]/.test(limitedValue)) {
+      // Clear error if valid
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.phone;
+        return newErrors;
+      });
+    }
     
     setFormData(prev => ({
       ...prev,
@@ -405,9 +558,25 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     validateField('phone', limitedValue);
   };
 
+  // Handle emergency phone number input with validation for starting digit (6-9)
   const handleEmergencyPhoneChange = (contactNumber, value) => {
     const cleanValue = value.replace(/\D/g, '');
     const limitedValue = cleanValue.slice(0, 10);
+    
+    // If the first digit is entered and it's not 6-9, show error
+    if (limitedValue.length > 0 && !/^[6-9]/.test(limitedValue)) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [contactNumber]: 'Phone number must start with 6, 7, 8, or 9'
+      }));
+    } else if (fieldErrors[contactNumber] && limitedValue.length > 0 && /^[6-9]/.test(limitedValue)) {
+      // Clear error if valid
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[contactNumber];
+        return newErrors;
+      });
+    }
     
     setFormData(prev => ({
       ...prev,
@@ -415,6 +584,41 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     }));
     
     validateField(contactNumber, limitedValue);
+  };
+
+  // Handle bank account number - only digits (limited to 11 digits)
+  const handleBankAccountChange = (value) => {
+    const cleanValue = value.replace(/\D/g, '');
+    const limitedValue = cleanValue.slice(0, 11);
+    
+    setFormData(prev => ({
+      ...prev,
+      bankAccountNumber: limitedValue
+    }));
+    
+    validateField('bankAccountNumber', limitedValue);
+  };
+
+  // Handle IFSC code - uppercase letters and numbers
+  const handleIfscCodeChange = (value) => {
+    const processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    setFormData(prev => ({
+      ...prev,
+      ifscCode: processedValue
+    }));
+    
+    validateField('ifscCode', processedValue);
+  };
+
+  // Handle UPI ID - alphanumeric with @ybl at the end
+  const handleUpiIdChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      upiId: value
+    }));
+    
+    validateField('upiId', value);
   };
 
   const validateField = (field, value) => {
@@ -504,8 +708,8 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
 
       case 'bankAccountNumber':
         if (value && value.trim()) {
-          if (!/^\d{9,18}$/.test(value.replace(/\s/g, ''))) {
-            errors.bankAccountNumber = 'Account number must be 9-18 digits';
+          if (!/^\d{9,11}$/.test(value.replace(/\s/g, ''))) {
+            errors.bankAccountNumber = 'Account number must be 9-11 digits';
           } else {
             delete errors.bankAccountNumber;
           }
@@ -524,8 +728,9 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
 
       case 'upiId':
         if (value && value.trim()) {
-          if (!/^[\w.-]+@[\w]+$/.test(value)) {
-            errors.upiId = 'Please enter a valid UPI ID';
+          // UPI ID must end with @ybl
+          if (!/^[\w.-]+@ybl$/.test(value.toLowerCase())) {
+            errors.upiId = 'UPI ID must end with @ybl (e.g., username@ybl)';
           } else {
             delete errors.upiId;
           }
@@ -607,17 +812,23 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     return '•'.repeat(accountNumber.length - visibleDigits) + accountNumber.slice(-visibleDigits);
   };
 
-  const isFieldValid = (field) => {
-    return !fieldErrors[field] && formData[field] && formData[field].toString().trim();
-  };
-
-  const renderFormField = (field, label, isRequired = false, isFullWidth = false, isSelect = false, options = [], isReadOnly = false) => {
+  const renderFormField = (field, label, isRequired = false, isFullWidth = false, isSelect = false, options = [], isReadOnly = false, icon = null) => {
     const hasError = fieldErrors[field];
-    const isValid = isFieldValid(field);
+
+    const getFieldIcon = () => {
+      if (icon) return icon;
+      if (field.includes('Name') || field === 'fullName' || field === 'bankAccountHolder') return <UserIcon />;
+      if (field.includes('email')) return <EmailIcon />;
+      if (field.includes('phone')) return <PhoneIcon />;
+      if (field.includes('Location')) return <LocationIcon />;
+      if (field.includes('vehicle')) return <VehicleIcon />;
+      return null;
+    };
 
     return (
       <div style={isFullWidth ? styles.formRowFull : styles.formRow}>
         <label style={isReadOnly ? styles.labelDisabled : styles.label}>
+          {getFieldIcon()}
           {label}
           {isRequired && <span style={styles.required}>*</span>}
           {isReadOnly && <span style={{fontSize: '12px', color: '#4F6F6B', marginLeft: '8px'}}>(Cannot be changed)</span>}
@@ -646,7 +857,17 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
               <input
                 type="text"
                 value={formData[field]}
-                onChange={(e) => handleInputChange(field, e.target.value)}
+                onChange={(e) => {
+                  if (field === 'bankAccountNumber') {
+                    handleBankAccountChange(e.target.value);
+                  } else if (field === 'ifscCode') {
+                    handleIfscCodeChange(e.target.value);
+                  } else if (field === 'upiId') {
+                    handleUpiIdChange(e.target.value);
+                  } else {
+                    handleInputChange(field, e.target.value);
+                  }
+                }}
                 disabled={isReadOnly}
                 style={{
                   ...styles.input,
@@ -658,7 +879,9 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
               />
             )}
             {hasError && (
-              <div style={styles.errorText}>⚠️ {hasError}</div>
+              <div style={styles.errorText}>
+                <span style={{color: '#FF6B6B'}}>⚠️</span> {hasError}
+              </div>
             )}
           </div>
         ) : (
@@ -672,39 +895,44 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
 
   const renderPhoneField = (field, label, isRequired = false, isEmergency = false, isReadOnly = false) => {
     const hasError = fieldErrors[field];
-    const isValid = isFieldValid(field);
 
     return (
       <div style={styles.formRow}>
         <label style={isReadOnly ? styles.labelDisabled : styles.label}>
+          <PhoneIcon />
           {label}
           {isRequired && <span style={styles.required}>*</span>}
           {isReadOnly && <span style={{fontSize: '12px', color: '#4F6F6B', marginLeft: '8px'}}>(Cannot be changed)</span>}
         </label>
         
         {isEditing ? (
-          <div style={styles.inputContainer}>
-            <span style={styles.phonePrefix}>+91</span>
-            <input
-              type="tel"
-              value={formData[field]}
-              onChange={(e) => isEmergency ? 
-                handleEmergencyPhoneChange(field, e.target.value) : 
-                handlePhoneChange(e.target.value)
-              }
-              disabled={isReadOnly}
-              style={{
-                ...styles.input,
-                ...styles.phoneInput,
-                ...(hasError ? styles.inputError : {}),
-                ...(isReadOnly ? styles.inputReadOnly : {})
-              }}
-              placeholder="Enter 10-digit number"
-              maxLength="10"
-              readOnly={isReadOnly}
-            />
+          <div>
+            <div style={styles.phoneContainer}>
+              <div style={styles.phonePrefix}>+91</div>
+              <div style={styles.phoneInputContainer}>
+                <input
+                  type="tel"
+                  value={formData[field]}
+                  onChange={(e) => isEmergency ? 
+                    handleEmergencyPhoneChange(field, e.target.value) : 
+                    handlePhoneChange(e.target.value)
+                  }
+                  disabled={isReadOnly}
+                  style={{
+                    ...styles.phoneInput,
+                    ...(hasError ? styles.phoneInputError : {}),
+                    ...(isReadOnly ? styles.phoneInputReadOnly : {})
+                  }}
+                  placeholder="Enter 10-digit number"
+                  maxLength="10"
+                  readOnly={isReadOnly}
+                />
+              </div>
+            </div>
             {hasError && (
-              <div style={styles.errorText}>⚠️ {hasError}</div>
+              <div style={styles.errorText}>
+                <span style={{color: '#FF6B6B'}}>⚠️</span> {hasError}
+              </div>
             )}
           </div>
         ) : (
@@ -716,13 +944,20 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
     );
   };
 
-  const renderSensitiveField = (field, label, maskFunction, isRequired = false) => {
+  const renderSensitiveField = (field, label, maskFunction, isRequired = false, inputType = 'text') => {
     const hasError = fieldErrors[field];
-    const isValid = isFieldValid(field);
+
+    const getFieldIcon = () => {
+      if (field.includes('Account')) return <BankIcon />;
+      if (field === 'ifscCode') return <BankIcon />;
+      if (field === 'upiId') return <BankIcon />;
+      return null;
+    };
 
     return (
       <div style={styles.formRow}>
         <label style={styles.label}>
+          {getFieldIcon()}
           {label}
           {isRequired && <span style={styles.required}>*</span>}
         </label>
@@ -730,17 +965,29 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
         {isEditing ? (
           <div style={styles.inputContainer}>
             <input
-              type="text"
+              type={inputType}
               value={formData[field]}
-              onChange={(e) => handleInputChange(field, e.target.value)}
+              onChange={(e) => {
+                if (field === 'bankAccountNumber') {
+                  handleBankAccountChange(e.target.value);
+                } else if (field === 'ifscCode') {
+                  handleIfscCodeChange(e.target.value);
+                } else if (field === 'upiId') {
+                  handleUpiIdChange(e.target.value);
+                } else {
+                  handleInputChange(field, e.target.value);
+                }
+              }}
               style={{
                 ...styles.input,
                 ...(hasError ? styles.inputError : {})
               }}
-              placeholder={`Enter ${label.toLowerCase()}`}
+              placeholder={field === 'upiId' ? 'Enter UPI ID (e.g., username@ybl)' : `Enter ${label.toLowerCase()}`}
             />
             {hasError && (
-              <div style={styles.errorText}>⚠️ {hasError}</div>
+              <div style={styles.errorText}>
+                <span style={{color: '#FF6B6B'}}>⚠️</span> {hasError}
+              </div>
             )}
           </div>
         ) : (
@@ -800,11 +1047,14 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
                 e.target.style.transform = 'scale(1)';
               }}
             >
-              📷
+              <CameraIcon />
             </button>
           </div>
           <div style={styles.profileUserInfo}>
             <div style={styles.agentId}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#4F6F6B">
+                <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+              </svg>
               <strong>AGENT ID:</strong> {profileData.agentId}
             </div>
             <button
@@ -816,6 +1066,9 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
               onMouseEnter={() => setHoverState(s => ({ ...s, editButton: true }))}
               onMouseLeave={() => setHoverState(s => ({ ...s, editButton: false }))}
             >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+              </svg>
               {isEditing ? 'Cancel Editing' : 'Edit Profile'}
             </button>
           </div>
@@ -823,7 +1076,10 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
 
         {/* Personal Information */}
         <div style={styles.formSection}>
-          <h3 style={styles.sectionTitle}>Personal Information</h3>
+          <h3 style={styles.sectionTitle}>
+            <UserIcon />
+            Personal Information
+          </h3>
           
           <div style={styles.formGrid}>
             {renderFormField('fullName', 'Full Name', true, false, false, [], true)}
@@ -848,14 +1104,23 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
 
         {/* Emergency Contacts */}
         <div style={styles.formSection}>
-          <h3 style={styles.sectionTitle}>Emergency Contacts</h3>
-          <p style={styles.sectionSubtitle}>In case of emergencies, we'll contact these people</p>
+          <h3 style={styles.sectionTitle}>
+            <EmergencyIcon />
+            Emergency Contacts
+          </h3>
+          <p style={styles.sectionSubtitle}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#4F6F6B">
+              <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" />
+            </svg>
+            In case of emergencies, we'll contact these people
+          </p>
           
           <div style={styles.emergencyFormGrid}>
             {/* Emergency Contact 1 */}
             <div style={styles.emergencyContactSection}>
               <div style={styles.emergencyContactHeader}>
-                <span>🚨 Emergency Contact 1</span>
+                <EmergencyIcon />
+                <span>Emergency Contact 1</span>
               </div>
               <div style={styles.formGridVertical}>
                 {renderFormField('emergencyContact1Name', 'Name')}
@@ -882,7 +1147,8 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
             {/* Emergency Contact 2 */}
             <div style={styles.emergencyContactSection}>
               <div style={styles.emergencyContactHeader}>
-                <span>🚨 Emergency Contact 2</span>
+                <EmergencyIcon />
+                <span>Emergency Contact 2</span>
               </div>
               <div style={styles.formGridVertical}>
                 {renderFormField('emergencyContact2Name', 'Name')}
@@ -910,43 +1176,84 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
 
         {/* Bank Details */}
         <div style={styles.formSection}>
-          <h3 style={styles.sectionTitle}>Bank Details</h3>
-          <p style={styles.sectionSubtitle}>For salary transfers and payments</p>
+          <h3 style={styles.sectionTitle}>
+            <BankIcon />
+            Bank Details
+          </h3>
+          <p style={styles.sectionSubtitle}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#4F6F6B">
+              <path d="M20 8h-3V4H7v4H4v2h16V8zM4 14h16v2H4v-2z" />
+            </svg>
+            For salary transfers and payments
+          </p>
           <div style={styles.formGrid}>
             {renderFormField('bankAccountHolder', 'Account Holder Name')}
             {renderFormField('bankName', 'Bank Name')}
-            {renderSensitiveField('bankAccountNumber', 'Account Number', maskAccountNumber)}
-            {renderFormField('ifscCode', 'IFSC Code')}
-            {renderSensitiveField('upiId', 'UPI ID', maskSensitiveData)}
+            {renderSensitiveField('bankAccountNumber', 'Account Number', maskAccountNumber, false, 'text')}
+            {renderSensitiveField('ifscCode', 'IFSC Code', maskSensitiveData, false, 'text')}
+            {renderSensitiveField('upiId', 'UPI ID', maskSensitiveData, false, 'text')}
           </div>
         </div>
 
         {/* Performance Statistics */}
         <div style={styles.formSection}>
-          <h3 style={styles.sectionTitle}>Performance Statistics</h3>
+          <h3 style={styles.sectionTitle}>
+            <StatsIcon />
+            Performance Statistics
+          </h3>
           <div style={styles.statsGrid}>
             <div style={styles.statItem}>
-              <div style={styles.statLabel}>Joined Date</div>
+              <div style={styles.statLabel}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#4F6F6B" style={{marginRight: '4px'}}>
+                  <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
+                </svg>
+                Joined Date
+              </div>
               <div style={styles.statValue}>{profileData.joinedDate}</div>
             </div>
             <div style={styles.statItem}>
-              <div style={styles.statLabel}>Total Deliveries</div>
+              <div style={styles.statLabel}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#4F6F6B" style={{marginRight: '4px'}}>
+                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                </svg>
+                Total Deliveries
+              </div>
               <div style={styles.statValue}>{profileData.totalDeliveries}</div>
             </div>
             <div style={styles.statItem}>
-              <div style={styles.statLabel}>Current Rating</div>
+              <div style={styles.statLabel}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#4F6F6B" style={{marginRight: '4px'}}>
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+                Current Rating
+              </div>
               <div style={styles.statValue}>{profileData.rating}/5 ⭐</div>
             </div>
             <div style={styles.statItem}>
-              <div style={styles.statLabel}>Completion Rate</div>
+              <div style={styles.statLabel}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#4F6F6B" style={{marginRight: '4px'}}>
+                  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                </svg>
+                Completion Rate
+              </div>
               <div style={styles.statValue}>{profileData.completionRate}</div>
             </div>
             <div style={styles.statItem}>
-              <div style={styles.statLabel}>Avg Response Time</div>
+              <div style={styles.statLabel}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#4F6F6B" style={{marginRight: '4px'}}>
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                </svg>
+                Avg Response Time
+              </div>
               <div style={styles.statValue}>{profileData.responseTime}</div>
             </div>
             <div style={styles.statItem}>
-              <div style={styles.statLabel}>Average Rating</div>
+              <div style={styles.statLabel}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#4F6F6B" style={{marginRight: '4px'}}>
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm4.18-12.24l-7.19 3.75 3.75 7.19 7.19-3.75-3.75-7.19z" />
+                </svg>
+                Average Rating
+              </div>
               <div style={styles.statValue}>{profileData.averageRating}/5 ⭐</div>
             </div>
           </div>
@@ -966,6 +1273,9 @@ const Profile = ({ profileData, setShowProfileImageUpload }) => {
               onMouseEnter={() => !hasValidationErrors() && setHoverState(s => ({ ...s, saveButton: true }))}
               onMouseLeave={() => setHoverState(s => ({ ...s, saveButton: false }))}
             >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
+              </svg>
               Save Changes
             </button>
           </div>

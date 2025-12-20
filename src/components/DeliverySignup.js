@@ -69,6 +69,11 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
   // NEW: Track user existence during typing
   const [existingUsers, setExistingUsers] = useState([]);
 
+  // NEW: Success modal state - UPDATED with better messaging
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [registrationData, setRegistrationData] = useState(null);
+
   // Load existing users on component mount
   useEffect(() => {
     const storedUsers = localStorage.getItem('registeredUsers');
@@ -140,7 +145,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
 
   const DeliveryIcon = () => (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+      <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
     </svg>
   );
 
@@ -205,10 +210,16 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     return existingUsers.some(user => user.phone === phone);
   };
 
-  // NEW: Enhanced validation functions with existence check
+  // NEW: Enhanced email validation with .com restriction and existence check
   const validateEmailWithExistence = (email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!email.trim()) return 'Email is required';
+    
+    // Ensure email ends with .com
+    if (!email.toLowerCase().endsWith('.com')) {
+      return 'Email must end with .com domain';
+    }
+    
     if (!emailRegex.test(email)) return 'Please enter a valid email address';
     
     // Check if email exists (but not if we're editing and it's the same email)
@@ -513,8 +524,52 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  // NEW: Email auto-completion function
+  const handleEmailInput = (e) => {
+    const { name, value } = e.target;
+    
+    // Remove @gmail.com if user is trying to delete it
+    let processedValue = value;
+    
+    // If user types @, auto-complete to @gmail.com
+    if (value.includes('@') && !value.includes('@gmail.com')) {
+      const beforeAt = value.split('@')[0];
+      processedValue = beforeAt + '@gmail.com';
+    }
+    
+    // If user tries to type after .com, prevent it
+    if (value.includes('.com') && value.length > value.indexOf('.com') + 4) {
+      processedValue = value.substring(0, value.indexOf('.com') + 4);
+    }
+    
+    // Clear OTP and verification status if email is changed
+    if (isEmailVerified && processedValue !== originalEmail) {
+      setIsEmailVerified(false);
+      setEmailOtpSent(false);
+      setEmailOtp('');
+    }
+    
+    setFormData({
+      ...formData,
+      [name]: processedValue
+    });
+
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: ''
+      });
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Skip email handling in handleChange since we have handleEmailInput
+    if (name === 'email') {
+      return; // Let handleEmailInput handle it
+    }
     
     let processedValue = value;
     
@@ -530,13 +585,6 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
       processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
     } else if (name === 'drivingLicenseNumber') {
       processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16);
-    } else if (name === 'email') {
-      // Clear OTP and verification status if email is changed
-      if (isEmailVerified && value !== originalEmail) {
-        setIsEmailVerified(false);
-        setEmailOtpSent(false);
-        setEmailOtp('');
-      }
     } else if (name === 'phone') {
       // Clear OTP and verification status if phone is changed
       if (isPhoneVerified && value !== originalPhone) {
@@ -606,9 +654,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     });
   };
 
-  // ... [rest of the file upload handlers remain the same] ...
-
-  // File upload handlers (keep as is)
+  // File upload handlers
   const handleFileUpload = (fileType, file) => {
     if (!file) return;
 
@@ -678,8 +724,8 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
 
       setFormErrors(errors);
 
-      if (Object.values(errors).some(error => error !== '') || !agreeToTerms) {
-        setToastMessage('Please fix all errors and agree to terms');
+      if (Object.values(errors).some(error => error !== '')) {
+        setToastMessage('Please fix all errors');
         setToastType('error');
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
@@ -755,7 +801,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     );
   };
 
-  // Handle Submit Function
+  // Handle Submit Function - UPDATED with success modal
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -763,6 +809,16 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
       setToastMessage('Please complete all verification steps');
       setToastType('error');
       setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      return;
+    }
+
+    // Check terms agreement - NOW ONLY ON STEP 4
+    if (!agreeToTerms) {
+      setToastMessage('You must agree to the Terms of Service and Privacy Policy');
+      setToastType('error');
+      setShowToast(true);
+      setIsLoading(false);
       setTimeout(() => setShowToast(false), 3000);
       return;
     }
@@ -782,8 +838,8 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
 
     setFormErrors(errors);
 
-    if (Object.values(errors).some(error => error !== '') || !agreeToTerms) {
-      setToastMessage('Please fix all errors and agree to terms');
+    if (Object.values(errors).some(error => error !== '')) {
+      setToastMessage('Please fix all errors');
       setToastType('error');
       setShowToast(true);
       setIsLoading(false);
@@ -857,19 +913,16 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     
     localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
 
-    // Also set current user in localStorage for immediate login
-    localStorage.setItem('currentUser', JSON.stringify({
-      id: newUser.id,
-      fullName: newUser.fullName,
-      email: newUser.email,
-      userType: newUser.userType,
-      isVerified: true
-    }));
+    // Store registration data for success modal
+    setRegistrationData({
+      fullName: formData.fullName,
+      email: formData.email
+    });
 
-    setToastMessage(`Account created! Welcome ${formData.fullName}`);
-    setToastType('success');
-    setShowToast(true);
-    
+    // Show success modal
+    setSuccessMessage(`Account created successfully! Welcome ${formData.fullName}`);
+    setShowSuccessModal(true);
+
     // Reset form
     setFormData({
       fullName: '',
@@ -908,14 +961,23 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     setOriginalEmail('');
     setOriginalPhone('');
 
-    setTimeout(() => {
-      setShowToast(false);
-      if (onSignupSuccess) {
-        onSignupSuccess();
-      }
-    }, 2000);
-
     setIsLoading(false);
+  };
+
+  // Function to navigate to login after success
+  const navigateToLogin = () => {
+    setShowSuccessModal(false);
+    // Clear any current user session to force login
+    localStorage.removeItem('currentUser');
+    
+    // Call the login switch function
+    if (onSwitchToLogin && typeof onSwitchToLogin === 'function') {
+      onSwitchToLogin();
+    } else {
+      // Fallback if prop is not provided
+      console.log('Navigating to login...');
+      window.location.href = '/login';
+    }
   };
 
   const passwordStrength = validatePassword(formData.password) ? 'strong' : 'weak';
@@ -984,7 +1046,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     </div>
   );
 
-  // Step 1: Basic Information (UPDATED with SVG Icons)
+  // Step 1: Basic Information
   const renderStep1 = () => (
     <div>
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
@@ -1009,7 +1071,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
         {formErrors.fullName && <div style={errorStyle}>{formErrors.fullName}</div>}
       </div>
 
-      {/* Email with OTP Verification - UPDATED with Edit Mode and SVG Icons */}
+      {/* Email with OTP Verification */}
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
           <label style={labelStyle}>
@@ -1069,10 +1131,10 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
             type="email"
             name="email"
             value={formData.email}
-            onChange={handleChange}
+            onChange={handleEmailInput}
             onBlur={handleBlur}
             required
-            placeholder="Enter your email"
+            placeholder="username@gmail.com"
             style={{
               ...inputStyle(formErrors.email),
               paddingLeft: '36px',
@@ -1213,7 +1275,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
         )}
       </div>
 
-      {/* Phone with OTP Verification - UPDATED with Edit Mode and SVG Icons */}
+      {/* Phone with OTP Verification */}
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
           <label style={labelStyle}>
@@ -1556,7 +1618,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
         )}
       </div>
 
-      {/* Verification Status - UPDATED with SVG Icons */}
+      {/* Verification Status */}
       {(isPhoneVerified || isEmailVerified) && (
         <div style={{
           backgroundColor: '#E0F2F1',
@@ -1594,7 +1656,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     </div>
   );
 
-  // Step 2: Aadhar & PAN Verification (with SVG Icons)
+  // Step 2: Aadhar & PAN Verification
   const renderStep2 = () => (
     <div>
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
@@ -1822,7 +1884,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     </div>
   );
 
-  // Step 3: Driving License & Vehicle Details (with SVG Icons)
+  // Step 3: Driving License & Vehicle Details
   const renderStep3 = () => (
     <div>
       <div style={{ marginBottom: '16px', textAlign: 'left' }}>
@@ -1909,7 +1971,7 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
     </div>
   );
 
-  // Step 4: Final Verification (with SVG Icons)
+  // Step 4: Final Verification - NOW WITH TERMS AND CONDITIONS
   const renderStep4 = () => (
     <div>
       <FileUploadField
@@ -1962,6 +2024,52 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
           </div>
         </div>
       </div>
+
+      {/* Terms and Conditions Checkbox - NOW ONLY ON STEP 4 */}
+      <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+        <label style={termsLabelStyle}>
+          <input
+            type="checkbox"
+            checked={agreeToTerms}
+            onChange={(e) => {
+              setAgreeToTerms(e.target.checked);
+              // Clear any terms error when user checks the box
+              if (e.target.checked) {
+                // You can add error state for terms if needed
+              }
+            }}
+            style={{ marginTop: '2px' }}
+          />
+          <span style={{ color: agreeToTerms ? '#124441' : '#EF4444', fontWeight: agreeToTerms ? 'normal' : '500' }}>
+            I agree to the{' '}
+            <a 
+              href="https://drive.google.com/file/d/1bZkQuNNdVootx27yQ0lMbIpqn83oIrYn/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={linkStyle}
+              onClick={(e) => e.preventDefault()}
+            >
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a 
+              href="https://drive.google.com/file/d/1D3PHKle-WG-A9sJv2f4O2ZjBzoGaKLzo/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={linkStyle}
+              onClick={(e) => e.preventDefault()}
+            >
+              Privacy Policy
+            </a>
+            {!agreeToTerms && ' *'}
+          </span>
+        </label>
+        {!agreeToTerms && (
+          <div style={{ fontSize: '11px', color: '#EF4444', marginTop: '4px', marginLeft: '24px' }}>
+            You must agree to the Terms of Service and Privacy Policy to complete registration
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -2008,6 +2116,95 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {toastType === 'success' ? <SuccessIcon /> : <ErrorIcon />}
             {toastMessage}
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal - UPDATED with better messaging */}
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '30px',
+            maxWidth: '450px',
+            width: '90%',
+            textAlign: 'center',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)'
+          }}>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              backgroundColor: '#E0F2F1',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px'
+            }}>
+              <SuccessIcon />
+            </div>
+            <h3 style={{ color: '#009688', margin: '0 0 10px' }}>Registration Successful!</h3>
+            <p style={{ color: '#124441', marginBottom: '15px' }}>
+              Welcome to QuickMed Delivery Partner Network, {registrationData?.fullName}!
+            </p>
+            <div style={{
+              backgroundColor: '#F5F5F5',
+              borderRadius: '8px',
+              padding: '15px',
+              marginBottom: '20px',
+              textAlign: 'left'
+            }}>
+              <p style={{ fontSize: '14px', color: '#4F6F6B', margin: '0 0 10px 0' }}>
+                <strong>Your account details:</strong>
+              </p>
+              <div style={{ fontSize: '13px', color: '#124441' }}>
+                <div style={{ display: 'flex', marginBottom: '5px' }}>
+                  <span style={{ width: '100px', fontWeight: '500' }}>Email:</span>
+                  <span>{registrationData?.email}</span>
+                </div>
+                <div style={{ display: 'flex', marginBottom: '5px' }}>
+                  <span style={{ width: '100px', fontWeight: '500' }}>Role:</span>
+                  <span>Delivery Partner</span>
+                </div>
+                <div style={{ display: 'flex' }}>
+                  <span style={{ width: '100px', fontWeight: '500' }}>Status:</span>
+                  <span style={{ color: '#009688' }}>Pending Verification</span>
+                </div>
+              </div>
+            </div>
+            <p style={{ color: '#4F6F6B', fontSize: '14px', marginBottom: '25px' }}>
+              Your account is under verification. Please login with your credentials to check the status.
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={navigateToLogin}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: '#009688',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Go to Login
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2122,40 +2319,6 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
               {currentStep === 4 && renderStep4()}
             </>
 
-            {/* Terms and Conditions Checkbox */}
-            <div style={{ marginBottom: '20px', textAlign: 'left' }}>
-              <label style={termsLabelStyle}>
-                <input
-                  type="checkbox"
-                  checked={agreeToTerms}
-                  onChange={(e) => setAgreeToTerms(e.target.checked)}
-                  style={{ marginTop: '2px' }}
-                />
-                <span>
-                  I agree to the{' '}
-                  <a 
-                    href="https://drive.google.com/file/d/1bZkQuNNdVootx27yQ0lMbIpqn83oIrYn/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={linkStyle}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a 
-                    href="https://drive.google.com/file/d/1D3PHKle-WG-A9sJv2f4O2ZjBzoGaKLzo/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={linkStyle}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Privacy Policy
-                  </a>
-                </span>
-              </label>
-            </div>
-
             {/* Navigation Buttons for Delivery */}
             <div style={navigationButtonsStyle}>
               {currentStep > 1 && (
@@ -2178,8 +2341,12 @@ const DeliverySignup = ({ onSwitchToLogin, onSignupSuccess, onSwitchToRoleSelect
               ) : (
                 <button
                   type="submit"
-                  disabled={isLoading}
-                  style={{...primaryButtonStyle, opacity: isLoading ? 0.7 : 1}}
+                  disabled={isLoading || !agreeToTerms}
+                  style={{
+                    ...primaryButtonStyle, 
+                    opacity: isLoading ? 0.7 : agreeToTerms ? 1 : 0.6,
+                    cursor: (!agreeToTerms || isLoading) ? 'not-allowed' : 'pointer'
+                  }}
                 >
                   {isLoading ? (
                     <>
@@ -2220,7 +2387,9 @@ const containerStyle = {
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
   backgroundColor: '#E0F2F1',
   padding: '20px',
-  position: 'relative'
+  position: 'relative',
+  width: '100%',
+  boxSizing: 'border-box'
 };
 
 const topNavContainerStyle = {
@@ -2229,7 +2398,8 @@ const topNavContainerStyle = {
   left: '20px',
   display: 'flex',
   gap: '12px',
-  zIndex: 100
+  zIndex: 100,
+  flexWrap: 'wrap'
 };
 
 const homeButtonStyle = {
@@ -2275,7 +2445,8 @@ const toastStyle = (type) => ({
   zIndex: 1000,
   animation: 'slideInRight 0.3s ease-out',
   fontSize: '14px',
-  fontWeight: '500'
+  fontWeight: '500',
+  maxWidth: 'calc(100% - 40px)'
 });
 
 const cardContainerStyle = {
@@ -2287,7 +2458,12 @@ const cardContainerStyle = {
   boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
   overflow: 'hidden',
   minHeight: '700px',
-  marginTop: '60px'
+  marginTop: '60px',
+  flexDirection: 'row',
+  '@media (max-width: 768px)': {
+    flexDirection: 'column',
+    minHeight: 'auto'
+  }
 };
 
 const leftSideStyle = {
@@ -2297,7 +2473,14 @@ const leftSideStyle = {
   padding: '50px 40px',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  '@media (max-width: 1024px)': {
+    padding: '30px 20px'
+  },
+  '@media (max-width: 768px)': {
+    padding: '30px 20px',
+    minHeight: '300px'
+  }
 };
 
 const contentStyle = {
@@ -2308,7 +2491,13 @@ const titleStyle = {
   fontSize: '28px',
   fontWeight: '700',
   marginBottom: '16px',
-  lineHeight: '1.3'
+  lineHeight: '1.3',
+  '@media (max-width: 1024px)': {
+    fontSize: '24px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '20px'
+  }
 };
 
 const quoteStyle = {
@@ -2318,13 +2507,27 @@ const quoteStyle = {
   marginBottom: '40px',
   maxWidth: '400px',
   marginLeft: 'auto',
-  marginRight: 'auto'
+  marginRight: 'auto',
+  '@media (max-width: 1024px)': {
+    fontSize: '14px',
+    marginBottom: '30px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '13px',
+    marginBottom: '20px'
+  }
 };
 
 // Steps container
 const stepsContainerStyle = {
   marginBottom: '40px',
-  textAlign: 'left'
+  textAlign: 'left',
+  '@media (max-width: 1024px)': {
+    marginBottom: '30px'
+  },
+  '@media (max-width: 768px)': {
+    marginBottom: '20px'
+  }
 };
 
 const stepStyle = (isActive) => ({
@@ -2332,18 +2535,35 @@ const stepStyle = (isActive) => ({
   alignItems: 'center',
   gap: '16px',
   marginBottom: '24px',
-  opacity: isActive ? 1 : 0.7
+  opacity: isActive ? 1 : 0.7,
+  '@media (max-width: 1024px)': {
+    gap: '12px',
+    marginBottom: '20px'
+  },
+  '@media (max-width: 768px)': {
+    gap: '8px',
+    marginBottom: '16px'
+  }
 });
 
 const stepTitleStyle = {
   fontSize: '16px',
   fontWeight: '600',
-  marginBottom: '4px'
+  marginBottom: '4px',
+  '@media (max-width: 1024px)': {
+    fontSize: '14px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '12px'
+  }
 };
 
 const stepSubtitleStyle = {
   fontSize: '12px',
-  opacity: 0.8
+  opacity: 0.8,
+  '@media (max-width: 768px)': {
+    fontSize: '10px'
+  }
 };
 
 const stepDividerStyle = {
@@ -2351,7 +2571,14 @@ const stepDividerStyle = {
   width: '2px',
   backgroundColor: 'rgba(255, 255, 255, 0.3)',
   marginLeft: '27px',
-  marginBottom: '8px'
+  marginBottom: '8px',
+  '@media (max-width: 1024px)': {
+    marginLeft: '22px'
+  },
+  '@media (max-width: 768px)': {
+    marginLeft: '18px',
+    height: '15px'
+  }
 };
 
 // Benefits section
@@ -2359,27 +2586,55 @@ const benefitsContainerStyle = {
   backgroundColor: 'rgba(255, 255, 255, 0.1)',
   borderRadius: '12px',
   padding: '20px',
-  textAlign: 'left'
+  textAlign: 'left',
+  '@media (max-width: 1024px)': {
+    padding: '15px'
+  },
+  '@media (max-width: 768px)': {
+    padding: '12px'
+  }
 };
 
 const benefitsTitleStyle = {
   fontSize: '18px',
   fontWeight: '600',
   marginBottom: '16px',
-  marginTop: 0
+  marginTop: 0,
+  '@media (max-width: 1024px)': {
+    fontSize: '16px',
+    marginBottom: '12px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '14px',
+    marginBottom: '8px'
+  }
 };
 
 const benefitsListStyle = {
   display: 'flex',
   flexDirection: 'column',
-  gap: '12px'
+  gap: '12px',
+  '@media (max-width: 1024px)': {
+    gap: '8px'
+  },
+  '@media (max-width: 768px)': {
+    gap: '6px'
+  }
 };
 
 const benefitItemStyle = {
   display: 'flex',
   alignItems: 'center',
   gap: '12px',
-  fontSize: '14px'
+  fontSize: '14px',
+  '@media (max-width: 1024px)': {
+    fontSize: '13px',
+    gap: '8px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '12px',
+    gap: '6px'
+  }
 };
 
 const rightSideStyle = {
@@ -2388,26 +2643,47 @@ const rightSideStyle = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  overflowY: 'auto'
+  overflowY: 'auto',
+  '@media (max-width: 1024px)': {
+    padding: '30px'
+  },
+  '@media (max-width: 768px)': {
+    padding: '20px'
+  }
 };
 
 const headerStyle = {
   textAlign: 'center',
-  marginBottom: '30px'
+  marginBottom: '30px',
+  '@media (max-width: 768px)': {
+    marginBottom: '20px'
+  }
 };
 
 const appNameStyle = {
   fontSize: '32px',
   fontWeight: '700',
   marginBottom: '8px',
-  color: '#009688'
+  color: '#009688',
+  '@media (max-width: 1024px)': {
+    fontSize: '28px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '24px'
+  }
 };
 
 const formTitleStyle = {
   color: '#124441',
   fontSize: '20px',
   fontWeight: '600',
-  marginBottom: '4px'
+  marginBottom: '4px',
+  '@media (max-width: 1024px)': {
+    fontSize: '18px'
+  },
+  '@media (max-width: 768px)': {
+    fontSize: '16px'
+  }
 };
 
 const termsLabelStyle = {
@@ -2416,20 +2692,31 @@ const termsLabelStyle = {
   gap: '8px',
   cursor: 'pointer',
   fontSize: '13px',
-  color: '#124441'
+  color: '#124441',
+  lineHeight: '1.4',
+  '@media (max-width: 768px)': {
+    fontSize: '12px'
+  }
 };
 
 const linkStyle = {
   color: '#009688',
   fontWeight: '500',
   cursor: 'pointer',
-  textDecoration: 'underline'
+  textDecoration: 'underline',
+  '@media (max-width: 768px)': {
+    fontSize: '12px'
+  }
 };
 
 const navigationButtonsStyle = {
   display: 'flex',
   gap: '12px',
-  marginBottom: '20px'
+  marginBottom: '20px',
+  '@media (max-width: 768px)': {
+    flexDirection: 'column',
+    gap: '10px'
+  }
 };
 
 const primaryButtonStyle = {
@@ -2447,7 +2734,11 @@ const primaryButtonStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '8px'
+  gap: '8px',
+  '@media (max-width: 768px)': {
+    padding: '12px',
+    fontSize: '13px'
+  }
 };
 
 const secondaryButtonStyle = {
@@ -2460,27 +2751,94 @@ const secondaryButtonStyle = {
   fontSize: '14px',
   fontWeight: '600',
   cursor: 'pointer',
-  transition: 'all 0.3s ease'
+  transition: 'all 0.3s ease',
+  '@media (max-width: 768px)': {
+    padding: '12px',
+    fontSize: '13px'
+  }
 };
 
 const switchAuthStyle = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: '20px'
+  marginTop: '20px',
+  '@media (max-width: 768px)': {
+    marginTop: '15px'
+  }
 };
 
 const switchTextStyle = {
   color: '#4F6F6B',
   fontSize: '14px',
   textAlign: 'center',
-  margin: 0
+  margin: 0,
+  '@media (max-width: 768px)': {
+    fontSize: '13px'
+  }
 };
 
 const switchLinkStyle = {
   color: '#009688',
   fontWeight: '600',
   cursor: 'pointer'
+};
+
+// Add responsive styles using inline style objects
+const responsiveStyles = {
+  '@media (max-width: 768px)': {
+    containerStyle: {
+      padding: '10px',
+      marginTop: '0'
+    },
+    cardContainerStyle: {
+      flexDirection: 'column',
+      minHeight: 'auto',
+      marginTop: '80px'
+    },
+    leftSideStyle: {
+      minHeight: '300px',
+      padding: '20px'
+    },
+    rightSideStyle: {
+      padding: '20px'
+    },
+    topNavContainerStyle: {
+      top: '10px',
+      left: '10px',
+      right: '10px',
+      justifyContent: 'center'
+    }
+  },
+  '@media (max-width: 480px)': {
+    containerStyle: {
+      padding: '5px'
+    },
+    cardContainerStyle: {
+      borderRadius: '12px',
+      marginTop: '70px'
+    },
+    leftSideStyle: {
+      padding: '15px',
+      minHeight: '250px'
+    },
+    rightSideStyle: {
+      padding: '15px'
+    },
+    titleStyle: {
+      fontSize: '18px'
+    },
+    formTitleStyle: {
+      fontSize: '14px'
+    }
+  }
+};
+
+// Apply responsive styles
+const applyResponsiveStyles = () => {
+  // This is a conceptual implementation
+  // In a real React app, you would use styled-components or CSS classes
+  return null;
 };
 
 export default DeliverySignup;

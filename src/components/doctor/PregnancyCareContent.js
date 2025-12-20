@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import './PregnancyCareContent.css';
 
 const PregnancyCareContent = ({ dashboardData, state, actions }) => {
   const { pregnancyFilter } = state;
-  const { setPregnancyFilter, handleViewFullHistory } = actions;
+  const { setPregnancyFilter } = actions;
 
   const [activeTab, setActiveTab] = useState('appointments');
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showReportViewer, setShowReportViewer] = useState(false);
-  const [showPackageModal, setShowPackageModal] = useState(false);
   const [showVideoConsultation, setShowVideoConsultation] = useState(false);
   const [currentConsultation, setCurrentConsultation] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -16,7 +16,11 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
   const [loadingAppointments, setLoadingAppointments] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [patientReports, setPatientReports] = useState({});
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [showPlanDetails, setShowPlanDetails] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   
   // Local state for appointments
   const [appointments, setAppointments] = useState({
@@ -27,6 +31,66 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
 
   // Local state for patients
   const [patients, setPatients] = useState([]);
+
+  // Pregnancy Packages Data
+  const pregnancyPackages = [
+    {
+      id: 'basic',
+      name: 'Basic Pregnancy Care',
+      price: '₹25,000',
+      duration: '9 months',
+      patients: '8 patients enrolled',
+      icon: '🤰',
+      color: '#009688',
+      features: [
+        'Monthly checkups',
+        'Basic tests (Blood, Urine)',
+        '2 Ultrasounds',
+        'Hospital delivery',
+        'Postnatal checkup'
+      ],
+      idealFor: 'Low-risk pregnancies, first-time mothers',
+      coverage: 'Standard pregnancy care'
+    },
+    {
+      id: 'premium',
+      name: 'Premium Pregnancy Care',
+      price: '₹50,000',
+      duration: '9 months',
+      patients: '5 patients enrolled',
+      icon: '🌟',
+      color: '#4DB6AC',
+      features: [
+        'Fortnightly checkups',
+        'All tests included',
+        '4 Ultrasounds',
+        'Home visits (3 times)',
+        'Nutrition counseling',
+        'Delivery & postnatal care'
+      ],
+      idealFor: 'Working professionals, high-risk pregnancies',
+      coverage: 'Enhanced care with home visits'
+    },
+    {
+      id: 'comprehensive',
+      name: 'Comprehensive Pregnancy Care',
+      price: '₹75,000',
+      duration: '9 months',
+      patients: '2 patients enrolled',
+      icon: '👑',
+      color: '#00796B',
+      features: [
+        'Weekly checkups',
+        'All tests & advanced scans',
+        'Unlimited home visits',
+        'Personalized nutrition plan',
+        'Delivery preparation classes',
+        'Complete postnatal care'
+      ],
+      idealFor: 'High-risk pregnancies, VIP patients',
+      coverage: 'Complete care package'
+    }
+  ];
 
   // Timer for video call
   useEffect(() => {
@@ -46,7 +110,20 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
     
     const reportsState = {};
     pregnancyPatients.forEach(patient => {
-      reportsState[patient.id] = patient.pregnancyDetails?.reports || [];
+      const reports = patient.pregnancyDetails?.reports || [];
+      reportsState[patient.id] = reports.map(report => ({
+        ...report,
+        id: report.id || `report_${patient.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: report.name || `Report_${Date.now()}`,
+        type: report.type || 'pdf',
+        date: report.date || new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        }),
+        size: report.size || 'N/A',
+        url: report.url || '#'
+      }));
     });
     setPatientReports(reportsState);
   }, [dashboardData]);
@@ -62,17 +139,17 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
   };
 
   // Show simple notification
-  const showNotification = (message, type = 'info') => {
+  const showNotification = useCallback((message, type = 'info') => {
     const id = Date.now();
     setNotifications(prev => [...prev, { id, message, type }]);
     
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
     }, 3000);
-  };
+  }, []);
 
   // Handle appointment approval
-  const handleApproveAppointment = (appointment) => {
+  const handleApproveAppointment = useCallback((appointment) => {
     if (appointment.isFirstConsultation && appointment.consultationType !== 'offline') {
       showNotification('First pregnancy consultation must be at hospital', 'error');
       return;
@@ -99,10 +176,10 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
       showNotification(`Appointment approved for ${appointment.patientName}`, 'success');
       setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
     }, 1000);
-  };
+  }, [showNotification]);
 
   // Handle appointment rejection
-  const handleRejectAppointment = (appointment) => {
+  const handleRejectAppointment = useCallback((appointment, reason) => {
     setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
 
     setTimeout(() => {
@@ -121,48 +198,57 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
             ...rejectedAppointment, 
             status: 'cancelled',
             cancelledDate: new Date().toLocaleDateString(),
-            reason: 'Rejected by doctor'
+            reason: reason,
+            rejectedBy: 'doctor'
           }]
         };
       });
       
       showNotification(`Appointment rejected for ${appointment.patientName}`, 'info');
       setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowRejectModal(false);
+      setSelectedAppointment(null);
     }, 1000);
-  };
+  }, [showNotification]);
 
-  // Handle appointment cancellation
-  const handleCancelAppointment = (appointment) => {
+  // Handle appointment rescheduling
+  const handleRescheduleAppointment = useCallback((appointment, newDate, newTime) => {
     setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
 
     setTimeout(() => {
       setAppointments(prev => {
-        const upcomingIndex = prev.upcoming.findIndex(a => a.id === appointment.id);
-        if (upcomingIndex === -1) return prev;
+        const pendingIndex = prev.pending.findIndex(a => a.id === appointment.id);
+        if (pendingIndex === -1) return prev;
 
-        const cancelledAppointment = prev.upcoming[upcomingIndex];
-        const newUpcoming = [...prev.upcoming];
-        newUpcoming.splice(upcomingIndex, 1);
+        const rescheduledAppointment = prev.pending[pendingIndex];
+        const newPending = [...prev.pending];
+        newPending.splice(pendingIndex, 1);
         
         return {
           ...prev,
-          upcoming: newUpcoming,
-          cancelled: [...prev.cancelled, { 
-            ...cancelledAppointment, 
-            status: 'cancelled',
-            cancelledDate: new Date().toLocaleDateString(),
-            reason: 'Cancelled by doctor'
+          pending: newPending,
+          upcoming: [...prev.upcoming, { 
+            ...rescheduledAppointment, 
+            status: 'upcoming',
+            date: newDate,
+            time: newTime,
+            originalDate: rescheduledAppointment.date,
+            originalTime: rescheduledAppointment.time,
+            rescheduledBy: 'doctor',
+            rescheduledDate: new Date().toLocaleDateString()
           }]
         };
       });
       
-      showNotification(`Appointment cancelled for ${appointment.patientName}`, 'info');
+      showNotification(`Appointment rescheduled for ${appointment.patientName}`, 'success');
       setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowRejectModal(false);
+      setSelectedAppointment(null);
     }, 1000);
-  };
+  }, [showNotification]);
 
   // Start video consultation
-  const handleStartConsultation = (appointment) => {
+  const handleStartConsultation = useCallback((appointment) => {
     if (appointment.isFirstConsultation) {
       showNotification(`First consultation must be at hospital for ${appointment.patientName}`, 'info');
       return;
@@ -172,10 +258,10 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
     setShowVideoConsultation(true);
     setCallTime(0);
     showNotification(`Starting video consultation with ${appointment.patientName}`, 'info');
-  };
+  }, [showNotification]);
 
   // End video consultation
-  const handleEndConsultation = () => {
+  const handleEndConsultation = useCallback(() => {
     setShowVideoConsultation(false);
     setIsRecording(false);
     setIsScreenSharing(false);
@@ -198,233 +284,659 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
     }
     
     setCurrentConsultation(null);
-  };
+  }, [currentConsultation, showNotification]);
 
   // Toggle recording
-  const handleToggleRecording = () => {
+  const handleToggleRecording = useCallback(() => {
     setIsRecording(!isRecording);
     showNotification(isRecording ? 'Recording stopped' : 'Recording started', 'info');
-  };
+  }, [isRecording, showNotification]);
 
   // Toggle screen sharing
-  const handleToggleScreenShare = () => {
+  const handleToggleScreenShare = useCallback(() => {
     setIsScreenSharing(!isScreenSharing);
     showNotification(isScreenSharing ? 'Screen sharing stopped' : 'Screen sharing started', 'info');
-  };
+  }, [isScreenSharing, showNotification]);
 
   // Handle file upload
-  const handleFileUpload = (patientId, patientName, file) => {
-    if (!file) return;
+  const handleFileUpload = useCallback((patientId, patientName, files) => {
+    if (!files || files.length === 0) return;
     
-    if (file.type !== 'application/pdf') {
-      showNotification('Please upload PDF files only', 'error');
+    const validFiles = Array.from(files).filter(file => 
+      file.type === 'application/pdf' || 
+      file.type.startsWith('image/') ||
+      file.name.toLowerCase().endsWith('.pdf') ||
+      file.name.toLowerCase().endsWith('.jpg') ||
+      file.name.toLowerCase().endsWith('.jpeg') ||
+      file.name.toLowerCase().endsWith('.png')
+    );
+
+    if (validFiles.length === 0) {
+      showNotification('Please upload PDF or image files only (PDF, JPG, PNG)', 'error');
       return;
     }
+
+    showNotification(`Uploading ${validFiles.length} file(s) to ${patientName}'s reports...`, 'info');
     
-    showNotification(`Uploading ${file.name} to ${patientName}'s locker...`, 'info');
+    const newReports = validFiles.map((file, index) => {
+      const fileId = `uploaded_${patientId}_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`;
+      return {
+        id: fileId,
+        name: file.name.replace(/\.[^/.]+$/, "").replace(/_/g, ' ').toUpperCase(),
+        date: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        }),
+        time: new Date().toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }),
+        type: file.type.startsWith('image/') ? 'image' : 'pdf',
+        file: file,
+        url: URL.createObjectURL(file),
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        uploaded: true
+      };
+    });
     
-    // Create report object immediately
-    const newReport = {
-      id: Date.now(),
-      name: file.name.replace('.pdf', '').replace(/_/g, ' ').toUpperCase(),
-      date: new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-      }),
-      type: 'pdf',
-      file: file, // Store the actual file object
-      url: URL.createObjectURL(file)
-    };
-    
-    // Update uploaded files state immediately
-    setUploadedFiles(prev => [...prev, newReport]);
-    
-    // Update patient reports state
     setPatientReports(prev => ({
       ...prev,
-      [patientId]: [...(prev[patientId] || []), newReport]
+      [patientId]: [...(prev[patientId] || []), ...newReports]
     }));
     
-    showNotification(`${file.name} uploaded successfully`, 'success');
-  };
+    showNotification(`${validFiles.length} file(s) uploaded successfully to ${patientName}'s reports`, 'success');
+  }, [showNotification]);
 
-  // Handle package selection
-  const handleSelectPackage = (patientId, patientName, packageName) => {
-    setPatients(prev => 
-      prev.map(patient => 
-        patient.id === patientId 
-          ? {
-              ...patient,
-              pregnancyDetails: {
-                ...patient.pregnancyDetails,
-                package: packageName
-              }
-            }
-          : patient
-      )
-    );
+  // Handle remove report
+  const handleRemoveReport = useCallback((patientId, reportId) => {
+    setPatientReports(prev => ({
+      ...prev,
+      [patientId]: prev[patientId]?.filter(r => r.id !== reportId) || []
+    }));
+    showNotification('Report removed successfully', 'success');
+  }, [showNotification]);
+
+  // Handle send reminder
+  const handleSendReminder = useCallback((appointment, message, method) => {
+    setLoadingAppointments(prev => ({ ...prev, [appointment.id]: true }));
     
-    showNotification(`Package updated to ${packageName} for ${patientName}`, 'success');
-    setShowPackageModal(false);
-  };
+    setTimeout(() => {
+      showNotification(`Reminder sent via ${method.toUpperCase()} to ${appointment.patientName}`, 'success');
+      setLoadingAppointments(prev => ({ ...prev, [appointment.id]: false }));
+      setShowReminderModal(false);
+      setSelectedAppointment(null);
+    }, 1000);
+  }, [showNotification]);
 
   // Format call time
-  const formatCallTime = (seconds) => {
+  const formatCallTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  // Video Consultation Modal
-  const VideoConsultationModal = () => {
-    if (!showVideoConsultation || !currentConsultation) return null;
+  // Get current date for date input
+  const getCurrentDate = useCallback(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }, []);
+
+  // Reject/Reschedule Modal Component
+  const RejectRescheduleModal = React.memo(({ 
+    show, 
+    appointment, 
+    onClose, 
+    onReject, 
+    onReschedule,
+    loading 
+  }) => {
+    const [rejectReason, setRejectReason] = useState('');
+    const [rescheduleDate, setRescheduleDate] = useState('');
+    const [rescheduleTime, setRescheduleTime] = useState('');
+
+    const handleRejectReasonChange = (e) => {
+      setRejectReason(e.target.value);
+    };
+
+    const handleRescheduleDateChange = (e) => {
+      setRescheduleDate(e.target.value);
+    };
+
+    const handleRescheduleTimeChange = (e) => {
+      setRescheduleTime(e.target.value);
+    };
+
+    const handleRejectSubmit = () => {
+      if (rejectReason.trim()) {
+        onReject(appointment, rejectReason);
+      }
+    };
+
+    const handleRescheduleSubmit = () => {
+      if (rescheduleDate && rescheduleTime) {
+        onReschedule(appointment, rescheduleDate, rescheduleTime);
+      }
+    };
+
+    if (!show || !appointment) return null;
 
     return (
-      <div style={styles.videoModalOverlay}>
-        <div style={styles.videoModal}>
-          {/* Header */}
-          <div style={styles.videoHeader}>
-            <div style={styles.videoHeaderInfo}>
-              <div style={styles.videoStatus}>
-                <span style={styles.connectedDot}>●</span>
+      <div className="modalOverlay">
+        <div className="modal">
+          <div className="modalHeader">
+            <h3 className="modalTitle">
+              Manage Appointment - {appointment.patientName}
+            </h3>
+            <button 
+              className="closeButton"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="modalContent">
+            <div className="appointmentInfoCard">
+              <p><strong>Patient:</strong> {appointment.patientName}</p>
+              <p><strong>Trimester:</strong> {appointment.trimester}</p>
+              <p><strong>Scheduled:</strong> {appointment.date} at {appointment.time}</p>
+              <p><strong>Issue:</strong> {appointment.issue}</p>
+            </div>
+
+            <div className="section">
+              <h4 className="sectionTitle">Reject Appointment</h4>
+              <div className="inputGroup">
+                <label className="label">Reason for rejection:</label>
+                <textarea 
+                  className="textarea"
+                  placeholder="Provide reason for rejecting this appointment..."
+                  value={rejectReason}
+                  onChange={handleRejectReasonChange}
+                  rows="3"
+                />
+              </div>
+              <button 
+                className="dangerButton"
+                onClick={handleRejectSubmit}
+                disabled={!rejectReason.trim() || loading}
+              >
+                {loading ? 'Processing...' : 'Reject Appointment'}
+              </button>
+            </div>
+
+            <div className="divider">
+              <span className="dividerText">OR</span>
+            </div>
+
+            <div className="section">
+              <h4 className="sectionTitle">Reschedule Appointment</h4>
+              <div className="inputGroup">
+                <label className="label">New Date:</label>
+                <input 
+                  type="date" 
+                  className="input"
+                  min={getCurrentDate()}
+                  value={rescheduleDate}
+                  onChange={handleRescheduleDateChange}
+                />
+              </div>
+              <div className="inputGroup">
+                <label className="label">New Time:</label>
+                <input 
+                  type="time" 
+                  className="input"
+                  value={rescheduleTime}
+                  onChange={handleRescheduleTimeChange}
+                />
+              </div>
+              <button 
+                className="successButton"
+                onClick={handleRescheduleSubmit}
+                disabled={!rescheduleDate || !rescheduleTime || loading}
+              >
+                {loading ? 'Processing...' : 'Reschedule Appointment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Reminder Modal Component
+  const ReminderModal = React.memo(({ 
+    show, 
+    appointment, 
+    onClose, 
+    onSendReminder,
+    loading 
+  }) => {
+    const [reminderMessage, setReminderMessage] = useState('');
+    const [reminderMethod, setReminderMethod] = useState('sms');
+
+    const handleReminderMessageChange = (e) => {
+      setReminderMessage(e.target.value);
+    };
+
+    const handleMethodChange = (method) => {
+      setReminderMethod(method);
+    };
+
+    const handleTimeOptionClick = (option) => {
+      let message = '';
+      switch(option) {
+        case '24h':
+          message = `Reminder: Your pregnancy care appointment with Dr. is scheduled for tomorrow at ${appointment.time}. Please be on time.`;
+          break;
+        case '1h':
+          message = `Reminder: Your appointment is in 1 hour. Please join the video call or arrive at the clinic for your ${appointment.trimester} trimester checkup.`;
+          break;
+        case 'now':
+          message = `Final reminder: Your appointment starts now. ${appointment.consultationType === 'online' ? 'Please join the video consultation.' : 'Please proceed to the reception.'}`;
+          break;
+        default:
+          message = '';
+      }
+      setReminderMessage(message);
+    };
+
+    const handleSubmit = () => {
+      if (reminderMessage.trim()) {
+        onSendReminder(appointment, reminderMessage, reminderMethod);
+      }
+    };
+
+    if (!show || !appointment) return null;
+
+    return (
+      <div className="modalOverlay">
+        <div className="modal">
+          <div className="modalHeader">
+            <h3 className="modalTitle">
+              Send Reminder - {appointment.patientName}
+            </h3>
+            <button 
+              className="closeButton"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="modalContent">
+            <div className="appointmentInfoCard">
+              <p><strong>Patient:</strong> {appointment.patientName}</p>
+              <p><strong>Trimester:</strong> {appointment.trimester} • {appointment.weeks} weeks</p>
+              <p><strong>Scheduled:</strong> {appointment.date} at {appointment.time}</p>
+              <p><strong>Appointment Type:</strong> {appointment.consultationType === 'offline' ? '🏥 Hospital' : 
+                 appointment.consultationType === 'home_visit' ? '🏠 Home Visit' : '💻 Online'}</p>
+            </div>
+
+            <div className="section">
+              <h4 className="sectionTitle">Reminder Details</h4>
+              
+              <div className="inputGroup">
+                <label className="label">Select Method:</label>
+                <div className="methodOptions">
+                  <label className={`methodOption ${reminderMethod === 'sms' ? 'activeMethodOption' : ''}`}>
+                    <input
+                      type="radio"
+                      value="sms"
+                      checked={reminderMethod === 'sms'}
+                      onChange={() => handleMethodChange('sms')}
+                      className="radioInput"
+                    />
+                    <span className="methodLabel">📱 SMS</span>
+                  </label>
+                  <label className={`methodOption ${reminderMethod === 'email' ? 'activeMethodOption' : ''}`}>
+                    <input
+                      type="radio"
+                      value="email"
+                      checked={reminderMethod === 'email'}
+                      onChange={() => handleMethodChange('email')}
+                      className="radioInput"
+                    />
+                    <span className="methodLabel">📧 Email</span>
+                  </label>
+                  <label className={`methodOption ${reminderMethod === 'whatsapp' ? 'activeMethodOption' : ''}`}>
+                    <input
+                      type="radio"
+                      value="whatsapp"
+                      checked={reminderMethod === 'whatsapp'}
+                      onChange={() => handleMethodChange('whatsapp')}
+                      className="radioInput"
+                    />
+                    <span className="methodLabel">💬 WhatsApp</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="inputGroup">
+                <label className="label">Reminder Message:</label>
+                <textarea 
+                  className="textarea"
+                  placeholder={`Reminder for ${appointment.patientName}'s appointment on ${appointment.date} at ${appointment.time}. Trimester: ${appointment.trimester}`}
+                  value={reminderMessage}
+                  onChange={handleReminderMessageChange}
+                  rows="4"
+                />
+                <div className="messagePreview">
+                  <strong>Preview:</strong>
+                  <div className="previewText">
+                    {reminderMessage || 'Your reminder message will appear here...'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="inputGroup">
+                <label className="label">Quick Templates:</label>
+                <div className="timeOptions">
+                  <button 
+                    type="button"
+                    className="timeOption"
+                    onClick={() => handleTimeOptionClick('24h')}
+                  >
+                    24 hours before
+                  </button>
+                  <button 
+                    type="button"
+                    className="timeOption"
+                    onClick={() => handleTimeOptionClick('1h')}
+                  >
+                    1 hour before
+                  </button>
+                  <button 
+                    type="button"
+                    className="timeOption"
+                    onClick={() => handleTimeOptionClick('now')}
+                  >
+                    At appointment time
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                className="primaryButton"
+                onClick={handleSubmit}
+                disabled={!reminderMessage.trim() || loading}
+              >
+                {loading ? 'Sending...' : `Send ${reminderMethod.toUpperCase()} Reminder`}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Report Viewer Modal Component
+  const ReportViewerModal = React.memo(({ 
+    show, 
+    patient, 
+    patientReports, 
+    onClose, 
+    onFileUpload,
+    onRemoveReport 
+  }) => {
+    const fileInputRef = useRef(null);
+
+    if (!show || !patient) return null;
+
+    const patientReportsList = patientReports[patient.id] || [];
+
+    const handleFileSelect = (e) => {
+      onFileUpload(patient.id, patient.name, e.target.files);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+
+    const handleRemoveClick = (reportId) => {
+      if (window.confirm('Are you sure you want to remove this report?')) {
+        onRemoveReport(patient.id, reportId);
+      }
+    };
+
+    return (
+      <div className="modalOverlay">
+        <div className="modal">
+          <div className="modalHeader">
+            <h3 className="modalTitle">
+              Medical Reports - {patient.name}
+            </h3>
+            <button 
+              className="closeButton"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="modalContent">
+            <div className="uploadSection">
+              <h4 className="sectionTitle">Upload New Report</h4>
+              <div className="uploadArea">
+                <input 
+                  ref={fileInputRef}
+                  type="file"
+                  id="report-upload"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="fileInput"
+                  onChange={handleFileSelect}
+                />
+                <label htmlFor="report-upload" className="uploadLabel">
+                  <div className="uploadIcon">📁</div>
+                  <div className="uploadText">
+                    <strong>Click to upload reports</strong>
+                    <span>Supports PDF, JPG, PNG files</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div className="section">
+              <h4 className="sectionTitle">All Reports ({patientReportsList.length})</h4>
+              {patientReportsList.length > 0 ? (
+                <div className="reportsList">
+                  {patientReportsList.map((report) => (
+                    <div key={report.id} className="reportItem">
+                      <div className="reportIcon">
+                        {report.type === 'pdf' ? '📄' : '🖼️'}
+                      </div>
+                      <div className="reportInfo">
+                        <div className="reportName">{report.name}</div>
+                        <div className="reportMeta">
+                          {report.date} • {report.type ? report.type.toUpperCase() : 'FILE'} • {report.size}
+                          {report.uploaded && <span style={{ marginLeft: '10px', color: '#4CAF50' }}>🆕 Uploaded</span>}
+                        </div>
+                      </div>
+                      <div className="reportActions">
+                        <button 
+                          className="smallButton"
+                          onClick={() => {
+                            if (report.url && report.url !== '#') {
+                              window.open(report.url, '_blank');
+                            } else {
+                              showNotification('File preview not available', 'info');
+                            }
+                          }}
+                        >
+                          View
+                        </button>
+                        <button 
+                          className="smallButton dangerButton"
+                          onClick={() => handleRemoveClick(report.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="emptyReports">
+                  <div className="emptyReportsIcon">📄</div>
+                  <p>No reports available yet</p>
+                  <p className="emptySubtext">Upload reports using the upload section above</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // Video Consultation Modal Component
+  const VideoConsultationModal = React.memo(({ 
+    show, 
+    consultation, 
+    callTime,
+    isRecording,
+    isScreenSharing,
+    onEndCall,
+    onToggleRecording,
+    onToggleScreenShare,
+    onClose 
+  }) => {
+    const [notes, setNotes] = useState('');
+
+    const handleNotesChange = (e) => {
+      setNotes(e.target.value);
+    };
+
+    const handleSaveNotes = () => {
+      if (notes.trim()) {
+        showNotification('Consultation notes saved', 'success');
+      } else {
+        showNotification('Please add some notes before saving', 'error');
+      }
+    };
+
+    if (!show || !consultation) return null;
+
+    return (
+      <div className="videoModalOverlay">
+        <div className="videoModal">
+          <div className="videoHeader">
+            <div className="videoHeaderInfo">
+              <div className="videoStatus">
+                <span className="connectedDot">●</span>
                 <span>Status: connected</span>
               </div>
-              <div style={styles.callTimer}>
+              <div className="callTimer">
                 <span>{formatCallTime(callTime)}</span>
               </div>
             </div>
             <button 
-              style={styles.endCallButton}
-              onClick={handleEndConsultation}
+              className="endCallButton"
+              onClick={onEndCall}
             >
               End Call
             </button>
           </div>
 
-          {/* Main Video Area */}
-          <div style={styles.videoMainArea}>
-            <div style={styles.patientVideoContainer}>
-              <div style={styles.patientVideoHeader}>
-                <div style={styles.patientVideoInfo}>
-                  <h3 style={styles.patientVideoName}>{currentConsultation.patientName}</h3>
-                  <div style={styles.trimesterIndicator}>
-                    🤰 {currentConsultation.trimester} Trimester • {currentConsultation.weeks} weeks
+          <div className="videoMainArea">
+            <div className="patientVideoContainer">
+              <div className="patientVideoHeader">
+                <div className="patientVideoInfo">
+                  <h3 className="patientVideoName">{consultation.patientName}</h3>
+                  <div className="trimesterIndicator">
+                    🤰 {consultation.trimester} Trimester • {consultation.weeks} weeks
                   </div>
                 </div>
               </div>
               
-              {/* Mock Video Feed */}
-              <div style={styles.videoFeed}>
-                <div style={styles.videoMock}>
-                  <div style={styles.videoMockContent}>
-                    <div style={styles.videoMockAvatar}>
-                      <span style={styles.avatarEmoji}>👩</span>
+              <div className="videoFeed">
+                <div className="videoMock">
+                  <div className="videoMockContent">
+                    <div className="videoMockAvatar">
+                      <span className="avatarEmoji">👩</span>
                     </div>
-                    <div style={styles.videoMockInfo}>
-                      <p style={styles.videoMockText}>Live Video Feed</p>
-                      <p style={styles.videoMockSubtext}>{currentConsultation.patientName}</p>
+                    <div className="videoMockInfo">
+                      <p className="videoMockText">Live Video Feed</p>
+                      <p className="videoMockSubtext">{consultation.patientName}</p>
                     </div>
                   </div>
                 </div>
                 
-                {/* Self View */}
-                <div style={styles.selfView}>
-                  <div style={styles.selfViewHeader}>
-                    <span style={styles.selfViewLabel}>You</span>
-                    <button 
-                      style={styles.selfViewToggle}
-                      onClick={() => showNotification('Switched camera view', 'info')}
-                    >
-                      Set View
-                    </button>
+                <div className="selfView">
+                  <div className="selfViewHeader">
+                    <span className="selfViewLabel">You</span>
                   </div>
-                  <div style={styles.selfViewVideo}>
-                    <div style={styles.selfViewMock}>
-                      <span style={styles.selfViewEmoji}>👨‍⚕️</span>
-                      <p style={styles.selfViewText}>Dr. View</p>
+                  <div className="selfViewVideo">
+                    <div className="selfViewMock">
+                      <span className="selfViewEmoji">👨‍⚕️</span>
+                      <p className="selfViewText">Dr. View</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Quick Tools Sidebar */}
-            <div style={styles.quickTools}>
-              <div style={styles.quickToolsHeader}>
-                <h4 style={styles.quickToolsTitle}>Quick Tools</h4>
+            <div className="quickTools">
+              <div className="quickToolsHeader">
+                <h4 className="quickToolsTitle">Pregnancy Care Tools</h4>
               </div>
               
-              <div style={styles.toolButtons}>
+              <div className="toolButtons">
                 <button 
-                  style={isScreenSharing ? styles.activeToolButton : styles.toolButton}
-                  onClick={handleToggleScreenShare}
+                  className={isScreenSharing ? 'activeToolButton' : 'toolButton'}
+                  onClick={onToggleScreenShare}
                 >
-                  <span style={styles.toolIcon}>🖥️</span>
+                  <span className="toolIcon">🖥️</span>
                   <span>Share Screen</span>
                 </button>
                 
                 <button 
-                  style={isRecording ? styles.recordingButton : styles.toolButton}
-                  onClick={handleToggleRecording}
+                  className={isRecording ? 'recordingButton' : 'toolButton'}
+                  onClick={onToggleRecording}
                 >
-                  <span style={styles.toolIcon}>⏺️</span>
+                  <span className="toolIcon">⏺️</span>
                   <span>{isRecording ? 'Recording...' : 'Record'}</span>
-                  {isRecording && <span style={styles.recordingDot}>●</span>}
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
+                  className="toolButton"
                   onClick={() => showNotification('Opening prescription pad', 'info')}
                 >
-                  <span style={styles.toolIcon}>💊</span>
+                  <span className="toolIcon">💊</span>
                   <span>Prescription</span>
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
-                  onClick={() => showNotification('Opening medical history', 'info')}
+                  className="toolButton"
+                  onClick={() => showNotification('Opening pregnancy chart', 'info')}
                 >
-                  <span style={styles.toolIcon}>📋</span>
-                  <span>Medical History</span>
+                  <span className="toolIcon">📈</span>
+                  <span>Progress Chart</span>
                 </button>
                 
                 <button 
-                  style={styles.toolButton}
-                  onClick={() => showNotification('Opening notes', 'info')}
+                  className="toolButton"
+                  onClick={() => showNotification('Opening test results', 'info')}
                 >
-                  <span style={styles.toolIcon}>📝</span>
-                  <span>Notes</span>
+                  <span className="toolIcon">🧪</span>
+                  <span>Test Results</span>
                 </button>
               </div>
               
-              {/* Call Controls */}
-              <div style={styles.callControls}>
-                <button style={styles.controlButton}>
-                  <span style={styles.controlIcon}>🎤</span>
-                  <span>Audio</span>
-                </button>
-                <button style={styles.controlButton}>
-                  <span style={styles.controlIcon}>📹</span>
-                  <span>Video</span>
-                </button>
-                <button style={styles.controlButton}>
-                  <span style={styles.controlIcon}>🔈</span>
-                  <span>Volume</span>
-                </button>
-              </div>
-              
-              {/* Consultation Notes */}
-              <div style={styles.consultationNotes}>
-                <h4 style={styles.notesTitle}>Consultation Notes</h4>
+              <div className="consultationNotes">
+                <h4 className="notesTitle">Consultation Notes</h4>
                 <textarea 
-                  style={styles.notesTextarea}
+                  className="notesTextarea"
                   placeholder="Add notes about symptoms, observations, recommendations..."
+                  value={notes}
+                  onChange={handleNotesChange}
                   rows="4"
                 />
                 <button 
-                  style={styles.saveNotesButton}
-                  onClick={() => showNotification('Notes saved', 'success')}
+                  className="saveNotesButton"
+                  onClick={handleSaveNotes}
                 >
                   Save Notes
                 </button>
@@ -432,64 +944,140 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
             </div>
           </div>
 
-          {/* Footer */}
-          <div style={styles.videoFooter}>
-            <div style={styles.appointmentInfo}>
-              <strong>Appointment:</strong> {currentConsultation.time} • {currentConsultation.date}
+          <div className="videoFooter">
+            <div className="appointmentInfo">
+              <strong>Patient:</strong> {consultation.patientName}
             </div>
-            <div style={styles.consultationType}>
-              <strong>Type:</strong> {currentConsultation.consultationType === 'video' ? 'Video Consultation' : 'Audio Call'}
+            <div className="consultationType">
+              <strong>Trimester:</strong> {consultation.trimester} • {consultation.weeks} weeks
             </div>
           </div>
         </div>
       </div>
     );
-  };
+  });
+
+  // Plan Details Modal Component
+  const PlanDetailsModal = React.memo(({ show, plan, onClose }) => {
+    if (!show || !plan) return null;
+
+    return (
+      <div className="modalOverlay">
+        <div className="modal">
+          <div className="modalHeader">
+            <h3 className="modalTitle">
+              {plan.name} - Complete Details
+            </h3>
+            <button 
+              className="closeButton"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="modalContent">
+            <div 
+              className="planHeaderCard"
+              style={{
+                backgroundColor: `${plan.color}20`,
+                borderColor: plan.color
+              }}
+            >
+              <div className="planHeaderContent">
+                <div className="planIconLarge">{plan.icon}</div>
+                <div>
+                  <h4 className="planHeaderTitle">{plan.name}</h4>
+                  <p className="planHeaderPrice">{plan.price}</p>
+                  <p className="planHeaderDuration">{plan.duration} • {plan.patients}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="section">
+              <h4 className="sectionTitle">Perfect For</h4>
+              <div className="idealFor">
+                <span className="idealForIcon">🎯</span>
+                <span>{plan.idealFor}</span>
+              </div>
+            </div>
+            
+            <div className="section">
+              <h4 className="sectionTitle">Care Coverage</h4>
+              <div className="coverageCard">
+                <span className="coverageIcon">⏰</span>
+                <span>{plan.coverage}</span>
+              </div>
+            </div>
+            
+            <div className="section">
+              <h4 className="sectionTitle">All Features</h4>
+              <div className="featuresList">
+                {plan.features.map((feature, index) => (
+                  <div key={index} className="featureItem">
+                    <span className="checkIcon">✓</span>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="section">
+              <h4 className="sectionTitle">Doctor's Recommendation</h4>
+              <div className="recommendation">
+                <p>This plan is ideal for {plan.idealFor.toLowerCase()}. It provides comprehensive care throughout the pregnancy journey with the right balance of checkups, tests, and support services.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  });
 
   // Pregnancy Appointment Card Component
-  const PregnancyAppointmentCard = ({ appointment }) => {
-    const isLoading = loadingAppointments[appointment.id];
+  const PregnancyAppointmentCard = React.memo(({ appointment, filter, onApprove, onRejectReschedule, onStartConsultation, onSendReminder, loading }) => {
+    const isLoading = loading[appointment.id];
     const isFirstConsultation = appointment.isFirstConsultation;
 
     return (
-      <div style={styles.appointmentCard}>
-        <div style={styles.appointmentHeader}>
-          <div style={styles.appointmentPatient}>
-            <div style={styles.profileIcon}>
+      <div className="appointmentCard">
+        <div className="appointmentHeader">
+          <div className="appointmentPatient">
+            <div className="profileIcon">
               <span>🤰</span>
             </div>
-            <div style={styles.patientInfo}>
-              <h3 style={styles.appointmentName}>
+            <div className="patientInfo">
+              <h3 className="appointmentName">
                 {appointment.patientName}
-                <span style={styles.trimesterBadge}>
+                <span className="trimesterBadge">
                   {appointment.trimester} Trimester
                 </span>
                 {isFirstConsultation && (
-                  <span style={styles.firstConsultationBadge}>First Visit</span>
+                  <span className="firstConsultationBadge">First Visit</span>
                 )}
               </h3>
-              <p style={styles.appointmentMeta}>
+              <p className="appointmentMeta">
                 Age: {appointment.age} • {appointment.weeks} weeks
                 {isFirstConsultation && (
-                  <span style={styles.freeBadge}> First Free</span>
+                  <span className="freeBadge"> First Free</span>
                 )}
               </p>
-              <div style={styles.consultationType}>
+              <div className="consultationType">
                 {appointment.consultationType === 'offline' ? '🏥 Hospital' : 
                  appointment.consultationType === 'home_visit' ? '🏠 Home Visit' : '💻 Online'}
               </div>
             </div>
           </div>
-          <div style={styles.appointmentTime}>
+          <div className="appointmentTime">
             <strong>{appointment.time}</strong>
             <span>{appointment.date}</span>
             {isFirstConsultation && (
-              <span style={styles.hospitalRequired}>🏥 Hospital Required</span>
+              <span className="hospitalRequired">🏥 Hospital Required</span>
             )}
           </div>
         </div>
         
-        <div style={styles.appointmentDetails}>
+        <div className="appointmentDetails">
           <p><strong>Reason:</strong> {appointment.issue}</p>
           <p><strong>Duration:</strong> {appointment.duration}</p>
           {appointment.location && (
@@ -497,39 +1085,39 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
           )}
         </div>
 
-        <div style={styles.appointmentActions}>
-          {pregnancyFilter === 'pending' && (
+        <div className="appointmentActions">
+          {filter === 'pending' && (
             <>
               <button 
-                style={styles.successButton}
-                onClick={() => handleApproveAppointment(appointment)}
+                className="successButton"
+                onClick={() => onApprove(appointment)}
                 disabled={isLoading}
               >
                 {isLoading ? 'Approving...' : 'Approve'}
               </button>
               <button 
-                style={styles.dangerButton}
-                onClick={() => handleRejectAppointment(appointment)}
+                className="secondaryButton"
+                onClick={() => onRejectReschedule(appointment)}
                 disabled={isLoading}
               >
-                {isLoading ? 'Rejecting...' : 'Reject'}
+                {isLoading ? 'Processing...' : 'Reject/Reschedule'}
               </button>
             </>
           )}
           
-          {pregnancyFilter === 'upcoming' && (
+          {filter === 'upcoming' && (
             <>
               {!isFirstConsultation ? (
                 <button 
-                  style={styles.primaryButton}
-                  onClick={() => handleStartConsultation(appointment)}
+                  className="primaryButton"
+                  onClick={() => onStartConsultation(appointment)}
                   disabled={isLoading}
                 >
                   Start Consultation
                 </button>
               ) : (
                 <button 
-                  style={styles.hospitalButton}
+                  className="hospitalButton"
                   onClick={() => showNotification(`First consultation must be at hospital for ${appointment.patientName}`, 'info')}
                   disabled={isLoading}
                 >
@@ -537,418 +1125,375 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
                 </button>
               )}
               <button 
-                style={styles.dangerButton}
-                onClick={() => handleCancelAppointment(appointment)}
+                className="secondaryButton"
+                onClick={() => onSendReminder(appointment)}
                 disabled={isLoading}
               >
-                {isLoading ? 'Cancelling...' : 'Cancel'}
+                {isLoading ? 'Processing...' : 'Send Reminder'}
               </button>
             </>
           )}
           
-          {pregnancyFilter === 'cancelled' && (
-            <div style={styles.cancelledInfo}>
+          {filter === 'cancelled' && (
+            <div className="cancelledInfo">
               <p><strong>Cancelled Date:</strong> {appointment.cancelledDate || 'N/A'}</p>
               <p><strong>Reason:</strong> {appointment.reason || 'Not specified'}</p>
+              {appointment.rejectedBy && (
+                <p><strong>Action By:</strong> {appointment.rejectedBy}</p>
+              )}
             </div>
           )}
         </div>
       </div>
     );
-  };
+  });
 
   // Pregnancy Patient Card Component
-  const PregnancyPatientCard = ({ patient }) => {
+  const PregnancyPatientCard = React.memo(({ patient, patientReports, onViewReports }) => {
     const patientReportsList = patientReports[patient.id] || [];
-    const uploadedPatientFiles = uploadedFiles.filter(file => 
-      patientReportsList.some(report => report.id === file.id)
-    );
-    const allReports = [...patientReportsList, ...uploadedPatientFiles];
+    const plan = patient.pregnancyDetails?.package || 'basic';
+    const currentPlan = pregnancyPackages.find(p => p.id === plan) || pregnancyPackages[0];
 
     return (
-      <div style={styles.patientCard}>
-        <div style={styles.patientHeader}>
-          <div style={styles.profileIconLarge}>
+      <div className="patientCard">
+        <div className="patientHeader">
+          <div className="profileIconLarge">
             <span>🤰</span>
           </div>
-          <div style={styles.patientBasicInfo}>
-            <h3 style={styles.patientName}>{patient.name}</h3>
-            <p style={styles.patientContact}>{patient.phone}</p>
-            <p style={styles.patientEmail}>{patient.email}</p>
+          <div className="patientBasicInfo">
+            <h3 className="patientName">{patient.name}</h3>
+            <p className="patientContact">{patient.phone}</p>
+            <p className="patientEmail">{patient.email}</p>
           </div>
         </div>
 
-        <div style={styles.pregnancyDetails}>
-          <div style={styles.detailRow}>
+        <div 
+          className="planIndicator"
+          style={{ borderLeftColor: currentPlan.color }}
+        >
+          <div className="planHeader">
+            <span className="planIcon">{currentPlan.icon}</span>
+            <span className="planName">{currentPlan.name}</span>
+          </div>
+          <div className="planCoverage">
+            <span className="coverageText">{currentPlan.coverage}</span>
+          </div>
+        </div>
+
+        <div className="pregnancyDetails">
+          <div className="detailRow">
             <span>Trimester:</span>
-            <strong>{patient.pregnancyDetails.trimester}</strong>
+            <strong>{patient.pregnancyDetails?.trimester || 'N/A'}</strong>
           </div>
-          <div style={styles.detailRow}>
+          <div className="detailRow">
             <span>Weeks:</span>
-            <strong>{patient.pregnancyDetails.weeks} weeks</strong>
+            <strong>{patient.pregnancyDetails?.weeks || 'N/A'} weeks</strong>
           </div>
-          <div style={styles.detailRow}>
-            <span>Package:</span>
-            <strong>{patient.pregnancyDetails.package}</strong>
-          </div>
-          <div style={styles.detailRow}>
+          <div className="detailRow">
             <span>Next Appointment:</span>
-            <strong>{patient.pregnancyDetails.nextAppointment}</strong>
+            <strong>{patient.pregnancyDetails?.nextAppointment || 'Not scheduled'}</strong>
+          </div>
+          <div className="detailRow">
+            <span>Last Checkup:</span>
+            <strong>{patient.pregnancyDetails?.lastCheckup || 'N/A'}</strong>
           </div>
         </div>
 
-        <div style={styles.reportsSummary}>
+        <div className="reportsSummary">
           <strong>Reports:</strong>
-          <span style={styles.reportCount}>
-            {allReports.length} PDF files
+          <span className="reportCount">
+            {patientReportsList.length} files
           </span>
         </div>
 
-        <div style={styles.patientActions}>
+        <div className="patientActions">
           <button 
-            style={styles.primaryButton}
-            onClick={() => {
-              setSelectedPatient({ ...patient, reports: allReports });
-              setShowReportViewer(true);
-            }}
+            className="primaryButton"
+            onClick={() => onViewReports(patient)}
           >
-            View Reports
-          </button>
-          <button 
-            style={styles.secondaryButton}
-            onClick={() => {
-              setSelectedPatient({ ...patient, reports: allReports });
-              setShowPackageModal(true);
-            }}
-          >
-            Change Package
+            View/Upload Reports
           </button>
         </div>
       </div>
     );
-  };
-
-  // Report Viewer Modal
-  const ReportViewerModal = () => {
-    if (!showReportViewer || !selectedPatient) return null;
-
-    const reports = selectedPatient.reports || [];
-
-    return (
-      <div style={styles.modalOverlay}>
-        <div style={styles.modal}>
-          <div style={styles.modalHeader}>
-            <h3>File Locker - {selectedPatient.name}</h3>
-            <button 
-              style={styles.closeButton}
-              onClick={() => setShowReportViewer(false)}
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div style={styles.modalContent}>
-            <div style={styles.uploadSection}>
-              <h4>Upload New Report</h4>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    handleFileUpload(selectedPatient.id, selectedPatient.name, file);
-                    // Refresh the reports list
-                    setTimeout(() => {
-                      setSelectedPatient(prev => ({
-                        ...prev,
-                        reports: [...(prev.reports || []), {
-                          id: Date.now(),
-                          name: file.name.replace('.pdf', '').replace(/_/g, ' ').toUpperCase(),
-                          date: new Date().toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric' 
-                          }),
-                          type: 'pdf',
-                          url: URL.createObjectURL(file)
-                        }]
-                      }));
-                    }, 100);
-                  }
-                }}
-                style={styles.fileInput}
-              />
-              <p style={styles.fileNote}>Only PDF files are accepted</p>
-            </div>
-            
-            {reports.length > 0 ? (
-              <div style={styles.reportsList}>
-                <h4>Medical Reports ({reports.length})</h4>
-                {reports.map((report) => (
-                  <div key={report.id} style={styles.reportItem}>
-                    <div style={styles.reportInfo}>
-                      <div style={styles.reportIcon}>📄</div>
-                      <div>
-                        <strong>{report.name}</strong>
-                        <p style={styles.reportDate}>Uploaded: {report.date}</p>
-                      </div>
-                    </div>
-                    <button 
-                      style={styles.viewButton}
-                      onClick={() => {
-                        if (report.url) {
-                          window.open(report.url, '_blank');
-                        } else if (report.file) {
-                          const url = URL.createObjectURL(report.file);
-                          window.open(url, '_blank');
-                        } else {
-                          showNotification('Opening PDF file...', 'info');
-                        }
-                      }}
-                    >
-                      View PDF
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={styles.noReports}>
-                <div style={styles.noReportsIcon}>📁</div>
-                <p>No reports uploaded yet</p>
-                <p style={styles.noReportsText}>Upload PDF files to view them here</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Package Modal
-  const PackageModal = () => {
-    if (!showPackageModal || !selectedPatient) return null;
-
-    return (
-      <div style={styles.modalOverlay}>
-        <div style={styles.modal}>
-          <div style={styles.modalHeader}>
-            <h3>Select Package for {selectedPatient.name}</h3>
-            <button 
-              style={styles.closeButton}
-              onClick={() => setShowPackageModal(false)}
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div style={styles.modalContent}>
-            <p style={styles.currentPackage}>
-              Current Package: <strong>{selectedPatient.pregnancyDetails.package}</strong>
-            </p>
-            
-            <div style={styles.packagesList}>
-              {dashboardData.pregnancyPackages.map(pkg => (
-                <div key={pkg.id} style={styles.packageCard}>
-                  <div style={styles.packageInfo}>
-                    <div>
-                      <h4 style={styles.packageName}>{pkg.name}</h4>
-                      <p style={styles.packagePrice}>{pkg.price}</p>
-                    </div>
-                    <p style={styles.packageDuration}>{pkg.duration}</p>
-                  </div>
-                  
-                  <div style={styles.packageFeatures}>
-                    {pkg.features.slice(0, 3).map((feature, index) => (
-                      <div key={index} style={styles.feature}>
-                        ✓ {feature}
-                      </div>
-                    ))}
-                    {pkg.features.length > 3 && (
-                      <div style={styles.moreFeatures}>
-                        +{pkg.features.length - 3} more features
-                      </div>
-                    )}
-                  </div>
-                  
-                  <button 
-                    style={{
-                      ...styles.selectButton,
-                      ...(selectedPatient.pregnancyDetails.package === pkg.name && styles.currentPackageButton)
-                    }}
-                    onClick={() => handleSelectPackage(selectedPatient.id, selectedPatient.name, pkg.name)}
-                  >
-                    {selectedPatient.pregnancyDetails.package === pkg.name ? 'Current' : 'Select'}
-                  </button>
-                </div>
-              ))}
-            </div>
-            
-            <div style={styles.packageNotes}>
-              <p><strong>Note:</strong> All packages include first free hospital consultation</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  });
 
   // Packages Tab Component
-  const PackagesTab = () => (
-    <div style={styles.packagesContainer}>
-      <div style={styles.packagesHeader}>
+  const PackagesTab = React.memo(() => (
+    <div className="packagesContainer">
+      <div className="packagesHeader">
         <h3>Pregnancy Care Packages</h3>
-        <p>Offer comprehensive care packages to expecting mothers</p>
+        <p>Three comprehensive plans for complete pregnancy care</p>
       </div>
       
-      <div style={styles.packagesGrid}>
-        {dashboardData.pregnancyPackages.map(pkg => (
-          <div key={pkg.id} style={styles.packageCardLarge}>
-            <div style={styles.packageCardHeader}>
-              <h4 style={styles.packageNameLarge}>{pkg.name}</h4>
-              <div style={styles.packagePriceLarge}>{pkg.price}</div>
-            </div>
-            
-            <div style={styles.packageDurationLarge}>
-              <span>{pkg.duration}</span>
-              <span>• {pkg.patients} patients enrolled</span>
-            </div>
-            
-            <div style={styles.packageFeaturesList}>
-              {pkg.features.map((feature, index) => (
-                <div key={index} style={styles.featureItem}>
-                  <span style={styles.featureIcon}>✓</span>
-                  <span>{feature}</span>
-                </div>
-              ))}
-            </div>
-            
-            {/* <div style={styles.packageActions}>
-              <button 
-                style={styles.explainButton}
-                onClick={() => {
-                  showNotification(`Explaining ${pkg.name} package details to patient`, 'info');
+      <div className="packagesGrid">
+        {pregnancyPackages.map(pkg => {
+          let patientsCount = '0';
+          if (typeof pkg.patients === 'string') {
+            patientsCount = pkg.patients.split(' ')[0] || '0';
+          } else if (typeof pkg.patients === 'number') {
+            patientsCount = pkg.patients.toString();
+          }
+
+          return (
+            <div key={pkg.id} className="packageCard">
+              <div 
+                className="packageCardHeader"
+                style={{
+                  backgroundColor: `${pkg.color}20`,
+                  borderBottomColor: pkg.color
                 }}
               >
-                Explain Package
-              </button>
-            </div> */}
-          </div>
-        ))}
+                <div className="packageCardIcon">{pkg.icon}</div>
+                <div>
+                  <h4 className="packageCardName">{pkg.name}</h4>
+                  <div className="packageCardPrice">{pkg.price}</div>
+                </div>
+              </div>
+              
+              <div className="packageCardBody">
+                <div className="packageCardDuration">
+                  <span>{pkg.duration}</span>
+                  <span>• {patientsCount} patients enrolled</span>
+                </div>
+                
+                <div className="packageCardFeatures">
+                  <div className="featuresList">
+                    {pkg.features && pkg.features.map((feature, index) => (
+                      <div key={index} className="featureItem">
+                        <span className="featureIcon">✓</span>
+                        <span className="featureText">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="packageCardActions">
+                <button 
+                  className="detailsButton"
+                  style={{
+                    borderColor: pkg.color,
+                    color: pkg.color
+                  }}
+                  onClick={() => {
+                    setSelectedPlan(pkg);
+                    setShowPlanDetails(true);
+                  }}
+                >
+                  View Details
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
       
-      <div style={styles.packageGuidelines}>
-        <h4>Package Guidelines</h4>
-        <ul style={styles.guidelinesList}>
+      <div className="packagesComparison">
+        <h4 className="comparisonTitle">Plan Comparison</h4>
+        <table className="comparisonTable">
+          <thead>
+            <tr>
+              <th className="tableHeader">Features</th>
+              <th className="tableHeader">Basic</th>
+              <th className="tableHeader">Premium</th>
+              <th className="tableHeader">Comprehensive</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="tableCell">Checkup Frequency</td>
+              <td className="tableCell">Monthly</td>
+              <td className="tableCell">Fortnightly</td>
+              <td className="tableCell">Weekly</td>
+            </tr>
+            <tr>
+              <td className="tableCell">Ultrasounds</td>
+              <td className="tableCell">2 scans</td>
+              <td className="tableCell">4 scans</td>
+              <td className="tableCell">Advanced scans</td>
+            </tr>
+            <tr>
+              <td className="tableCell">Home Visits</td>
+              <td className="tableCell">None</td>
+              <td className="tableCell">3 visits</td>
+              <td className="tableCell">Unlimited</td>
+            </tr>
+            <tr>
+              <td className="tableCell">Nutrition Plan</td>
+              <td className="tableCell">Basic</td>
+              <td className="tableCell">Counseling</td>
+              <td className="tableCell">Personalized</td>
+            </tr>
+            <tr>
+              <td className="tableCell">Delivery Classes</td>
+              <td className="tableCell">No</td>
+              <td className="tableCell">No</td>
+              <td className="tableCell">Yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="packagesGuidelines">
+        <h4 className="guidelinesTitle">Package Guidelines</h4>
+        <ul className="guidelinesList">
           <li>✓ First consultation is always free at hospital</li>
           <li>✓ Explain all packages during first visit</li>
           <li>✓ Help patient choose based on trimester and needs</li>
           <li>✓ Package can be upgraded anytime</li>
+          <li>✓ Emergency support available 24/7 for all plans</li>
         </ul>
       </div>
     </div>
-  );
+  ));
 
   // Notifications Component
-  const Notifications = () => (
-    <div style={styles.notificationsContainer}>
+  const Notifications = React.memo(() => (
+    <div className="notificationsContainer">
       {notifications.map(notification => (
         <div
           key={notification.id}
+          className="notification"
           style={{
-            ...styles.notification,
-            backgroundColor: notification.type === 'success' ? '#10B981' :
-                           notification.type === 'error' ? '#EF4444' : '#3B82F6'
+            backgroundColor: notification.type === 'success' ? '#4CAF50' :
+                           notification.type === 'error' ? '#F44336' : '#009688'
           }}
         >
           {notification.message}
         </div>
       ))}
     </div>
-  );
+  ));
 
   return (
-    <div style={styles.mainContent}>
+    <div className="mainContent">
       <Notifications />
-      <VideoConsultationModal />
-      <ReportViewerModal />
-      <PackageModal />
+      <RejectRescheduleModal 
+        show={showRejectModal}
+        appointment={selectedAppointment}
+        onClose={() => {
+          setShowRejectModal(false);
+          setSelectedAppointment(null);
+        }}
+        onReject={handleRejectAppointment}
+        onReschedule={handleRescheduleAppointment}
+        loading={selectedAppointment ? loadingAppointments[selectedAppointment.id] : false}
+      />
+      <ReminderModal 
+        show={showReminderModal}
+        appointment={selectedAppointment}
+        onClose={() => {
+          setShowReminderModal(false);
+          setSelectedAppointment(null);
+        }}
+        onSendReminder={handleSendReminder}
+        loading={selectedAppointment ? loadingAppointments[selectedAppointment.id] : false}
+      />
+      <ReportViewerModal 
+        show={showReportViewer}
+        patient={selectedPatient}
+        patientReports={patientReports}
+        onClose={() => {
+          setShowReportViewer(false);
+          setSelectedPatient(null);
+        }}
+        onFileUpload={handleFileUpload}
+        onRemoveReport={handleRemoveReport}
+      />
+      <VideoConsultationModal 
+        show={showVideoConsultation}
+        consultation={currentConsultation}
+        callTime={callTime}
+        isRecording={isRecording}
+        isScreenSharing={isScreenSharing}
+        onEndCall={handleEndConsultation}
+        onToggleRecording={handleToggleRecording}
+        onToggleScreenShare={handleToggleScreenShare}
+        onClose={() => {
+          setShowVideoConsultation(false);
+          setCurrentConsultation(null);
+        }}
+      />
+      <PlanDetailsModal 
+        show={showPlanDetails}
+        plan={selectedPlan}
+        onClose={() => setShowPlanDetails(false)}
+      />
       
-      <div style={styles.header}>
+      <div className="header">
         <div>
-          <h1 style={styles.title}>Pregnancy Care</h1>
-          <p style={styles.subtitle}>Manage pregnancy appointments and patients</p>
+          <h1 className="title">Pregnancy Care</h1>
+          <p className="subtitle">Manage pregnancy appointments and patients</p>
         </div>
-        
-        <div style={styles.tabs}>
-          <button
-            style={{
-              ...styles.tab,
-              ...(activeTab === 'appointments' && styles.activeTab)
-            }}
-            onClick={() => setActiveTab('appointments')}
-          >
-            Appointments
-          </button>
-          <button
-            style={{
-              ...styles.tab,
-              ...(activeTab === 'patients' && styles.activeTab)
-            }}
-            onClick={() => setActiveTab('patients')}
-          >
-            Patients
-          </button>
-          <button
-            style={{
-              ...styles.tab,
-              ...(activeTab === 'packages' && styles.activeTab)
-            }}
-            onClick={() => setActiveTab('packages')}
-          >
-            Packages
-          </button>
-        </div>
+      </div>
+
+      <div className="tabs">
+        <button
+          className={`tab ${activeTab === 'appointments' ? 'activeTab' : ''}`}
+          onClick={() => setActiveTab('appointments')}
+        >
+          Appointments ({appointments.upcoming.length + appointments.pending.length})
+        </button>
+        <button
+          className={`tab ${activeTab === 'patients' ? 'activeTab' : ''}`}
+          onClick={() => setActiveTab('patients')}
+        >
+          Patients ({patients.length})
+        </button>
+        <button
+          className={`tab ${activeTab === 'packages' ? 'activeTab' : ''}`}
+          onClick={() => setActiveTab('packages')}
+        >
+          Care Packages
+        </button>
       </div>
 
       {activeTab === 'appointments' && (
         <>
-          <div style={styles.filterTabs}>
+          <div className="filterTabs">
             <button
-              style={{
-                ...styles.filterTab,
-                ...(pregnancyFilter === 'pending' && styles.activeFilterTab)
-              }}
+              className={`filterTab ${pregnancyFilter === 'pending' ? 'activeFilterTab' : ''}`}
               onClick={() => setPregnancyFilter('pending')}
             >
               Pending ({appointments.pending.length})
             </button>
             <button
-              style={{
-                ...styles.filterTab,
-                ...(pregnancyFilter === 'upcoming' && styles.activeFilterTab)
-              }}
+              className={`filterTab ${pregnancyFilter === 'upcoming' ? 'activeFilterTab' : ''}`}
               onClick={() => setPregnancyFilter('upcoming')}
             >
               Upcoming ({appointments.upcoming.length})
             </button>
             <button
-              style={{
-                ...styles.filterTab,
-                ...(pregnancyFilter === 'cancelled' && styles.activeFilterTab)
-              }}
+              className={`filterTab ${pregnancyFilter === 'cancelled' ? 'activeFilterTab' : ''}`}
               onClick={() => setPregnancyFilter('cancelled')}
             >
               Cancelled ({appointments.cancelled.length})
             </button>
           </div>
 
-          <div style={styles.appointmentsContainer}>
+          <div className="appointmentsContainer">
             {getFilteredPregnancyAppointments().length > 0 ? (
               getFilteredPregnancyAppointments().map(appointment => (
-                <PregnancyAppointmentCard key={appointment.id} appointment={appointment} />
+                <PregnancyAppointmentCard 
+                  key={appointment.id} 
+                  appointment={appointment} 
+                  filter={pregnancyFilter}
+                  onApprove={handleApproveAppointment}
+                  onRejectReschedule={(appt) => {
+                    setSelectedAppointment(appt);
+                    setShowRejectModal(true);
+                  }}
+                  onStartConsultation={handleStartConsultation}
+                  onSendReminder={(appt) => {
+                    setSelectedAppointment(appt);
+                    setShowReminderModal(true);
+                  }}
+                  loading={loadingAppointments}
+                />
               ))
             ) : (
-              <div style={styles.emptyState}>
+              <div className="emptyState">
                 <p>No {pregnancyFilter} appointments found</p>
               </div>
             )}
@@ -957,12 +1502,32 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
       )}
 
       {activeTab === 'patients' && (
-        <div style={styles.patientsContainer}>
-          <div style={styles.patientsGrid}>
-            {patients.map(patient => (
-              <PregnancyPatientCard key={patient.id} patient={patient} />
-            ))}
+        <div className="patientsContainer">
+          <div className="patientsHeader">
+            <h3>Pregnancy Patients ({patients.length})</h3>
           </div>
+          
+          {patients.length > 0 ? (
+            <div className="patientsGrid">
+              {patients.map(patient => (
+                <PregnancyPatientCard 
+                  key={patient.id} 
+                  patient={patient} 
+                  patientReports={patientReports}
+                  onViewReports={(patient) => {
+                    setSelectedPatient(patient);
+                    setShowReportViewer(true);
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="emptyState">
+              <div className="emptyStateIcon">🤰</div>
+              <h4>No pregnancy patients yet</h4>
+              <p>No patients are currently enrolled in pregnancy care</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -971,997 +1536,6 @@ const PregnancyCareContent = ({ dashboardData, state, actions }) => {
       )}
     </div>
   );
-};
-
-const styles = {
-  // Video Consultation Styles
-  videoModalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: '#124441',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2000
-  },
-  videoModal: {
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    width: '95%',
-    maxWidth: '1400px',
-    height: '90vh',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    boxShadow: '0 20px 60px rgba(18, 68, 65, 0.3)',
-    border: '2px solid #4DB6AC'
-  },
-  videoHeader: {
-    background: '#009688',
-    color: '#FFFFFF',
-    padding: '15px 25px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottom: '1px solid #4DB6AC'
-  },
-  videoHeaderInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px'
-  },
-  videoStatus: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
-    fontWeight: '500'
-  },
-  connectedDot: {
-    color: '#10B981',
-    fontSize: '12px'
-  },
-  callTimer: {
-    background: 'rgba(255,255,255,0.1)',
-    padding: '5px 12px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    fontWeight: '600'
-  },
-  endCallButton: {
-    background: '#EF4444',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '8px 20px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: '600',
-    fontSize: '14px',
-    transition: 'background 0.2s',
-    ':hover': {
-      background: '#DC2626'
-    }
-  },
-  videoMainArea: {
-    flex: 1,
-    display: 'flex',
-    overflow: 'hidden'
-  },
-  patientVideoContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    background: '#E0F2F1'
-  },
-  patientVideoHeader: {
-    padding: '15px 25px',
-    borderBottom: '1px solid #4DB6AC',
-    background: '#FFFFFF'
-  },
-  patientVideoInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  patientVideoName: {
-    margin: 0,
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  trimesterIndicator: {
-    background: '#E0F2F1',
-    color: '#009688',
-    padding: '4px 12px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    fontWeight: '500',
-    border: '1px solid #4DB6AC'
-  },
-  videoFeed: {
-    flex: 1,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    position: 'relative'
-  },
-  videoMock: {
-    flex: 1,
-    background: 'linear-gradient(135deg, #009688 0%, #4DB6AC 100%)',
-    borderRadius: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden'
-  },
-  videoMockContent: {
-    textAlign: 'center',
-    color: '#FFFFFF'
-  },
-  videoMockAvatar: {
-    fontSize: '80px',
-    marginBottom: '20px'
-  },
-  videoMockText: {
-    fontSize: '24px',
-    fontWeight: '600',
-    margin: 0,
-    marginBottom: '5px'
-  },
-  videoMockSubtext: {
-    fontSize: '16px',
-    opacity: 0.9,
-    margin: 0
-  },
-  selfView: {
-    width: '200px',
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    border: '2px solid #4DB6AC',
-    position: 'absolute',
-    bottom: '20px',
-    right: '20px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-  },
-  selfViewHeader: {
-    background: '#E0F2F1',
-    padding: '8px 12px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottom: '1px solid #4DB6AC'
-  },
-  selfViewLabel: {
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#4F6F6B'
-  },
-  selfViewToggle: {
-    background: 'transparent',
-    border: '1px solid #4DB6AC',
-    padding: '3px 8px',
-    borderRadius: '4px',
-    fontSize: '10px',
-    cursor: 'pointer',
-    color: '#4F6F6B'
-  },
-  selfViewVideo: {
-    padding: '15px',
-    textAlign: 'center'
-  },
-  selfViewMock: {
-    background: '#E0F2F1',
-    borderRadius: '8px',
-    padding: '15px'
-  },
-  selfViewEmoji: {
-    fontSize: '40px',
-    marginBottom: '5px',
-    color: '#009688'
-  },
-  selfViewText: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    margin: 0
-  },
-  quickTools: {
-    width: '300px',
-    background: '#FFFFFF',
-    borderLeft: '1px solid #4DB6AC',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  quickToolsHeader: {
-    padding: '20px',
-    borderBottom: '1px solid #4DB6AC'
-  },
-  quickToolsTitle: {
-    margin: 0,
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  toolButtons: {
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  toolButton: {
-    background: '#FFFFFF',
-    border: '1px solid #4DB6AC',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#124441',
-    transition: 'all 0.2s',
-    ':hover': {
-      background: '#E0F2F1',
-      borderColor: '#009688'
-    }
-  },
-  activeToolButton: {
-    background: '#E0F2F1',
-    border: '1px solid #009688',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#009688',
-    fontWeight: '500'
-  },
-  recordingButton: {
-    background: '#FEF2F2',
-    border: '1px solid #EF4444',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#EF4444',
-    fontWeight: '500'
-  },
-  recordingDot: {
-    color: '#EF4444',
-    fontSize: '12px',
-    animation: 'pulse 1s infinite'
-  },
-  toolIcon: {
-    fontSize: '18px'
-  },
-  callControls: {
-    padding: '20px',
-    borderTop: '1px solid #4DB6AC',
-    borderBottom: '1px solid #4DB6AC',
-    display: 'flex',
-    justifyContent: 'space-around'
-  },
-  controlButton: {
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '5px',
-    fontSize: '12px',
-    color: '#4F6F6B',
-    padding: '8px',
-    borderRadius: '6px',
-    transition: 'background 0.2s',
-    ':hover': {
-      background: '#E0F2F1'
-    }
-  },
-  controlIcon: {
-    fontSize: '24px'
-  },
-  consultationNotes: {
-    flex: 1,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  notesTitle: {
-    margin: '0 0 15px 0',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#124441'
-  },
-  notesTextarea: {
-    flex: 1,
-    border: '1px solid #4DB6AC',
-    borderRadius: '8px',
-    padding: '12px',
-    fontSize: '14px',
-    fontFamily: 'inherit',
-    resize: 'none',
-    marginBottom: '15px',
-    color: '#124441',
-    backgroundColor: '#FFFFFF',
-    ':focus': {
-      outline: 'none',
-      borderColor: '#009688',
-      boxShadow: '0 0 0 3px rgba(0, 150, 136, 0.1)'
-    }
-  },
-  saveNotesButton: {
-    background: '#009688',
-    color: '#FFFFFF',
-    border: 'none',
-    padding: '10px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: '500',
-    fontSize: '14px',
-    transition: 'background 0.2s',
-    border: '1px solid #4DB6AC',
-    ':hover': {
-      background: '#00897B'
-    }
-  },
-  videoFooter: {
-    background: '#E0F2F1',
-    padding: '12px 25px',
-    borderTop: '1px solid #4DB6AC',
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  appointmentInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  consultationType: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  // Animation for recording dot
-  '@keyframes pulse': {
-    '0%, 100%': {
-      opacity: 1
-    },
-    '50%': {
-      opacity: 0.5
-    }
-  },
-
-  // Main Content and Layout Styles
-  mainContent: {
-    padding: '20px',
-    backgroundColor: '#E0F2F1'
-  },
-  header: {
-    marginBottom: '30px'
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    marginBottom: '5px',
-    color: '#124441'
-  },
-  subtitle: {
-    color: '#4F6F6B',
-    marginBottom: '20px'
-  },
-  tabs: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '20px'
-  },
-  tab: {
-    padding: '10px 20px',
-    background: '#FFFFFF',
-    border: '1px solid #4DB6AC',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    color: '#124441'
-  },
-  activeTab: {
-    background: '#009688',
-    color: '#FFFFFF',
-    borderColor: '#009688'
-  },
-  filterTabs: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '20px'
-  },
-  filterTab: {
-    padding: '8px 16px',
-    background: '#FFFFFF',
-    border: '1px solid #4DB6AC',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    color: '#124441'
-  },
-  activeFilterTab: {
-    background: '#009688',
-    color: '#FFFFFF',
-    borderColor: '#009688'
-  },
-  appointmentsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  appointmentCard: {
-    background: '#FFFFFF',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    border: '1px solid #4DB6AC'
-  },
-  appointmentHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '15px'
-  },
-  appointmentPatient: {
-    display: 'flex',
-    gap: '12px',
-    alignItems: 'center'
-  },
-  profileIcon: {
-    width: '40px',
-    height: '40px',
-    background: '#E0F2F1',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '18px',
-    color: '#009688'
-  },
-  patientInfo: {
-    flex: 1
-  },
-  appointmentName: {
-    fontSize: '16px',
-    fontWeight: '600',
-    marginBottom: '5px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    flexWrap: 'wrap',
-    color: '#124441'
-  },
-  trimesterBadge: {
-    background: '#E0F2F1',
-    color: '#009688',
-    padding: '2px 8px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '500',
-    border: '1px solid #4DB6AC'
-  },
-  firstConsultationBadge: {
-    background: '#E0F2F1',
-    color: '#009688',
-    padding: '2px 8px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '500',
-    border: '1px solid #4DB6AC'
-  },
-  appointmentMeta: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    marginBottom: '5px'
-  },
-  freeBadge: {
-    background: '#10B981',
-    color: '#FFFFFF',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    fontSize: '12px',
-    marginLeft: '5px'
-  },
-  consultationType: {
-    fontSize: '13px',
-    color: '#009688',
-    fontWeight: '500'
-  },
-  appointmentTime: {
-    textAlign: 'right',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '5px',
-    color: '#124441'
-  },
-  hospitalRequired: {
-    fontSize: '11px',
-    color: '#EF4444',
-    backgroundColor: '#FEF2F2',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    border: '1px solid #EF4444'
-  },
-  appointmentDetails: {
-    marginBottom: '15px',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  appointmentActions: {
-    display: 'flex',
-    gap: '10px',
-    flexWrap: 'wrap'
-  },
-  cancelledInfo: {
-    width: '100%',
-    padding: '10px',
-    background: '#FEF2F2',
-    borderRadius: '5px',
-    fontSize: '14px',
-    color: '#4F6F6B',
-    border: '1px solid #EF4444'
-  },
-  primaryButton: {
-    padding: '8px 16px',
-    background: '#009688',
-    color: '#FFFFFF',
-    border: '1px solid #009688',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    minWidth: '140px'
-  },
-  hospitalButton: {
-    padding: '8px 16px',
-    background: '#E0F2F1',
-    color: '#009688',
-    border: '1px solid #009688',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    minWidth: '180px'
-  },
-  secondaryButton: {
-    padding: '8px 16px',
-    background: 'transparent',
-    color: '#009688',
-    border: '1px solid #009688',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px'
-  },
-  successButton: {
-    padding: '8px 16px',
-    background: '#10B981',
-    color: '#FFFFFF',
-    border: '1px solid #10B981',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px'
-  },
-  dangerButton: {
-    padding: '8px 16px',
-    background: '#EF4444',
-    color: '#FFFFFF',
-    border: '1px solid #EF4444',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px'
-  },
-  patientsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  patientsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '20px'
-  },
-  patientCard: {
-    background: '#FFFFFF',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    border: '1px solid #4DB6AC'
-  },
-  patientHeader: {
-    display: 'flex',
-    gap: '15px',
-    alignItems: 'center',
-    marginBottom: '15px'
-  },
-  profileIconLarge: {
-    width: '50px',
-    height: '50px',
-    background: '#E0F2F1',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '20px',
-    color: '#009688'
-  },
-  patientBasicInfo: {
-    flex: 1
-  },
-  patientName: {
-    fontSize: '16px',
-    fontWeight: '600',
-    marginBottom: '5px',
-    color: '#124441'
-  },
-  patientContact: {
-    fontSize: '14px',
-    color: '#4F6F6B',
-    marginBottom: '2px'
-  },
-  patientEmail: {
-    fontSize: '13px',
-    color: '#4F6F6B'
-  },
-  pregnancyDetails: {
-    background: '#E0F2F1',
-    padding: '15px',
-    borderRadius: '5px',
-    marginBottom: '15px',
-    border: '1px solid #4DB6AC'
-  },
-  detailRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '5px',
-    fontSize: '14px',
-    color: '#124441'
-  },
-  reportsSummary: {
-    marginBottom: '15px',
-    padding: '10px',
-    background: '#E0F2F1',
-    borderRadius: '5px',
-    fontSize: '14px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    border: '1px solid #4DB6AC',
-    color: '#124441'
-  },
-  reportCount: {
-    color: '#009688',
-    fontWeight: '500'
-  },
-  patientActions: {
-    display: 'flex',
-    gap: '10px'
-  },
-  packagesContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '25px'
-  },
-  packagesHeader: {
-    marginBottom: '10px'
-  },
-  packagesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '20px'
-  },
-  packageCardLarge: {
-    background: '#FFFFFF',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-    border: '1px solid #4DB6AC'
-  },
-  packageCardHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start'
-  },
-  packageNameLarge: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#124441',
-    margin: 0
-  },
-  packagePriceLarge: {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: '#009688'
-  },
-  packageDurationLarge: {
-    display: 'flex',
-    gap: '10px',
-    fontSize: '14px',
-    color: '#4F6F6B'
-  },
-  packageFeaturesList: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  featureItem: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '8px',
-    fontSize: '14px',
-    color: '#124441'
-  },
-  featureIcon: {
-    color: '#009688',
-    flexShrink: 0
-  },
-  packageActions: {
-    marginTop: '10px'
-  },
-  explainButton: {
-    padding: '8px 16px',
-    background: 'transparent',
-    color: '#009688',
-    border: '1px solid #009688',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    width: '100%'
-  },
-  packageGuidelines: {
-    background: '#E0F2F1',
-    padding: '20px',
-    borderRadius: '8px',
-    marginTop: '20px',
-    border: '1px solid #4DB6AC'
-  },
-  guidelinesList: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    color: '#124441'
-  },
-  modalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(18, 68, 65, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    padding: '20px'
-  },
-  modal: {
-    background: '#FFFFFF',
-    borderRadius: '8px',
-    maxWidth: '500px',
-    width: '100%',
-    maxHeight: '80vh',
-    overflow: 'auto',
-    border: '2px solid #4DB6AC'
-  },
-  modalHeader: {
-    padding: '20px',
-    borderBottom: '1px solid #4DB6AC',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  closeButton: {
-    background: 'none',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    color: '#4F6F6B',
-    backgroundColor: '#E0F2F1',
-    padding: '8px',
-    borderRadius: '4px'
-  },
-  modalContent: {
-    padding: '20px'
-  },
-  currentPackage: {
-    fontSize: '14px',
-    marginBottom: '20px',
-    padding: '10px',
-    background: '#E0F2F1',
-    borderRadius: '5px',
-    color: '#124441',
-    border: '1px solid #4DB6AC'
-  },
-  packagesList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-    marginBottom: '20px'
-  },
-  packageCard: {
-    border: '1px solid #4DB6AC',
-    borderRadius: '8px',
-    padding: '15px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    backgroundColor: '#FFFFFF'
-  },
-  packageInfo: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start'
-  },
-  packageName: {
-    fontSize: '16px',
-    fontWeight: '600',
-    margin: 0,
-    color: '#124441'
-  },
-  packagePrice: {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    color: '#009688',
-    margin: 0
-  },
-  packageDuration: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    marginTop: '5px'
-  },
-  packageFeatures: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '5px',
-    fontSize: '13px',
-    color: '#124441'
-  },
-  feature: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px'
-  },
-  moreFeatures: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    fontStyle: 'italic'
-  },
-  selectButton: {
-    padding: '8px 16px',
-    background: '#009688',
-    color: '#FFFFFF',
-    border: '1px solid #009688',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    width: '100%'
-  },
-  currentPackageButton: {
-    background: '#10B981',
-    borderColor: '#10B981'
-  },
-  packageNotes: {
-    fontSize: '13px',
-    color: '#4F6F6B',
-    paddingTop: '15px',
-    borderTop: '1px solid #4DB6AC'
-  },
-  uploadSection: {
-    marginBottom: '20px'
-  },
-  fileInput: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    border: '1px solid #4DB6AC',
-    borderRadius: '5px',
-    color: '#124441',
-    backgroundColor: '#FFFFFF'
-  },
-  fileNote: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    marginTop: '5px'
-  },
-  reportsList: {
-    marginTop: '20px'
-  },
-  reportItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px',
-    border: '1px solid #4DB6AC',
-    borderRadius: '5px',
-    marginBottom: '10px',
-    background: '#E0F2F1'
-  },
-  reportInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    flex: 1
-  },
-  reportIcon: {
-    fontSize: '20px',
-    color: '#009688'
-  },
-  reportDate: {
-    fontSize: '12px',
-    color: '#4F6F6B',
-    marginTop: '2px'
-  },
-  viewButton: {
-    padding: '6px 12px',
-    background: '#009688',
-    color: '#FFFFFF',
-    border: '1px solid #009688',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    whiteSpace: 'nowrap'
-  },
-  noReports: {
-    textAlign: 'center',
-    padding: '30px 20px',
-    color: '#4F6F6B',
-    background: '#E0F2F1',
-    borderRadius: '8px',
-    border: '1px dashed #4DB6AC'
-  },
-  noReportsIcon: {
-    fontSize: '40px',
-    marginBottom: '10px',
-    opacity: 0.5,
-    color: '#009688'
-  },
-  noReportsText: {
-    fontSize: '13px',
-    color: '#4F6F6B',
-    marginTop: '5px'
-  },
-  notificationsContainer: {
-    position: 'fixed',
-    top: '20px',
-    right: '20px',
-    zIndex: 1001,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  notification: {
-    padding: '12px 20px',
-    borderRadius: '5px',
-    color: '#FFFFFF',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '40px',
-    color: '#4F6F6B',
-    background: '#FFFFFF',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    border: '1px solid #4DB6AC'
-  }
 };
 
 export default PregnancyCareContent;
